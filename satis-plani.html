@@ -1,375 +1,657 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Haftalık Satış Planı</title>
+<title>Kitap Takibi</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0f14;
+    --bg:      #0d0f14;
     --surface: #161a24;
     --surface2: #1e2333;
-    --border: #2a3045;
-    --accent: #f0c93a;
+    --border:  #2a3045;
+    --accent:  #f0c93a;
     --accent2: #4ef0a0;
-    --danger: #f05a4e;
-    --text: #e8ecf7;
-    --muted: #6b7599;
-    --radius: 14px;
+    --accent3: #4ec8f0;
+    --danger:  #f05a4e;
+    --purple:  #c44ef0;
+    --text:    #e8ecf7;
+    --muted:   #6b7599;
+    --radius:  14px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    padding: 32px 16px;
+    min-height: 100vh; padding: 36px 20px 60px;
   }
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: linear-gradient(rgba(240,201,58,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    content: ''; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(240,201,58,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
-  .container { max-width: 1000px; margin: 0 auto; position: relative; z-index: 1; }
+  .container { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
 
-  header { margin-bottom: 36px; }
-  .week-badge {
+  /* ── Header ── */
+  header { margin-bottom: 32px; text-align: center; }
+  .tag {
     display: inline-block;
     background: var(--accent); color: #000;
-    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    padding: 5px 12px; border-radius: 4px; margin-bottom: 12px;
+    font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 4px; margin-bottom: 14px;
   }
-  h1 { font-family: 'Syne', sans-serif; font-size: clamp(24px,5vw,40px); font-weight: 800; line-height: 1.1; margin-bottom: 6px; }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px,5vw,44px); font-weight: 800; line-height: 1.05;
+    margin-bottom: 4px;
+  }
   h1 span { color: var(--accent); }
-  .subtitle { color: var(--muted); font-size: 12px; }
+  .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
 
-  .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 36px; }
-  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; }
-  .summary-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-  .summary-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
-  .summary-value.yellow { color: var(--accent); }
-  .summary-value.green  { color: var(--accent2); }
-
-  .table-scroll { overflow-x: auto; }
-  table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
-
-  thead th {
-    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--muted); padding: 0 4px 10px; text-align: center; font-weight: 400;
-  }
-  thead th.col-name { text-align: left; }
-  thead th.today-col { color: var(--accent); }
-
-  tbody tr { animation: fadeIn 0.3s ease both; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-
-  td { padding: 3px 4px; vertical-align: middle; }
-
-  .name-cell {
+  /* Book name/author inputs */
+  .book-fields {
+    display: flex; flex-direction: column; gap: 8px;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 10px 14px;
-    display: flex; align-items: center; gap: 10px;
-    height: 64px; min-width: 100px;
+    border-radius: var(--radius); overflow: hidden;
   }
-  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .svc-label { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+  .book-field {
+    display: flex; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .book-field:last-child { border-bottom: none; }
+  .field-tag {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); padding: 12px 14px;
+    border-right: 1px solid var(--border);
+    white-space: nowrap; min-width: 80px; text-align: right;
+  }
+  .field-inp {
+    flex: 1; background: transparent; border: none; outline: none;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600;
+    color: var(--text); padding: 12px 16px;
+    transition: background 0.15s;
+  }
+  .field-inp::placeholder { color: var(--border); font-weight: 400; }
+  .field-inp:focus { background: rgba(240,201,58,0.04); }
 
-  .counter {
+  /* ── Stats ── */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 10px; margin: 20px 0;
+  }
+  .stat-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); height: 64px; min-width: 96px;
+    border-radius: var(--radius); padding: 16px 12px; text-align: center;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: #3a4560; }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
+    line-height: 1; margin-bottom: 5px;
+  }
+  .stat-num.yellow { color: var(--accent); }
+  .stat-num.green  { color: var(--accent2); }
+  .stat-num.blue   { color: var(--accent3); }
+  .stat-lbl { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+  /* ── Counter ── */
+  .counter-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px 24px;
+    text-align: center; margin-bottom: 12px;
+    position: relative; overflow: hidden;
+  }
+  .counter-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  }
+  .counter-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 20px;
+  }
+  .counter-main {
+    display: flex; align-items: center; justify-content: center; gap: 24px;
+    margin-bottom: 18px;
+  }
+  .page-display {
+    font-family: 'Syne', sans-serif; font-size: 88px; font-weight: 800;
+    color: var(--text); line-height: 1; min-width: 180px;
+    text-shadow: 0 0 40px rgba(240,201,58,0.15);
+  }
+  .page-unit {
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-top: 2px;
+  }
+
+  .cnt-btn {
+    width: 52px; height: 52px; border-radius: 50%; border: none;
+    cursor: pointer; font-size: 22px; font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s; user-select: none;
+  }
+  .cnt-plus  { background: var(--accent); color: #000; }
+  .cnt-plus:hover  { background: #ffd84a; transform: scale(1.1); }
+  .cnt-plus:active { transform: scale(0.92); }
+  .cnt-minus { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .cnt-minus:hover { background: var(--border); color: var(--text); }
+
+  /* Step pills */
+  .step-row {
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 18px;
   }
-  .counter.has-val { border-color: var(--accent); background: rgba(240,201,58,0.07); }
-  .counter.today-counter { border-color: rgba(240,201,58,0.4); }
-
-  .btn {
-    width: 28px; height: 28px; border-radius: 8px; border: none; cursor: pointer;
-    font-size: 20px; font-weight: 700; font-family: 'Syne', sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.1s; flex-shrink: 0; line-height: 1; user-select: none;
+  .step-lbl { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+  .step-pill {
+    padding: 4px 12px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent;
+    font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted);
+    cursor: pointer; transition: all 0.12s;
   }
-  .btn-plus  { background: var(--accent); color: #000; }
-  .btn-plus:hover  { background: #ffd84a; transform: scale(1.12); }
-  .btn-plus:active { transform: scale(0.92); }
-  .btn-minus { background: var(--surface2); color: var(--muted); }
-  .btn-minus:hover { background: var(--border); color: var(--text); }
-  .btn-minus:active { transform: scale(0.92); }
-
-  .count-num {
-    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
-    min-width: 24px; text-align: center; color: var(--text);
+  .step-pill.active, .step-pill:hover {
+    background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500;
   }
 
-  .total-cell {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius); height: 64px; min-width: 68px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
-    color: var(--accent2);
+  /* Progress */
+  .prog-track {
+    height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 7px;
+  }
+  .prog-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .prog-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
   }
 
-  .target-cell {
-    background: var(--surface); border: 1px dashed var(--border);
-    border-radius: var(--radius); height: 64px; min-width: 76px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  /* ── Goal strip ── */
+  .goal-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 20px;
   }
-  .target-lbl { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-  .target-input {
+  .goal-header {
+    padding: 10px 16px; background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+  }
+  .goal-body {
+    display: flex; gap: 0; flex-wrap: wrap;
+  }
+  .goal-field {
+    flex: 1; min-width: 150px;
+    padding: 14px 18px;
+    border-right: 1px solid var(--border);
+  }
+  .goal-field:last-child { border-right: none; }
+  .goal-lbl { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .goal-inp {
     background: transparent; border: none; outline: none;
     font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
-    color: var(--accent); text-align: center; width: 64px;
+    color: var(--accent2); width: 100%;
   }
-  .target-input::placeholder { color: #3a4560; }
+  .goal-inp::placeholder { color: var(--border); font-weight: 400; font-size: 16px; }
+  .pace-bar {
+    padding: 10px 18px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted); font-style: normal;
+    min-height: 38px; display: flex; align-items: center; gap: 6px;
+  }
+  .pace-bar span.hi { color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; }
 
-  .prog-bar-cell { padding: 0 4px 10px; }
-  .prog-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-  .prog-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease, background 0.3s; }
-  .pct-cell { font-size: 10px; color: var(--muted); text-align: center; padding-bottom: 10px; }
+  /* ── Section card ── */
+  .section-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+  }
+  .sec-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .sec-icon { font-size: 15px; }
+  .sec-title {
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .sec-count { margin-left: auto; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
 
-  .reset-btn {
+  /* Quotes list */
+  .quotes-list { }
+  .quote-item {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.25s ease;
+  }
+  .quote-item:last-child { border-bottom: none; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
+  .quote-text {
+    font-size: 14px; line-height: 1.65; color: var(--text);
+    margin-bottom: 6px; position: relative; padding-left: 14px;
+  }
+  .quote-text::before {
+    content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
+    width: 2px; background: var(--accent); border-radius: 2px;
+  }
+  .quote-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.08em;
+  }
+  .q-del {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--border); font-size: 15px; padding: 0 4px;
+    transition: color 0.15s; line-height: 1;
+  }
+  .q-del:hover { color: var(--danger); }
+  .no-quotes {
+    padding: 24px; text-align: center;
+    font-size: 13px; color: var(--border);
+  }
+
+  /* Quote add form */
+  .quote-form {
+    padding: 14px 18px; background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+  .quote-ta {
+    width: 100%; min-height: 68px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
+    resize: none; outline: none; line-height: 1.6;
+    transition: border-color 0.15s; margin-bottom: 8px;
+  }
+  .quote-ta::placeholder { color: var(--muted); }
+  .quote-ta:focus { border-color: var(--accent); }
+  .form-row { display: flex; gap: 8px; align-items: center; }
+  .page-inp {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px; outline: none;
+    font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted);
+    width: 100px; transition: border-color 0.15s;
+  }
+  .page-inp::placeholder { color: var(--border); }
+  .page-inp:focus { border-color: var(--accent3); }
+  .add-btn {
+    margin-left: auto;
+    background: var(--accent); color: #000;
+    border: none; border-radius: 8px;
+    padding: 8px 20px; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: #ffd84a; }
+
+  /* Notes textarea */
+  .notes-ta {
+    width: 100%; min-height: 140px;
+    background: transparent; border: none; outline: none;
+    padding: 16px 18px;
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
+    line-height: 1.8; resize: vertical;
+  }
+  .notes-ta::placeholder { color: var(--muted); }
+
+  /* Footer */
+  .footer-row { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }
+  .ghost-btn {
     background: transparent; border: 1px solid var(--border); color: var(--muted);
     padding: 9px 20px; border-radius: 8px; cursor: pointer;
     font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.08em;
-    transition: all 0.2s; margin: 24px auto 0; display: block;
+    transition: all 0.2s;
   }
-  .reset-btn:hover { border-color: var(--danger); color: var(--danger); }
-  .footer { margin-top: 16px; text-align: center; font-size: 11px; color: var(--muted); }
+  .ghost-btn:hover { border-color: var(--danger); color: var(--danger); }
+  .import-btn:hover { border-color: var(--accent2) !important; color: var(--accent2) !important; }
+  .footer-note { text-align: center; margin-top: 14px; font-size: 11px; color: var(--muted); }
 
-  @media (max-width: 600px) {
-    .summary-bar { grid-template-columns: repeat(2,1fr); }
-    .counter { min-width: 80px; }
-    .btn { width: 24px; height: 24px; font-size: 17px; }
-    .count-num { font-size: 18px; }
+  /* Confetti */
+  #confettiCanvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999; }
+
+  @media(max-width:480px){
+    .page-display { font-size:64px; }
+    .goal-field { min-width: 120px; }
   }
 </style>
 </head>
 <body>
+<canvas id="confettiCanvas"></canvas>
 <div class="container">
+
+  <!-- Header -->
   <header>
-    <div class="week-badge" id="weekBadge">—</div>
-    <h1>Haftalık <span>Satış</span> Planı</h1>
-    <p class="subtitle">+ butonu ile günlük gerçekleşen adetleri gir · Hedef alanına haftalık hedefinizi yaz</p>
+    <div class="tag">📚 Okuma Takibi</div>
+    <h1>Kitap <span>Günlüğü</span></h1>
+    <p class="subtitle">Sayfa sayacı · Hedef · Alıntılar · Notlar</p>
+    <div class="book-fields">
+      <div class="book-field">
+        <span class="field-tag">Kitap</span>
+        <input class="field-inp" id="bookName" placeholder="Kitabın adını yaz..." oninput="saveMeta()">
+      </div>
+      <div class="book-field">
+        <span class="field-tag">Yazar</span>
+        <input class="field-inp" id="authorName" placeholder="Yazar adı..." oninput="saveMeta()">
+      </div>
+    </div>
   </header>
 
-  <div class="summary-bar">
-    <div class="summary-card">
-      <div class="summary-label">Bu Hafta Toplam</div>
-      <div class="summary-value yellow" id="s-total">0</div>
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num yellow" id="stat-read">0</div>
+      <div class="stat-lbl">Okunan Sayfa</div>
     </div>
-    <div class="summary-card">
-      <div class="summary-label">Toplam Hedef</div>
-      <div class="summary-value" id="s-target">0</div>
+    <div class="stat-card">
+      <div class="stat-num green" id="stat-left">—</div>
+      <div class="stat-lbl">Kalan Sayfa</div>
     </div>
-    <div class="summary-card">
-      <div class="summary-label">Gerçekleşme</div>
-      <div class="summary-value green" id="s-pct">—</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Bugün</div>
-      <div class="summary-value" id="s-today">0</div>
+    <div class="stat-card">
+      <div class="stat-num blue" id="stat-days">—</div>
+      <div class="stat-lbl">Kalan Gün</div>
     </div>
   </div>
 
-  <div class="table-scroll">
-    <table id="mainTable">
-      <thead id="thead"></thead>
-      <tbody id="tbody"></tbody>
-    </table>
+  <!-- Counter -->
+  <div class="counter-card">
+    <div class="counter-label">Toplam Okunan Sayfa</div>
+    <div class="counter-main">
+      <button class="cnt-btn cnt-minus" onclick="addPages(-step)">−</button>
+      <div>
+        <div class="page-display" id="pageNum">0</div>
+        <div class="page-unit">sayfa</div>
+      </div>
+      <button class="cnt-btn cnt-plus" onclick="addPages(step)">+</button>
+    </div>
+    <div class="step-row">
+      <span class="step-lbl">Adım</span>
+      <button class="step-pill active" onclick="setStep(1,this)">1</button>
+      <button class="step-pill" onclick="setStep(5,this)">5</button>
+      <button class="step-pill" onclick="setStep(10,this)">10</button>
+      <button class="step-pill" onclick="setStep(25,this)">25</button>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+    <div class="prog-labels">
+      <span id="progLeft">Toplam sayfa girilmedi</span>
+      <span id="progPct"></span>
+    </div>
   </div>
 
-  <button class="reset-btn" onclick="resetAll()">↺ Tüm Verileri Sıfırla</button>
-  <p class="footer">Veriler tarayıcınızda saklanır · Sayfa yenilendiğinde korunur</p>
+  <!-- Goal -->
+  <div class="goal-card">
+    <div class="goal-header">Hedef Ayarları</div>
+    <div class="goal-body">
+      <div class="goal-field">
+        <div class="goal-lbl">Toplam Sayfa</div>
+        <input class="goal-inp" type="number" id="totalPages" placeholder="örn. 320" min="1" oninput="saveMeta();updateAll()">
+      </div>
+      <div class="goal-field">
+        <div class="goal-lbl">Bitiş Tarihi</div>
+        <input class="goal-inp" type="date" id="deadlineDate" style="font-size:15px;color:var(--accent2)" oninput="saveMeta();updateAll()">
+      </div>
+    </div>
+    <div class="pace-bar" id="paceBar">—</div>
+  </div>
+
+  <!-- Quotes -->
+  <div class="section-card">
+    <div class="sec-header">
+      <span class="sec-icon">❝</span>
+      <span class="sec-title">Alıntılar</span>
+      <span class="sec-count" id="quoteCount">0 alıntı</span>
+    </div>
+    <div id="quotesList"></div>
+    <div class="quote-form">
+      <textarea class="quote-ta" id="quoteInput" placeholder="Kitaptan beğendiğin bir cümle..."></textarea>
+      <div class="form-row">
+        <input class="page-inp" type="number" id="quotePageInp" placeholder="Sayfa no">
+        <button class="add-btn" onclick="addQuote()">+ Ekle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="section-card">
+    <div class="sec-header">
+      <span class="sec-icon">📝</span>
+      <span class="sec-title">Notlar & Düşünceler</span>
+    </div>
+    <textarea class="notes-ta" id="notesArea"
+      placeholder="Karakterler, olaylar, kafana takılan sorular, kitabın sende bıraktıkları..."
+      oninput="saveNotes()"></textarea>
+  </div>
+
+  <div class="footer-row">
+    <button class="ghost-btn" onclick="exportData()">⬇ Dışa Aktar</button>
+    <button class="ghost-btn import-btn" onclick="document.getElementById('importFile').click()">⬆ İçe Aktar</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+    <button class="ghost-btn" onclick="resetAll()">↺ Sıfırla</button>
+  </div>
+  <p class="footer-note">Verileri yedeklemek için <strong style="color:var(--accent)">Dışa Aktar</strong> · Başka cihazda yüklemek için <strong style="color:var(--accent2)">İçe Aktar</strong></p>
+
 </div>
 
 <script>
-const SERVICES = [
-  { key:'kk',      label:'KK',      color:'#f0c93a' },
-  { key:'oft',     label:'OFT',     color:'#4ef0a0' },
-  { key:'ap',      label:'AP',      color:'#4ec8f0' },
-  { key:'esnek',   label:'Esnek',   color:'#c44ef0' },
-  { key:'bes',     label:'BES',     color:'#f08a4e' },
-  { key:'sigorta', label:'Sigorta', color:'#f04e7a' },
-];
-const DAYS = ['Pzt','Sal','Çar','Per','Cum'];
+let pages   = parseInt(localStorage.getItem('book_pages'))||0;
+let step    = 1;
+let quotes  = JSON.parse(localStorage.getItem('book_quotes')||'[]');
+let finished = false;
 
-function todayCol() {
-  const d = new Date().getDay();
-  return (d===0||d===6) ? -1 : d-1;
+function init(){
+  document.getElementById('bookName').value     = localStorage.getItem('book_name')||'';
+  document.getElementById('authorName').value   = localStorage.getItem('book_author')||'';
+  document.getElementById('totalPages').value   = localStorage.getItem('book_total')||'';
+  document.getElementById('deadlineDate').value = localStorage.getItem('book_deadline')||'';
+  document.getElementById('notesArea').value    = localStorage.getItem('book_notes')||'';
+  const total = parseInt(localStorage.getItem('book_total'))||0;
+  if(total > 0 && pages >= total) finished = true;
+  updateAll(); renderQuotes();
 }
 
-function getWeekLabel() {
-  const now = new Date(), day = now.getDay();
-  const diff = now.getDate() - day + (day===0?-6:1);
-  const mon = new Date(now); mon.setDate(diff);
-  const fri = new Date(mon); fri.setDate(mon.getDate()+4);
-  const M=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-  return `${mon.getDate()} ${M[mon.getMonth()]} – ${fri.getDate()} ${M[fri.getMonth()]} ${fri.getFullYear()}`;
+function saveMeta(){
+  localStorage.setItem('book_name',     document.getElementById('bookName').value);
+  localStorage.setItem('book_author',   document.getElementById('authorName').value);
+  localStorage.setItem('book_total',    document.getElementById('totalPages').value);
+  localStorage.setItem('book_deadline', document.getElementById('deadlineDate').value);
+}
+function saveNotes(){ localStorage.setItem('book_notes', document.getElementById('notesArea').value); }
+
+function addPages(delta){
+  const prev = pages;
+  pages = Math.max(0, pages + delta);
+  localStorage.setItem('book_pages', pages);
+  const total = parseInt(document.getElementById('totalPages').value)||0;
+  if(total > 0 && pages >= total && prev < total && !finished){
+    finished = true; launchConfetti();
+  }
+  if(pages < (total||Infinity)) finished = false;
+  updateAll();
 }
 
-function lsGet(k)    { return parseInt(localStorage.getItem(k)||'0'); }
-function lsSet(k,v)  { localStorage.setItem(k,v); }
-function dayKey(s,d) { return `satis_${s}_${d}`; }
-function tgtKey(s)   { return `target_${s}`; }
-
-let state = {};
-function loadState() {
-  SERVICES.forEach(s => {
-    state[s.key] = {
-      days: [0,1,2,3,4].map(d => lsGet(dayKey(s.key,d))),
-      target: lsGet(tgtKey(s.key))
-    };
-  });
+function setStep(n, btn){
+  step = n;
+  document.querySelectorAll('.step-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
-function buildHead() {
-  const tc = todayCol();
-  let html = '<tr><th class="col-name">Hizmet</th>';
-  DAYS.forEach((d,i) => html += `<th class="${i===tc?'today-col':''}">${d}</th>`);
-  html += '<th>Toplam</th><th>Hedef</th></tr>';
-  document.getElementById('thead').innerHTML = html;
+function updateAll(){
+  const total    = parseInt(document.getElementById('totalPages').value)||0;
+  const deadline = document.getElementById('deadlineDate').value;
+
+  document.getElementById('pageNum').textContent    = pages;
+  document.getElementById('stat-read').textContent  = pages;
+  document.getElementById('stat-left').textContent  = total ? Math.max(0,total-pages) : '—';
+
+  // Days
+  let daysLeft = '—';
+  if(deadline){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const end   = new Date(deadline); end.setHours(0,0,0,0);
+    const diff  = Math.ceil((end-today)/(1000*60*60*24));
+    daysLeft = diff > 0 ? diff : diff===0 ? 'Bugün!' : 'Geçti';
+  }
+  document.getElementById('stat-days').textContent = daysLeft;
+
+  // Progress
+  if(total > 0){
+    const pct = Math.min(100, Math.round(pages/total*100));
+    document.getElementById('progFill').style.width = pct+'%';
+    document.getElementById('progLeft').textContent = `${Math.max(0,total-pages)} sayfa kaldı`;
+    document.getElementById('progPct').textContent  = pct+'%';
+  } else {
+    document.getElementById('progFill').style.width = '0%';
+    document.getElementById('progLeft').textContent = 'Toplam sayfa girilmedi';
+    document.getElementById('progPct').textContent  = '';
+  }
+
+  // Pace
+  const paceEl = document.getElementById('paceBar');
+  if(total > 0 && deadline){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const end   = new Date(deadline); end.setHours(0,0,0,0);
+    const diff  = Math.ceil((end-today)/(1000*60*60*24));
+    const left  = Math.max(0, total-pages);
+    if(diff > 0 && left > 0){
+      const daily = Math.ceil(left/diff);
+      paceEl.innerHTML = `Hedefe ulaşmak için günde <span class="hi">${daily} sayfa</span> okumalısın.`;
+    } else if(left <= 0){
+      paceEl.innerHTML = `<span class="hi">🎉 Kitabı tamamladın!</span>`;
+    } else {
+      paceEl.innerHTML = `<span style="color:var(--danger)">Bitiş tarihi geçmiş.</span>`;
+    }
+  } else {
+    paceEl.innerHTML = 'Hedef & tarih girince günlük hız hesaplanır.';
+  }
 }
 
-function buildBody() {
-  const tc = todayCol();
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '';
-
-  SERVICES.forEach((s, si) => {
-    const days   = state[s.key].days;
-    const target = state[s.key].target;
-    const total  = days.reduce((a,b)=>a+b,0);
-    const pct    = target>0 ? Math.min(100,Math.round(total/target*100)) : 0;
-    const pc     = pct>=100?'#4ef0a0':pct>=60?s.color:'#f05a4e';
-
-    // --- Main data row ---
-    const tr = document.createElement('tr');
-    tr.style.animationDelay = (si*0.06)+'s';
-
-    // Name cell
-    const tdName = document.createElement('td');
-    tdName.innerHTML = `<div class="name-cell">
-      <div class="dot" style="background:${s.color}"></div>
-      <div class="svc-label" style="color:${s.color}">${s.label}</div>
-    </div>`;
-    tr.appendChild(tdName);
-
-    // Day counter cells
-    days.forEach((v, d) => {
-      const td = document.createElement('td');
-      const isToday = d===tc;
-      td.innerHTML = `<div class="counter${v>0?' has-val':''}${isToday?' today-counter':''}" id="cell_${s.key}_${d}">
-        <button class="btn btn-minus" onclick="change('${s.key}',${d},-1)">−</button>
-        <span class="count-num" id="num_${s.key}_${d}">${v}</span>
-        <button class="btn btn-plus" onclick="change('${s.key}',${d},1)">+</button>
-      </div>`;
-      tr.appendChild(td);
+function addQuote(){
+  const text = document.getElementById('quoteInput').value.trim();
+  const pg   = document.getElementById('quotePageInp').value.trim();
+  if(!text) return;
+  quotes.push({ text, page:pg, date:new Date().toLocaleDateString('tr-TR') });
+  localStorage.setItem('book_quotes', JSON.stringify(quotes));
+  document.getElementById('quoteInput').value   = '';
+  document.getElementById('quotePageInp').value = '';
+  renderQuotes();
+}
+function deleteQuote(i){
+  quotes.splice(i,1);
+  localStorage.setItem('book_quotes', JSON.stringify(quotes));
+  renderQuotes();
+}
+function renderQuotes(){
+  const list = document.getElementById('quotesList');
+  list.innerHTML = '';
+  if(!quotes.length){
+    list.innerHTML = '<div class="no-quotes">Henüz alıntı eklenmedi...</div>';
+  } else {
+    quotes.forEach((q,i)=>{
+      const d = document.createElement('div');
+      d.className = 'quote-item';
+      d.innerHTML = `<div class="quote-text">${q.text}</div>
+        <div class="quote-meta">
+          <span>${q.page?'s.'+q.page+' · ':''}${q.date}</span>
+          <button class="q-del" onclick="deleteQuote(${i})">✕</button>
+        </div>`;
+      list.appendChild(d);
     });
+  }
+  document.getElementById('quoteCount').textContent = quotes.length+' alıntı';
+}
 
-    // Total cell
-    const tdTotal = document.createElement('td');
-    tdTotal.innerHTML = `<div class="total-cell" id="total_${s.key}">${total}</div>`;
-    tr.appendChild(tdTotal);
+function resetAll(){
+  if(!confirm('Tüm veriler silinecek. Emin misin?')) return;
+  ['book_pages','book_quotes','book_notes'].forEach(k=>localStorage.removeItem(k));
+  pages=0; quotes=[]; finished=false;
+  document.getElementById('notesArea').value='';
+  updateAll(); renderQuotes();
+}
 
-    // Target cell
-    const tdTarget = document.createElement('td');
-    tdTarget.innerHTML = `<div class="target-cell">
-      <span class="target-lbl">Hedef</span>
-      <input class="target-input" type="number" min="0"
-        id="tgt_${s.key}" value="${target||''}" placeholder="—"
-        oninput="setTarget('${s.key}',this.value)">
-    </div>`;
-    tr.appendChild(tdTarget);
-    tbody.appendChild(tr);
+/* Confetti */
+const canvas=document.getElementById('confettiCanvas'), ctx=canvas.getContext('2d');
+let particles=[],animFrame=null;
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener('resize',resizeCanvas); resizeCanvas();
 
-    // --- Progress row ---
-    const pr = document.createElement('tr');
-    pr.innerHTML = `<td></td>
-      <td colspan="5" class="prog-bar-cell">
-        <div class="prog-track">
-          <div class="prog-fill" id="prog_${s.key}" style="width:${pct}%;background:${pc}"></div>
-        </div>
-      </td>
-      <td class="pct-cell" id="pct_${s.key}">${target>0?pct+'%':'—'}</td>
-      <td></td>`;
-    tbody.appendChild(pr);
+function launchConfetti(){
+  resizeCanvas();
+  const colors=['#f0c93a','#4ef0a0','#4ec8f0','#c44ef0','#f05a4e','#ffffff'];
+  for(let i=0;i<220;i++){
+    particles.push({
+      x:Math.random()*canvas.width, y:-10-Math.random()*250,
+      w:5+Math.random()*10, h:3+Math.random()*5,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*360, vx:(Math.random()-.5)*4,
+      vy:1.5+Math.random()*5, vr:(Math.random()-.5)*8,
+      opacity:1, gravity:.1+Math.random()*.1
+    });
+  }
+  if(!animFrame) animateConfetti();
+}
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity; p.rot+=p.vr;
+    if(p.y>canvas.height*.72) p.opacity-=0.028;
+    ctx.save(); ctx.globalAlpha=Math.max(0,p.opacity);
+    ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color;
+    if(p.w>12){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill();}
+    else{ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);}
+    ctx.restore();
   });
+  particles=particles.filter(p=>p.opacity>0);
+  if(particles.length>0){animFrame=requestAnimationFrame(animateConfetti);}
+  else{animFrame=null;ctx.clearRect(0,0,canvas.width,canvas.height);}
 }
 
-function change(sKey, day, delta) {
-  const nv = Math.max(0, state[sKey].days[day] + delta);
-  state[sKey].days[day] = nv;
-  lsSet(dayKey(sKey,day), nv);
-
-  document.getElementById(`num_${sKey}_${day}`).textContent = nv;
-  const cell = document.getElementById(`cell_${sKey}_${day}`);
-  nv>0 ? cell.classList.add('has-val') : cell.classList.remove('has-val');
-
-  updateRow(sKey);
-  updateSummary();
+function exportData(){
+  const data = {
+    book_name:     localStorage.getItem('book_name')||'',
+    book_author:   localStorage.getItem('book_author')||'',
+    book_total:    localStorage.getItem('book_total')||'',
+    book_deadline: localStorage.getItem('book_deadline')||'',
+    book_pages:    localStorage.getItem('book_pages')||'0',
+    book_quotes:   localStorage.getItem('book_quotes')||'[]',
+    book_notes:    localStorage.getItem('book_notes')||'',
+    exported_at:   new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const bookName = (data.book_name||'kitap').replace(/\s+/g,'-').toLowerCase();
+  a.download = `${bookName}-yedek.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
-function setTarget(sKey, val) {
-  const v = Math.max(0, parseInt(val)||0);
-  state[sKey].target = v;
-  lsSet(tgtKey(sKey), v);
-  updateRow(sKey);
-  updateSummary();
+function importData(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const data = JSON.parse(e.target.result);
+      const keys = ['book_name','book_author','book_total','book_deadline','book_pages','book_quotes','book_notes'];
+      keys.forEach(k=>{ if(data[k]!==undefined) localStorage.setItem(k, data[k]); });
+      pages  = parseInt(localStorage.getItem('book_pages'))||0;
+      quotes = JSON.parse(localStorage.getItem('book_quotes')||'[]');
+      finished = false;
+      init();
+      alert('✅ Veriler başarıyla yüklendi!');
+    } catch(err) {
+      alert('❌ Dosya okunamadı. Geçerli bir yedek dosyası seç.');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 
-function updateRow(sKey) {
-  const s      = SERVICES.find(x=>x.key===sKey);
-  const total  = state[sKey].days.reduce((a,b)=>a+b,0);
-  const target = state[sKey].target;
-  const pct    = target>0 ? Math.min(100,Math.round(total/target*100)) : 0;
-  const pc     = pct>=100?'#4ef0a0':pct>=60?s.color:'#f05a4e';
-
-  const el = document.getElementById(`total_${sKey}`);
-  if(el) el.textContent = total;
-  const pg = document.getElementById(`prog_${sKey}`);
-  if(pg) { pg.style.width=pct+'%'; pg.style.background=pc; }
-  const pt = document.getElementById(`pct_${sKey}`);
-  if(pt) pt.textContent = target>0?pct+'%':'—';
-}
-
-function updateSummary() {
-  let tot=0, tgt=0, today=0;
-  const tc = todayCol();
-  SERVICES.forEach(s => {
-    tot += state[s.key].days.reduce((a,b)=>a+b,0);
-    tgt += state[s.key].target;
-    if(tc>=0) today += state[s.key].days[tc];
-  });
-  document.getElementById('s-total').textContent  = tot;
-  document.getElementById('s-target').textContent = tgt;
-  document.getElementById('s-pct').textContent    = tgt>0 ? Math.round(tot/tgt*100)+'%' : '—';
-  document.getElementById('s-today').textContent  = today;
-}
-
-function resetAll() {
-  if(!confirm('Tüm satış verileri sıfırlanacak. Emin misin?')) return;
-  SERVICES.forEach(s => {
-    for(let d=0;d<5;d++) { localStorage.removeItem(dayKey(s.key,d)); state[s.key].days[d]=0; }
-    localStorage.removeItem(tgtKey(s.key)); state[s.key].target=0;
-  });
-  buildBody();
-  updateSummary();
-}
-
-// Init
-document.getElementById('weekBadge').textContent = getWeekLabel();
-loadState();
-buildHead();
-buildBody();
-updateSummary();
+init();
 </script>
 </body>
 </html>
-
