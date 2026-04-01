@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haftalık Satış Planı</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a24;
+    --surface2: #1e2333;
+    --border: #2a3045;
+    --accent: #f0c93a;
+    --accent2: #4ef0a0;
+    --danger: #f05a4e;
+    --text: #e8ecf7;
+    --muted: #6b7599;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(240,201,58,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 40px;
+  }
+
+  .week-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* Summary bar */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    transition: border-color 0.2s;
+  }
+
+  .summary-card:hover { border-color: var(--accent); }
+
+  .summary-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .summary-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .summary-value.highlight { color: var(--accent); }
+  .summary-value.success { color: var(--accent2); }
+
+  /* Days row */
+  .days-header {
+    display: grid;
+    grid-template-columns: 180px repeat(5, 1fr) 90px 90px;
+    gap: 8px;
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+
+  .day-label {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 0;
+  }
+
+  .day-label.today {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .col-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Row */
+  .service-row {
+    display: grid;
+    grid-template-columns: 180px repeat(5, 1fr) 90px 90px;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+    animation: fadeIn 0.3s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .service-name {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 56px;
+  }
+
+  .service-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .service-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Counter cell */
+  .counter-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: border-color 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .counter-cell:hover { border-color: #3a4560; }
+  .counter-cell.has-value { border-color: var(--accent); background: rgba(240,201,58,0.05); }
+
+  .btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+
+  .btn-plus {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-plus:hover { background: #ffd84a; transform: scale(1.1); }
+  .btn-plus:active { transform: scale(0.95); }
+
+  .btn-minus {
+    background: var(--surface2);
+    color: var(--muted);
+  }
+  .btn-minus:hover { background: var(--border); color: var(--text); }
+
+  .count-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    min-width: 24px;
+    text-align: center;
+    color: var(--text);
+  }
+
+  /* Total & Target cells */
+  .total-cell, .target-cell {
+    height: 56px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .total-cell {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent2);
+  }
+
+  .target-cell {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    gap: 6px;
+    flex-direction: column;
+  }
+
+  .target-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    width: 60px;
+  }
+
+  .target-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Progress bar under row */
+  .progress-row {
+    grid-column: 2 / 7;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: -4px;
+    margin-bottom: 4px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Divider */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 16px;
+  }
+
+  /* Footer note */
+  .footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* Reset button */
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+    margin-top: 20px;
+  }
+
+  .reset-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .days-header, .service-row {
+      grid-template-columns: 120px repeat(5, 1fr) 70px 70px;
+      gap: 5px;
+    }
+    .service-name { padding: 10px 10px; }
+    .service-text { font-size: 12px; }
+    .count-val { font-size: 15px; }
+    .btn { width: 20px; height: 20px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="week-badge" id="weekBadge">Hafta yükleniyor...</div>
+    <h1>Haftalık <span>Satış</span> Planı</h1>
+    <p class="subtitle">Günlük satış adetlerini takip et · Hedeflerini gir · Performansını gör</p>
+  </header>
+
+  <!-- Summary -->
+  <div class="summary-bar">
+    <div class="summary-card">
+      <div class="summary-label">Bu Hafta Toplam</div>
+      <div class="summary-value highlight" id="grandTotal">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Toplam Hedef</div>
+      <div class="summary-value" id="grandTarget">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Gerçekleşme %</div>
+      <div class="summary-value success" id="grandPct">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Bugünkü Satış</div>
+      <div class="summary-value" id="todayTotal">0</div>
+    </div>
+  </div>
+
+  <!-- Header row -->
+  <div class="days-header">
+    <div class="col-label">Hizmet</div>
+    <div class="day-label" data-d="0">Pzt</div>
+    <div class="day-label" data-d="1">Sal</div>
+    <div class="day-label" data-d="2">Çar</div>
+    <div class="day-label" data-d="3">Per</div>
+    <div class="day-label" data-d="4">Cum</div>
+    <div class="day-label">Toplam</div>
+    <div class="day-label">Hedef</div>
+  </div>
+
+  <!-- Rows -->
+  <div id="rows"></div>
+
+  <div style="text-align:center">
+    <button class="reset-btn" onclick="resetAll()">↺ Tüm Verileri Sıfırla</button>
+  </div>
+
+  <div class="footer">Veriler tarayıcınızda saklanır · Sayfa yenilendiğinde korunur</div>
+</div>
+
+<script>
+const SERVICES = [
+  { key: 'kk',      label: 'KK',      color: '#f0c93a' },
+  { key: 'oft',     label: 'OFT',     color: '#4ef0a0' },
+  { key: 'ap',      label: 'AP',      color: '#4ec8f0' },
+  { key: 'esnek',   label: 'Esnek',   color: '#c44ef0' },
+  { key: 'bes',     label: 'BES',     color: '#f08a4e' },
+  { key: 'sigorta', label: 'Sigorta', color: '#f04e7a' },
+];
+
+const DAYS = ['Pzt','Sal','Çar','Per','Cum'];
+
+// State
+let data = {};
+
+function storageKey(service, day) { return `satis_${service}_${day}`; }
+function targetKey(service)       { return `target_${service}`; }
+
+function load() {
+  SERVICES.forEach(s => {
+    data[s.key] = { days: [], target: 0 };
+    for (let d = 0; d < 5; d++) {
+      const v = parseInt(localStorage.getItem(storageKey(s.key, d)) || '0');
+      data[s.key].days[d] = v;
+    }
+    data[s.key].target = parseInt(localStorage.getItem(targetKey(s.key)) || '0');
+  });
+}
+
+function save(service, day, val) {
+  localStorage.setItem(storageKey(service, day), val);
+  data[service].days[day] = val;
+}
+
+function saveTarget(service, val) {
+  localStorage.setItem(targetKey(service), val);
+  data[service].target = val;
+}
+
+function resetAll() {
+  if (!confirm('Tüm satış verileri silinecek. Emin misin?')) return;
+  SERVICES.forEach(s => {
+    for (let d = 0; d < 5; d++) {
+      localStorage.removeItem(storageKey(s.key, d));
+      data[s.key].days[d] = 0;
+    }
+    localStorage.removeItem(targetKey(s.key));
+    data[s.key].target = 0;
+  });
+  renderRows();
+  updateSummary();
+}
+
+// Which column is today (0=Mon..4=Fri)
+function todayCol() {
+  const day = new Date().getDay(); // 0=Sun
+  if (day === 0 || day === 6) return -1;
+  return day - 1;
+}
+
+function getWeekLabel() {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const mon = new Date(now.setDate(diff));
+  const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+  const fmt = d => `${d.getDate()} ${['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'][d.getMonth()]}`;
+  return `${fmt(mon)} – ${fmt(fri)} ${fri.getFullYear()}`;
+}
+
+function renderRows() {
+  const container = document.getElementById('rows');
+  container.innerHTML = '';
+  const tc = todayCol();
+
+  SERVICES.forEach((s, si) => {
+    const row = document.createElement('div');
+    row.className = 'service-row';
+    row.style.animationDelay = (si * 0.05) + 's';
+
+    // Service name
+    row.innerHTML = `
+      <div class="service-name">
+        <div class="service-dot" style="background:${s.color}"></div>
+        <div class="service-text" style="color:${s.color}">${s.label}</div>
+      </div>`;
+
+    // Day cells
+    for (let d = 0; d < 5; d++) {
+      const val = data[s.key].days[d];
+      const cell = document.createElement('div');
+      cell.className = 'counter-cell' + (val > 0 ? ' has-value' : '');
+      if (d === tc) cell.style.borderColor = s.color + '66';
+
+      cell.innerHTML = `
+        <button class="btn btn-minus" onclick="change('${s.key}',${d},-1)">−</button>
+        <span class="count-val" id="val_${s.key}_${d}">${val}</span>
+        <button class="btn btn-plus" onclick="change('${s.key}',${d},1)">+</button>`;
+      row.appendChild(cell);
+    }
+
+    // Total cell
+    const total = data[s.key].days.reduce((a, b) => a + b, 0);
+    const target = data[s.key].target;
+    const pct = target > 0 ? Math.min(100, Math.round(total / target * 100)) : 0;
+    const progressColor = pct >= 100 ? '#4ef0a0' : pct >= 60 ? s.color : '#f05a4e';
+
+    row.innerHTML += `<div class="total-cell" id="total_${s.key}">${total}</div>`;
+
+    // Target cell
+    const tcell = document.createElement('div');
+    tcell.className = 'target-cell';
+    tcell.innerHTML = `
+      <span class="target-label">Hedef</span>
+      <input class="target-input" type="number" min="0" id="target_${s.key}"
+        value="${target || ''}" placeholder="—"
+        onchange="changeTarget('${s.key}', this.value)"
+        oninput="changeTarget('${s.key}', this.value)">`;
+    row.appendChild(tcell);
+
+    container.appendChild(row);
+
+    // Progress bar row
+    const prog = document.createElement('div');
+    prog.className = 'service-row';
+    prog.style.gap = '8px';
+    prog.style.height = '10px';
+    prog.style.marginBottom = '10px';
+    prog.style.marginTop = '-4px';
+    prog.innerHTML = `<div></div>
+      <div style="grid-column:2/7;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;">
+        <div id="prog_${s.key}" style="height:100%;width:${pct}%;background:${progressColor};border-radius:2px;transition:width .4s ease,background .3s"></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;grid-column:7" id="pct_${s.key}">${target>0?pct+'%':'—'}</div>
+      <div></div>`;
+    container.appendChild(prog);
+  });
+
+  updateSummary();
+}
+
+function change(service, day, delta) {
+  const cur = data[service].days[day];
+  const nv = Math.max(0, cur + delta);
+  save(service, day, nv);
+
+  const el = document.getElementById(`val_${service}_${day}`);
+  el.textContent = nv;
+  el.closest('.counter-cell').classList.toggle('has-value', nv > 0);
+
+  updateRow(service);
+  updateSummary();
+}
+
+function changeTarget(service, val) {
+  const v = Math.max(0, parseInt(val) || 0);
+  saveTarget(service, v);
+  updateRow(service);
+  updateSummary();
+}
+
+function updateRow(service) {
+  const total = data[service].days.reduce((a, b) => a + b, 0);
+  const target = data[service].target;
+  const pct = target > 0 ? Math.min(100, Math.round(total / target * 100)) : 0;
+  const s = SERVICES.find(x => x.key === service);
+  const progressColor = pct >= 100 ? '#4ef0a0' : pct >= 60 ? s.color : '#f05a4e';
+
+  document.getElementById(`total_${service}`).textContent = total;
+  const pBar = document.getElementById(`prog_${service}`);
+  if (pBar) { pBar.style.width = pct + '%'; pBar.style.background = progressColor; }
+  const pctEl = document.getElementById(`pct_${service}`);
+  if (pctEl) pctEl.textContent = target > 0 ? pct + '%' : '—';
+}
+
+function updateSummary() {
+  let grand = 0, grandT = 0;
+  const tc = todayCol();
+  let todaySum = 0;
+
+  SERVICES.forEach(s => {
+    const total = data[s.key].days.reduce((a, b) => a + b, 0);
+    grand += total;
+    grandT += data[s.key].target;
+    if (tc >= 0) todaySum += data[s.key].days[tc];
+  });
+
+  document.getElementById('grandTotal').textContent = grand;
+  document.getElementById('grandTarget').textContent = grandT;
+  document.getElementById('grandPct').textContent = grandT > 0 ? Math.round(grand/grandT*100) + '%' : '—';
+  document.getElementById('todayTotal').textContent = todaySum;
+}
+
+function highlightToday() {
+  const tc = todayCol();
+  document.querySelectorAll('.day-label').forEach((el, i) => {
+    el.classList.toggle('today', i === tc);
+  });
+}
+
+// Init
+document.getElementById('weekBadge').textContent = getWeekLabel();
+load();
+renderRows();
+highlightToday();
+</script>
+</body>
+</html>
