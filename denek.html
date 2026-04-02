@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Takibi - Fokus Edition</title>
+<title>Kitap Takibi - Final</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -14,191 +14,208 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
-    min-height: 100vh; padding: 20px 20px 80px; position: relative;
+    min-height: 100vh; padding: 20px;
   }
-  body::before {
-    content: ''; position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(240,201,58,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
-    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  .container { max-width: 600px; margin: 0 auto; }
+
+  /* ZAMANLAYICI (İlave Edilen Özellik) */
+  .timer-box {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 30px;
+    padding: 8px 18px; display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
-  .container { max-width: 650px; margin: 0 auto; position: relative; z-index: 1; }
+  .timer-display { font-family: 'Syne'; font-weight: 800; color: var(--accent2); font-size: 18px; }
 
-  /* ZAMANLAYICI (Kalan Tek Ekstra Özellik) */
-  .timer-bar {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 30px; padding: 10px 20px; display: flex; align-items: center;
-    justify-content: space-between; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  }
-  .timer-display { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent2); text-shadow: 0 0 10px rgba(78,240,160,0.3); }
+  /* ÜST BİLGİ & KAPAK */
+  header { text-align: center; margin-bottom: 25px; }
+  .book-title { font-family: 'Syne'; font-size: 42px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .book-author { color: var(--muted); font-size: 14px; margin-top: 5px; }
+  #coverImg { width: 140px; height: 200px; border-radius: 10px; object-fit: cover; margin: 20px auto; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
 
-  /* BAŞLIK & KAPAK */
-  header { text-align: center; margin-bottom: 24px; }
-  h1 { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--accent); margin-bottom: 5px; text-shadow: 0 0 20px rgba(240,201,58,0.3); }
-  .subtitle { font-family: 'Syne', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 20px; }
-  #coverDisplay { width: 130px; height: 185px; margin: 0 auto 20px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); display: none; object-fit: cover; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+  /* KÜNYE TABLOSU */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 15px; overflow: hidden; }
+  .card-header { background: var(--surface2); padding: 10px 15px; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .grid-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+  .field { background: var(--surface); padding: 12px; }
+  .f-lbl { font-size: 8px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; display: block; }
+  .f-val { width: 100%; background: transparent; border: none; color: var(--text); font-family: 'Syne'; font-size: 14px; font-weight: 600; outline: none; }
 
-  /* CANLI SAYAÇLAR */
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 10px; text-align: center; }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
-  .stat-num.yellow { color: var(--accent); text-shadow: 0 0 15px rgba(240,201,58,0.5); }
-  .stat-num.green { color: var(--accent2); text-shadow: 0 0 15px rgba(78,240,160,0.5); }
-  .stat-num.blue { color: var(--accent3); text-shadow: 0 0 15px rgba(78,200,240,0.5); }
-  .stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  /* SAYAÇLAR */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; text-align: center; }
+  .s-num { font-family: 'Syne'; font-size: 28px; font-weight: 800; display: block; }
+  .s-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; }
 
-  /* KÜNYE */
-  .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
-  .sec-header { padding: 12px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-family: 'Syne'; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-  .book-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
-  .book-field { background: var(--surface); padding: 12px; }
-  .field-tag { font-size: 8px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-  .field-inp { width: 100%; background: transparent; border: none; color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; outline: none; }
+  /* ANA SAYAÇ */
+  .counter { text-align: center; padding: 30px 20px; }
+  .big-num { font-family: 'Syne'; font-size: 80px; font-weight: 800; margin-bottom: 15px; }
+  .btn-circle { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; transition: 0.2s; }
+  .btn-plus { background: var(--accent); color: #000; }
+  .btn-minus { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
-  /* SAYFA SAYACI */
-  .counter-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 35px 20px; text-align: center; margin-bottom: 20px; }
-  .page-display { font-family: 'Syne', sans-serif; font-size: 85px; font-weight: 800; line-height: 1; color: var(--text); margin-bottom: 20px; }
-  .cnt-btn { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-  .cnt-plus { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(240,201,58,0.3); }
-  .cnt-minus { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  /* LİSTELER (Alıntılar & Son Okumalar) */
+  .list-item { padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 13px; display: flex; justify-content: space-between; }
+  .hist-plus { color: var(--accent2); font-weight: 700; }
+  .hist-minus { color: var(--danger); font-weight: 700; }
 
-  .f-btn { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: 'Syne'; }
+  .btn-small { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="timer-bar">
-    <div style="font-size: 10px; color: var(--muted); font-weight: 700;">OKUMA ODAĞI</div>
+  <div class="timer-box">
+    <div style="font-size: 10px; font-weight: 700; color: var(--muted);">FOCUS</div>
     <div class="timer-display" id="timer">00:00</div>
-    <button class="f-btn" id="timerBtn" onclick="toggleTimer()" style="background:var(--accent2); color:#000; border:none;">BAŞLAT</button>
+    <button class="btn-small" id="timerBtn" onclick="toggleTimer()" style="background:var(--accent2); color:#000; border:none; font-weight:800;">BAŞLAT</button>
   </div>
 
   <header>
-    <img id="coverDisplay" alt="Kapak">
-    <h1 id="dynTitle">Kitap Günlüğü</h1>
-    <p id="dynAuthor" class="subtitle">İlerleyişini kaydet</p>
+    <div class="book-title" id="dispTitle">Kitap Adı</div>
+    <div class="book-author" id="dispAuthor">Yazar</div>
+    <img id="coverImg">
   </header>
 
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num yellow" id="stat-read">0</div><div class="stat-lbl">Okunan</div></div>
-    <div class="stat-card"><div class="stat-num green" id="stat-left">—</div><div class="stat-lbl">Kalan</div></div>
-    <div class="stat-card"><div class="stat-num blue" id="stat-days">—</div><div class="stat-lbl">Kalan Gün</div></div>
-  </div>
-
-  <div class="section-card">
-    <div class="sec-header">📖 KÜNYE</div>
-    <div class="book-fields">
-      <div class="book-field" style="grid-column: span 2; border-bottom: 1px solid var(--border);"><span class="field-tag">Kitap Adı</span><input class="field-inp" id="bName" oninput="saveAll()"></div>
-      <div class="book-field"><span class="field-tag">Yazar</span><input class="field-inp" id="bAuthor" oninput="saveAll()"></div>
-      <div class="book-field"><span class="field-tag">Kapak URL</span><input class="field-inp" id="bCover" oninput="saveAll()"></div>
-      <div class="book-field"><span class="field-tag">Toplam Sayfa</span><input class="field-inp" type="number" id="bTotal" oninput="saveAll()"></div>
-      <div class="book-field"><span class="field-tag">Hedef Tarih</span><input class="field-inp" type="date" id="bDeadline" oninput="saveAll()"></div>
+  <div class="card">
+    <div class="card-header">📋 KÜNYE</div>
+    <div class="grid-fields">
+      <div class="field" style="grid-column: span 2;"><span class="f-lbl">Kapak URL</span><input class="f-val" id="inCover" oninput="save()"></div>
+      <div class="field"><span class="f-lbl">Kitap Adı</span><input class="f-val" id="inTitle" oninput="save()"></div>
+      <div class="field"><span class="f-lbl">Yazar</span><input class="f-val" id="inAuthor" oninput="save()"></div>
+      <div class="field"><span class="f-lbl">Toplam Sayfa</span><input class="f-val" type="number" id="inTotal" oninput="save()"></div>
+      <div class="field"><span class="f-lbl">Hedef Bitiş</span><input class="f-val" type="date" id="inDate" oninput="save()"></div>
     </div>
-    <div id="statusArea" style="padding:15px; text-align:center; font-weight:800; font-family:'Syne'; border-top:1px solid var(--border);">—</div>
   </div>
 
-  <div class="counter-card">
-    <div class="page-display" id="pageNum">0</div>
-    <div style="display:flex; align-items:center; justify-content:center; gap:35px; margin-bottom:20px;">
-      <button class="cnt-btn cnt-minus" onclick="addPages(-1)">−</button>
-      <button class="cnt-btn cnt-plus" onclick="addPages(1)">+</button>
+  <div class="stats">
+    <div class="stat-box"><span class="s-num" style="color:var(--accent)" id="sRead">0</span><span class="s-lbl">Okunan</span></div>
+    <div class="stat-box"><span class="s-num" style="color:var(--accent2)" id="sLeft">0</span><span class="s-lbl">Kalan</span></div>
+    <div class="stat-box"><span class="s-num" style="color:var(--accent3)" id="sDays">0</span><span class="s-lbl">Kalan Gün</span></div>
+  </div>
+
+  <div class="card counter">
+    <div class="big-num" id="bigPage">0</div>
+    <div style="display:flex; justify-content:center; gap:40px; margin-bottom:20px;">
+      <button class="btn-circle btn-minus" onclick="changePage(-1)">−</button>
+      <button class="btn-circle btn-plus" onclick="changePage(1)">+</button>
     </div>
     <div style="display:flex; justify-content:center; gap:8px;">
-      <button class="f-btn" onclick="setStep(5)">5</button>
-      <button class="f-btn" onclick="setStep(10)">10</button>
-      <button class="f-btn" onclick="setStep(25)">25</button>
+      <button class="btn-small" onclick="setStep(1)">1</button>
+      <button class="btn-small" onclick="setStep(10)">10</button>
+      <button class="btn-small" onclick="setStep(25)">25</button>
     </div>
   </div>
 
-  <div style="display:flex; justify-content:center; gap:10px;">
-    <button class="f-btn" onclick="exportData()">💾 YEDEKLE</button>
-    <button class="f-btn" onclick="document.getElementById('importFile').click()">📂 YÜKLE</button>
-    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(this)">
+  <div class="card">
+    <div class="card-header">📊 SON OKUMALAR</div>
+    <div id="historyList"></div>
+  </div>
+
+  <div style="display:flex; gap:10px; margin-top:20px;">
+    <button class="btn-small" onclick="exportJSON()">Yedekle</button>
+    <button class="btn-small" onclick="document.getElementById('fileInp').click()">Yükle</button>
+    <input type="file" id="fileInp" style="display:none" onchange="importJSON(this)">
+    <button class="btn-small" style="margin-left:auto; color:var(--danger)" onclick="reset()">Sıfırla</button>
   </div>
 </div>
 
 <script>
-let pages = parseInt(localStorage.getItem('f_pages')) || 0;
+let pages = parseInt(localStorage.getItem('p_val')) || 0;
+let history = JSON.parse(localStorage.getItem('p_hist') || '[]');
 let step = 1;
-let timerInt;
-let seconds = 0;
+let timer;
+let sec = 0;
 
-function saveAll() {
-  const n = document.getElementById('bName').value;
-  const a = document.getElementById('bAuthor').value;
-  const t = parseInt(document.getElementById('bTotal').value) || 0;
-  const c = document.getElementById('bCover').value;
-  const d = document.getElementById('bDeadline').value;
+function save() {
+  const t = document.getElementById('inTitle').value;
+  const a = document.getElementById('inAuthor').value;
+  const c = document.getElementById('inCover').value;
+  const tot = parseInt(document.getElementById('inTotal').value) || 0;
+  const dat = document.getElementById('inDate').value;
 
-  document.getElementById('dynTitle').textContent = n || 'Kitap Günlüğü';
-  document.getElementById('dynAuthor').textContent = a || 'İlerleyişini kaydet';
-  const img = document.getElementById('coverDisplay');
+  document.getElementById('dispTitle').textContent = t || 'Kitap Adı';
+  document.getElementById('dispAuthor').textContent = a || 'Yazar';
+  const img = document.getElementById('coverImg');
   if(c) { img.src = c; img.style.display = 'block'; } else { img.style.display = 'none'; }
 
-  document.getElementById('pageNum').textContent = pages;
-  document.getElementById('stat-read').textContent = pages;
-  document.getElementById('stat-left').textContent = t ? Math.max(0, t - pages) : '—';
-  
-  if(d) {
-    const diff = Math.ceil((new Date(d) - new Date()) / (1000*60*60*24));
-    document.getElementById('stat-days').textContent = diff > 0 ? diff : (diff === 0 ? 'Bgn' : 'Bitti');
+  document.getElementById('bigPage').textContent = pages;
+  document.getElementById('sRead').textContent = pages;
+  document.getElementById('sLeft').textContent = tot ? Math.max(0, tot - pages) : '0';
+
+  if(dat) {
+    const diff = Math.ceil((new Date(dat) - new Date()) / (1000*60*60*24));
+    document.getElementById('sDays').textContent = diff >= 0 ? diff : '!';
   }
 
-  let sText = '—';
-  if(t > 0) {
-    const pct = (pages / t) * 100;
-    if(pct >= 100) sText = '🥹 <span style="color:var(--accent2)">BİTTİ</span>';
-    else if(pct >= 50) sText = '🤩 HARİKA';
-    else sText = '🙂 DEVAM';
-  }
-  document.getElementById('statusArea').innerHTML = sText;
-
-  localStorage.setItem('f_name', n); localStorage.setItem('f_author', a);
-  localStorage.setItem('f_total', t); localStorage.setItem('f_cover', c);
-  localStorage.setItem('f_deadline', d); localStorage.setItem('f_pages', pages);
+  localStorage.setItem('p_title', t); localStorage.setItem('p_author', a);
+  localStorage.setItem('p_cover', c); localStorage.setItem('p_total', tot);
+  localStorage.setItem('p_date', dat); localStorage.setItem('p_val', pages);
+  renderHistory();
 }
 
-function addPages(val) { pages = Math.max(0, pages + (val * step)); saveAll(); }
+function changePage(v) {
+  let diff = v * step;
+  pages = Math.max(0, pages + diff);
+  history.unshift({ time: new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'}), diff: diff, total: pages });
+  if(history.length > 5) history.pop();
+  localStorage.setItem('p_hist', JSON.stringify(history));
+  save();
+}
+
 function setStep(s) { step = s; }
 
 function toggleTimer() {
-  const b = document.getElementById('timerBtn');
-  if(timerInt) { clearInterval(timerInt); timerInt = null; b.textContent = 'DEVAM'; b.style.background = 'var(--accent)'; }
+  const btn = document.getElementById('timerBtn');
+  if(timer) { clearInterval(timer); timer = null; btn.textContent = 'DEVAM'; btn.style.background = 'var(--accent)'; }
   else {
-    timerInt = setInterval(() => { seconds++;
-      const m = Math.floor(seconds/60).toString().padStart(2,'0');
-      const s = (seconds%60).toString().padStart(2,'0');
+    timer = setInterval(() => { sec++;
+      let m = Math.floor(sec/60).toString().padStart(2,'0');
+      let s = (sec%60).toString().padStart(2,'0');
       document.getElementById('timer').textContent = `${m}:${s}`;
     }, 1000);
-    b.textContent = 'DUR'; b.style.background = 'var(--danger)';
+    btn.textContent = 'DURDUR'; btn.style.background = 'var(--danger)';
   }
 }
 
-function exportData() {
-  const data = { n:document.getElementById('bName').value, a:document.getElementById('bAuthor').value, t:document.getElementById('bTotal').value, c:document.getElementById('bCover').value, d:document.getElementById('bDeadline').value, p:pages };
+function renderHistory() {
+  const list = document.getElementById('historyList'); list.innerHTML = '';
+  history.forEach(i => {
+    list.innerHTML += `<div class="list-item">
+      <span>${i.time}</span>
+      <span class="${i.diff > 0 ? 'hist-plus' : 'hist-minus'}">${i.diff > 0 ? '+' : ''}${i.diff}</span>
+      <span style="color:var(--muted)">${i.total}</span>
+    </div>`;
+  });
+}
+
+function exportJSON() {
+  const data = { t:localStorage.getItem('p_title'), a:localStorage.getItem('p_author'), c:localStorage.getItem('p_cover'), tot:localStorage.getItem('p_total'), d:localStorage.getItem('p_date'), p:pages, h:history };
   const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'yedek.json'; a.click();
 }
 
-function importData(input) {
+function importJSON(input) {
   const reader = new FileReader();
   reader.onload = (e) => {
     const d = JSON.parse(e.target.result);
-    localStorage.setItem('f_name', d.n); localStorage.setItem('f_author', d.a);
-    localStorage.setItem('f_total', d.t); localStorage.setItem('f_cover', d.c);
-    localStorage.setItem('f_deadline', d.d); localStorage.setItem('f_pages', d.p);
+    localStorage.setItem('p_title', d.t); localStorage.setItem('p_author', d.a);
+    localStorage.setItem('p_cover', d.c); localStorage.setItem('p_total', d.tot);
+    localStorage.setItem('p_date', d.d); localStorage.setItem('p_val', d.p);
+    localStorage.setItem('p_hist', JSON.stringify(d.h));
     location.reload();
   };
   reader.readAsText(input.files[0]);
 }
 
+function reset() { if(confirm("Sıfırlansın mı?")) { localStorage.clear(); location.reload(); } }
+
 window.onload = () => {
-  document.getElementById('bName').value = localStorage.getItem('f_name') || '';
-  document.getElementById('bAuthor').value = localStorage.getItem('f_author') || '';
-  document.getElementById('bTotal').value = localStorage.getItem('f_total') || '';
-  document.getElementById('bCover').value = localStorage.getItem('f_cover') || '';
-  document.getElementById('bDeadline').value = localStorage.getItem('f_deadline') || '';
-  saveAll();
+  document.getElementById('inTitle').value = localStorage.getItem('p_title') || '';
+  document.getElementById('inAuthor').value = localStorage.getItem('p_author') || '';
+  document.getElementById('inCover').value = localStorage.getItem('p_cover') || '';
+  document.getElementById('inTotal').value = localStorage.getItem('p_total') || '';
+  document.getElementById('inDate').value = localStorage.getItem('p_date') || '';
+  save();
 };
 </script>
 </body>
