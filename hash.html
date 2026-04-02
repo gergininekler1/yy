@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Takibi</title>
+<title>Kitap Takibi V2</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -25,8 +24,12 @@
   body {
     background: var(--bg); color: var(--text);
     font-family: 'DM Mono', monospace;
-    min-height: 100vh; padding: 36px 20px 60px;
+    min-height: 100vh; padding: 20px 20px 60px;
+    overflow-x: hidden;
+    transition: background 0.3s;
   }
+  
+  /* Arkaplan ve Kapak Efekti */
   body::before {
     content: ''; position: fixed; inset: 0;
     background-image:
@@ -34,49 +37,88 @@
       linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
+  .cover-bg {
+    position: fixed; inset: -50px; z-index: 0;
+    background-size: cover; background-position: center;
+    filter: blur(40px) opacity(0.15) saturate(1.5);
+    transition: background-image 0.5s ease;
+    pointer-events: none;
+  }
+
   .container { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ── Kitaplık Kontrolleri ── */
+  .lib-controls {
+    display: flex; gap: 10px; margin-bottom: 24px;
+    background: var(--surface); padding: 10px;
+    border-radius: var(--radius); border: 1px solid var(--border);
+    align-items: center; justify-content: space-between;
+  }
+  .book-select {
+    flex: 1; background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-family: 'Syne', sans-serif; font-weight: 600;
+    outline: none; cursor: pointer;
+  }
+  .lib-btn {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 14px; cursor: pointer; font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700; transition: all 0.2s;
+  }
+  .lib-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  /* ── Odak Modu ── */
+  body.focus-mode .hide-in-focus { display: none !important; }
+  body.focus-mode { padding-top: 10vh; }
+  .focus-btn {
+    position: fixed; bottom: 20px; right: 20px; z-index: 100;
+    width: 50px; height: 50px; border-radius: 25px;
+    background: var(--surface); border: 2px solid var(--border); color: var(--muted);
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  }
+  .focus-btn:hover { border-color: var(--accent); color: var(--accent); }
+  body.focus-mode .focus-btn { background: var(--accent); color: #000; border-color: var(--accent); }
 
   /* ── Header ── */
   header { margin-bottom: 32px; text-align: center; }
   .tag {
-    display: inline-block;
-    background: var(--accent); color: #000;
+    display: inline-block; background: var(--accent); color: #000;
     font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
     letter-spacing: 0.2em; text-transform: uppercase;
     padding: 4px 12px; border-radius: 4px; margin-bottom: 14px;
   }
   h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(26px,5vw,44px); font-weight: 800; line-height: 1.05;
-    margin-bottom: 4px;
+    font-family: 'Syne', sans-serif; font-size: clamp(26px,5vw,44px); 
+    font-weight: 800; line-height: 1.05; margin-bottom: 4px;
   }
   h1 span { color: var(--accent); }
   .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
 
-  /* Book name/author inputs */
+  /* Book Inputs */
   .book-fields {
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 0;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); overflow: hidden;
   }
   .book-field {
-    display: flex; align-items: center;
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; border-bottom: 1px solid var(--border);
   }
   .book-field:last-child { border-bottom: none; }
   .field-tag {
     font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
     color: var(--muted); padding: 12px 14px;
-    border-right: 1px solid var(--border);
-    white-space: nowrap; min-width: 80px; text-align: right;
+    border-right: 1px solid var(--border); white-space: nowrap; 
+    min-width: 90px; text-align: right; background: var(--surface2);
   }
   .field-inp {
     flex: 1; background: transparent; border: none; outline: none;
     font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600;
-    color: var(--text); padding: 12px 16px;
-    transition: background 0.15s;
+    color: var(--text); padding: 12px 16px; transition: background 0.15s;
+    width: 100%;
   }
-  .field-inp::placeholder { color: var(--border); font-weight: 400; }
+  .field-inp::placeholder { color: var(--muted); font-weight: 400; }
   .field-inp:focus { background: rgba(240,201,58,0.04); }
 
   /* ── Stats ── */
@@ -87,9 +129,7 @@
   .stat-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 16px 12px; text-align: center;
-    transition: border-color 0.2s;
   }
-  .stat-card:hover { border-color: #3a4560; }
   .stat-num {
     font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
     line-height: 1; margin-bottom: 5px;
@@ -103,12 +143,10 @@
   .counter-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 28px 24px;
-    text-align: center; margin-bottom: 12px;
-    position: relative; overflow: hidden;
+    text-align: center; margin-bottom: 12px; position: relative; overflow: hidden;
   }
   .counter-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
   }
   .counter-label {
@@ -120,21 +158,19 @@
     margin-bottom: 18px;
   }
   .page-display {
-    font-family: 'Syne', sans-serif; font-size: 88px; font-weight: 800;
-    color: var(--text); line-height: 1; min-width: 180px;
+    font-family: 'Syne', sans-serif; font-size: clamp(60px, 12vw, 88px); font-weight: 800;
+    color: var(--text); line-height: 1; min-width: 140px;
     text-shadow: 0 0 40px rgba(240,201,58,0.15);
   }
   .page-unit {
     font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
     color: var(--muted); margin-top: 2px;
   }
-
   .cnt-btn {
     width: 52px; height: 52px; border-radius: 50%; border: none;
     cursor: pointer; font-size: 22px; font-weight: 700;
-    font-family: 'Syne', sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.12s; user-select: none;
+    font-family: 'Syne', sans-serif; display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s; user-select: none; flex-shrink: 0;
   }
   .cnt-plus  { background: var(--accent); color: #000; }
   .cnt-plus:hover  { background: #ffd84a; transform: scale(1.1); }
@@ -142,78 +178,62 @@
   .cnt-minus { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
   .cnt-minus:hover { background: var(--border); color: var(--text); }
 
-  /* Step pills */
+  /* Steps */
   .step-row {
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    margin-bottom: 18px;
+    margin-bottom: 18px; flex-wrap: wrap;
   }
-  .step-lbl { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
   .step-pill {
-    padding: 4px 12px; border-radius: 20px;
-    border: 1px solid var(--border); background: transparent;
-    font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted);
-    cursor: pointer; transition: all 0.12s;
+    padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; font-family: 'DM Mono', monospace; font-size: 13px;
+    color: var(--muted); cursor: pointer; transition: all 0.12s;
   }
   .step-pill.active, .step-pill:hover {
     background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500;
   }
 
   /* Progress */
-  .prog-track {
-    height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 7px;
-  }
+  .prog-track { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 7px; }
   .prog-fill {
-    height: 100%; border-radius: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2));
     transition: width 0.5s cubic-bezier(.4,0,.2,1);
   }
-  .prog-labels {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--muted);
-  }
+  .prog-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
 
-  /* ── Goal strip ── */
+  /* ── Goal ── */
   .goal-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); overflow: hidden; margin-bottom: 20px;
   }
   .goal-header {
-    padding: 10px 16px; background: var(--surface2);
-    border-bottom: 1px solid var(--border);
+    padding: 10px 16px; background: var(--surface2); border-bottom: 1px solid var(--border);
     font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
   }
-  .goal-body {
-    display: flex; gap: 0; flex-wrap: wrap;
-  }
+  .goal-body { display: flex; flex-wrap: wrap; }
   .goal-field {
-    flex: 1; min-width: 150px;
-    padding: 14px 18px;
-    border-right: 1px solid var(--border);
+    flex: 1; min-width: 150px; padding: 14px 18px; border-right: 1px solid var(--border);
   }
   .goal-field:last-child { border-right: none; }
   .goal-lbl { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   .goal-inp {
-    background: transparent; border: none; outline: none;
-    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
-    color: var(--accent2); width: 100%;
+    background: transparent; border: none; outline: none; width: 100%;
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent2);
   }
   .goal-inp::placeholder { color: var(--border); font-weight: 400; font-size: 16px; }
   .pace-bar {
-    padding: 10px 18px; border-top: 1px solid var(--border);
-    font-size: 13px; color: var(--muted); font-style: normal;
+    padding: 10px 18px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted);
     min-height: 38px; display: flex; align-items: center; gap: 6px;
   }
   .pace-bar span.hi { color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; }
 
-  /* ── Section card ── */
+  /* ── Section Cards (Quotes, Notes, History) ── */
   .section-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
   }
   .sec-header {
     display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px; background: var(--surface2);
-    border-bottom: 1px solid var(--border);
+    padding: 12px 16px; background: var(--surface2); border-bottom: 1px solid var(--border);
   }
   .sec-icon { font-size: 15px; }
   .sec-title {
@@ -222,14 +242,14 @@
   }
   .sec-count { margin-left: auto; font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
 
-  /* Quotes list */
-  .quotes-list { }
-  .quote-item {
+  /* Quotes & History Lists */
+  .list-item {
     padding: 14px 18px; border-bottom: 1px solid var(--border);
     animation: fadeUp 0.25s ease;
   }
-  .quote-item:last-child { border-bottom: none; }
+  .list-item:last-child { border-bottom: none; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
+  
   .quote-text {
     font-size: 14px; line-height: 1.65; color: var(--text);
     margin-bottom: 6px; position: relative; padding-left: 14px;
@@ -238,176 +258,162 @@
     content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
     width: 2px; background: var(--accent); border-radius: 2px;
   }
-  .quote-meta {
+  .quote-text strong { color: var(--accent2); font-weight: 600; }
+  .quote-text em { color: var(--accent3); font-style: italic; }
+
+  .meta-row {
     display: flex; justify-content: space-between; align-items: center;
     font-size: 11px; color: var(--muted); letter-spacing: 0.08em;
   }
-  .q-del {
+  .del-btn {
     background: transparent; border: none; cursor: pointer;
-    color: var(--border); font-size: 15px; padding: 0 4px;
-    transition: color 0.15s; line-height: 1;
+    color: var(--border); font-size: 15px; padding: 0 4px; transition: color 0.15s; line-height: 1;
   }
-  .q-del:hover { color: var(--danger); }
-  .no-quotes {
-    padding: 24px; text-align: center;
-    font-size: 13px; color: var(--border);
-  }
+  .del-btn:hover { color: var(--danger); }
+  .empty-state { padding: 24px; text-align: center; font-size: 13px; color: var(--border); }
 
-  /* Quote add form */
-  .quote-form {
-    padding: 14px 18px; background: var(--bg);
-    border-top: 1px solid var(--border);
+  /* History Specific */
+  .hist-entry { display: flex; align-items: center; gap: 12px; }
+  .hist-badge {
+    background: rgba(78, 240, 160, 0.1); color: var(--accent2);
+    padding: 4px 8px; border-radius: 6px; font-weight: 700; font-family: 'Syne', sans-serif;
   }
-  .quote-ta {
-    width: 100%; min-height: 68px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 14px;
-    color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
-    resize: none; outline: none; line-height: 1.6;
-    transition: border-color 0.15s; margin-bottom: 8px;
+  .hist-badge.negative { background: rgba(240, 90, 78, 0.1); color: var(--danger); }
+
+  /* Forms */
+  .input-form { padding: 14px 18px; background: var(--bg); border-top: 1px solid var(--border); }
+  .form-ta {
+    width: 100%; min-height: 68px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 13px; resize: none; outline: none; line-height: 1.6; margin-bottom: 8px;
   }
-  .quote-ta::placeholder { color: var(--muted); }
-  .quote-ta:focus { border-color: var(--accent); }
+  .form-ta:focus { border-color: var(--accent); }
   .form-row { display: flex; gap: 8px; align-items: center; }
   .page-inp {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 7px 12px; outline: none;
-    font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted);
-    width: 100px; transition: border-color 0.15s;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 12px; outline: none; font-family: 'DM Mono', monospace; font-size: 13px;
+    color: var(--text); width: 100px;
   }
-  .page-inp::placeholder { color: var(--border); }
-  .page-inp:focus { border-color: var(--accent3); }
   .add-btn {
-    margin-left: auto;
-    background: var(--accent); color: #000;
-    border: none; border-radius: 8px;
-    padding: 8px 20px; cursor: pointer;
-    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
-    transition: background 0.15s;
+    margin-left: auto; background: var(--accent); color: #000; border: none; border-radius: 8px;
+    padding: 8px 20px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
   }
-  .add-btn:hover { background: #ffd84a; }
-
-  /* Notes textarea */
   .notes-ta {
-    width: 100%; min-height: 140px;
-    background: transparent; border: none; outline: none;
-    padding: 16px 18px;
-    color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
+    width: 100%; min-height: 140px; background: transparent; border: none; outline: none;
+    padding: 16px 18px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
     line-height: 1.8; resize: vertical;
   }
-  .notes-ta::placeholder { color: var(--muted); }
 
   /* Footer */
-  .footer-row { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }
+  .footer-row { display: flex; justify-content: center; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
   .ghost-btn {
     background: transparent; border: 1px solid var(--border); color: var(--muted);
-    padding: 9px 20px; border-radius: 8px; cursor: pointer;
-    font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.08em;
-    transition: all 0.2s;
+    padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: 'DM Mono', monospace;
+    font-size: 12px; letter-spacing: 0.08em; transition: all 0.2s;
   }
   .ghost-btn:hover { border-color: var(--danger); color: var(--danger); }
-  .import-btn:hover { border-color: var(--accent2) !important; color: var(--accent2) !important; }
-  .footer-note { text-align: center; margin-top: 14px; font-size: 11px; color: var(--muted); }
-
-  /* Confetti */
+  
   #confettiCanvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999; }
-
-  @media(max-width:480px){
-    .page-display { font-size:64px; }
-    .goal-field { min-width: 120px; }
-  }
 </style>
 </head>
 <body>
+<div id="coverBg" class="cover-bg"></div>
 <canvas id="confettiCanvas"></canvas>
-<div class="container">
 
-  <!-- Header -->
-  <header>
-    <div class="tag">📚 Okuma Takibi</div>
+<button class="focus-btn" onclick="toggleFocus()" title="Odak Modu">👁</button>
+
+<div class="container">
+  
+  <div class="lib-controls hide-in-focus">
+    <select class="book-select" id="bookSelect" onchange="switchBook()"></select>
+    <button class="lib-btn" onclick="createNewBook()">+ Yeni Kitap</button>
+  </div>
+
+  <header class="hide-in-focus">
+    <div class="tag">📚 Okuma Takibi V2</div>
     <h1>Kitap <span>Günlüğü</span></h1>
-    <p class="subtitle">Sayfa sayacı · Hedef · Alıntılar · Notlar</p>
-    <div class="book-fields">
+    <div class="book-fields" style="margin-top: 20px;">
       <div class="book-field">
         <span class="field-tag">Kitap</span>
-        <input class="field-inp" id="bookName" placeholder="Kitabın adını yaz..." oninput="saveMeta()">
+        <input class="field-inp" id="bName" placeholder="Kitabın adını yaz..." oninput="saveMeta()">
       </div>
       <div class="book-field">
         <span class="field-tag">Yazar</span>
-        <input class="field-inp" id="authorName" placeholder="Yazar adı..." oninput="saveMeta()">
+        <input class="field-inp" id="bAuthor" placeholder="Yazar adı..." oninput="saveMeta()">
+      </div>
+      <div class="book-field">
+        <span class="field-tag">Kapak URL</span>
+        <input class="field-inp" id="bCover" placeholder="https://... (Görsel Linki)" oninput="saveMeta()">
       </div>
     </div>
   </header>
 
-  <!-- Stats -->
-  <div class="stats-row">
+  <div class="stats-row hide-in-focus">
     <div class="stat-card">
-      <div class="stat-num yellow" id="stat-read">0</div>
-      <div class="stat-lbl">Okunan Sayfa</div>
+      <div class="stat-num yellow" id="stat-read">0</div><div class="stat-lbl">Okunan Sayfa</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num green" id="stat-left">—</div>
-      <div class="stat-lbl">Kalan Sayfa</div>
+      <div class="stat-num green" id="stat-left">—</div><div class="stat-lbl">Kalan Sayfa</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num blue" id="stat-days">—</div>
-      <div class="stat-lbl">Kalan Gün</div>
+      <div class="stat-num blue" id="stat-days">—</div><div class="stat-lbl">Kalan Gün</div>
     </div>
   </div>
 
-  <!-- Counter -->
   <div class="counter-card">
-    <div class="counter-label">Toplam Okunan Sayfa</div>
+    <div class="counter-label hide-in-focus">Toplam Okunan Sayfa</div>
     <div class="counter-main">
       <button class="cnt-btn cnt-minus" onclick="addPages(-step)">−</button>
       <div>
         <div class="page-display" id="pageNum">0</div>
-        <div class="page-unit">sayfa</div>
+        <div class="page-unit hide-in-focus">sayfa</div>
       </div>
       <button class="cnt-btn cnt-plus" onclick="addPages(step)">+</button>
     </div>
-    <div class="step-row">
-      <span class="step-lbl">Adım</span>
+    <div class="step-row hide-in-focus">
+      <span style="font-size:10px; color:var(--muted); text-transform:uppercase; margin-right:4px;">Adım</span>
       <button class="step-pill active" onclick="setStep(1,this)">1</button>
       <button class="step-pill" onclick="setStep(5,this)">5</button>
       <button class="step-pill" onclick="setStep(10,this)">10</button>
       <button class="step-pill" onclick="setStep(25,this)">25</button>
     </div>
-    <div class="prog-track">
-      <div class="prog-fill" id="progFill" style="width:0%"></div>
-    </div>
-    <div class="prog-labels">
-      <span id="progLeft">Toplam sayfa girilmedi</span>
-      <span id="progPct"></span>
+    <div class="prog-track hide-in-focus"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-labels hide-in-focus">
+      <span id="progLeft">...</span><span id="progPct"></span>
     </div>
   </div>
 
-  <!-- Goal -->
-  <div class="goal-card">
+  <div class="goal-card hide-in-focus">
     <div class="goal-header">Hedef Ayarları</div>
     <div class="goal-body">
       <div class="goal-field">
         <div class="goal-lbl">Toplam Sayfa</div>
-        <input class="goal-inp" type="number" id="totalPages" placeholder="örn. 320" min="1" oninput="saveMeta();updateAll()">
+        <input class="goal-inp" type="number" id="bTotal" placeholder="örn. 320" min="1" oninput="saveMeta()">
       </div>
       <div class="goal-field">
         <div class="goal-lbl">Bitiş Tarihi</div>
-        <input class="goal-inp" type="date" id="deadlineDate" style="font-size:15px;color:var(--accent2)" oninput="saveMeta();updateAll()">
+        <input class="goal-inp" type="date" id="bDeadline" style="font-size:15px;color:var(--accent2)" oninput="saveMeta()">
       </div>
     </div>
     <div class="pace-bar" id="paceBar">—</div>
   </div>
 
-  <!-- Quotes -->
-  <div class="section-card">
+  <div class="section-card hide-in-focus">
     <div class="sec-header">
-      <span class="sec-icon">❝</span>
-      <span class="sec-title">Alıntılar</span>
+      <span class="sec-icon">⏳</span><span class="sec-title">Okuma Geçmişi</span>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <div class="section-card hide-in-focus">
+    <div class="sec-header">
+      <span class="sec-icon">❝</span><span class="sec-title">Alıntılar</span>
       <span class="sec-count" id="quoteCount">0 alıntı</span>
     </div>
     <div id="quotesList"></div>
-    <div class="quote-form">
-      <textarea class="quote-ta" id="quoteInput" placeholder="Kitaptan beğendiğin bir cümle..."></textarea>
+    <div class="input-form">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">İpucu: **kalın** ve *italik* yapabilirsiniz.</div>
+      <textarea class="form-ta" id="quoteInput" placeholder="Kitaptan beğendiğin bir cümle..."></textarea>
       <div class="form-row">
         <input class="page-inp" type="number" id="quotePageInp" placeholder="Sayfa no">
         <button class="add-btn" onclick="addQuote()">+ Ekle</button>
@@ -415,241 +421,299 @@
     </div>
   </div>
 
-  <!-- Notes -->
-  <div class="section-card">
-    <div class="sec-header">
-      <span class="sec-icon">📝</span>
-      <span class="sec-title">Notlar & Düşünceler</span>
-    </div>
-    <textarea class="notes-ta" id="notesArea"
-      placeholder="Karakterler, olaylar, kafana takılan sorular, kitabın sende bıraktıkları..."
-      oninput="saveNotes()"></textarea>
+  <div class="section-card hide-in-focus">
+    <div class="sec-header"><span class="sec-icon">📝</span><span class="sec-title">Notlar</span></div>
+    <textarea class="notes-ta" id="notesArea" placeholder="Düşüncelerin..." oninput="saveMeta()"></textarea>
   </div>
 
-  <div class="footer-row">
-    <button class="ghost-btn" onclick="exportData()">⬇ Dışa Aktar</button>
-    <button class="ghost-btn import-btn" onclick="document.getElementById('importFile').click()">⬆ İçe Aktar</button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
-    <button class="ghost-btn" onclick="resetAll()">↺ Sıfırla</button>
+  <div class="footer-row hide-in-focus">
+    <button class="ghost-btn" onclick="deleteCurrentBook()">🗑 Bu Kitabı Sil</button>
+    <button class="ghost-btn" onclick="alert('Verileri yedeklemek için tüm localStorage `app_library` anahtarını kopyalayabilirsiniz. Gelişmiş export yakında eklenecek.')">⬇ Dışa Aktar</button>
   </div>
-  <p class="footer-note">Verileri yedeklemek için <strong style="color:var(--accent)">Dışa Aktar</strong> · Başka cihazda yüklemek için <strong style="color:var(--accent2)">İçe Aktar</strong></p>
-
 </div>
 
 <script>
-let pages   = parseInt(localStorage.getItem('book_pages'))||0;
-let step    = 1;
-let quotes  = JSON.parse(localStorage.getItem('book_quotes')||'[]');
-let finished = false;
+// --- Data Structure ---
+let appData = {
+  activeId: null,
+  books: []
+};
+let currentBook = null;
+let step = 1;
 
-function init(){
-  document.getElementById('bookName').value     = localStorage.getItem('book_name')||'';
-  document.getElementById('authorName').value   = localStorage.getItem('book_author')||'';
-  document.getElementById('totalPages').value   = localStorage.getItem('book_total')||'';
-  document.getElementById('deadlineDate').value = localStorage.getItem('book_deadline')||'';
-  document.getElementById('notesArea').value    = localStorage.getItem('book_notes')||'';
-  const total = parseInt(localStorage.getItem('book_total'))||0;
-  if(total > 0 && pages >= total) finished = true;
-  updateAll(); renderQuotes();
-}
-
-function saveMeta(){
-  localStorage.setItem('book_name',     document.getElementById('bookName').value);
-  localStorage.setItem('book_author',   document.getElementById('authorName').value);
-  localStorage.setItem('book_total',    document.getElementById('totalPages').value);
-  localStorage.setItem('book_deadline', document.getElementById('deadlineDate').value);
-}
-function saveNotes(){ localStorage.setItem('book_notes', document.getElementById('notesArea').value); }
-
-function addPages(delta){
-  const prev = pages;
-  pages = Math.max(0, pages + delta);
-  localStorage.setItem('book_pages', pages);
-  const total = parseInt(document.getElementById('totalPages').value)||0;
-  if(total > 0 && pages >= total && prev < total && !finished){
-    finished = true; launchConfetti();
+// --- Initialize & Migrate ---
+function init() {
+  // Eski veriyi taşıma (Migration)
+  if(localStorage.getItem('book_pages') && !localStorage.getItem('app_library')) {
+    const migratedBook = {
+      id: Date.now().toString(),
+      name: localStorage.getItem('book_name') || 'Eski Kitap',
+      author: localStorage.getItem('book_author') || '',
+      cover: '',
+      total: parseInt(localStorage.getItem('book_total')) || 0,
+      deadline: localStorage.getItem('book_deadline') || '',
+      pages: parseInt(localStorage.getItem('book_pages')) || 0,
+      quotes: JSON.parse(localStorage.getItem('book_quotes') || '[]'),
+      notes: localStorage.getItem('book_notes') || '',
+      history: []
+    };
+    appData.books.push(migratedBook);
+    appData.activeId = migratedBook.id;
+    // Eski verileri temizle
+    ['book_name','book_author','book_total','book_deadline','book_pages','book_quotes','book_notes'].forEach(k => localStorage.removeItem(k));
+    saveData();
+  } else {
+    const saved = localStorage.getItem('app_library');
+    if(saved) appData = JSON.parse(saved);
   }
-  if(pages < (total||Infinity)) finished = false;
-  updateAll();
+
+  // Eğer hiç kitap yoksa boş bir tane oluştur
+  if(appData.books.length === 0) {
+    createNewBook(true);
+  } else {
+    currentBook = appData.books.find(b => b.id === appData.activeId) || appData.books[0];
+    appData.activeId = currentBook.id;
+    refreshUI();
+  }
 }
 
-function setStep(n, btn){
+function saveData() {
+  localStorage.setItem('app_library', JSON.stringify(appData));
+}
+
+function createNewBook(isInit = false) {
+  const newBook = {
+    id: Date.now().toString(), name: '', author: '', cover: '', total: 0,
+    deadline: '', pages: 0, quotes: [], notes: '', history: []
+  };
+  appData.books.push(newBook);
+  appData.activeId = newBook.id;
+  currentBook = newBook;
+  saveData();
+  if(!isInit) refreshUI();
+}
+
+function switchBook() {
+  const sel = document.getElementById('bookSelect');
+  appData.activeId = sel.value;
+  currentBook = appData.books.find(b => b.id === appData.activeId);
+  saveData();
+  refreshUI();
+}
+
+function deleteCurrentBook() {
+  if(!confirm(`"${currentBook.name || 'Bu kitabı'}" silmek istediğine emin misin?`)) return;
+  appData.books = appData.books.filter(b => b.id !== currentBook.id);
+  if(appData.books.length === 0) createNewBook(true);
+  else { appData.activeId = appData.books[0].id; currentBook = appData.books[0]; }
+  saveData(); refreshUI();
+}
+
+// --- Interaction Logic ---
+function saveMeta() {
+  currentBook.name = document.getElementById('bName').value;
+  currentBook.author = document.getElementById('bAuthor').value;
+  currentBook.cover = document.getElementById('bCover').value;
+  currentBook.total = parseInt(document.getElementById('bTotal').value) || 0;
+  currentBook.deadline = document.getElementById('bDeadline').value;
+  currentBook.notes = document.getElementById('notesArea').value;
+  saveData();
+  updateCalculations();
+  updateDropdown();
+  updateCover();
+}
+
+function setStep(n, btn) {
   step = n;
-  document.querySelectorAll('.step-pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.step-pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-function updateAll(){
-  const total    = parseInt(document.getElementById('totalPages').value)||0;
-  const deadline = document.getElementById('deadlineDate').value;
+function addPages(delta) {
+  const prev = currentBook.pages;
+  currentBook.pages = Math.max(0, currentBook.pages + delta);
+  
+  // History Logging
+  if(delta !== 0) {
+    const today = new Date().toLocaleDateString('tr-TR');
+    // Aynı güne ait son kaydı bulup güncelleyebiliriz veya yeni ekleriz
+    currentBook.history.unshift({
+      date: new Date().toLocaleString('tr-TR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}),
+      delta: delta,
+      total: currentBook.pages
+    });
+    // Geçmişi son 10 kayıtla sınırla
+    if(currentBook.history.length > 10) currentBook.history.pop();
+  }
 
-  document.getElementById('pageNum').textContent    = pages;
-  document.getElementById('stat-read').textContent  = pages;
-  document.getElementById('stat-left').textContent  = total ? Math.max(0,total-pages) : '—';
+  saveData();
+  
+  // Confetti check
+  if(currentBook.total > 0 && currentBook.pages >= currentBook.total && prev < currentBook.total) {
+    launchConfetti();
+  }
+  
+  updateCalculations();
+  renderHistory();
+}
 
-  // Days
+// --- Formatting (Markdown) ---
+function parseText(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+             .replace(/\*(.*?)\*/g, '<em>$1</em>');
+}
+
+function addQuote() {
+  const text = document.getElementById('quoteInput').value.trim();
+  const pg = document.getElementById('quotePageInp').value.trim();
+  if(!text) return;
+  currentBook.quotes.push({ text, page: pg, date: new Date().toLocaleDateString('tr-TR') });
+  saveData();
+  document.getElementById('quoteInput').value = '';
+  document.getElementById('quotePageInp').value = '';
+  renderQuotes();
+}
+
+function deleteQuote(i) {
+  currentBook.quotes.splice(i,1); saveData(); renderQuotes();
+}
+
+// --- UI Rendering ---
+function refreshUI() {
+  updateDropdown();
+  document.getElementById('bName').value = currentBook.name;
+  document.getElementById('bAuthor').value = currentBook.author;
+  document.getElementById('bCover').value = currentBook.cover;
+  document.getElementById('bTotal').value = currentBook.total || '';
+  document.getElementById('bDeadline').value = currentBook.deadline;
+  document.getElementById('notesArea').value = currentBook.notes;
+  
+  updateCover();
+  updateCalculations();
+  renderQuotes();
+  renderHistory();
+}
+
+function updateDropdown() {
+  const sel = document.getElementById('bookSelect');
+  sel.innerHTML = '';
+  appData.books.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name ? b.name : '(İsimsiz Kitap)';
+    if(b.id === appData.activeId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function updateCover() {
+  const bg = document.getElementById('coverBg');
+  if(currentBook.cover) {
+    bg.style.backgroundImage = `url('${currentBook.cover}')`;
+  } else {
+    bg.style.backgroundImage = 'none';
+  }
+}
+
+function updateCalculations() {
+  const p = currentBook.pages;
+  const t = currentBook.total;
+  const d = currentBook.deadline;
+
+  document.getElementById('pageNum').textContent = p;
+  document.getElementById('stat-read').textContent = p;
+  document.getElementById('stat-left').textContent = t ? Math.max(0, t - p) : '—';
+
   let daysLeft = '—';
-  if(deadline){
+  if(d) {
     const today = new Date(); today.setHours(0,0,0,0);
-    const end   = new Date(deadline); end.setHours(0,0,0,0);
-    const diff  = Math.ceil((end-today)/(1000*60*60*24));
-    daysLeft = diff > 0 ? diff : diff===0 ? 'Bugün!' : 'Geçti';
+    const end = new Date(d); end.setHours(0,0,0,0);
+    const diff = Math.ceil((end-today)/(1000*60*60*24));
+    daysLeft = diff > 0 ? diff : diff === 0 ? 'Bugün!' : 'Geçti';
   }
   document.getElementById('stat-days').textContent = daysLeft;
 
-  // Progress
-  if(total > 0){
-    const pct = Math.min(100, Math.round(pages/total*100));
-    document.getElementById('progFill').style.width = pct+'%';
-    document.getElementById('progLeft').textContent = `${Math.max(0,total-pages)} sayfa kaldı`;
-    document.getElementById('progPct').textContent  = pct+'%';
+  if(t > 0) {
+    const pct = Math.min(100, Math.round(p/t*100));
+    document.getElementById('progFill').style.width = pct + '%';
+    document.getElementById('progLeft').textContent = `${Math.max(0, t - p)} sayfa kaldı`;
+    document.getElementById('progPct').textContent = pct + '%';
   } else {
     document.getElementById('progFill').style.width = '0%';
-    document.getElementById('progLeft').textContent = 'Toplam sayfa girilmedi';
-    document.getElementById('progPct').textContent  = '';
+    document.getElementById('progLeft').textContent = 'Hedef girilmedi';
+    document.getElementById('progPct').textContent = '';
   }
 
-  // Pace
   const paceEl = document.getElementById('paceBar');
-  if(total > 0 && deadline){
+  if(t > 0 && d) {
     const today = new Date(); today.setHours(0,0,0,0);
-    const end   = new Date(deadline); end.setHours(0,0,0,0);
-    const diff  = Math.ceil((end-today)/(1000*60*60*24));
-    const left  = Math.max(0, total-pages);
-    if(diff > 0 && left > 0){
-      const daily = Math.ceil(left/diff);
-      paceEl.innerHTML = `Hedefe ulaşmak için günde <span class="hi">${daily} sayfa</span> okumalısın.`;
-    } else if(left <= 0){
-      paceEl.innerHTML = `<span class="hi">🎉 Kitabı tamamladın!</span>`;
-    } else {
-      paceEl.innerHTML = `<span style="color:var(--danger)">Bitiş tarihi geçmiş.</span>`;
-    }
+    const end = new Date(d); end.setHours(0,0,0,0);
+    const diff = Math.ceil((end-today)/(1000*60*60*24));
+    const left = Math.max(0, t - p);
+    if(diff > 0 && left > 0) paceEl.innerHTML = `Hedefe ulaşmak için günde <span class="hi">${Math.ceil(left/diff)} sayfa</span> okumalısın.`;
+    else if(left <= 0) paceEl.innerHTML = `<span class="hi">🎉 Kitabı tamamladın!</span>`;
+    else paceEl.innerHTML = `<span style="color:var(--danger)">Bitiş tarihi geçmiş.</span>`;
   } else {
     paceEl.innerHTML = 'Hedef & tarih girince günlük hız hesaplanır.';
   }
 }
 
-function addQuote(){
-  const text = document.getElementById('quoteInput').value.trim();
-  const pg   = document.getElementById('quotePageInp').value.trim();
-  if(!text) return;
-  quotes.push({ text, page:pg, date:new Date().toLocaleDateString('tr-TR') });
-  localStorage.setItem('book_quotes', JSON.stringify(quotes));
-  document.getElementById('quoteInput').value   = '';
-  document.getElementById('quotePageInp').value = '';
-  renderQuotes();
-}
-function deleteQuote(i){
-  quotes.splice(i,1);
-  localStorage.setItem('book_quotes', JSON.stringify(quotes));
-  renderQuotes();
-}
-function renderQuotes(){
+function renderQuotes() {
   const list = document.getElementById('quotesList');
   list.innerHTML = '';
-  if(!quotes.length){
-    list.innerHTML = '<div class="no-quotes">Henüz alıntı eklenmedi...</div>';
-  } else {
-    quotes.forEach((q,i)=>{
-      const d = document.createElement('div');
-      d.className = 'quote-item';
-      d.innerHTML = `<div class="quote-text">${q.text}</div>
-        <div class="quote-meta">
-          <span>${q.page?'s.'+q.page+' · ':''}${q.date}</span>
-          <button class="q-del" onclick="deleteQuote(${i})">✕</button>
-        </div>`;
-      list.appendChild(d);
+  if(!currentBook.quotes.length) list.innerHTML = '<div class="empty-state">Henüz alıntı eklenmedi...</div>';
+  else {
+    currentBook.quotes.forEach((q, i) => {
+      list.innerHTML += `<div class="list-item">
+        <div class="quote-text">${parseText(q.text)}</div>
+        <div class="meta-row"><span>${q.page ? 's.'+q.page+' · ' : ''}${q.date}</span>
+        <button class="del-btn" onclick="deleteQuote(${i})">✕</button></div></div>`;
     });
   }
-  document.getElementById('quoteCount').textContent = quotes.length+' alıntı';
+  document.getElementById('quoteCount').textContent = currentBook.quotes.length + ' alıntı';
 }
 
-function resetAll(){
-  if(!confirm('Tüm veriler silinecek. Emin misin?')) return;
-  ['book_pages','book_quotes','book_notes'].forEach(k=>localStorage.removeItem(k));
-  pages=0; quotes=[]; finished=false;
-  document.getElementById('notesArea').value='';
-  updateAll(); renderQuotes();
-}
-
-/* Confetti */
-const canvas=document.getElementById('confettiCanvas'), ctx=canvas.getContext('2d');
-let particles=[],animFrame=null;
-function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-window.addEventListener('resize',resizeCanvas); resizeCanvas();
-
-function launchConfetti(){
-  resizeCanvas();
-  const colors=['#f0c93a','#4ef0a0','#4ec8f0','#c44ef0','#f05a4e','#ffffff'];
-  for(let i=0;i<220;i++){
-    particles.push({
-      x:Math.random()*canvas.width, y:-10-Math.random()*250,
-      w:5+Math.random()*10, h:3+Math.random()*5,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      rot:Math.random()*360, vx:(Math.random()-.5)*4,
-      vy:1.5+Math.random()*5, vr:(Math.random()-.5)*8,
-      opacity:1, gravity:.1+Math.random()*.1
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  if(!currentBook.history || !currentBook.history.length) list.innerHTML = '<div class="empty-state">Henüz okuma kaydı yok...</div>';
+  else {
+    currentBook.history.forEach(h => {
+      const isPos = h.delta > 0;
+      const sign = isPos ? '+' : '';
+      list.innerHTML += `<div class="list-item hist-entry">
+        <div class="hist-badge ${!isPos ? 'negative' : ''}">${sign}${h.delta}</div>
+        <div style="font-size:13px; color:var(--text);">Toplam: ${h.total}</div>
+        <div style="margin-left:auto; font-size:11px; color:var(--muted);">${h.date}</div>
+      </div>`;
     });
   }
+}
+
+function toggleFocus() { document.body.classList.toggle('focus-mode'); }
+
+// --- Confetti ---
+const canvas = document.getElementById('confettiCanvas'), ctx = canvas.getContext('2d');
+let particles = [], animFrame = null;
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+function launchConfetti() {
+  const colors = ['#f0c93a','#4ef0a0','#4ec8f0','#c44ef0','#f05a4e','#ffffff'];
+  for(let i=0; i<200; i++) particles.push({ x:Math.random()*canvas.width, y:-10-Math.random()*250, w:5+Math.random()*10, h:3+Math.random()*5, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vx:(Math.random()-.5)*4, vy:1.5+Math.random()*5, vr:(Math.random()-.5)*8, opacity:1, gravity:.1+Math.random()*.1 });
   if(!animFrame) animateConfetti();
 }
-function animateConfetti(){
+function animateConfetti() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{
+  particles.forEach(p => {
     p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity; p.rot+=p.vr;
-    if(p.y>canvas.height*.72) p.opacity-=0.028;
-    ctx.save(); ctx.globalAlpha=Math.max(0,p.opacity);
-    ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-    ctx.fillStyle=p.color;
-    if(p.w>12){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill();}
-    else{ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);}
+    if(p.y>canvas.height*.7) p.opacity-=0.03;
+    ctx.save(); ctx.globalAlpha=Math.max(0,p.opacity); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color; p.w>12 ? (ctx.beginPath(), ctx.arc(0,0,p.w/2,0,Math.PI*2), ctx.fill()) : ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
     ctx.restore();
   });
-  particles=particles.filter(p=>p.opacity>0);
-  if(particles.length>0){animFrame=requestAnimationFrame(animateConfetti);}
-  else{animFrame=null;ctx.clearRect(0,0,canvas.width,canvas.height);}
-}
-
-function exportData(){
-  const data = {
-    book_name:     localStorage.getItem('book_name')||'',
-    book_author:   localStorage.getItem('book_author')||'',
-    book_total:    localStorage.getItem('book_total')||'',
-    book_deadline: localStorage.getItem('book_deadline')||'',
-    book_pages:    localStorage.getItem('book_pages')||'0',
-    book_quotes:   localStorage.getItem('book_quotes')||'[]',
-    book_notes:    localStorage.getItem('book_notes')||'',
-    exported_at:   new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  const bookName = (data.book_name||'kitap').replace(/\s+/g,'-').toLowerCase();
-  a.download = `${bookName}-yedek.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function importData(input){
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    try {
-      const data = JSON.parse(e.target.result);
-      const keys = ['book_name','book_author','book_total','book_deadline','book_pages','book_quotes','book_notes'];
-      keys.forEach(k=>{ if(data[k]!==undefined) localStorage.setItem(k, data[k]); });
-      pages  = parseInt(localStorage.getItem('book_pages'))||0;
-      quotes = JSON.parse(localStorage.getItem('book_quotes')||'[]');
-      finished = false;
-      init();
-      alert('✅ Veriler başarıyla yüklendi!');
-    } catch(err) {
-      alert('❌ Dosya okunamadı. Geçerli bir yedek dosyası seç.');
-    }
-  };
-  reader.readAsText(file);
-  input.value = '';
+  particles = particles.filter(p => p.opacity>0);
+  if(particles.length) animFrame = requestAnimationFrame(animateConfetti);
+  else { animFrame = null; ctx.clearRect(0,0,canvas.width,canvas.height); }
 }
 
 init();
