@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ NEXUS WRITER - Neural Inspiration Matrix</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: #0a0a0a;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 255, 0.03) 2px, rgba(0, 255, 255, 0.03) 4px),
+                linear-gradient(180deg, #000000 0%, #0a0e1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #0ff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0ff, transparent);
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); opacity: 0.8; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        .container {
+            background: rgba(10, 15, 25, 0.85);
+            border: 2px solid #0ff;
+            border-radius: 0;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.3),
+                inset 0 0 30px rgba(0, 255, 255, 0.05);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff00ff, #0ff, transparent);
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: #0ff;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 900;
+            text-shadow: 
+                0 0 10px #0ff,
+                0 0 20px #0ff,
+                0 0 30px #0ff;
+            letter-spacing: 4px;
+            animation: glitch 8s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            91% { transform: translate(-2px, 2px); }
+            92% { transform: translate(2px, -2px); }
+            93% { transform: translate(0); }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #ff00ff;
+            margin-bottom: 30px;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85em;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        button {
+            font-family: 'Orbitron', sans-serif;
+            background: transparent;
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: 15px 30px;
+            border-radius: 0;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: rgba(0, 255, 255, 0.05);
+            border-color: #0ff;
+            color: #0ff;
+            padding: 10px 20px;
+            font-size: 0.85em;
+        }
+
+        .mode-btn.active {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            text-shadow: none;
+        }
+
+        .words-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .word-card {
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid #0ff;
+            padding: 20px;
+            border-radius: 0;
+            box-shadow: 
+                0 0 15px rgba(0, 255, 255, 0.2),
+                inset 0 0 15px rgba(0, 255, 255, 0.05);
+            animation: fadeIn 0.5s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .word-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 0, 255, 0.1) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .word-card:hover::before {
+            left: 100%;
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff00ff;
+            box-shadow: 
+                0 0 25px rgba(255, 0, 255, 0.4),
+                inset 0 0 25px rgba(255, 0, 255, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) rotateX(20deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .word-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #0ff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .word-type {
+            font-size: 0.5em;
+            background: #ff00ff;
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 0;
+            font-family: 'Share Tech Mono', monospace;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .word-definition {
+            color: #9ff;
+            line-height: 1.6;
+            font-size: 0.9em;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .stats {
+            text-align: center;
+            margin-top: 20px;
+            color: #0ff;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85em;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .inspiration-quote {
+            background: rgba(255, 0, 255, 0.1);
+            border-left: 4px solid #ff00ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0;
+            color: #ff00ff;
+            display: none;
+            font-family: 'Share Tech Mono', monospace;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+        }
+
+        .inspiration-quote.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .extra-tools {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .tool-section {
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid #0ff;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .tool-section h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ff00ff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.1em;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .suggestion-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #0ff;
+            padding: 12px;
+            margin: 10px 0;
+            color: #9ff;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .prompt-display {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #ff00ff;
+            padding: 15px;
+            color: #ff00ff;
+            font-family: 'Share Tech Mono', monospace;
+            margin-top: 15px;
+            display: none;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .prompt-display.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="container">
+        <h1>⚡ NEXUS WRITER</h1>
+        <p class="subtitle">// Neural Inspiration Matrix v2.49 //</p>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="scifi">🚀 BİLİM KURGU</button>
+            <button class="mode-btn" data-mode="korku">👁️ KORKU/GERİLİM</button>
+            <button class="mode-btn" data-mode="distopya">🌃 DİSTOPYA</button>
+            <button class="mode-btn" data-mode="teknoloji">⚙️ TEKNOLOJİ</button>
+            <button class="mode-btn" data-mode="doganotu">🌌 DOĞAÜSTÜ</button>
+        </div>
+
+        <div class="controls">
+            <button id="generateBtn">⚡ YENİ KELİMELER</button>
+            <button id="sceneBtn">🎬 SAHNE ÜRETECİ</button>
+            <button id="characterBtn">👤 KARAKTER İPUCU</button>
+            <button id="plotBtn">📖 OLAY ÖRGÜSÜ</button>
+        </div>
+
+        <div class="inspiration-quote" id="inspirationQuote"></div>
+
+        <div class="words-container" id="wordsContainer"></div>
+
+        <div class="extra-tools">
+            <div class="tool-section">
+                <h3>// SAHNE KURGUSU</h3>
+                <button id="atmosphereBtn" style="margin-bottom: 10px;">🌫️ Atmosfer Önerisi</button>
+                <div id="atmosphereBox" class="suggestion-box" style="display: none;"></div>
+            </div>
+
+            <div class="tool-section">
+                <h3>// YARATICI PROMPT</h3>
+                <button id="promptBtn">💭 Hikaye Başlangıcı Üret</button>
+                <div id="promptDisplay" class="prompt-display"></div>
+            </div>
+        </div>
+
+        <div class="stats" id="stats">// SİSTEM HAZIR - İLK TARAMAYA BAŞLA //</div>
+    </div>
+
+    <script>
+        const wordDatabase = {
+            scifi: [
+                // Teknoloji & Uzay
+                { word: "Singularite", definition: "Teknolojik gelişimin kontrolden çıktığı kritik nokta. Yapay zekanın insanı aştığı an.", type: "isim" },
+                { word: "Kvantum", definition: "Atom altı parçacıkların garip davranışları. Aynı anda birden fazla yerde olma durumu.", type: "isim" },
+                { word: "Antimadde", definition: "Normal maddenin zıttı. Temas ettiğinde muazzam enerji açığa çıkarır.", type: "isim" },
+                { word: "Kriyo-uyku", definition: "Derin uzay yolculuklarında kullanılan dondurulmuş uyku hali.", type: "isim" },
+                { word: "Hologram", definition: "Üç boyutlu ışık projeksiyonu. Maddesel olmayan görüntü.", type: "isim" },
+                { word: "Nanoit", definition: "Mikroskobik boyutta, kendi kendine çoğalabilen robot.", type: "isim" },
+                { word: "Siborg", definition: "Yarı insan yarı makine hibrit varlık.", type: "isim" },
+                { word: "Klonlama", definition: "Genetik kopyalama ile özdeş canlı üretme.", type: "isim" },
+                { word: "Terraforming", definition: "Başka gezegeni yaşanabilir hale getirme süreci.", type: "isim" },
+                { word: "Işınlanma", definition: "Maddenin bir noktadan diğerine anlık transferi.", type: "isim" },
+                { word: "Zaman genişlemesi", definition: "Işık hızına yaklaştıkça zamanın yavaşlaması.", type: "isim" },
+                { word: "Kara delik", definition: "Işığın bile kaçamadığı, sonsuz yoğunlukta kozmik nesne.", type: "isim" },
+                { word: "Wormhole", definition: "Uzay-zamanda kısayol oluşturan tünel.", type: "isim" },
+                { word: "Exoskeleton", definition: "Vücuda takılan, gücü artıran mekanik iskelet.", type: "isim" },
+                { word: "Biyonik", definition: "Biyolojik fonksiyonu taklit eden elektronik sistem.", type: "sıfat" },
+                { word: "Sentetik", definition: "Yapay olarak üretilmiş, doğal olmayan.", type: "sıfat" },
+                { word: "Nöral ağ", definition: "Beyin gibi çalışan yapay sinir sistemi.", type: "isim" },
+                { word: "Kuantum dolanıklık", definition: "İki parçacığın mesafeden bağımsız eşzamanlı etkileşimi.", type: "isim" },
+                { word: "Siber-alem", definition: "Dijital dünya, sanal evren.", type: "isim" },
+                { word: "Yapay bilinç", definition: "Makinelerde oluşan öz-farkındalık durumu.", type: "isim" },
+                
+                // Bilimsel Terimler
+                { word: "Mutasyon", definition: "Genetik yapıda kalıcı değişiklik.", type: "isim" },
+                { word: "Radyasyon", definition: "Yüksek enerjili zararlı parçacık yayılımı.", type: "isim" },
+                { word: "Biyomühendislik", definition: "Canlı organizmaların genetik manipülasyonu.", type: "isim" },
+                { word: "Plazma", definition: "Maddenin dördüncü hali, iyonize gaz.", type: "isim" },
+                { word: "Entropi", definition: "Sistemdeki düzensizlik ve kaos miktarı.", type: "isim" },
+                { word: "Paradoks", definition: "Mantıksal çelişki, çözülemeyen ikilem.", type: "isim" },
+                { word: "Anomali", definition: "Normalden sapma, beklenmedik durum.", type: "isim" },
+                { word: "Hibrid", definition: "İki farklı türün karışımından oluşan varlık.", type: "isim" },
+                { word: "Virüs", definition: "Kendini çoğaltan, sistem ele geçiren mikroorganizma.", type: "isim" },
+                { word: "Semprom", definition: "Hastalığın belirtileri, bulgular.", type: "isim" },
+                { word: "İzolasyon", definition: "Tecrit, dış dünyadan tamamen kopukluk.", type: "isim" },
+                { word: "Kontaminasyon", definition: "Bulaşma, kirlenme, enfeksiyon yayılımı.", type: "isim" },
+                { word: "Protokol", definition: "Acil durumlarda uyulması gereken katı kurallar.", type: "isim" },
+                { word: "Algoritma", definition: "Problemin çözümü için adım adım talimatlar.", type: "isim" },
+                { word: "Veri akışı", definition: "Bilginin sürekli transfer edilmesi.", type: "isim" },
+                
+                // Uzay & Kozmos
+                { word: "Nebula", definition: "Yıldızlararası gaz ve toz bulutu.", type: "isim" },
+                { word: "Pulsar", definition: "Düzenli radyo dalgaları yayan dönen nötron yıldızı.", type: "isim" },
+                { word: "Kuasar", definition: "Evrendeki en parlak ve uzak kozmik cisim.", type: "isim" },
+                { word: "Asteroid", definition: "Küçük kaya parçası, gezegen artığı.", type: "isim" },
+                { word: "Komet", definition: "Buzlu kuyruklu yıldız.", type: "isim" },
+                { word: "Galaksi", definition: "Milyarlarca yıldızın oluşturduğu kozmik ada.", type: "isim" },
+                { word: "Süpernova", definition: "Dev yıldızın patlayarak ölümü.", type: "isim" },
+                { word: "Vakum", definition: "Boş uzay, hiçlik, hava olmayan ortam.", type: "isim" },
+                { word: "Yörünge", definition: "Bir cismin diğerinin etrafında çizdiği yol.", type: "isim" },
+                { word: "Gravitasyon", definition: "Kütlelerin birbirini çekme kuvveti.", type: "isim" },
+                { word: "Işık hızı", definition: "Evrendeki maksimum hız sınırı (300.000 km/s).", type: "isim" },
+                { word: "Paralel evren", definition: "Bizimkine benzer ama farklı gerçeklik düzlemi.", type: "isim" },
+                { word: "Boyut", definition: "Uzayın farklı katmanları, alternatif ekseni.", type: "isim" },
+                
+                // Gelecek Toplumu
+                { word: "Megakent", definition: "Milyonlarca nüfuslu dev şehir kompleksi.", type: "isim" },
+                { word: "Otokrasi", definition: "Tek kişinin mutlak iktidarı, diktatörlük.", type: "isim" },
+                { word: "Oligarşi", definition: "Küçük elit grubun yönetimi.", type: "isim" },
+                { word: "Totaliter", definition: "Her şeyi kontrol eden baskıcı rejim.", type: "sıfat" },
+                { word: "Hiyerarşi", definition: "Katmanlı güç ve otorite yapısı.", type: "isim" },
+                { word: "Kast", definition: "Değişmez sosyal sınıf, tabaka.", type: "isim" },
+                { word: "Paria", definition: "Toplum dışı, hor görülen sınıf.", type: "isim" },
+                { word: "Propaganda", definition: "Kitle manipülasyonu, yönlendirme.", type: "isim" },
+                { word: "Gözetim", definition: "Sürekli izleme, takip, kontrol.", type: "isim" },
+                { word: "Distopya", definition: "Kötü gidişatla karanlık gelecek toplumu.", type: "isim" },
+                { word: "Ütopya", definition: "Mükemmel ideal toplum hayali.", type: "isim" },
+                { word: "Anarşi", definition: "Düzensizlik, otoritesizlik, kaos.", type: "isim" },
+                { word: "Sendikasyon", definition: "Büyük şirket birlikteliği, tekelleşme.", type: "isim" },
+                
+                // Teknolojik Kavramlar
+                { word: "İmplant", definition: "Vücuda yerleştirilen elektronik cihaz.", type: "isim" },
+                { word: "Arayüz", definition: "İnsan-makine etkileşim noktası.", type: "isim" },
+                { word: "Sanal gerçeklik", definition: "Bilgisayar yaratımı yapay dünya deneyimi.", type: "isim" },
+                { word: "Simülasyon", definition: "Gerçeğin dijital taklidi, model.", type: "isim" },
+                { word: "Avatar", definition: "Sanal dünyadaki dijital temsil.", type: "isim" },
+                { word: "Şifreleme", definition: "Veriyi okunamaz hale getirme.", type: "isim" },
+                { word: "Hack", definition: "Sisteme izinsiz giriş, korsanlık.", type: "isim" },
+                { word: "Firewall", definition: "Dijital koruma duvarı.", type: "isim" },
+                { word: "Bulut", definition: "İnternet üzerinden veri depolama.", type: "isim" },
+                { word: "Bit", definition: "En küçük bilgi birimi (0 veya 1).", type: "isim" },
+                { word: "Kod", definition: "Programlama dili komutları dizisi.", type: "isim" },
+                { word: "Glitch", definition: "Sistemde geçici hata, aksaklık.", type: "isim" },
+                { word: "Patch", definition: "Yazılım hatası düzeltme güncellemesi.", type: "isim" },
+                
+                // Duygu & Deneyim
+                { word: "Varoluşsal", definition: "Varlığın anlamını sorgulayan, felsefi.", type: "sıfat" },
+                { word: "Yabancılaşma", definition: "Kendine ve topluma yabancılaşma hissi.", type: "isim" },
+                { word: "Paranoya", definition: "Aşırı şüphe, takip edilme sanrısı.", type: "isim" },
+                { word: "Dezoriyantasyon", definition: "Yön kaybı, şaşkınlık, uyumsuzluk.", type: "isim" },
+                { word: "Empati", definition: "Başkasının duygularını hissetme yetisi.", type: "isim" },
+                { word: "Apati", definition: "Duygusuzluk, ilgisizlik, kayıtsızlık.", type: "isim" },
+                { word: "Nostalji", definition: "Geçmiş özlemi, eski günlere hasret.", type: "isim" },
+                { word: "Disosiyasyon", definition: "Gerçeklikten kopma, bölünmüşlük hissi.", type: "isim" }
+            ],
+            korku: [
+                // Korku Unsurları
+                { word: "Dehşet", definition: "Aşırı korku, büyük panik hali.", type: "isim" },
+                { word: "Ürkütücü", definition: "Korku uyandıran, tüyler ürpertici.", type: "sıfat" },
+                { word: "Kasvet", definition: "Karanlık, hüzünlü, iç karartıcı atmosfer.", type: "isim" },
+                { word: "Tekinsiz", definition: "Rahatsız edici garip, ürkütücü.", type: "sıfat" },
+                { word: "Grotesk", definition: "İğrenç, çirkin, anormal biçimli.", type: "sıfat" },
+                { word: "Makabr", definition: "Ölümcül, ürkütücü, korkunç.", type: "sıfat" },
+                { word: "Sapkın", definition: "Normal dışı, bozuk, anormal.", type: "sıfat" },
+                { word: "İblisçe", definition: "Kötü ruhlu, şeytani, uğursuz.", type: "sıfat" },
+                { word: "Lanetli", definition: "Beddua almış, uğursuz, şanssız.", type: "sıfat" },
+                { word: "Melankolik", definition: "Hüzünlü, kederli, kasvetli.", type: "sıfat" },
+                { word: "Acayip", definition: "Garip, tuhaf, olağandışı.", type: "sıfat" },
+                { word: "Gizemli", definition: "Anlaşılmaz, esrarengiz, bilinmeyen.", type: "sıfat" },
+                { word: "Kâbus", definition: "Korkunç rüya, korkutucu hayal.", type: "isim" },
+                { word: "Sanrı", definition: "Gerçek olmayan algı, hayal görme.", type: "isim" },
+                { word: "Hezeyan", definition: "Saçma, mantıksız, delice düşünceler.", type: "isim" },
+                { word: "Obsesyon", definition: "Takıntı, zihnin ele geçiren düşünce.", type: "isim" },
+                { word: "Fobi", definition: "Aşırı mantıksız korku.", type: "isim" },
+                { word: "Panik", definition: "Ani şiddetli korku, telaş.", type: "isim" },
+                { word: "Travma", definition: "Ruhsal yara, derin psikolojik hasar.", type: "isim" },
+                { word: "Histeri", definition: "Aşırı duygusal tepki, kontrol kaybı.", type: "isim" },
+                
+                // Ölüm & Karanlık
+                { word: "Ölümsüz", definition: "Asla ölmeyen, ebedi yaşayan.", type: "sıfat" },
+                { word: "Leş", definition: "Çürüyen ölü beden, cenaze.", type: "isim" },
+                { word: "Cehennemî", definition: "Cehennem gibi korkunç, yakıcı.", type: "sıfat" },
+                { word: "Mezar", definition: "Ölülerin gömüldüğü yer, kabir.", type: "isim" },
+                { word: "Ceset", definition: "Cansız insan bedeni, ölü.", type: "isim" },
+                { word: "Kefenlemek", definition: "Ölüyü beyaz örtüye sarmak.", type: "fiil" },
+                { word: "Mumyalanmış", definition: "Çürümemiş kurutulmuş ölü.", type: "sıfat" },
+                { word: "Nekropol", definition: "Ölüler şehri, antik mezarlık.", type: "isim" },
+                { word: "Morgue", definition: "Cesetlerin saklandığı soğuk oda.", type: "isim" },
+                { word: "Otopsi", definition: "Ölü bedeni inceleme, post-mortem.", type: "isim" },
+                { word: "Kasırga", definition: "Şiddetli dönen fırtına, hortum.", type: "isim" },
+                { word: "Kıyamet", definition: "Dünyanın sonu, yıkım günü.", type: "isim" },
+                { word: "Mahvolmuş", definition: "Yok olmuş, harap, enkaz.", type: "sıfat" },
+                { word: "Yıkıntı", definition: "Çökmüş yapı kalıntısı, harabe.", type: "isim" },
+                { word: "Enkaz", definition: "Yıkılmış bina parçaları, moloz.", type: "isim" },
+                { word: "Felaket", definition: "Büyük yıkım, trajedi, afet.", type: "isim" },
+                
+                // Doğaüstü Varlıklar
+                { word: "Vampir", definition: "Kan emen ölümsüz yaratık.", type: "isim" },
+                { word: "Zombi", definition: "Yaşayan ölü, bilinçsiz ceset.", type: "isim" },
+                { word: "Hayalet", definition: "Ölünün ruhu, görünen tin.", type: "isim" },
+                { word: "Demon", definition: "Kötü ruh, şeytan, cin.", type: "isim" },
+                { word: "Kurt adam", definition: "Dolunayda kurt olan insan.", type: "isim" },
+                { word: "Gölge yaratık", definition: "Karanlıkta yaşayan varlık.", type: "isim" },
+                { word: "Canavar", definition: "Korkunç yaratık, canavarca varlık.", type: "isim" },
+                { word: "Mutant", definition: "Genetik değişime uğramış canlı.", type: "isim" },
+                { word: "Parazit", definition: "Konakçısından beslenen zararlı organizma.", type: "isim" },
+                { word: "Kontrol", definition: "Zihnin ele geçirilmesi, irade kaybı.", type: "isim" },
+                { word: "Sahiplenme", definition: "Kötü ruhun bedene girmesi.", type: "isim" },
+                { word: "Medyum", definition: "Ruhlarla iletişim kuran kişi.", type: "isim" },
+                { word: "Kehânet", definition: "Geleceği görme, falcılık.", type: "isim" },
+                { word: "Lanet", definition: "Kötü dilek, beddua, sihir.", type: "isim" },
+                { word: "Ritüel", definition: "Büyülü ayin, tören, seremoni.", type: "isim" },
+                { word: "Kurban", definition: "Tanrıya sunulan canlı, fedakâr.", type: "isim" },
+                { word: "Tapınak", definition: "Kutsal ibadet yeri, mabet.", type: "isim" },
+                { word: "Karanlık güç", definition: "Kötü enerji, şeytani kudret.", type: "isim" },
+                
+                // Duygu & Korku
+                { word: "İrkilmek", definition: "Aniden korkuyla sıçramak.", type: "fiil" },
+                { word: "Ürpermek", definition: "Korkudan titremek, tüylerin diken diken olması.", type: "fiil" },
+                { word: "Dehşete düşmek", definition: "Büyük korkuya kapılmak.", type: "fiil" },
+                { word: "Donakalmak", definition: "Korkudan hareketsiz kalmak.", type: "fiil" },
+                { word: "Felç", definition: "Hareket edememe, korkudan taş kesilme.", type: "isim" },
+                { word: "Şok", definition: "Travmatik ani sarsıntı.", type: "isim" },
+                { word: "Terör", definition: "Korkutma, sindirme, yıldırma.", type: "isim" },
+                { word: "Anksiyete", definition: "Sürekli kaygı, tedirginlik.", type: "isim" },
+                { word: "Kuşku", definition: "Şüphe, güvensizlik, tereddüt.", type: "isim" },
+                { word: "Umutsuzluk", definition: "Çıkış yolu görememe, çaresizlik.", type: "isim" },
+                { word: "Çaresizlik", definition: "Aciz kalma, çözümsüzlük.", type: "isim" },
+                { word: "Yalnızlık", definition: "Terk edilmişlik, soyutlanma.", type: "isim" },
+                
+                // Atmosfer & Ortam
+                { word: "Loş", definition: "Yarı karanlık, sönük, solgun.", type: "sıfat" },
+                { word: "Puslu", definition: "Sisli, bulanık, belirsiz.", type: "sıfat" },
+                { word: "Rutubetli", definition: "Nemli, ıslak, çürümeye müsait.", type: "sıfat" },
+                { word: "Küflü", definition: "Çürük kokulu, bayat, eski.", type: "sıfat" },
+                { word: "Çürümüş", definition: "Bozulmuş, kokmuş, parçalanmış.", type: "sıfat" },
+                { word: "Sessizlik", definition: "Ses olmama, tam sükûnet.", type: "isim" },
+                { word: "Gürültü", definition: "Rahatsız edici ses, patırtı.", type: "isim" },
+                { word: "Fısıltı", definition: "Çok alçak ses, kulağa söyleme.", type: "isim" },
+                { word: "İnilti", definition: "Acı çeken kişinin sesi.", type: "isim" },
+                { word: "Çığlık", definition: "Keskin yüksek korku sesi.", type: "isim" },
+                { word: "Hırıltı", definition: "Boğazdan gelen hışırtılı ses.", type: "isim" },
+                { word: "Gıcırtı", definition: "Sürtünmeden çıkan tiz ses.", type: "isim" },
+                { word: "Çatırtı", definition: "Kırılma, kırışma sesi.", type: "isim" },
+                { word: "Mezarlık", definition: "Ölülerin defnedildiği alan.", type: "isim" },
+                { word: "Bodrum", definition: "Binanın en alt karanlık katı.", type: "isim" },
+                { word: "Tavan arası", definition: "Çatı altı toz dolu boşluk.", type: "isim" },
+                { word: "Koridor", definition: "Uzun dar geçit, hol.", type: "isim" },
+                { word: "Labirent", definition: "Karmaşık yolların oluşturduğu çıkmaz.", type: "isim" },
+                { word: "Uçurum", definition: "Derin düşüş, kenar tehlike.", type: "isim" },
+                { word: "Bataklık", definition: "Çamurlu, batıran sulak alan.", type: "isim" }
+            ],
+            distopya: [
+                // Toplum Kontrol
+                { word: "Totalitarizm", definition: "Her şeyin devlet kontrolünde olması.", type: "isim" },
+                { word: "Baskı", definition: "Zorla susturma, özgürlük engeli.", type: "isim" },
+                { word: "Sansür", definition: "Bilgi ve ifade engellemesi.", type: "isim" },
+                { word: "Manipülasyon", definition: "Aldatarak yönlendirme, kandırma.", type: "isim" },
+                { word: "İdeoloji", definition: "Toplumu yönlendiren fikir sistemi.", type: "isim" },
+                { word: "Doktrin", definition: "Dayatılan resmi öğreti.", type: "isim" },
+                { word: "Beyin yıkama", definition: "Düşünce kontrolü, zihin programlama.", type: "isim" },
+                { word: "Gözetleme", definition: "Her hareketi izleme, takip.", type: "isim" },
+                { word: "Kamera ağı", definition: "Şehri kaplayan göz sistemi.", type: "isim" },
+                { word: "Kimlik kartı", definition: "Vatandaş takip ve kontrol belgesi.", type: "isim" },
+                { word: "Çip", definition: "Vücuda takılı izleme cihazı.", type: "isim" },
+                { word: "Kimlik numarası", definition: "Bireye atanan kod.", type: "isim" },
+                { word: "İhlal", definition: "Yasak çiğneme, kural bozma.", type: "isim" },
+                { word: "Ceza", definition: "Yasak eyleme verilen acı.", type: "isim" },
+                { word: "İnfaz", definition: "Ölüm cezasını uygulama.", type: "isim" },
+                { word: "Sürgün", definition: "Zorla başka yere gönderme.", type: "isim" },
+                { word: "Tecrit", definition: "Toplumdan ayırma, izolasyon.", type: "isim" },
+                { word: "Karantina", definition: "Hastalık veya tehlike nedeniyle kapanma.", type: "isim" },
+                { word: "Yasaklama", definition: "Kesin men etme, durdurma.", type: "isim" },
+                { word: "Sokağa çıkma yasağı", definition: "Dışarıda dolaşma engeli.", type: "isim" },
+                
+                // Sınıf & Eşitsizlik
+                { word: "Aristokrasi", definition: "Soylu zümrenin ayrıcalıklı yönetimi.", type: "isim" },
+                { word: "Proletar", definition: "İşçi sınıfı, emekçi kitleler.", type: "isim" },
+                { word: "Ayrıcalık", definition: "Sadece belirli gruba tanınan hak.", type: "isim" },
+                { word: "Eşitsizlik", definition: "Haklar ve fırsatlarda adaletsizlik.", type: "isim" },
+                { word: "Seçkinler", definition: "Toplumun en üst tabakası, elit.", type: "isim" },
+                { word: "Yoksulluk", definition: "Şiddetli fakirlik, yoksunluk.", type: "isim" },
+                { word: "Açlık", definition: "Beslenme eksikliği, kıtlık.", type: "isim" },
+                { word: "Kıtlık", definition: "Temel ihtiyaçların yetersizliği.", type: "isim" },
+                { word: "Rant", definition: "Haksız kazanç, kayırmacılık.", type: "isim" },
+                { word: "Sömürü", definition: "Zayıfı kullanma, haksız faydalanma.", type: "isim" },
+                { word: "Kölelik", definition: "İnsanın mülk olarak kullanılması.", type: "isim" },
+                { word: "Hiyerarşi", definition: "Katı sosyal mertebe düzeni.", type: "isim" },
+                
+                // İsyan & Direniş
+                { word: "İsyan", definition: "Sisteme karşı ayaklanma.", type: "isim" },
+                { word: "Ayaklanma", definition: "Kitlesel başkaldırı.", type: "isim" },
+                { word: "Devrim", definition: "Düzeni değiştirme hareketi.", type: "isim" },
+                { word: "Direniş", definition: "Zorbalığa karşı durma.", type: "isim" },
+                { word: "Yeraltı", definition: "Gizli muhalif örgütlenme.", type: "isim" },
+                { word: "Sabotaj", definition: "Sisteme gizli zarar verme.", type: "isim" },
+                { word: "Suikast", definition: "Politik cinayet planı.", type: "isim" },
+                { word: "Darbe", definition: "Güç ele geçirme hareketi.", type: "isim" },
+                { word: "Anarşist", definition: "Otorite karşıtı aktivist.", type: "isim" },
+                { word: "Muhalif", definition: "Karşı çıkan, düşman.", type: "isim" },
+                { word: "İhanet", definition: "Vatan veya gruba ihanet.", type: "isim" },
+                { word: "Komplo", definition: "Gizli kötü plan, suikast.", type: "isim" },
+                { word: "Darbe", definition: "Ani hükümet devirmesi.", type: "isim" },
+                
+                // Çevre & Yıkım
+                { word: "Ekolojik felaket", definition: "Doğanın geri dönüşsüz tahribi.", type: "isim" },
+                { word: "Nükleer kış", definition: "Radyasyon sonrası buzul çağı.", type: "isim" },
+                { word: "Kuraklık", definition: "Su eksikliği, çöl iklimi.", type: "isim" },
+                { word: "Sel", definition: "Aşırı su baskını, taşkın.", type: "isim" },
+                { word: "Kirlilik", definition: "Hava-su-toprak zehirlenmesi.", type: "isim" },
+                { word: "Toksik", definition: "Zehirli, zararlı, öldürücü.", type: "sıfat" },
+                { word: "Radyoaktif", definition: "Radyasyon yayan, ışınlı.", type: "sıfat" },
+                { word: "Mutasyon", definition: "Radyasyondan kalıcı değişim.", type: "isim" },
+                { word: "Salgın", definition: "Hızla yayılan hastalık.", type: "isim" },
+                { word: "Pandem", definition: "Küresel ölçekte salgın.", type: "isim" },
+                { word: "Virüs", definition: "Bulaşıcı tehlikeli hastalık.", type: "isim" },
+                { word: "Karantina", definition: "Hastalıktan koruma izolasyonu.", type: "isim" },
+                { word: "Enkaz", definition: "Çökmüş binaların kalıntıları.", type: "isim" },
+                { word: "Harabeye dönmüş", definition: "Tamamen yıkılmış, kullanılamaz.", type: "sıfat" },
+                
+                // Teknoloji Karanlığı
+                { word: "Drone", definition: "İnsansız hava aracı, gözetleme.", type: "isim" },
+                { word: "Asker robot", definition: "Savaş makinesi, katil otomat.", type: "isim" },
+                { word: "Yapay zeka tiranlığı", definition: "Makinelerin insan yönetimi.", type: "isim" },
+                { word: "Siber saldırı", definition: "Dijital sistemlere sabotaj.", type: "isim" },
+                { word: "Veri madenciliği", definition: "Kişisel bilgi çalma.", type: "isim" },
+                { word: "Dijital kimlik", definition: "Sanal varlık, online profil.", type: "isim" },
+                { word: "Algoritma baskısı", definition: "Yazılımın insan kontrolü.", type: "isim" },
+                { word: "Sosyal kredi", definition: "Davranışa göre puan sistemi.", type: "isim" }
+            ],
+            teknoloji: [
+                // Yapay Zeka
+                { word: "Öğrenme", definition: "Veriden deneyim kazanma yeteneği.", type: "isim" },
+                { word: "Sinir ağı", definition: "Beyin benzeri bağlantılı işlem birimi.", type: "isim" },
+                { word: "Derin öğrenme", definition: "Çok katmanlı yapay sinir ağı.", type: "isim" },
+                { word: "Makine öğrenmesi", definition: "Bilgisayarın kendi kendine iyileşmesi.", type: "isim" },
+                { word: "Kendi kendini programlama", definition: "Yazılımın kendi kodunu yazması.", type: "isim" },
+                { word: "Öz-farkındalık", definition: "Makinenin kendini bilmesi.", type: "isim" },
+                { word: "Öz-iyileştirme", definition: "Hatalardan öğrenip düzelme.", type: "isim" },
+                { word: "Turing testi", definition: "Makinenin insanca düşündüğünü kanıtlama.", type: "isim" },
+                { word: "Zekâ patlaması", definition: "Kontrolsüz AI gelişimi.", type: "isim" },
+                { word: "Tekno-evrim", definition: "Teknolojik doğal seçilim.", type: "isim" },
+                
+                // Siber Dünya
+                { word: "Siber-uzay", definition: "Dijital ağların oluşturduğu sanal evren.", type: "isim" },
+                { word: "Matris", definition: "Tüm sistemleri birleştiren kod ağı.", type: "isim" },
+                { word: "Veri denizi", definition: "Sonsuz bilgi akışı.", type: "isim" },
+                { word: "Dijital hayalet", definition: "Sistemde iz bırakmayan kullanıcı.", type: "isim" },
+                { word: "Darknet", definition: "İnternet'in gizli karanlık katmanı.", type: "isim" },
+                { word: "Kripto para", definition: "Şifreli dijital para birimi.", type: "isim" },
+                { word: "Blockchain", definition: "Dağıtık kayıt sistemi, blok zincir.", type: "isim" },
+                { word: "NFT", definition: "Benzersiz dijital varlık sertifikası.", type: "isim" },
+                { word: "Metaverse", definition: "Kalıcı sanal evren, dijital dünya.", type: "isim" },
+                { word: "Sanal gerçeklik", definition: "Bilgisayar yaratımı deneyim dünyası.", type: "isim" },
+                { word: "Artırılmış gerçeklik", definition: "Gerçek üzerine dijital katman.", type: "isim" },
+                { word: "Karma gerçeklik", definition: "Fiziksel ve sanal karışımı.", type: "isim" },
+                
+                // Siber Güvenlik
+                { word: "Hacker", definition: "Sisteme izinsiz giren kod ustası.", type: "isim" },
+                { word: "Exploit", definition: "Güvenlik açığından faydalanma.", type: "isim" },
+                { word: "Zero-day", definition: "Henüz bilinmeyen güvenlik açığı.", type: "isim" },
+                { word: "Backdoor", definition: "Gizli arka kapı erişimi.", type: "isim" },
+                { word: "Trojan", definition: "Zararsız gibi görünen zararlı yazılım.", type: "isim" },
+                { word: "Ransomware", definition: "Veri rehin alan fidye yazılımı.", type: "isim" },
+                { word: "Phishing", definition: "Sahte sitelerle bilgi çalma.", type: "isim" },
+                { word: "DDoS saldırısı", definition: "Sistemi trafikle çökertme.", type: "isim" },
+                { word: "Şifre kırma", definition: "Parolaları deneme-yanılma ile bulma.", type: "isim" },
+                { word: "SQL injection", definition: "Veritabanına zararlı kod enjekte etme.", type: "isim" },
+                { word: "XSS", definition: "Web sitesine kod yerleştirme saldırısı.", type: "isim" },
+                { word: "Botnet", definition: "Kontrol edilen zombie bilgisayar ağı.", type: "isim" },
+                
+                // Biyoteknoloji
+                { word: "CRISPR", definition: "Gen düzenleme makas teknolojisi.", type: "isim" },
+                { word: "Gen terapisi", definition: "Hastalıklı geni düzeltme tedavisi.", type: "isim" },
+                { word: "DNA programlama", definition: "Genetik kod yazımı.", type: "isim" },
+                { word: "Transhumanizm", definition: "İnsanı teknolojik geliştirme felsefesi.", type: "isim" },
+                { word: "Kök hücre", definition: "Her hücreye dönüşebilen ana hücre.", type: "isim" },
+                { word: "Klonlama", definition: "Genetik kopyalama.", type: "isim" },
+                { word: "Tasarlanmış bebek", definition: "Genetik özellikleri seçilmiş insan.", type: "isim" },
+                { word: "Organ basımı", definition: "3D yazıcıyla doku üretme.", type: "isim" },
+                { word: "Nöral implant", definition: "Beyne takılan elektronik çip.", type: "isim" },
+                { word: "Beyin-bilgisayar arayüzü", definition: "Düşüncelerle makine kontrolü.", type: "isim" },
+                
+                // Robotik & Otomasyon
+                { word: "Androi", definition: "İnsan görünümlü robot.", type: "isim" },
+                { word: "Humanoidi", definition: "İnsansı yapay varlık.", type: "isim" },
+                { word: "Otonom", definition: "Kendi kendine karar veren.", type: "sıfat" },
+                { word: "Drone sürüsü", definition: "Koordineli insansız araç filosu.", type: "isim" },
+                { word: "Nano-robot", definition: "Mikroskobik boyutta makine.", type: "isim" },
+                { word: "Servo motor", definition: "Hassas konum kontrol motoru.", type: "isim" },
+                { word: "Aktuatör", definition: "Hareketi sağlayan mekanik parça.", type: "isim" },
+                { word: "Sensör", definition: "Çevre algılama cihazı.", type: "isim" },
+                { word: "LiDAR", definition: "Lazer mesafe ölçüm sistemi.", type: "isim" },
+                { word: "Otonom araç", definition: "Sürücüsüz kendi kendine giden taşıt.", type: "isim" }
+            ],
+            doganotu: [
+                // Büyü & Sihir
+                { word: "Büyü", definition: "Doğaüstü güçlerle gerçekleştirilen olağanüstü eylem.", type: "isim" },
+                { word: "Sihir", definition: "Fizik kurallarını delen güç kullanımı.", type: "isim" },
+                { word: "Büyücü", definition: "Doğaüstü güçleri kontrol eden kişi.", type: "isim" },
+                { word: "Cadı", definition: "Karanlık büyü yapan kadın.", type: "isim" },
+                { word: "Büyücü çırağı", definition: "Sihir öğrenen acemi.", type: "isim" },
+                { word: "Runik yazı", definition: "Gizemli sembollerle yazılmış büyü.", type: "isim" },
+                { word: "İksir", definition: "Büyülü etkileri olan sıvı.", type: "isim" },
+                { word: "Tılsım", definition: "Koruma veya güç veren büyülü obje.", type: "isim" },
+                { word: "Muska", definition: "Koruyucu büyülü yazı.", type: "isim" },
+                { word: "Lanet", definition: "Birini kötü talihle mahkum etme büyüsü.", type: "isim" },
+                { word: "Kara büyü", definition: "Kötü amaçlı, tehlikeli sihir.", type: "isim" },
+                { word: "Ak büyü", definition: "İyi amaçlı, iyileştirici sihir.", type: "isim" },
+                { word: "Kehanet", definition: "Geleceği görme yeteneği, falcılık.", type: "isim" },
+                { word: "Telepati", definition: "Zihinler arası iletişim.", type: "isim" },
+                { word: "Telekinezi", definition: "Zihinle obje hareket ettirme.", type: "isim" },
+                { word: "Levitasyon", definition: "havada asılı durma, uçma.", type: "isim" },
+                { word: "Illüzyon", definition: "Gerçek olmayan görüntü yaratma.", type: "isim" },
+                { word: "Dönüşüm", definition: "Şekil değiştirme, başkalaşım.", type: "isim" },
+                { word: "Büyülü asa", definition: "Gücü odaklayan değnek.", type: "isim" },
+                { word: "Grimoire", definition: "Büyü kitabı, sihir ansiklopedisi.", type: "isim" },
+                { word: "Çağrı büyüsü", definition: "Varlık çağırma ayini.", type: "isim" },
+                { word: "Koruma tılsımı", definition: "Zararlı güçlere karşı kalkan.", type: "isim" },
+                
+                // Mitolojik Varlıklar
+                { word: "Ejderha", definition: "Dev kanatlı ateş püskürten sürüngen.", type: "isim" },
+                { word: "Fenik", definition: "Küllerinden yeniden doğan ateş kuşu.", type: "isim" },
+                { word: "Grifon", definition: "Kartal başlı aslan vücutlu yaratık.", type: "isim" },
+                { word: "Unicorn", definition: "Alnında boynuzlu beyaz at.", type: "isim" },
+                { word: "Centaur", definition: "Yarı insan yarı at yaratık.", type: "isim" },
+                { word: "Minotur", definition: "Boğa başlı insan vücutlu canavar.", type: "isim" },
+                { word: "Medusa", definition: "Yılan saçlı taşlaştıran kadın.", type: "isim" },
+                { word: "Harpie", definition: "Kuş vücutlu kadın başlı yaratık.", type: "isim" },
+                { word: "Golem", definition: "Topraktan yaratılan cansız hizmetkar.", type: "isim" },
+                { word: "Trol", definition: "Kaba saba dev yaratık.", type: "isim" },
+                { word: "Goblin", definition: "Küçük sinsi kötücül varlık.", type: "isim" },
+                { word: "Ork", definition: "Vahşi savaşçı yaratık.", type: "isim" },
+                { word: "Elf", definition: "Zarif uzun ömürlü büyülü halk.", type: "isim" },
+                { word: "Cüce", definition: "Kısa boylu usta maden işçisi.", type: "isim" },
+                { word: "Peri", definition: "Uçan ufak büyülü varlık.", type: "isim" },
+                { word: "Cin", definition: "Dumandan yaratılmış doğaüstü varlık.", type: "isim" },
+                { word: "İfrit", definition: "Ateşten yaratılmış güçlü cin.", type: "isim" },
+                { word: "Karakoncolos", definition: "Kış gecelerinde dolaşan kötü ruh.", type: "isim" },
+                { word: "Banshee", definition: "Ölümü haber veren çığlık atan ruh.", type: "isim" },
+                { word: "Succubus", definition: "Erkeklerin enerjisini emen kadın demon.", type: "isim" },
+                { word: "Incubus", definition: "Kadınların enerjisini emen erkek demon.", type: "isim" },
+                { word: "Basilisk", definition: "Bakışı öldüren yılan kral.", type: "isim" },
+                { word: "Cerber", definition: "Üç başlı cehennem bekçisi köpek.", type: "isim" },
+                { word: "Hidra", definition: "Çok başlı su yılanı, kesilen baş yenilenir.", type: "isim" },
+                
+                // Gizemli Güçler
+                { word: "Aura", definition: "Varlıkları saran enerji alanı.", type: "isim" },
+                { word: "Çakra", definition: "Bedendeki enerji merkezleri.", type: "isim" },
+                { word: "Ether", definition: "Görünmez evrensel enerji.", type: "isim" },
+                { word: "Mana", definition: "Büyülerin kaynağı olan sihirli enerji.", type: "isim" },
+                { word: "Ruhani enerji", definition: "Fizikötesi yaşam gücü.", type: "isim" },
+                { word: "Astral seyahat", definition: "Ruhun bedenden ayrılıp gezinmesi.", type: "isim" },
+                { word: "Astral düzlem", definition: "Ruhlar aleminin katmanı.", type: "isim" },
+                { word: "Portal", definition: "Boyutlar arası geçiş kapısı.", type: "isim" },
+                { word: "Paralel dünya", definition: "Bizimkine benzer alternatif gerçeklik.", type: "isim" },
+                { word: "Zaman döngüsü", definition: "Tekrar eden sürekli zaman halkası.", type: "isim" },
+                { word: "Kehanetin tutması", definition: "Öngörünün gerçekleşmesi.", type: "isim" },
+                { word: "Üçüncü göz", definition: "Fizikötesi algılama yeteneği.", type: "isim" },
+                { word: "Rüya yürüyüşü", definition: "Başkalarının rüyasına girme.", type: "isim" },
+                
+                // Kutsal & Lanetli Objeler
+                { word: "Excalibur", definition: "Efsanevi kayadan çıkan kılıç.", type: "isim" },
+                { word: "Kutsal kase", definition: "Sonsuz hayat veren kadeh.", type: "isim" },
+                { word: "Pandora'nın kutusu", definition: "Tüm kötülükleri saklayan kutu.", type: "isim" },
+                { word: "Felsefe taşı", definition: "Kurşunu altına çeviren efsanevi taş.", type: "isim" },
+                { word: "Ölümsüzlük iksiri", definition: "Sonsuza kadar yaşatan sıvı.", type: "isim" },
+                { word: "Zamanda dondurucu", definition: "Zamanı durduran artefakt.", type: "isim" },
+                { word: "Ruh emici kılıç", definition: "Öldürdüklerinin ruhunu alan silah.", type: "isim" },
+                { word: "Görünmezlik pelerini", definition: "Giyen görünmez olan kumaş.", type: "isim" },
+                { word: "Sonsuz torba", definition: "İçi sınırsız alan olan çanta.", type: "isim" },
+                { word: "Ayna dünyası", definition: "Aynada var olan ters gerçeklik.", type: "isim" },
+                
+                // Doğaüstü Olaylar
+                { word: "Kıyamet", definition: "Dünyanın sonu, son gün.", type: "isim" },
+                { word: "Apokalips", definition: "Yok edici büyük felaket.", type: "isim" },
+                { word: "Ruhlar alemi", definition: "Ölülerin yaşadığı boyut.", type: "isim" },
+                { word: "Reenkarnasyon", definition: "Ruhun yeni bedende tekrar doğuşu.", type: "isim" },
+                { word: "Ölümsüzlük", definition: "Sonsuza kadar yaşama durumu.", type: "isim" },
+                { word: "Geçmiş yaşam", definition: "Önceki varoluşun anıları.", type: "isim" },
+                { word: "Zaman yolculuğu", definition: "Geçmiş veya geleceğe seyahat.", type: "isim" },
+                { word: "Boyut kayması", definition: "Farklı gerçekliğe ani geçiş.", type: "isim" },
+                { word: "Kuantum sıçraması", definition: "Fizik kurallarını delen ani değişim.", type: "isim" }
+            ]
+        };
+
+        const scenePrompts = [
+            "Işıkların titrediği terk edilmiş bir uzay istasyonunda tek başınasın. Duvarlardan garip bir sıvı sızıyor.",
+            "Yeraltı şehrinin neon ışıklarında yürürken birinin seni takip ettiğini hissediyorsun.",
+            "Hologram ekranlar çılgınca titreşiyor. Sistemde bir şey çok yanlış gidiyor.",
+            "Kriyo-uyku kapsülünden uyandın. Ama ekip 200 yıl önce ölmüş olmalıydı...",
+            "Şehir üstündeki dev ekranda yüzün var. Ama sen o ekrana hiç poz vermedin.",
+            "Laboratuvarın derinliklerinden gelen çığlıklar giderek yaklaşıyor.",
+            "Gökyüzü bölünüyor. İki ay var. Dün sadece bir taneydi.",
+            "Aynaya baktığında yansıman sana farklı şeyler söylüyor.",
+            "Karanlık koridorda sadece kırmızı acil durum ışıkları yanıyor. Birşey nefes alıyor.",
+            "Terk edilmiş binada bulduğun günlük, daha dün yazılmış. Ama burası 50 yıldır boş."
+        ];
+
+        const characterHints = [
+            "Yapay zekaya sahip bir androitten şüpheleniyorsun ama tam emin değilsin.",
+            "Genetik değişim geçirmiş bir bilim insanı. Mutasyon kontrol dışına çıkıyor.",
+            "Hafızası silinmiş eski bir ajan. Geçmişindeki sırlar peşini bırakmıyor.",
+            "Zihin okuma yeteneği kazanmış biri. Ama bu yetenek onu delirtiyor.",
+            "Tek başına hayatta kalan son insan. Ya da öyle sanıyor.",
+            "Rüyalarında başka bir boyutu gören biri. Rüyalar gerçekleşmeye başladı.",
+            "İki kimliği olan bir karakter. Hangisinin gerçek olduğunu bilmiyor.",
+            "Zamanı 10 saniye geriye alabiliyor. Ama her kullanımda bir şeyler kaybediyor.",
+            "Görünmezlik yeteneği var ama vücudu yavaş yavaş kaybolmaya başladı.",
+            "Ölümden dönen biri. Artık farklı şeyler görebiliyor."
+        ];
+
+        const plotTwists = [
+            "Ana karakter aslında klonlanmış bir kopya. Orijinali öldürülmüş.",
+            "Tüm şehir dev bir simülasyon. Gerçek dünya çok daha kötü.",
+            "Kurtarmaya çalıştığın kişi aslında seni tuzağa çekiyor.",
+            "Geçmişe gönderilen mesajlar geleceği değiştiriyor ama kimin gönderdiği bilinmiyor.",
+            "İki düşman taraf aslında aynı güç tarafından manipüle ediliyor.",
+            "Kahramanın kurtardığı şey aslında en büyük tehdit.",
+            "Zaman döngüsündesin ve bu sonsuz kere yaşandı.",
+            "Dünya çoktan yok olmuş. Tüm insanlık dijital kopyalar halinde yaşıyor.",
+            "Ana karakter ölmüş. Şimdi hayalet olarak olayları izliyor.",
+            "Virüs kaza değildi. Bilerek yayıldı ve amacı şaşırtıcı."
+        ];
+
+        const atmospheres = [
+            "Ağır metal kokusu, paslanmış demirin soğuk yüzeyleri. Sessizlik kulakları tırmalıyor.",
+            "Neon ışıklar titre titre yanıp sönüyor. Her köşe gölge dolu, rahatsız edici.",
+            "Nemli, küf kokulu, boğucu bir hava. Duvarlar ter içinde, sanki nefes alıyorlar.",
+            "Kristal berraklığında bir sessizlik. Çok sessiz. Kulak zarlarını zorlayacak kadar sessiz.",
+            "Kırmızı alarm ışıkları her şeyi kana boyuyor. Tekrarlayan siren sesi kafa karıştırıcı.",
+            "Elektrik çatırtıları. Statik yüklenmiş hava. Kılların diken diken oluşu.",
+            "Gecenin en karanlık saati. Ay ışığı bile buraya ulaşmıyor gibir.",
+            "Soluduğun her nefes metalik bir tat bırakıyor. Hava filtrelerden geçmiş ama güvende değilsin.",
+            "Titreyen hologramlar gerçeklikle karışıyor. Hangisi gerçek hangisi projeksiyon anlaşılmıyor.",
+            "Dondurucu soğuk. Her nefeste ağrı. Parmaklar hissizleşiyor."
+        ];
+
+        let currentMode = 'scifi';
+        let totalWordsShown = 0;
+
+        // Mod seçimi
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentMode = this.dataset.mode;
+            });
+        });
+
+        // Kelime oluştur
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            generateWords();
+        });
+
+        // Sahne üreteci
+        document.getElementById('sceneBtn').addEventListener('click', function() {
+            const scene = scenePrompts[Math.floor(Math.random() * scenePrompts.length)];
+            showQuote(scene);
+        });
+
+        // Karakter ipucu
+        document.getElementById('characterBtn').addEventListener('click', function() {
+            const hint = characterHints[Math.floor(Math.random() * characterHints.length)];
+            showQuote(hint);
+        });
+
+        // Olay örgüsü
+        document.getElementById('plotBtn').addEventListener('click', function() {
+            const plot = plotTwists[Math.floor(Math.random() * plotTwists.length)];
+            showQuote(plot);
+        });
+
+        // Atmosfer önerisi
+        document.getElementById('atmosphereBtn').addEventListener('click', function() {
+            const atmos = atmospheres[Math.floor(Math.random() * atmospheres.length)];
+            const box = document.getElementById('atmosphereBox');
+            box.textContent = atmos;
+            box.style.display = 'block';
+        });
+
+        // Prompt üreteci
+        document.getElementById('promptBtn').addEventListener('click', function() {
+            const scene = scenePrompts[Math.floor(Math.random() * scenePrompts.length)];
+            const char = characterHints[Math.floor(Math.random() * characterHints.length)];
+            const prompt = `BAŞLANGIÇ: ${scene}\n\nKARAKTER: ${char}`;
+            
+            const display = document.getElementById('promptDisplay');
+            display.textContent = prompt;
+            display.classList.add('show');
+        });
+
+        function showQuote(text) {
+            const quoteEl = document.getElementById('inspirationQuote');
+            quoteEl.textContent = text;
+            quoteEl.classList.add('show');
+            
+            setTimeout(() => {
+                quoteEl.classList.remove('show');
+            }, 8000);
+        }
+
+        function generateWords() {
+            const container = document.getElementById('wordsContainer');
+            const words = wordDatabase[currentMode];
+            const count = Math.floor(Math.random() * 6) + 5; // 5-10 arası
+            
+            // Rastgele kelime seç
+            const shuffled = [...words].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, count);
+            
+            // Kartları oluştur
+            container.innerHTML = '';
+            selected.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'word-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="word-title">
+                        ${item.word}
+                        <span class="word-type">${item.type}</span>
+                    </div>
+                    <div class="word-definition">${item.definition}</div>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            totalWordsShown += count;
+            document.getElementById('stats').textContent = 
+                `// ${count} KELİME AKTİF • TOPLAM ${totalWordsShown} KELİME TARandı //`;
+        }
+
+        // İlk yüklemede otomatik kelime göster
+        generateWords();
+    </script>
+</body>
+</html>
