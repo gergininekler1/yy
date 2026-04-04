@@ -3,267 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Öykü Mimarı v6.0 | Showrunner</title>
+    <title>Öykü Mimarı v7.0 | Mood Director</title>
     <style>
         :root {
-            --bg: #000000;
-            --card: #181818;
+            --bg: #050505;
+            --card: #121212;
             --accent: #E50914;
             --text: #ffffff;
-            --text-dim: #a0a0a0;
-            --nav-bg: #121212;
+            --text-dim: #888;
+            /* Mood Colors */
+            --mood-tense: #ff4d4d;
+            --mood-sad: #4d94ff;
+            --mood-calm: #4dff88;
+            --mood-mystery: #a366ff;
+            --mood-action: #ff944d;
         }
 
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0; padding-bottom: 90px;
-        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; }
+        
+        .header { padding: 15px; background: #000; border-bottom: 1px solid #222; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-size: 1.1rem; color: var(--accent); margin: 0; letter-spacing: 2px; }
 
-        .header {
-            padding: 15px;
-            background: var(--nav-bg);
-            border-bottom: 1px solid #333;
-            text-align: center;
-        }
-
-        .header h1 { font-size: 1.4rem; color: var(--accent); margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-
-        .tab-content { display: none; padding: 15px; animation: fadeIn 0.4s; }
+        .tab-content { display: none; padding: 15px; animation: slideUp 0.3s ease-out; }
         .tab-content.active { display: block; }
+        @keyframes slideUp { from {opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);} }
 
-        @keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
-
-        /* NETFLIX KARAKTER KARTLARI */
-        .char-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; }
-        .char-card {
-            width: 45%;
+        /* MOOD SAHNE KARTLARI */
+        .scene-container { margin-top: 15px; }
+        .scene-card {
             background: var(--card);
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid #333;
-        }
-        .char-img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            background: #222;
-        }
-        .char-info { padding: 10px; }
-        .char-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 4px; display: block; }
-        .char-role { color: var(--accent); font-size: 0.75rem; display: block; }
-        .char-delete {
-            position: absolute; top: 5px; right: 5px;
-            background: rgba(0,0,0,0.7); color: white;
-            border-radius: 50%; width: 20px; height: 20px;
-            text-align: center; line-height: 18px; font-size: 12px; cursor: pointer;
-        }
-
-        /* REHBER VE İPUÇLARI */
-        .guide-box {
-            background: #1e1e1e;
-            border-left: 4px solid var(--accent);
+            border-radius: 10px;
             padding: 12px;
-            margin-bottom: 15px;
-            font-size: 0.85rem;
-            color: #ddd;
+            margin-bottom: 10px;
+            border-left: 6px solid #444;
+            position: relative;
         }
-        .inspiration-chip {
-            background: #2a2a2a;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            margin-bottom: 15px;
-            color: #f1c40f;
-            border: 1px dashed #444;
-        }
+        .scene-card.tense { border-left-color: var(--mood-tense); }
+        .scene-card.sad { border-left-color: var(--mood-sad); }
+        .scene-card.calm { border-left-color: var(--mood-calm); }
+        .scene-card.mystery { border-left-color: var(--mood-mystery); }
+        .scene-card.action { border-left-color: var(--mood-action); }
 
-        /* FORM ELEMANLARI */
-        .input-group { margin-bottom: 15px; }
-        label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
-        input, textarea, select {
-            width: 100%; background: #262626; border: 1px solid #333;
-            color: white; padding: 12px; border-radius: 4px; margin-top: 5px;
-            box-sizing: border-box; font-size: 0.95rem;
-        }
+        .scene-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .scene-mood-tag { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: #222; }
 
-        .writing-area { height: 400px; line-height: 1.7; font-family: 'Georgia', serif; }
+        /* KARAKTER KARTLARI (NETFLIX) */
+        .char-scroll { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
+        .char-mini-card { flex: 0 0 110px; background: var(--card); border-radius: 6px; overflow: hidden; border: 1px solid #222; }
+        .char-mini-img { width: 100%; height: 130px; object-fit: cover; }
+        .char-mini-name { padding: 5px; font-size: 0.75rem; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* EDITÖR */
+        .mood-selector { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding: 5px 0; }
+        .mood-btn { padding: 6px 12px; border-radius: 15px; border: 1px solid #333; background: #111; color: white; font-size: 0.7rem; cursor: pointer; white-space: nowrap; }
+        .mood-btn.active { border-color: var(--accent); background: var(--accent); }
+
+        textarea { width: 100%; background: #111; border: 1px solid #222; color: #ddd; padding: 15px; border-radius: 8px; font-size: 1rem; line-height: 1.7; box-sizing: border-box; }
+        .writing-zone { height: calc(100vh - 280px); min-height: 300px; }
 
         /* NAVİGASYON */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%;
-            background: var(--nav-bg); display: flex;
-            justify-content: space-around; padding: 12px 0;
-            border-top: 1px solid #333; z-index: 1000;
-        }
-        .nav-item { color: var(--text-dim); font-size: 0.7rem; text-align: center; }
-        .nav-item.active { color: var(--accent); font-weight: bold; }
-
-        .btn-main {
-            background: var(--accent); color: white; border: none;
-            padding: 12px; border-radius: 4px; width: 100%;
-            font-weight: bold; text-transform: uppercase; margin-top: 10px;
-        }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #222; }
+        .nav-item { color: var(--text-dim); font-size: 0.65rem; text-align: center; }
+        .nav-item.active { color: var(--accent); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>PROJECT: SHOWRUNNER</h1>
+    <h1>MOOD DIRECTOR <small>v7</small></h1>
 </div>
 
-<div id="dna" class="tab-content active">
-    <div class="input-group">
-        <label>Öykü İsmi</label>
-        <input type="text" id="mainTitle" oninput="saveAll()">
-    </div>
-
-    <div style="border-bottom: 1px solid #333; padding-bottom: 10px;">
-        <h2>Karakter Kadrosu</h2>
-        <div class="char-grid" id="charGrid"></div>
-        <div class="input-group" style="margin-top:20px; background: #111; padding: 10px; border-radius: 8px;">
-            <input type="text" id="newCharName" placeholder="Karakter İsmi">
-            <input type="text" id="newCharRole" placeholder="Rolü (Örn: Antagonist)">
-            <input type="text" id="newCharImg" placeholder="Fotoğraf URL (Opsiyonel)">
-            <button class="btn-main" onclick="addCharacter()">Kadroya Ekle</button>
+<div id="cast" class="tab-content active">
+    <h2>🎭 Karakter Kadrosu</h2>
+    <div class="char-scroll" id="charScroll">
         </div>
+    <div style="margin-top:20px; background: #111; padding: 15px; border-radius: 10px;">
+        <input type="text" id="cName" placeholder="İsim" style="width:100%; margin-bottom:10px; background:#222; border:none; padding:10px; color:white;">
+        <input type="text" id="cImg" placeholder="Fotoğraf URL" style="width:100%; margin-bottom:10px; background:#222; border:none; padding:10px; color:white;">
+        <button onclick="addCast()" style="width:100%; background:var(--accent); color:white; border:none; padding:10px; border-radius:5px; font-weight:bold;">KADROYA EKLE</button>
     </div>
 </div>
 
-<div id="structure" class="tab-content">
-    <div id="structureGuide" class="guide-box">Seçili aşama için rehber burada görünecek.</div>
-    
-    <div class="input-group">
-        <label>Aşama Seç:</label>
-        <select id="structSelect" onchange="updateStructureGuide()">
-            <option value="serim">1. SERİM (Giriş)</option>
-            <option value="dugum">2. DÜĞÜM (Olayın Başlaması)</option>
-            <option value="gelisme">3. GELİŞME (Engeller)</option>
-            <option value="doruk">4. DORUK (Hesaplaşma)</option>
-            <option value="cozum">5. ÇÖZÜM (Final)</option>
-        </select>
+<div id="scenes" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>🎬 Sahne Akışı</h2>
+        <button onclick="addNewSceneCard()" style="background:#222; color:white; border:1px solid #444; padding:5px 10px; border-radius:5px; font-size:0.7rem;">+ YENİ SAHNE</button>
     </div>
-    <textarea id="stagePlanInput" style="height: 200px;" placeholder="Bu aşamanın detaylarını buraya not al..." oninput="saveAll()"></textarea>
+    <div class="scene-container" id="sceneList">
+        </div>
 </div>
 
 <div id="write" class="tab-content">
-    <div id="inspiration" class="inspiration-chip" onclick="newInspiration()">💡 İpucu: Karakterin o anki kokuyu veya sesi duymasını sağla.</div>
-    
-    <div id="currentStageInfo" style="font-size: 0.75rem; color: var(--accent); margin-bottom: 5px; font-weight: bold;">MOD: SERİM</div>
-    <textarea id="mainDraft" class="writing-area" placeholder="Sahneyi canlandır..." oninput="saveAll()"></textarea>
-    
-    <button class="btn-main" style="background:#222; border:1px solid #444;" onclick="downloadDraft()">Taslağı İndir</button>
+    <div class="mood-selector" id="moodPicker">
+        <div class="mood-btn active" onclick="setMood('tense', this)">🔥 Gerilimli</div>
+        <div class="mood-btn" onclick="setMood('sad', this)">💧 Hüzünlü</div>
+        <div class="mood-btn" onclick="setMood('calm', this)">🍃 Sakin</div>
+        <div class="mood-btn" onclick="setMood('mystery', this)">🔮 Gizemli</div>
+        <div class="mood-btn" onclick="setMood('action', this)">⚡ Aksiyon</div>
+    </div>
+    <textarea id="editor" class="writing-zone" placeholder="Sahneyi hisset ve yazmaya başla..." oninput="syncWrite()"></textarea>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('dna', this)"><span>🧬</span><br>DNA</div>
-    <div class="nav-item" onclick="switchTab('structure', this)"><span>⏳</span><br>YAPI</div>
-    <div class="nav-item" onclick="switchTab('write', this)"><span>🖋️</span><br>YAZ</div>
+    <div class="nav-item active" onclick="switchTab('cast', this)"><span>👥</span><br>KADRO</div>
+    <div class="nav-item" onclick="switchTab('scenes', this)"><span>🎞️</span><br>SAHNELER</div>
+    <div class="nav-item" onclick="switchTab('write', this)"><span>🖋️</span><br>YAZIM</div>
 </nav>
 
 <script>
-    // DATA MODEL
-    let db = JSON.parse(localStorage.getItem('showrunner_db')) || {
-        title: "",
+    let project = JSON.parse(localStorage.getItem('mood_v7')) || {
         chars: [],
-        plans: { serim: "", dugum: "", gelisme: "", doruk: "", cozum: "" },
-        draft: ""
+        scenes: [],
+        currentDraft: "",
+        currentMood: "tense"
     };
-
-    const guides = {
-        serim: "Karakterin sıradan dünyasını tanıt. Bir eksiklik veya içsel huzursuzluk hissettir. Atmosferi kur.",
-        dugum: "Karakteri konfor alanından çıkaran o olay! Artık geri dönüş yok. Macera çağrısı burada gerçekleşir.",
-        gelisme: "Engellerin büyüdüğü yer. Karakter deniyor ve yanılıyor. Yardımcılarla tanışıyor.",
-        doruk: "En yüksek gerilim! Karakter en büyük korkusuyla yüzleşir. Maskeler düşer. Hikayenin kalbi burasıdır.",
-        cozum: "Toz duman dağılır. Karakter değişti mi? Yeni dünya düzeni nasıl? Tüm soruları cevapla (veya bilerek açık bırak)."
-    };
-
-    const tips = [
-        "💡 İpucu: 'Anlatma, göster.' Karakterin üzgün olduğunu söyleme, titreyen ellerini anlat.",
-        "💡 İpucu: Diyalogları kısa tut. Gerçek insanlar nadiren uzun nutuk çeker.",
-        "💡 İpucu: Her sahne bir çatışma içermelidir. Kim ne istiyor ve kim engel oluyor?",
-        "💡 İpucu: Beş duyuyu kullan. Hava nasıl kokuyor? Zemin ayaklarının altında nasıl hissettiriyor?",
-        "💡 İpucu: Karakterine bir 'zaaf' ver. Kusursuz kahramanlar sıkıcıdır."
-    ];
 
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         el.classList.add('active');
-        if(id === 'write') {
-            const currentStage = document.getElementById('structSelect').value;
-            document.getElementById('currentStageInfo').innerText = "MOD: " + currentStage.toUpperCase();
-        }
     }
 
-    function updateStructureGuide() {
-        const val = document.getElementById('structSelect').value;
-        document.getElementById('structureGuide').innerText = guides[val];
-        document.getElementById('stagePlanInput').value = db.plans[val] || "";
-    }
-
-    function addCharacter() {
-        const name = document.getElementById('newCharName').value;
-        const role = document.getElementById('newCharRole').value;
-        const img = document.getElementById('newCharImg').value || 'https://via.placeholder.com/150/222/fff?text=Character';
-        
+    // KARAKTER SİSTEMİ
+    function addCast() {
+        const name = document.getElementById('cName').value;
+        const img = document.getElementById('cImg').value || 'https://via.placeholder.com/110x130/222/fff?text=No+Img';
         if(!name) return;
-        db.chars.push({ name, role, img, id: Date.now() });
-        saveAll();
+        project.chars.push({name, img, id: Date.now()});
+        save();
         renderChars();
-        document.getElementById('newCharName').value = "";
-        document.getElementById('newCharRole').value = "";
-    }
-
-    function deleteChar(id) {
-        db.chars = db.chars.filter(c => c.id !== id);
-        saveAll();
-        renderChars();
+        document.getElementById('cName').value = "";
     }
 
     function renderChars() {
-        const grid = document.getElementById('charGrid');
-        grid.innerHTML = db.chars.map(c => `
-            <div class="char-card">
-                <div class="char-delete" onclick="deleteChar(${c.id})">×</div>
-                <img src="${c.img}" class="char-img">
-                <div class="char-info">
-                    <span class="char-name">${c.name}</span>
-                    <span class="char-role">${c.role}</span>
+        const scroll = document.getElementById('charScroll');
+        scroll.innerHTML = project.chars.map(c => `
+            <div class="char-mini-card" onclick="if(confirm('Silinsin mi?')) deleteChar(${c.id})">
+                <img src="${c.img}" class="char-mini-img">
+                <span class="char-mini-name">${c.name}</span>
+            </div>
+        `).join('');
+    }
+
+    function deleteChar(id) {
+        project.chars = project.chars.filter(c => c.id !== id);
+        save(); renderChars();
+    }
+
+    // SAHNE SİSTEMİ
+    function addNewSceneCard() {
+        const desc = prompt("Sahne özeti (Zaman çizelgesi için):");
+        if(!desc) return;
+        project.scenes.push({desc, mood: project.currentMood, id: Date.now()});
+        save();
+        renderScenes();
+    }
+
+    function renderScenes() {
+        const list = document.getElementById('sceneList');
+        list.innerHTML = project.scenes.map((s, index) => `
+            <div class="scene-card ${s.mood}">
+                <div class="scene-header">
+                    <span style="font-size:0.8rem; font-weight:bold;">Sahne ${index + 1}</span>
+                    <span class="scene-mood-tag">${s.mood}</span>
+                </div>
+                <div style="font-size:0.85rem; color:#ccc;">${s.desc}</div>
+                <div style="margin-top:10px; display:flex; gap:10px;">
+                    <small style="color:var(--accent);" onclick="loadSceneToEditor(${index})">Düzenle</small>
+                    <small style="color:#666;" onclick="deleteScene(${index})">Sil</small>
                 </div>
             </div>
         `).join('');
     }
 
-    function newInspiration() {
-        const chip = document.getElementById('inspiration');
-        chip.innerText = tips[Math.floor(Math.random() * tips.length)];
+    // YAZIM SİSTEMİ
+    function setMood(mood, btn) {
+        project.currentMood = mood;
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        save();
     }
 
-    function saveAll() {
-        db.title = document.getElementById('mainTitle').value;
-        db.draft = document.getElementById('mainDraft').value;
-        const stage = document.getElementById('structSelect').value;
-        db.plans[stage] = document.getElementById('stagePlanInput').value;
-        localStorage.setItem('showrunner_db', JSON.stringify(db));
+    function syncWrite() {
+        project.currentDraft = document.getElementById('editor').value;
+        save();
+    }
+
+    function save() {
+        localStorage.setItem('mood_v7', JSON.stringify(project));
     }
 
     window.onload = () => {
-        document.getElementById('mainTitle').value = db.title || "";
-        document.getElementById('mainDraft').value = db.draft || "";
         renderChars();
-        updateStructureGuide();
+        renderScenes();
+        document.getElementById('editor').value = project.currentDraft;
     };
 
-    function downloadDraft() {
-        const blob = new Blob([db.draft], {type:'text/plain'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = (db.title || 'oyku') + '.txt';
-        a.click();
+    function deleteScene(index) {
+        project.scenes.splice(index, 1);
+        save(); renderScenes();
     }
 </script>
 
