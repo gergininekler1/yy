@@ -1,0 +1,587 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body-wrapper {
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .app {
+    font-family: 'DM Sans', sans-serif;
+    background: #0a0a0f;
+    min-height: 100vh;
+    padding: 0;
+    color: #f0eee8;
+  }
+
+  .header {
+    padding: 28px 24px 16px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #f0eee8;
+    letter-spacing: -0.5px;
+  }
+
+  .logo span {
+    color: #c8a96e;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: rgba(240,238,232,0.4);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .badge {
+    font-size: 10px;
+    background: rgba(200,169,110,0.15);
+    color: #c8a96e;
+    border: 0.5px solid rgba(200,169,110,0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  .word-bank-section {
+    padding: 20px 24px 12px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  }
+
+  .section-label {
+    font-size: 10px;
+    color: rgba(240,238,232,0.35);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .textarea-wrap {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #f0eee8;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 12px 14px;
+    resize: none;
+    outline: none;
+    height: 80px;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus {
+    border-color: rgba(200,169,110,0.4);
+  }
+
+  textarea::placeholder {
+    color: rgba(240,238,232,0.2);
+  }
+
+  .word-count {
+    font-size: 10px;
+    color: rgba(240,238,232,0.3);
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  .controls {
+    padding: 14px 24px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-generate {
+    background: #c8a96e;
+    color: #0a0a0f;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    flex: 1;
+    min-width: 140px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-generate:active { transform: scale(0.98); opacity: 0.9; }
+
+  .btn-clear {
+    background: transparent;
+    color: rgba(240,238,232,0.4);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .btn-clear:hover { color: #f0eee8; border-color: rgba(255,255,255,0.25); }
+
+  .mode-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .mode-btn {
+    background: transparent;
+    border: none;
+    color: rgba(240,238,232,0.4);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-btn.active {
+    background: rgba(200,169,110,0.15);
+    color: #c8a96e;
+  }
+
+  .cards-section {
+    padding: 6px 16px 20px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .word-card {
+    background: #13131a;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 18px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .word-card:hover {
+    border-color: rgba(200,169,110,0.35);
+    transform: translateY(-1px);
+  }
+
+  .word-card.featured {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #16141e 0%, #13131a 100%);
+    border-color: rgba(200,169,110,0.2);
+  }
+
+  .card-number {
+    font-size: 10px;
+    color: rgba(200,169,110,0.4);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .card-word {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #f0eee8;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .word-card.featured .card-word {
+    font-size: 28px;
+  }
+
+  .card-type {
+    font-size: 10px;
+    color: #c8a96e;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-meaning {
+    font-size: 12px;
+    color: rgba(240,238,232,0.55);
+    line-height: 1.5;
+  }
+
+  .card-accent {
+    position: absolute;
+    right: 0; top: 0;
+    width: 3px;
+    height: 100%;
+    background: rgba(200,169,110,0.15);
+    border-radius: 0 14px 14px 0;
+  }
+
+  .word-card.featured .card-accent {
+    width: 100%;
+    height: 3px;
+    top: 0; right: auto; left: 0;
+    background: rgba(200,169,110,0.2);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .story-prompt {
+    margin: 12px 16px 0;
+    background: rgba(200,169,110,0.05);
+    border: 0.5px solid rgba(200,169,110,0.15);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .story-prompt-label {
+    font-size: 10px;
+    color: #c8a96e;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .story-prompt-text {
+    font-size: 13px;
+    color: rgba(240,238,232,0.7);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  .saved-section {
+    padding: 12px 24px 20px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+  }
+
+  .saved-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .chip {
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: rgba(240,238,232,0.6);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .chip-remove {
+    color: rgba(240,238,232,0.3);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .chip-remove:hover { color: #c8a96e; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 24px;
+    color: rgba(240,238,232,0.25);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 30px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #c8a96e;
+    border-radius: 50%;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    padding: 10px 24px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    border-bottom: 0.5px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.01);
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 18px;
+    font-weight: 500;
+    color: #c8a96e;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    color: rgba(240,238,232,0.3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+
+<div class="app" id="app">
+
+  <div class="header">
+    <div>
+      <div class="logo">S枚z<span>k枚艧k眉</span></div>
+      <div class="subtitle">Yazar谋n kelime atlas谋</div>
+    </div>
+    <div class="badge">v1.0</div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-label">脺retilen</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-saved">0</div>
+      <div class="stat-label">Kaydedilen</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-sessions">0</div>
+      <div class="stat-label">Oturum</div>
+    </div>
+  </div>
+
+  <div class="word-bank-section">
+    <div class="section-label">Kendi kelime havuzun (iste臒e ba臒l谋)</div>
+    <div class="textarea-wrap">
+      <textarea id="wordBank" placeholder="Buraya kelime listenizi yap谋艧t谋r谋n... (枚rn: h眉z眉n, umut, k谋y谋, sessizlik, gece...) Bo艧 b谋rak谋rsan谋z genel T眉rk莽e kelime da臒arc谋臒谋ndan 眉retilir." oninput="updateWordCount()"></textarea>
+    </div>
+    <div class="word-count" id="wordCount">0 kelime</div>
+  </div>
+
+  <div class="controls">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-random" onclick="setMode('random')">Rastgele</button>
+      <button class="mode-btn" id="mode-thematic" onclick="setMode('thematic')">Tematik</button>
+    </div>
+    <button class="btn-clear" onclick="clearCards()">Temizle</button>
+    <button class="btn-generate" id="genBtn" onclick="generateWords()">鉁� Kelime 脺ret</button>
+  </div>
+
+  <div class="cards-section">
+    <div id="cardsContainer">
+      <div class="empty-state">
+        <div class="empty-icon">馃摉</div>
+        <div>Kelime 眉retmek i莽in butona bas.<br>Her kelime bir 枚yk眉n眉n tohumudur.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="storyPromptContainer"></div>
+
+  <div class="saved-section" id="savedSection" style="display:none">
+    <div class="section-label">Kaydedilen kelimeler</div>
+    <div class="saved-chips" id="savedChips"></div>
+  </div>
+
+</div>
+
+<script>
+let mode = 'random';
+let savedWords = [];
+let totalGenerated = 0;
+let sessions = 0;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-random').classList.toggle('active', m === 'random');
+  document.getElementById('mode-thematic').classList.toggle('active', m === 'thematic');
+}
+
+function updateWordCount() {
+  const text = document.getElementById('wordBank').value.trim();
+  if (!text) { document.getElementById('wordCount').textContent = '0 kelime'; return; }
+  const count = text.split(/[\s,貙;]+/).filter(w => w.length > 1).length;
+  document.getElementById('wordCount').textContent = count + ' kelime';
+}
+
+function clearCards() {
+  document.getElementById('cardsContainer').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">馃摉</div>
+      <div>Kelime 眉retmek i莽in butona bas.<br>Her kelime bir 枚yk眉n眉n tohumudur.</div>
+    </div>`;
+  document.getElementById('storyPromptContainer').innerHTML = '';
+}
+
+async function generateWords() {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  const bankText = document.getElementById('wordBank').value.trim();
+  let wordListInstruction = '';
+  if (bankText) {
+    const bankWords = bankText.split(/[\s,貙;貙\n]+/).filter(w => w.length > 1);
+    if (bankWords.length >= 5) {
+      wordListInstruction = `艦U KEL陌ME HAVUZUNDAN 5 kelime se莽: [${bankWords.join(', ')}]. YALNIZCA bu listeden se莽.`;
+    }
+  }
+
+  const modeInstruction = mode === 'thematic'
+    ? 'K谋sa 枚yk眉 yazarl谋臒谋na ilham verecek, duygusal ve imgelem a莽谋c谋 kelimeler se莽.'
+    : '脟e艧itli kategorilerden (somut/soyut, eylem/isim, duygu/nesne kar谋艧谋k) rastgele kelimeler se莽.';
+
+  const prompt = `Sen bir T眉rk莽e kelime k眉rasyonu asistan谋s谋n. 脰yk眉 yazarlar谋na ilham vermek i莽in ${wordListInstruction || modeInstruction}
+
+5 adet T眉rk莽e kelime 眉ret. Her biri i莽in 艧u JSON format谋n谋 kullan:
+[
+  {"kelime": "...", "tur": "isim/s谋fat/fiil/zarf", "anlam": "k谋sa T眉rk莽e tan谋m (max 12 kelime)", "imgelem": "tek c眉mle: bu kelimeyle bir sahne 枚nerisi"}
+]
+
+SADECE JSON d枚nd眉r. Ba艧ka a莽谋klama ekleme.`;
+
+  document.getElementById('cardsContainer').innerHTML = `<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  document.getElementById('storyPromptContainer').innerHTML = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content.map(i => i.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const words = JSON.parse(clean);
+
+    sessions++;
+    totalGenerated += words.length;
+    document.getElementById('stat-total').textContent = totalGenerated;
+    document.getElementById('stat-sessions').textContent = sessions;
+
+    renderCards(words);
+    renderStoryPrompt(words);
+
+  } catch(e) {
+    document.getElementById('cardsContainer').innerHTML = `<div class="empty-state" style="color:rgba(200,80,80,0.7)">Bir hata olu艧tu. Tekrar dene.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '鉁� Kelime 脺ret';
+}
+
+function renderCards(words) {
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML = '<div class="cards-grid" id="grid"></div>';
+  const grid = document.getElementById('grid');
+
+  words.forEach((w, i) => {
+    const featured = i === 0;
+    const card = document.createElement('div');
+    card.className = `word-card${featured ? ' featured' : ''} fade-in`;
+    card.style.animationDelay = (i * 0.07) + 's';
+    card.innerHTML = `
+      <div class="card-accent"></div>
+      <div class="card-number">0${i+1}</div>
+      <div class="card-word">${w.kelime}</div>
+      <div class="card-type">${w.tur || ''}</div>
+      <div class="card-meaning">${w.anlam}</div>
+    `;
+    card.onclick = () => saveWord(w.kelime);
+    grid.appendChild(card);
+  });
+}
+
+function renderStoryPrompt(words) {
+  const kelimeliste = words.map(w => w.kelime).join(', ');
+  const imgelem = words[0]?.imgelem || '';
+
+  document.getElementById('storyPromptContainer').innerHTML = `
+    <div class="story-prompt fade-in">
+      <div class="story-prompt-label">鉁� 脰yk眉 k谋v谋lc谋m谋</div>
+      <div class="story-prompt-text">${imgelem || 'Bu kelimeleri kullanarak k谋sa bir sahne yaz: ' + kelimeliste}</div>
+    </div>`;
+}
+
+function saveWord(kelime) {
+  if (savedWords.includes(kelime)) return;
+  savedWords.push(kelime);
+  document.getElementById('stat-saved').textContent = savedWords.length;
+  renderSaved();
+}
+
+function removeWord(kelime) {
+  savedWords = savedWords.filter(w => w !== kelime);
+  document.getElementById('stat-saved').textContent = savedWords.length;
+  renderSaved();
+}
+
+function renderSaved() {
+  const sec = document.getElementById('savedSection');
+  const chips = document.getElementById('savedChips');
+  if (savedWords.length === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  chips.innerHTML = savedWords.map(w => `
+    <div class="chip">
+      ${w}
+      <span class="chip-remove" onclick="removeWord('${w}')">脳</span>
+    </div>`).join('');
+}
+</script>
