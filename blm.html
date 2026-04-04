@@ -1,135 +1,79 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html><html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Distopik Öykü Yazım Paneli</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distopik Yazım Paneli v2</title>
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0e0e0e;
-        color: #e0e0e0;
-    }
-    header {
-        background: #111;
-        padding: 20px;
-        text-align: center;
-        border-bottom: 2px solid crimson;
-    }
-    h1 {
-        color: crimson;
-    }
-    .container {
-        display: grid;
-        grid-template-columns: 250px 1fr;
-        height: calc(100vh - 80px);
-    }
-    nav {
-        background: #151515;
-        padding: 15px;
-        border-right: 1px solid #333;
-    }
-    nav button {
-        display: block;
-        width: 100%;
-        margin-bottom: 10px;
-        padding: 10px;
-        background: #222;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    nav button:hover {
-        background: crimson;
-    }
-    main {
-        padding: 20px;
-        overflow-y: auto;
-    }
-    textarea {
-        width: 100%;
-        height: 300px;
-        background: #1c1c1c;
-        color: white;
-        border: 1px solid #444;
-        padding: 10px;
-    }
-    input {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        background: #1c1c1c;
-        color: white;
-        border: 1px solid #444;
-    }
-    .section {
-        display: none;
-    }
-    .active {
-        display: block;
-    }
+body {margin:0;font-family:sans-serif;background:#0b0b0b;color:#eee;}
+header{padding:12px;text-align:center;background:#111;border-bottom:1px solid #333}
+h1{font-size:18px;color:#ff2e63;margin:0}
+.container{display:flex;flex-direction:column;height:100vh}
+nav{display:flex;overflow-x:auto;background:#151515}
+nav button{flex:1;padding:10px;background:#151515;color:#ccc;border:none}
+nav button.active{background:#ff2e63;color:#fff}
+main{flex:1;overflow:auto;padding:10px}
+textarea,input{width:100%;margin-bottom:10px;background:#1a1a1a;color:#fff;border:1px solid #333;padding:10px;border-radius:8px}
+button.action{width:100%;padding:12px;margin:5px 0;background:#ff2e63;color:white;border:none;border-radius:8px}
+.card{background:#141414;padding:10px;border-radius:10px;margin-bottom:10px}
 </style>
 </head>
-
 <body>
-
-<header>
-    <h1>Distopik Hikaye Yazım Paneli</h1>
-    <p>Bilim kurgu • Korku • Distopya</p>
-</header>
-
 <div class="container">
-
-<nav>
-    <button onclick="show('plan')">Proje Planı</button>
-    <button onclick="show('world')">Dünya Tasarımı</button>
-    <button onclick="show('characters')">Karakterler</button>
-    <button onclick="show('chapters')">Bölüm Yazımı</button>
-    <button onclick="show('notes')">Notlar</button>
-</nav>
-
-<main>
-
-<div id="plan" class="section active">
-    <h2>Proje Planı</h2>
-    <input placeholder="Kitap Adı">
-    <input placeholder="Tema (örn: Yapay zeka diktatörlüğü)">
-    <textarea placeholder="Hikayenin genel fikri..."></textarea>
+<header><h1>Distopik Yazım Paneli</h1></header><nav>
+<button onclick="show('write')" class="active">Yaz</button>
+<button onclick="show('ideas')">İlham</button>
+<button onclick="show('characters')">Karakter</button>
+</nav><main>
+<div id="write" class="section">
+<input id="title" placeholder="Bölüm başlığı">
+<textarea id="content" placeholder="Yazmaya başla..."></textarea>
+<button class="action" onclick="save()">Kaydet</button>
+</div><div id="ideas" class="section" style="display:none">
+<div class="card">
+<b>Kelime Üret</b>
+<p id="word"></p>
+<button class="action" onclick="generateWord()">Kelime Üret</button>
 </div>
-
-<div id="world" class="section">
-    <h2>Dünya Tasarımı</h2>
-    <textarea placeholder="Dünya nasıl bir yer? (yıkılmış şehirler, teknoloji seviyesi, rejim vb.)"></textarea>
+<div class="card">
+<b>Sahne Fikri</b>
+<p id="scene"></p>
+<button class="action" onclick="generateScene()">Sahne Üret</button>
 </div>
-
-<div id="characters" class="section">
-    <h2>Karakterler</h2>
-    <input placeholder="Karakter adı">
-    <textarea placeholder="Karakter geçmişi, motivasyonu, korkuları..."></textarea>
+<div class="card">
+<b>Plot Twist</b>
+<p id="twist"></p>
+<button class="action" onclick="generateTwist()">Twist Üret</button>
 </div>
-
-<div id="chapters" class="section">
-    <h2>Bölüm Yazımı</h2>
-    <input placeholder="Bölüm başlığı">
-    <textarea placeholder="Hikayeni burada yaz..."></textarea>
+</div><div id="characters" class="section" style="display:none">
+<input id="charName" placeholder="Karakter adı">
+<textarea id="charDesc" placeholder="Özellikler..."></textarea>
+<button class="action" onclick="saveChar()">Kaydet</button>
+<div id="charList"></div>
 </div>
-
-<div id="notes" class="section">
-    <h2>Notlar & İlham</h2>
-    <textarea placeholder="Aklına gelen karanlık fikirler, sahneler, diyaloglar..."></textarea>
-</div>
-
 </main>
+</div><script>
+function show(id){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active')}
 
-</div>
+function save(){localStorage.setItem('story',document.getElementById('content').value);alert('Kaydedildi')}
+window.onload=function(){document.getElementById('content').value=localStorage.getItem('story')||''}
 
-<script>
-function show(sectionId) {
-    let sections = document.querySelectorAll('.section');
-    sections.forEach(sec => sec.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-}
-</script>
+const words=["karanlık","simülasyon","çürüme","yapay zeka","parazit","unutulmuş","protokol","gözetim","virüs","koloni"]
+function generateWord(){document.getElementById('word').innerText=words[Math.floor(Math.random()*words.length)]}
 
-</body>
+const scenes=[
+"Şehirde elektrikler kesilir ve herkes aynı rüyayı görür",
+"Bir karakter aynada kendisinin farklı bir versiyonunu fark eder",
+"Yapay zeka insanların düşüncelerini silmeye başlar"
+]
+function generateScene(){document.getElementById('scene').innerText=scenes[Math.floor(Math.random()*scenes.length)]}
+
+const twists=[
+"Ana karakter aslında sistemin yaratıcısıdır",
+"Gerçek dünya çoktan yok olmuştur",
+"Düşman aslında insanlığın son umududur"
+]
+function generateTwist(){document.getElementById('twist').innerText=twists[Math.floor(Math.random()*twists.length)]}
+
+function saveChar(){let name=document.getElementById('charName').value;let desc=document.getElementById('charDesc').value;let list=document.getElementById('charList');let div=document.createElement('div');div.className='card';div.innerText=name+" - "+desc;list.appendChild(div)}
+</script></body>
 </html>
