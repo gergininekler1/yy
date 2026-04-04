@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öykü Mimarı | Writer's Room</title>
+    <title>Öykü Mimarı v3.0 | Director's Cut</title>
     <style>
-        /* NETFLIX TARZI MODERN TASARIM */
         :root {
             --bg-color: #141414;
             --card-bg: #181818;
@@ -22,300 +21,203 @@
             color: var(--text-main);
             margin: 0;
             padding: 20px;
-            line-height: 1.6;
         }
 
+        .container { max-width: 1200px; margin: auto; }
+        
         .header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header h1 {
-            color: var(--primary-red);
-            font-size: 2.5rem;
-            margin: 0;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        @media (max-width: 768px) {
-            .grid-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .section {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            color: var(--text-main);
-            margin-top: 0;
-            border-left: 4px solid var(--primary-red);
-            padding-left: 10px;
-        }
-
-        label {
-            display: block;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            background-color: #333;
-            color: white;
-            border: 1px solid #444;
-            padding: 10px;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-            transition: border 0.3s;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-red);
-        }
-
-        textarea { height: 80px; resize: vertical; }
-        
-        .writing-area { height: 250px; font-size: 16px; line-height: 1.8; }
-
-        button {
-            background-color: var(--primary-red);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 15px;
-            transition: background 0.3s;
-        }
-
-        button:hover { background-color: var(--hover-red); }
-        button.secondary { background-color: #333; border: 1px solid #555; }
-        button.secondary:hover { background-color: #444; }
-
-        /* KELİME SAYACI & PROGRESS BAR */
-        .progress-container {
-            background-color: #333;
-            border-radius: 4px;
-            height: 10px;
-            width: 100%;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary-red);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .stats {
             display: flex;
             justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 5px;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-red);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
 
-        .dynamic-item {
-            background-color: #222;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 4px;
-            border-left: 2px solid #555;
+        .header h1 { color: var(--primary-red); margin: 0; letter-spacing: 2px; }
+
+        .grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
+
+        .panel {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
         }
-        
-        .top-bar {
-            display: flex;
-            justify-content: flex-end;
-            max-width: 1200px;
-            margin: 0 auto 20px auto;
+
+        h2 { font-size: 1.1rem; border-left: 3px solid var(--primary-red); padding-left: 10px; margin-bottom: 20px; }
+
+        /* SÜRÜKLE BIRAK STİLLERİ */
+        .scene-card {
+            background: #222;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: grab;
+            border: 1px solid #444;
+            transition: transform 0.2s;
         }
+        .scene-card:active { cursor: grabbing; transform: scale(0.98); }
+        .scene-card.dragging { opacity: 0.5; border: 1px dashed var(--primary-red); }
+
+        textarea, input {
+            width: 100%; background: #2b2b2b; color: white; border: 1px solid #444;
+            padding: 12px; border-radius: 5px; margin-top: 5px; box-sizing: border-box;
+        }
+
+        button {
+            background: var(--primary-red); color: white; border: none; padding: 10px 15px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        button:hover { background: var(--hover-red); }
+        .btn-twist { background: #e59400; color: black; margin-top: 10px; width: 100%; }
+
+        /* TWIST MODAL */
+        #twistDisplay {
+            display: none;
+            background: #e59400; color: black; padding: 15px;
+            border-radius: 5px; margin-top: 10px; font-weight: bold;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+        .stats-bar { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>ÖYKÜ MİMARI</h1>
-    <p style="color: var(--text-muted); margin-top: 5px;">Karanlığa hoş geldin. Yaratmaya başla.</p>
-</div>
-
-<div class="top-bar">
-    <button onclick="exportTxt()">📥 Taslağı İndir (.txt)</button>
-</div>
-
-<div class="grid-container">
-    
-    <div>
-        <div class="section" id="setup-section">
-            <h2>Temel Kurulum</h2>
-            <label>Öykü Adı</label>
-            <input type="text" id="storyTitle" class="saveable" placeholder="Başlık...">
-            
-            <label>Logline (Tek Cümlelik Özet)</label>
-            <textarea id="logline" class="saveable" placeholder="Karakterin hedefi ve engeli..."></textarea>
-            
-            <label>Tema</label>
-            <input type="text" id="theme" class="saveable" placeholder="Örn: Yalnızlık, İntikam...">
-        </div>
-
-        <div class="section">
-            <h2>Karakter Galerisi</h2>
-            <div id="characterList"></div>
-            <button class="secondary" onclick="addCharacter()">+ Yeni Karakter Ekle</button>
-        </div>
-
-        <div class="section">
-            <h2>Dinamik Sahneler</h2>
-            <div id="sceneList"></div>
-            <button class="secondary" onclick="addScene()">+ Yeni Sahne Ekle</button>
+<div class="container">
+    <div class="header">
+        <h1>ÖYKÜ MİMARI <small style="font-size: 0.4em; color: white;">v3.0</small></h1>
+        <div>
+            <button onclick="exportData()" style="background:#333;">💾 Kaydet & İndir</button>
         </div>
     </div>
 
-    <div>
-        <div class="section">
-            <h2>Serbest Yazım & Taslak</h2>
-            <label>Günlük Hedef: 500 Kelime</label>
-            <textarea id="draftArea" class="saveable writing-area" placeholder="Hikayen buradan başlıyor..."></textarea>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="wordProgress"></div>
+    <div class="grid">
+        <div class="side-panel">
+            <div class="panel">
+                <h2>Olay Örgüsü (Sahneler)</h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Sahneleri sürükleyerek sırasını değiştir.</p>
+                <div id="sceneContainer">
+                    </div>
+                <button onclick="addNewScene()" style="width: 100%; background: #333; margin-top:10px;">+ Sahne Ekle</button>
             </div>
-            <div class="stats">
-                <span id="wordCount">0 Kelime</span>
-                <span>Hedef: 500</span>
+
+            <div class="panel" style="margin-top: 20px;">
+                <h2>Twist Jeneratörü</h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Hikaye tıkandı mı? Bir sürpriz patlat!</p>
+                <button class="btn-twist" onclick="generateTwist()">⚡ Rastgele Twist Üret</button>
+                <div id="twistDisplay"></div>
             </div>
         </div>
 
-        <div class="section">
-            <h2>Dramatik Yapı Notları</h2>
-            <label>Tetikleyici Olay</label>
-            <textarea id="inciting" class="saveable"></textarea>
-            
-            <label>Kriz & Doruk Noktası (Climax)</label>
-            <textarea id="climax" class="saveable"></textarea>
+        <div class="main-content">
+            <div class="panel">
+                <h2>Yazım Atölyesi</h2>
+                <input type="text" id="storyTitle" placeholder="Öykü Başlığı..." style="font-size: 1.5rem; border: none; background: transparent; border-bottom: 1px solid #333;">
+                <textarea id="mainDraft" style="height: 500px; margin-top: 20px; font-size: 1.1rem; line-height: 1.8;" placeholder="Anlatmaya başla..."></textarea>
+                <div class="stats-bar">
+                    <span id="wordCount">0 Kelime</span>
+                    <span>Mod: Odaklanma Açık</span>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
 <script>
-    // 1. OTOMATİK KAYIT SİSTEMİ (Local Storage)
-    const saveables = document.querySelectorAll('.saveable');
-    
-    // Sayfa yüklendiğinde verileri getir
-    window.onload = function() {
-        saveables.forEach(el => {
-            if(localStorage.getItem(el.id)) {
-                el.value = localStorage.getItem(el.id);
-            }
-            // Değişiklik anında kaydet
-            el.addEventListener('input', () => {
-                localStorage.setItem(el.id, el.value);
-            });
-        });
+    const twists = [
+        "En güvenilir karakterin aslında bir casus olduğu ortaya çıkar.",
+        "Karakterin elindeki gizemli eşya aslında geçmişten gelen bir mesajdır.",
+        "Beklenmedik bir doğal afet (fırtına, deprem) tüm planları bozar.",
+        "Ana karakterin aslında ölü olduğu veya bir simülasyonda olduğu anlaşılır.",
+        "Yardımcı karakter, kahramanın en büyük sırrını topluma açıklar.",
+        "Zaman çizelgesi aniden kırılır; olaylar aslında gelecekte geçiyordur."
+    ];
+
+    // Sürükle Bırak Mantığı
+    const container = document.getElementById('sceneContainer');
+
+    function addNewScene(content = "") {
+        const id = Date.now();
+        const card = document.createElement('div');
+        card.className = 'scene-card';
+        card.draggable = true;
+        card.innerHTML = `
+            <textarea placeholder="Sahne detayı..." oninput="saveAll()">${content}</textarea>
+            <small style="color: #666; cursor:pointer;" onclick="this.parentElement.remove(); saveAll();">Sil</small>
+        `;
         
-        loadDynamicItems('characters', 'characterList');
-        loadDynamicItems('scenes', 'sceneList');
-        updateWordCount();
+        card.addEventListener('dragstart', () => card.classList.add('dragging'));
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+        
+        container.appendChild(card);
+    }
+
+    container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        const dragging = document.querySelector('.dragging');
+        if (afterElement == null) {
+            container.appendChild(dragging);
+        } else {
+            container.insertBefore(dragging, afterElement);
+        }
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.scene-card:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Twist Jeneratörü
+    function generateTwist() {
+        const display = document.getElementById('twistDisplay');
+        const randomTwist = twists[Math.floor(Math.random() * twists.length)];
+        display.innerText = "YENİ KRİZ: " + randomTwist;
+        display.style.display = 'block';
+    }
+
+    // Kelime Sayacı
+    document.getElementById('mainDraft').addEventListener('input', function() {
+        const words = this.value.trim().split(/\s+/).filter(x => x.length > 0).length;
+        document.getElementById('wordCount').innerText = words + " Kelime";
+        saveAll();
+    });
+
+    // Kayıt Fonksiyonu
+    function saveAll() {
+        const scenes = [...container.querySelectorAll('textarea')].map(t => t.value);
+        localStorage.setItem('scenes_v3', JSON.stringify(scenes));
+        localStorage.setItem('title_v3', document.getElementById('storyTitle').value);
+        localStorage.setItem('draft_v3', document.getElementById('mainDraft').value);
+    }
+
+    window.onload = () => {
+        document.getElementById('storyTitle').value = localStorage.getItem('title_v3') || "";
+        document.getElementById('mainDraft').value = localStorage.getItem('draft_v3') || "";
+        const savedScenes = JSON.parse(localStorage.getItem('scenes_v3') || "[]");
+        savedScenes.forEach(s => addNewScene(s));
     };
 
-    // 2. KELİME SAYACI VE İLERLEME ÇUBUĞU
-    const draftArea = document.getElementById('draftArea');
-    draftArea.addEventListener('input', updateWordCount);
-
-    function updateWordCount() {
-        let text = draftArea.value.trim();
-        let wordCount = text === "" ? 0 : text.split(/\s+/).length;
-        document.getElementById('wordCount').innerText = wordCount + " Kelime";
-        
-        let percentage = (wordCount / 500) * 100;
-        if(percentage > 100) percentage = 100;
-        document.getElementById('wordProgress').style.width = percentage + "%";
-    }
-
-    // 3. DİNAMİK KARAKTER VE SAHNE EKLEME
-    function addCharacter(name = "", role = "") {
-        const div = document.createElement('div');
-        div.className = 'dynamic-item';
-        div.innerHTML = `
-            <input type="text" placeholder="Karakter Adı" value="${name}" oninput="saveDynamicItems('characters', 'characterList')" style="margin-bottom:5px;">
-            <input type="text" placeholder="Rolü / Amacı" value="${role}" oninput="saveDynamicItems('characters', 'characterList')">
-        `;
-        document.getElementById('characterList').appendChild(div);
-        saveDynamicItems('characters', 'characterList');
-    }
-
-    function addScene(desc = "") {
-        const div = document.createElement('div');
-        div.className = 'dynamic-item';
-        div.innerHTML = `
-            <textarea placeholder="Sahne açıklaması ve çatışması..." oninput="saveDynamicItems('scenes', 'sceneList')">${desc}</textarea>
-        `;
-        document.getElementById('sceneList').appendChild(div);
-        saveDynamicItems('scenes', 'sceneList');
-    }
-
-    // Dinamik öğeleri kaydetme
-    function saveDynamicItems(storageKey, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input, textarea');
-        const data = Array.from(inputs).map(input => input.value);
-        localStorage.setItem(storageKey, JSON.stringify(data));
-    }
-
-    // Dinamik öğeleri yükleme
-    function loadDynamicItems(storageKey, containerId) {
-        const data = JSON.parse(localStorage.getItem(storageKey) || "[]");
-        if(storageKey === 'characters') {
-            for(let i=0; i<data.length; i+=2) {
-                addCharacter(data[i], data[i+1]);
-            }
-        } else if(storageKey === 'scenes') {
-            data.forEach(desc => addScene(desc));
-        }
-    }
-
-    // 4. DIŞA AKTARMA (EXPORT) SİSTEMİ
-    function exportTxt() {
-        let title = document.getElementById('storyTitle').value || "Isimsiz_Oyku";
-        let content = "=== " + title.toUpperCase() + " ===\n\n";
-        
-        content += "LOGLINE: " + document.getElementById('logline').value + "\n";
-        content += "TEMA: " + document.getElementById('theme').value + "\n\n";
-        
-        content += "--- TASLAK METİN ---\n";
-        content += document.getElementById('draftArea').value + "\n";
-        
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = title.replace(/\s+/g, '_') + '_Taslak.txt';
-        link.click();
+    function exportData() {
+        const title = document.getElementById('storyTitle').value || "Bölüm_1";
+        const content = document.getElementById('mainDraft').value;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = title + ".txt";
+        a.click();
     }
 </script>
 
