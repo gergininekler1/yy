@@ -3,129 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Öykü Mimarı v8.0 | Master Architect</title>
+    <title>Öykü Mimarı v9.0 | Dune Edition</title>
     <style>
+        /* image_0.png ve image_1.png'DAN ESİNLENEN RENK PALETİ VE TARZ */
         :root {
-            --bg: #0a0a0a;
-            --card: #141414;
-            --accent: #E50914;
-            --text: #ffffff;
-            --text-dim: #666;
-            --mindmap-line: #333;
+            --bg-deep: #0b0c10;
+            --card-deep: #12141a;
+            --accent-neon: #00ffff; /* Neon Turkuaz */
+            --accent-warm: #ffda44; /* Canlı Sarı */
+            --accent-green: #2ecc71; /* Asit Yeşil (Tetikleyici Olay) */
+            --text-main: #ffffff;
+            --text-muted: #8c9096;
+            --border-muted: #2d3038;
+            --body-text-font: 'Georgia', serif;
+            --ui-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-
-        /* MİND MAP & TİMELİNE GÖRSELİ */
-        .mindmap-container {
-            padding: 20px 10px;
-            background: #000;
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #222;
-        }
-        .mindmap-line {
-            position: absolute; top: 38px; left: 10%; right: 10%;
-            height: 2px; background: var(--mindmap-line); z-index: 1;
-        }
-        .node {
-            z-index: 2; text-align: center; width: 60px; position: relative;
-        }
-        .node-dot {
-            width: 12px; height: 12px; background: #333; border-radius: 50%;
-            margin: 0 auto 8px; border: 2px solid var(--bg); transition: 0.3s;
-        }
-        .node.active .node-dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-        .node-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; }
-        .node.active .node-label { color: var(--accent); font-weight: bold; }
-
-        /* ANALİZ PANELİ */
-        .analysis-box {
-            background: #1a1a1a; padding: 10px; border-radius: 8px; margin-bottom: 15px;
-            display: none; font-size: 0.8rem; border: 1px solid #333;
+        body {
+            font-family: var(--ui-font);
+            background: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Nav bar için */
         }
 
-        /* SAHNE LİSTESİ (SÜRÜKLENEBİLİR) */
-        .scene-item {
-            background: var(--card); padding: 15px; margin-bottom: 8px;
-            border-radius: 8px; border: 1px solid #222; display: flex; align-items: center;
+        /* HEADER */
+        .header {
+            padding: 15px;
+            background: var(--card-deep);
+            border-bottom: 1px solid var(--border-muted);
+            text-align: center;
         }
-        .scene-handle { margin-right: 15px; color: #444; cursor: grab; }
 
-        /* GENEL STİLLER */
-        .tab-content { display: none; padding: 15px; }
+        .header h1 {
+            font-size: 1.2rem;
+            color: var(--accent-neon);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* TAB İÇERİK */
+        .tab-content { display: none; padding: 15px; animation: fadeIn 0.4s; }
         .tab-content.active { display: block; }
-        textarea { width: 100%; background: #111; border: 1px solid #222; color: #ddd; padding: 15px; border-radius: 8px; font-size: 1rem; line-height: 1.6; min-height: 300px; }
-        
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #222; z-index: 1000; }
-        .nav-item { color: var(--text-dim); font-size: 0.7rem; text-align: center; }
-        .nav-item.active { color: var(--accent); }
 
-        button { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+        /* KART TABANLI DÜZEN */
+        .card {
+            background: var(--card-deep);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-muted);
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* GİRİŞ ALANLARI */
+        .input-group { margin-bottom: 15px; }
+        
+        input, textarea, select {
+            width: 100%;
+            background: #1c1e26;
+            border: 1px solid #2d3038;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        
+        input:focus, textarea:focus { border-color: var(--accent-neon); }
+        
+        /* KARAKTER KARTLARI (NETFLIX GRID) */
+        .char-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        
+        .char-card {
+            background: #1c1e26;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2d3038;
+            position: relative;
+        }
+        
+        .char-img { width: 100%; height: 120px; object-fit: cover; }
+        .char-name { padding: 8px; font-weight: bold; font-size: 0.85rem; }
+
+        /* YAZIM ALANI */
+        .writing-area { height: calc(100vh - 280px); line-height: 1.7; font-family: var(--body-text-font); }
+
+        /* YAZIM ASİSTANI (YENİ İPUÇLARI) */
+        .writer-assistant {
+            background: rgba(255, 218, 68, 0.1);
+            color: var(--accent-warm);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            border: 1px dashed var(--accent-warm);
+        }
+
+        /* NAVİGASYON (Alt Bar) */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--card-deep); display: flex;
+            justify-content: space-around; padding: 12px 0;
+            border-top: 1px solid var(--border-muted); z-index: 1000;
+        }
+        
+        .nav-item {
+            color: var(--text-muted); font-size: 0.7rem; text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        
+        .nav-item.active { color: var(--accent-neon); }
+        .nav-item.active .nav-icon { color: var(--accent-neon); }
+        
+        .nav-icon { font-size: 1.4rem; color: var(--text-muted); }
+
+        /* BUTONLAR */
+        button {
+            border: none; padding: 12px; border-radius: 6px;
+            width: 100%; font-weight: bold; text-transform: uppercase; margin-top: 10px;
+            cursor: pointer; font-size: 0.9rem;
+        }
+        
+        .btn-green { background: var(--accent-green); color: black; }
+        .btn-yellow { background: var(--accent-warm); color: black; }
     </style>
 </head>
 <body>
 
-<div class="mindmap-container">
-    <div class="mindmap-line"></div>
-    <div class="node active" id="node-serim">
-        <div class="node-dot"></div>
-        <div class="node-label">Serim</div>
+<div class="header">
+    <h1>ÖYKÜ MİMARI PRO</h1>
+</div>
+
+<div id="dna" class="tab-content active">
+    <div class="card">
+        <div class="card-title">🏗️ Proje DNA'sı</div>
+        <div class="input-group">
+            <input type="text" id="storyTitle" placeholder="Öykü Adı..." oninput="autoSave()">
+        </div>
+        <div class="input-group">
+            <textarea id="logline" placeholder="Logline: Kim, neyi, neden istiyor?" oninput="autoSave()"></textarea>
+        </div>
     </div>
-    <div class="node" id="node-dugum">
-        <div class="node-dot"></div>
-        <div class="node-label">Düğüm</div>
-    </div>
-    <div class="node" id="node-gelisme">
-        <div class="node-dot"></div>
-        <div class="node-label">Gelişme</div>
-    </div>
-    <div class="node" id="node-doruk">
-        <div class="node-dot"></div>
-        <div class="node-label">Doruk</div>
-    </div>
-    <div class="node" id="node-cozum">
-        <div class="node-dot"></div>
-        <div class="node-label">Çözüm</div>
+
+    <div class="card">
+        <div class="card-title">👥 Karakter Kadrosu</div>
+        <div class="char-grid" id="charGrid"></div>
+        <button class="btn-yellow" style="background:#1c1e26; color:white; border:1px solid #333;" onclick="addCharacter()">+ Karakter Ekle</button>
     </div>
 </div>
 
-<div id="analysisArea" class="tab-content">
-    <div class="analysis-box" id="analysisContent" style="display:block;">
-        Metni yazdıktan sonra analiz butonuna bas kanka.
+<div id="write" class="tab-content">
+    <div class="writer-assistant" id="currentTip">Hocanın İpucu: 'Anlatma, göster.' Karakterin duygularını eylemleriyle anlat.</div>
+    
+    <div class="card">
+        <div class="input-group">
+            <select id="stageSelect" onchange="autoSave()">
+                <option value="serim">Aşama: SERİM</option>
+                <option value="dugum">Aşama: DÜĞÜM</option>
+                <option value="gelisme">Aşama: GELİŞME</option>
+                <option value="doruk">Aşama: DORUK</option>
+                <option value="cozum">Aşama: ÇÖZÜM</option>
+            </select>
+        </div>
+        
+        <textarea id="mainDraft" class="writing-area" placeholder="Anlatmaya başla..." oninput="autoSave()"></textarea>
     </div>
-    <button onclick="analyzeText()">📊 Kelime Analizi Yap</button>
-</div>
-
-<div id="timeline" class="tab-content">
-    <div id="sceneList"></div>
-    <button onclick="addScenePrompt()">+ Yeni Sahne Ekle</button>
-</div>
-
-<div id="write" class="tab-content active">
-    <select id="stageSelect" onchange="updateMindMap()" style="width:100%; background:#222; color:white; padding:10px; border:none; border-radius:5px; margin-bottom:15px;">
-        <option value="serim">Aşama: SERİM</option>
-        <option value="dugum">Aşama: DÜĞÜM</option>
-        <option value="gelisme">Aşama: GELİŞME</option>
-        <option value="doruk">Aşama: DORUK</option>
-        <option value="cozum">Aşama: ÇÖZÜM</option>
-    </select>
-    <textarea id="mainEditor" placeholder="Kalemine kuvvet..." oninput="autoSave()"></textarea>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item" onclick="switchTab('timeline', this)"><span>🎞️</span><br>AKIŞ</div>
-    <div class="nav-item active" onclick="switchTab('write', this)"><span>🖋️</span><br>YAZ</div>
-    <div class="nav-item" onclick="switchTab('analysisArea', this)"><span>📊</span><br>ANALİZ</div>
+    <div class="nav-item active" onclick="switchTab('dna', this)">
+        <span class="nav-icon">🧬</span>
+        <span>DNA</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('write', this)">
+        <span class="nav-icon">🖋️</span>
+        <span>YAZ</span>
+    </div>
 </nav>
 
 <script>
-    let data = JSON.parse(localStorage.getItem('mimari_v8')) || {
-        scenes: [],
+    // DATA MODEL
+    let project = JSON.parse(localStorage.getItem('showrunner_v9')) || {
+        title: "",
+        logline: "",
+        chars: [],
         draft: "",
-        currentStage: "serim"
+        stage: "serim"
+    };
+
+    // HOCANIN İPUÇLARI (ASİSTAN)
+    const stageTips = {
+        serim: [
+            "Atmosferi kur kanka. Çevrenin kokusunu ve sesini anlat.",
+            "Karakterin sıradan dünyasını göster. Bir eksiklik hissettir.",
+            "Olayın geçtiği yeri bir dekor gibi değil, yaşayan bir yer gibi betimle."
+        ],
+        dugum: [
+            "Karakteri konfor alanından çıkaran olay! Artık geri dönüş yok.",
+            "Tetikleyici olay şaşırtıcı ve net olmalı.",
+            "Karakter 'Macera Çağrısı'nı kabul etmek zorunda kalmalı."
+        ],
+        gelisme: [
+            "Engellerin büyüdüğü yer. Karakter yanılıyor, öğreniyor.",
+            "Her sahne bir çatışma içermelidir kanka. Kim engel oluyor?",
+            "Yeni karakterler ve müttefiklerle tanıştır."
+        ],
+        doruk: [
+            "En yüksek gerilim! Karakter en büyük korkusuyla yüzleşir.",
+            "Tüm soruların cevabını bu hesaplaşmada ver.",
+            "Karakterin maskesi düşer ve dönüşüm gerçekleşir."
+        ],
+        cozum: [
+            "Toz duman dağılır. Karakter değişti mi?",
+            "Yeni bir dünya düzeni kur. Tüm açık uçları kapat kanka.",
+            "Okurda bir tatmin duygusu yarat."
+        ]
     };
 
     function switchTab(id, el) {
@@ -133,69 +242,51 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         el.classList.add('active');
+        if(id === 'write') updateWriterAssistant();
     }
 
-    function updateMindMap() {
+    function updateWriterAssistant() {
         const stage = document.getElementById('stageSelect').value;
-        data.currentStage = stage;
-        document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
-        document.getElementById('node-' + stage).classList.add('active');
+        const currentTips = stageTips[stage] || [];
+        const tipText = currentTips[Math.floor(Math.random() * currentTips.length)] || "Kalemine kuvvet kanka.";
+        document.getElementById('currentTip').innerText = "Hocanın İpucu: " + tipText;
+    }
+
+    // KARAKTER SİSTEMİ
+    function addCharacter() {
+        const name = prompt("Karakter İsmi:");
+        const img = prompt("Karakter Fotoğraf URL (Örn: image_1.png):") || 'https://via.placeholder.com/150';
+        if(!name) return;
+        project.chars.push({ name, img, id: Date.now() });
         autoSave();
+        renderChars();
     }
 
-    function autoSave() {
-        data.draft = document.getElementById('mainEditor').value;
-        localStorage.setItem('mimari_v8', JSON.stringify(data));
-    }
-
-    // KELİME ANALİZİ
-    function analyzeText() {
-        const text = document.getElementById('mainEditor').value;
-        if(!text) return;
-        const words = text.toLowerCase().match(/\b\w+\b/g);
-        const freq = {};
-        words.forEach(w => { if(w.length > 3) freq[w] = (freq[w] || 0) + 1; });
-        
-        const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 5);
-        let html = "<b>En Çok Kullandığın Kelimeler:</b><br>";
-        sorted.forEach(([w, c]) => {
-            html += `- ${w.toUpperCase()}: ${c} kez<br>`;
-        });
-        document.getElementById('analysisContent').innerHTML = html;
-    }
-
-    // SAHNE YÖNETİMİ
-    function addScenePrompt() {
-        const s = prompt("Sahne özeti:");
-        if(s) {
-            data.scenes.push({desc: s, id: Date.now()});
-            renderScenes();
-            autoSave();
-        }
-    }
-
-    function renderScenes() {
-        const list = document.getElementById('sceneList');
-        list.innerHTML = data.scenes.map((s, i) => `
-            <div class="scene-item">
-                <div class="scene-handle">☰</div>
-                <div style="flex:1; font-size:0.85rem;">${i+1}. ${s.desc}</div>
-                <div onclick="deleteScene(${i})" style="color:var(--accent); font-size:1.2rem;">×</div>
+    function renderChars() {
+        const grid = document.getElementById('charGrid');
+        grid.innerHTML = project.chars.map(c => `
+            <div class="char-card">
+                <img src="${c.img}" class="char-img">
+                <span class="char-name">${c.name}</span>
             </div>
         `).join('');
     }
 
-    function deleteScene(i) {
-        data.scenes.splice(i, 1);
-        renderScenes();
-        autoSave();
+    // KAYIT SİSTEMİ
+    function autoSave() {
+        project.title = document.getElementById('storyTitle').value;
+        project.logline = document.getElementById('logline').value;
+        project.draft = document.getElementById('mainDraft').value;
+        project.stage = document.getElementById('stageSelect').value;
+        localStorage.setItem('showrunner_v9', JSON.stringify(project));
     }
 
     window.onload = () => {
-        document.getElementById('mainEditor').value = data.draft;
-        document.getElementById('stageSelect').value = data.currentStage;
-        updateMindMap();
-        renderScenes();
+        document.getElementById('storyTitle').value = project.title || "";
+        document.getElementById('logline').value = project.logline || "";
+        document.getElementById('mainDraft').value = project.draft || "";
+        document.getElementById('stageSelect').value = project.stage;
+        renderChars();
     };
 </script>
 
