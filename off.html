@@ -1,186 +1,270 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Öykü Yazım Aracı</title>
-<style>
-    /* Genel Stil */
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #1a1a1a;
-        color: #f0f0f0;
-        margin: 0;
-        padding: 0;
-    }
-    header {
-        background: #0d6efd;
-        color: white;
-        text-align: center;
-        padding: 1rem;
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
-    main {
-        padding: 1rem;
-    }
-    section {
-        background: #2a2a2a;
-        margin-bottom: 1rem;
-        padding: 1rem;
-        border-radius: 12px;
-    }
-    h2 {
-        color: #0d6efd;
-        margin-top: 0;
-    }
-    textarea {
-        width: 100%;
-        border-radius: 8px;
-        border: none;
-        padding: 0.5rem;
-        margin-top: 0.5rem;
-        resize: vertical;
-        min-height: 60px;
-        font-size: 1rem;
-    }
-    button {
-        background: #0d6efd;
-        border: none;
-        padding: 0.5rem 1rem;
-        color: white;
-        border-radius: 8px;
-        margin-top: 0.5rem;
-        cursor: pointer;
-        font-size: 1rem;
-    }
-    button:hover {
-        background: #0956c1;
-    }
-    .generated {
-        background: #1e1e1e;
-        padding: 0.5rem;
-        border-radius: 8px;
-        margin-top: 0.5rem;
-        font-style: italic;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Öykü Mimarı v6.0 | Showrunner</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #181818;
+            --accent: #E50914;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --nav-bg: #121212;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0; padding-bottom: 90px;
+        }
+
+        .header {
+            padding: 15px;
+            background: var(--nav-bg);
+            border-bottom: 1px solid #333;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 1.4rem; color: var(--accent); margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+
+        .tab-content { display: none; padding: 15px; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
+
+        /* NETFLIX KARAKTER KARTLARI */
+        .char-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; }
+        .char-card {
+            width: 45%;
+            background: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #333;
+        }
+        .char-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #222;
+        }
+        .char-info { padding: 10px; }
+        .char-name { font-weight: bold; font-size: 0.9rem; margin-bottom: 4px; display: block; }
+        .char-role { color: var(--accent); font-size: 0.75rem; display: block; }
+        .char-delete {
+            position: absolute; top: 5px; right: 5px;
+            background: rgba(0,0,0,0.7); color: white;
+            border-radius: 50%; width: 20px; height: 20px;
+            text-align: center; line-height: 18px; font-size: 12px; cursor: pointer;
+        }
+
+        /* REHBER VE İPUÇLARI */
+        .guide-box {
+            background: #1e1e1e;
+            border-left: 4px solid var(--accent);
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #ddd;
+        }
+        .inspiration-chip {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            color: #f1c40f;
+            border: 1px dashed #444;
+        }
+
+        /* FORM ELEMANLARI */
+        .input-group { margin-bottom: 15px; }
+        label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
+        input, textarea, select {
+            width: 100%; background: #262626; border: 1px solid #333;
+            color: white; padding: 12px; border-radius: 4px; margin-top: 5px;
+            box-sizing: border-box; font-size: 0.95rem;
+        }
+
+        .writing-area { height: 400px; line-height: 1.7; font-family: 'Georgia', serif; }
+
+        /* NAVİGASYON */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--nav-bg); display: flex;
+            justify-content: space-around; padding: 12px 0;
+            border-top: 1px solid #333; z-index: 1000;
+        }
+        .nav-item { color: var(--text-dim); font-size: 0.7rem; text-align: center; }
+        .nav-item.active { color: var(--accent); font-weight: bold; }
+
+        .btn-main {
+            background: var(--accent); color: white; border: none;
+            padding: 12px; border-radius: 4px; width: 100%;
+            font-weight: bold; text-transform: uppercase; margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<header>Öykü Yazım Aracı</header>
-<main>
 
-<!-- 1. Fikir ve Tema -->
-<section>
-<h2>1️⃣ Fikir ve Tema</h2>
-<label>Hikayenin temel fikri:</label>
-<textarea id="themeInput" placeholder="Temel fikri buraya yaz..."></textarea>
-<button onclick="generateIdea()">İlham Ver</button>
-<div class="generated" id="ideaOutput"></div>
-</section>
+<div class="header">
+    <h1>PROJECT: SHOWRUNNER</h1>
+</div>
 
-<!-- 2. Karakter Arkı -->
-<section>
-<h2>2️⃣ Karakter Arkı</h2>
-<label>Ana karakterin motivasyonu ve özellikleri:</label>
-<textarea id="characterInput" placeholder="Karakteri tanımla..."></textarea>
-<button onclick="generateCharacter()">Karakter Önerisi</button>
-<div class="generated" id="characterOutput"></div>
-</section>
+<div id="dna" class="tab-content active">
+    <div class="input-group">
+        <label>Öykü İsmi</label>
+        <input type="text" id="mainTitle" oninput="saveAll()">
+    </div>
 
-<!-- 3. Evren Tasarımı -->
-<section>
-<h2>3️⃣ Evren Tasarımı</h2>
-<label>Hikayenin geçtiği ortam ve kurallar:</label>
-<textarea id="worldInput" placeholder="Evreni tasarla..."></textarea>
-<button onclick="generateWorld()">Evren Önerisi</button>
-<div class="generated" id="worldOutput"></div>
-</section>
+    <div style="border-bottom: 1px solid #333; padding-bottom: 10px;">
+        <h2>Karakter Kadrosu</h2>
+        <div class="char-grid" id="charGrid"></div>
+        <div class="input-group" style="margin-top:20px; background: #111; padding: 10px; border-radius: 8px;">
+            <input type="text" id="newCharName" placeholder="Karakter İsmi">
+            <input type="text" id="newCharRole" placeholder="Rolü (Örn: Antagonist)">
+            <input type="text" id="newCharImg" placeholder="Fotoğraf URL (Opsiyonel)">
+            <button class="btn-main" onclick="addCharacter()">Kadroya Ekle</button>
+        </div>
+    </div>
+</div>
 
-<!-- 4. Kurgu Yapısı -->
-<section>
-<h2>4️⃣ Kurgu Yapısı</h2>
-<label>Olay örgüsü ve yapı:</label>
-<textarea id="plotInput" placeholder="Olayları sırala..."></textarea>
-<button onclick="generatePlot()">Kurgu Önerisi</button>
-<div class="generated" id="plotOutput"></div>
-</section>
+<div id="structure" class="tab-content">
+    <div id="structureGuide" class="guide-box">Seçili aşama için rehber burada görünecek.</div>
+    
+    <div class="input-group">
+        <label>Aşama Seç:</label>
+        <select id="structSelect" onchange="updateStructureGuide()">
+            <option value="serim">1. SERİM (Giriş)</option>
+            <option value="dugum">2. DÜĞÜM (Olayın Başlaması)</option>
+            <option value="gelisme">3. GELİŞME (Engeller)</option>
+            <option value="doruk">4. DORUK (Hesaplaşma)</option>
+            <option value="cozum">5. ÇÖZÜM (Final)</option>
+        </select>
+    </div>
+    <textarea id="stagePlanInput" style="height: 200px;" placeholder="Bu aşamanın detaylarını buraya not al..." oninput="saveAll()"></textarea>
+</div>
 
-<!-- 5. Anlatıcı ve Bakış Açısı -->
-<section>
-<h2>5️⃣ Anlatıcı ve Bakış Açısı</h2>
-<label>Bakış açısı ve anlatıcı tipi:</label>
-<textarea id="narrativeInput" placeholder="Bakış açısını belirle..."></textarea>
-<button onclick="generateNarrative()">Bakış Açısı Önerisi</button>
-<div class="generated" id="narrativeOutput"></div>
-</section>
+<div id="write" class="tab-content">
+    <div id="inspiration" class="inspiration-chip" onclick="newInspiration()">💡 İpucu: Karakterin o anki kokuyu veya sesi duymasını sağla.</div>
+    
+    <div id="currentStageInfo" style="font-size: 0.75rem; color: var(--accent); margin-bottom: 5px; font-weight: bold;">MOD: SERİM</div>
+    <textarea id="mainDraft" class="writing-area" placeholder="Sahneyi canlandır..." oninput="saveAll()"></textarea>
+    
+    <button class="btn-main" style="background:#222; border:1px solid #444;" onclick="downloadDraft()">Taslağı İndir</button>
+</div>
 
-<!-- 6. Yazım ve Revizyon -->
-<section>
-<h2>6️⃣ Yazım ve Revizyon</h2>
-<label>İlk taslak ve notlar:</label>
-<textarea id="draftInput" placeholder="İlk taslağı buraya yaz..."></textarea>
-<button onclick="generateRevision()">Revizyon Önerisi</button>
-<div class="generated" id="revisionOutput"></div>
-</section>
-
-</main>
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('dna', this)"><span>🧬</span><br>DNA</div>
+    <div class="nav-item" onclick="switchTab('structure', this)"><span>⏳</span><br>YAPI</div>
+    <div class="nav-item" onclick="switchTab('write', this)"><span>🖋️</span><br>YAZ</div>
+</nav>
 
 <script>
-// Basit ilham üreten fonksiyonlar
-function generateIdea() {
-    const ideas = [
-        "Gizemli bir şehirde kaybolan bir zaman makinesi.",
-        "Yapay zekanın insan duygularını anlamaya çalışması.",
-        "Küçük bir kasabada ortaya çıkan sıra dışı güçler."
-    ];
-    document.getElementById('ideaOutput').innerText = ideas[Math.floor(Math.random()*ideas.length)];
-}
+    // DATA MODEL
+    let db = JSON.parse(localStorage.getItem('showrunner_db')) || {
+        title: "",
+        chars: [],
+        plans: { serim: "", dugum: "", gelisme: "", doruk: "", cozum: "" },
+        draft: ""
+    };
 
-function generateCharacter() {
-    const chars = [
-        "Cesur ama yalnız bir kahraman.",
-        "Kurnaz ve sır dolu bir anti-kahraman.",
-        "Meraklı, genç bir bilim insanı."
-    ];
-    document.getElementById('characterOutput').innerText = chars[Math.floor(Math.random()*chars.length)];
-}
+    const guides = {
+        serim: "Karakterin sıradan dünyasını tanıt. Bir eksiklik veya içsel huzursuzluk hissettir. Atmosferi kur.",
+        dugum: "Karakteri konfor alanından çıkaran o olay! Artık geri dönüş yok. Macera çağrısı burada gerçekleşir.",
+        gelisme: "Engellerin büyüdüğü yer. Karakter deniyor ve yanılıyor. Yardımcılarla tanışıyor.",
+        doruk: "En yüksek gerilim! Karakter en büyük korkusuyla yüzleşir. Maskeler düşer. Hikayenin kalbi burasıdır.",
+        cozum: "Toz duman dağılır. Karakter değişti mi? Yeni dünya düzeni nasıl? Tüm soruları cevapla (veya bilerek açık bırak)."
+    };
 
-function generateWorld() {
-    const worlds = [
-        "Gelecekteki distopik bir şehir.",
-        "Büyü ile teknolojinin birleştiği bir evren.",
-        "Post-apokaliptik bir dünyada hayatta kalma mücadelesi."
+    const tips = [
+        "💡 İpucu: 'Anlatma, göster.' Karakterin üzgün olduğunu söyleme, titreyen ellerini anlat.",
+        "💡 İpucu: Diyalogları kısa tut. Gerçek insanlar nadiren uzun nutuk çeker.",
+        "💡 İpucu: Her sahne bir çatışma içermelidir. Kim ne istiyor ve kim engel oluyor?",
+        "💡 İpucu: Beş duyuyu kullan. Hava nasıl kokuyor? Zemin ayaklarının altında nasıl hissettiriyor?",
+        "💡 İpucu: Karakterine bir 'zaaf' ver. Kusursuz kahramanlar sıkıcıdır."
     ];
-    document.getElementById('worldOutput').innerText = worlds[Math.floor(Math.random()*worlds.length)];
-}
 
-function generatePlot() {
-    const plots = [
-        "Başlangıçta rutin bir gün, sonra büyük bir kaos.",
-        "Karakter, gizemli bir nesneyi bulur ve yolculuk başlar.",
-        "Dost ve düşmanlar ortaya çıkar, çatışma doruğa ulaşır."
-    ];
-    document.getElementById('plotOutput').innerText = plots[Math.floor(Math.random()*plots.length)];
-}
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+        if(id === 'write') {
+            const currentStage = document.getElementById('structSelect').value;
+            document.getElementById('currentStageInfo').innerText = "MOD: " + currentStage.toUpperCase();
+        }
+    }
 
-function generateNarrative() {
-    const narratives = [
-        "Birinci tekil anlatım: Karakterin içsel dünyası derinlemesine.",
-        "Üçüncü tekil ilahi bakış: Tüm olayları geniş perspektiften görme.",
-        "Hikaye bölümler arasında farklı bakış açılarıyla anlatılıyor."
-    ];
-    document.getElementById('narrativeOutput').innerText = narratives[Math.floor(Math.random()*narratives.length)];
-}
+    function updateStructureGuide() {
+        const val = document.getElementById('structSelect').value;
+        document.getElementById('structureGuide').innerText = guides[val];
+        document.getElementById('stagePlanInput').value = db.plans[val] || "";
+    }
 
-function generateRevision() {
-    const revisions = [
-        "Karakterin motivasyonunu güçlendir.",
-        "Olay örgüsünde sürprizleri artır.",
-        "Betimlemeleri zenginleştir ve atmosferi güçlendir."
-    ];
-    document.getElementById('revisionOutput').innerText = revisions[Math.floor(Math.random()*revisions.length)];
-}
+    function addCharacter() {
+        const name = document.getElementById('newCharName').value;
+        const role = document.getElementById('newCharRole').value;
+        const img = document.getElementById('newCharImg').value || 'https://via.placeholder.com/150/222/fff?text=Character';
+        
+        if(!name) return;
+        db.chars.push({ name, role, img, id: Date.now() });
+        saveAll();
+        renderChars();
+        document.getElementById('newCharName').value = "";
+        document.getElementById('newCharRole').value = "";
+    }
+
+    function deleteChar(id) {
+        db.chars = db.chars.filter(c => c.id !== id);
+        saveAll();
+        renderChars();
+    }
+
+    function renderChars() {
+        const grid = document.getElementById('charGrid');
+        grid.innerHTML = db.chars.map(c => `
+            <div class="char-card">
+                <div class="char-delete" onclick="deleteChar(${c.id})">×</div>
+                <img src="${c.img}" class="char-img">
+                <div class="char-info">
+                    <span class="char-name">${c.name}</span>
+                    <span class="char-role">${c.role}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function newInspiration() {
+        const chip = document.getElementById('inspiration');
+        chip.innerText = tips[Math.floor(Math.random() * tips.length)];
+    }
+
+    function saveAll() {
+        db.title = document.getElementById('mainTitle').value;
+        db.draft = document.getElementById('mainDraft').value;
+        const stage = document.getElementById('structSelect').value;
+        db.plans[stage] = document.getElementById('stagePlanInput').value;
+        localStorage.setItem('showrunner_db', JSON.stringify(db));
+    }
+
+    window.onload = () => {
+        document.getElementById('mainTitle').value = db.title || "";
+        document.getElementById('mainDraft').value = db.draft || "";
+        renderChars();
+        updateStructureGuide();
+    };
+
+    function downloadDraft() {
+        const blob = new Blob([db.draft], {type:'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = (db.title || 'oyku') + '.txt';
+        a.click();
+    }
 </script>
 
 </body>
