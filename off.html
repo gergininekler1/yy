@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Öykü Mimarı v5.0 | Mobil Pro</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #121212;
+            --accent: #E50914;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --nav-bg: #1a1a1a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Nav bar için boşluk */
+        }
+
+        /* ÜST HEADER */
+        .header {
+            padding: 15px;
+            background: var(--nav-bg);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 { font-size: 1.2rem; color: var(--accent); margin: 0; letter-spacing: 1px; }
+
+        /* ANA İÇERİK ALANLARI */
+        .tab-content { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+        /* KART TASARIMI */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #222;
+        }
+
+        h2 { font-size: 1rem; margin-top: 0; color: var(--accent); text-transform: uppercase; }
+
+        /* GİRİŞ ALANLARI */
+        input, textarea, select {
+            width: 100%;
+            background: #222;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .writing-area { height: 350px; line-height: 1.6; font-family: serif; }
+
+        /* DRAMATİK YAPI SEÇİCİ */
+        .stage-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: #333;
+        }
+
+        /* MOBİL ALT NAVİGASYON */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--nav-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #333;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 1.4rem; margin-bottom: 4px; }
+
+        .btn-action {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>ÖYKÜ MİMARI PRO</h1>
+    <span id="globalWordCount" style="font-size: 0.8rem; color: var(--text-dim);">0 Kelime</span>
+</div>
+
+<div id="dna" class="tab-content active">
+    <div class="card">
+        <h2>🏗️ Proje Temeli</h2>
+        <label>Öykü Adı</label>
+        <input type="text" id="mainTitle" placeholder="Örn: Görünmez Şehir" oninput="saveData()">
+        
+        <label>Logline (Tek Cümlelik Özet)</label>
+        <textarea id="logline" placeholder="Kim, neyi, neden istiyor?" oninput="saveData()"></textarea>
+        
+        <label>Ana Tema</label>
+        <input type="text" id="theme" placeholder="Örn: Bağışlama ve Zaman" oninput="saveData()">
+    </div>
+
+    <div class="card">
+        <h2>👥 Karakter Arkları</h2>
+        <div id="charList"></div>
+        <button class="btn-action" style="background:#333;" onclick="addChar()">+ Karakter Ekle</button>
+    </div>
+</div>
+
+<div id="structure" class="tab-content">
+    <div class="card">
+        <h2>⏳ Dramatik Akış Notları</h2>
+        <p style="font-size: 0.8rem; color: var(--text-dim);">Öykünün iskeletini burada planla.</p>
+        
+        <label>1. SERİM (Giriş/Normal Düzen)</label>
+        <textarea id="plan_serim" oninput="saveData()"></textarea>
+
+        <label>2. DÜĞÜM (Tetikleyici Olay)</label>
+        <textarea id="plan_dugum" oninput="saveData()"></textarea>
+
+        <label>3. GELİŞME (Çatışma/Engeller)</label>
+        <textarea id="plan_gelisme" oninput="saveData()"></textarea>
+
+        <label>4. DORUK (Climax)</label>
+        <textarea id="plan_doruk" oninput="saveData()"></textarea>
+
+        <label>5. ÇÖZÜM (Final)</label>
+        <textarea id="plan_cozum" oninput="saveData()"></textarea>
+    </div>
+</div>
+
+<div id="write" class="tab-content">
+    <div class="card">
+        <select id="chapterStage" onchange="syncData()">
+            <option value="Serim">Bölüm Aşaması: SERİM</option>
+            <option value="Düğüm">Bölüm Aşaması: DÜĞÜM</option>
+            <option value="Gelişme">Bölüm Aşaması: GELİŞME</option>
+            <option value="Doruk">Bölüm Aşaması: DORUK</option>
+            <option value="Çözüm">Bölüm Aşaması: ÇÖZÜM</option>
+        </select>
+        
+        <input type="text" id="chapterTitle" placeholder="Bölüm Başlığı..." oninput="syncData()">
+        
+        <div style="margin-top:15px; border-top: 1px solid #333; padding-top:10px;">
+            <p style="font-size: 0.75rem; color: orange;">💡 BU BÖLÜMÜN PLANI:</p>
+            <div id="currentStagePlan" style="font-size: 0.85rem; color: #ccc; font-style: italic;">Henüz plan yazılmadı.</div>
+        </div>
+
+        <textarea id="editorBody" class="writing-area" placeholder="Buraya yaz..." oninput="syncData()"></textarea>
+    </div>
+    <button class="btn-action" onclick="downloadProject()">📩 Tüm Dosyayı İndir</button>
+</div>
+
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="showTab('dna', this)">
+        <span>🧬</span>
+        <span>DNA</span>
+    </div>
+    <div class="nav-item" onclick="showTab('structure', this)">
+        <span>⏳</span>
+        <span>YAPI</span>
+    </div>
+    <div class="nav-item" onclick="showTab('write', this)">
+        <span>🖋️</span>
+        <span>YAZ</span>
+    </div>
+</nav>
+
+<script>
+    // VERİ KAYIT
+    let db = JSON.parse(localStorage.getItem('oyku_v5')) || {
+        main: { title: "", logline: "", theme: "" },
+        chars: [],
+        plans: { serim: "", dugum: "", gelisme: "", doruk: "", cozum: "" },
+        writing: { stage: "Serim", title: "", body: "" }
+    };
+
+    function showTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+        if(tabId === 'write') updateWriteContext();
+    }
+
+    function saveData() {
+        db.main.title = document.getElementById('mainTitle').value;
+        db.main.logline = document.getElementById('logline').value;
+        db.main.theme = document.getElementById('theme').value;
+        
+        db.plans.serim = document.getElementById('plan_serim').value;
+        db.plans.dugum = document.getElementById('plan_dugum').value;
+        db.plans.gelisme = document.getElementById('plan_gelisme').value;
+        db.plans.doruk = document.getElementById('plan_doruk').value;
+        db.plans.cozum = document.getElementById('plan_cozum').value;
+        
+        localStorage.setItem('oyku_v5', JSON.stringify(db));
+    }
+
+    function syncData() {
+        db.writing.stage = document.getElementById('chapterStage').value;
+        db.writing.title = document.getElementById('chapterTitle').value;
+        db.writing.body = document.getElementById('editorBody').value;
+        saveData();
+        updateWriteContext();
+    }
+
+    function updateWriteContext() {
+        const stage = db.writing.stage.toLowerCase();
+        document.getElementById('currentStagePlan').innerText = db.plans[stage] || "Bu aşama için 'YAPI' sekmesinde bir plan oluşturmadın kanka.";
+        
+        const words = db.writing.body.trim() ? db.writing.body.trim().split(/\s+/).length : 0;
+        document.getElementById('globalWordCount').innerText = words + " Kelime";
+    }
+
+    function addChar(name="", bio="") {
+        const div = document.createElement('div');
+        div.innerHTML = `<input type="text" placeholder="Karakter Adı" value="${name}" style="margin-bottom:5px;">
+                         <textarea placeholder="Arkı / Amacı">${bio}</textarea><hr style="border:0.5px solid #333">`;
+        document.getElementById('charList').appendChild(div);
+    }
+
+    window.onload = () => {
+        document.getElementById('mainTitle').value = db.main.title;
+        document.getElementById('logline').value = db.main.logline;
+        document.getElementById('theme').value = db.main.theme;
+        
+        document.getElementById('plan_serim').value = db.plans.serim;
+        document.getElementById('plan_dugum').value = db.plans.dugum;
+        document.getElementById('plan_gelisme').value = db.plans.gelisme;
+        document.getElementById('plan_doruk').value = db.plans.doruk;
+        document.getElementById('plan_cozum').value = db.plans.cozum;
+
+        document.getElementById('chapterStage').value = db.writing.stage;
+        document.getElementById('chapterTitle').value = db.writing.title;
+        document.getElementById('editorBody').value = db.writing.body;
+        updateWriteContext();
+    }
+
+    function downloadProject() {
+        let txt = `ÖYKÜ PROJESİ: ${db.main.title}\n\n`;
+        txt += `LOGLINE: ${db.main.logline}\nTEMA: ${db.main.theme}\n\n`;
+        txt += `--- AKTİF BÖLÜM (${db.writing.stage}) ---\n`;
+        txt += `BAŞLIK: ${db.writing.title}\n\n${db.writing.body}`;
+        
+        const blob = new Blob([txt], {type:'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'oyku_taslak.txt';
+        a.click();
+    }
+</script>
+
+</body>
+</html>
