@@ -797,4 +797,68 @@
             const blob = new Blob([content], { type: mimeType });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        /* --- ZAMANLAYICI (TIMER) --- */
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer() {
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+            sprintTimer = setInterval(() => {
+                sprintSeconds++;
+                document.getElementById('timer-display').textContent = formatTime(sprintSeconds);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            isTimerRunning = false;
+            clearInterval(sprintTimer);
+        }
+
+        function resetTimer() {
+            stopTimer();
+            sprintSeconds = 0;
+            document.getElementById('timer-display').textContent = "00:00";
+        }
+
+        /* --- ARAYÜZ YARDIMCILARI --- */
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        /* --- KLAVYE KISAYOLLARI --- */
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveData();
+            }
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                addChapter();
+            }
+            if (e.key === 'Escape' && document.body.classList.contains('distraction-free')) {
+                toggleFullscreen();
+            }
+        });
+
+        // Başlat
+        window.onload = init;
+
+    </script>
+</body>
+</html>
