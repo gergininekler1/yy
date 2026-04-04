@@ -3,220 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öykü Mimarı v3.0 | Director's Cut</title>
+    <title>Öykü Mimarı v4.0 | Master Edition</title>
     <style>
         :root {
-            --bg-color: #141414;
-            --card-bg: #181818;
-            --primary-red: #E50914;
-            --hover-red: #f40612;
-            --text-main: #FFFFFF;
-            --text-muted: #B3B3B3;
-            --border-color: #333333;
+            --bg: #0f0f0f;
+            --sidebar-bg: #1a1a1a;
+            --editor-bg: #121212;
+            --accent: #E50914;
+            --text: #e0e0e0;
+            --border: #333;
         }
 
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 20px;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .container { max-width: 1200px; margin: auto; }
-        
-        .header {
+        /* SOL PANEL: BÖLÜMLER */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            color: var(--accent);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .chapter-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .chapter-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chapter-item:hover { background: #252525; }
+        .chapter-item.active {
+            background: #252525;
+            border-left-color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* ORTA PANEL: EDİTÖR */
+        .main-editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--editor-bg);
+        }
+
+        .editor-header {
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--primary-red);
-            padding-bottom: 15px;
-            margin-bottom: 30px;
         }
 
-        .header h1 { color: var(--primary-red); margin: 0; letter-spacing: 2px; }
+        #chapterTitleInput {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            outline: none;
+            width: 70%;
+        }
 
-        .grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
+        .text-area-container {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            gap: 20px;
+        }
 
-        .panel {
-            background: var(--card-bg);
+        #editorBody {
+            flex: 2;
+            background: transparent;
+            border: none;
+            color: #ddd;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            resize: none;
+            outline: none;
+            font-family: 'Georgia', serif;
+        }
+
+        /* SAĞ PANEL: BÖLÜM PLANI */
+        .chapter-outline-panel {
+            width: 300px;
+            background: #181818;
             padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
-        h2 { font-size: 1.1rem; border-left: 3px solid var(--primary-red); padding-left: 10px; margin-bottom: 20px; }
+        .chapter-outline-panel h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 0;
+        }
 
-        /* SÜRÜKLE BIRAK STİLLERİ */
-        .scene-card {
+        #chapterPlanText {
+            width: 100%;
+            height: 80%;
             background: #222;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            cursor: grab;
             border: 1px solid #444;
-            transition: transform 0.2s;
-        }
-        .scene-card:active { cursor: grabbing; transform: scale(0.98); }
-        .scene-card.dragging { opacity: 0.5; border: 1px dashed var(--primary-red); }
-
-        textarea, input {
-            width: 100%; background: #2b2b2b; color: white; border: 1px solid #444;
-            padding: 12px; border-radius: 5px; margin-top: 5px; box-sizing: border-box;
+            color: #bbb;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            resize: none;
         }
 
         button {
-            background: var(--primary-red); color: white; border: none; padding: 10px 15px;
-            border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
-        }
-        button:hover { background: var(--hover-red); }
-        .btn-twist { background: #e59400; color: black; margin-top: 10px; width: 100%; }
-
-        /* TWIST MODAL */
-        #twistDisplay {
-            display: none;
-            background: #e59400; color: black; padding: 15px;
-            border-radius: 5px; margin-top: 10px; font-weight: bold;
-            animation: fadeIn 0.5s;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
         }
 
-        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
-
-        .stats-bar { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
+        .btn-add { margin: 10px 20px; background: #333; }
+        .btn-add:hover { background: #444; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>ÖYKÜ MİMARI <small style="font-size: 0.4em; color: white;">v3.0</small></h1>
-        <div>
-            <button onclick="exportData()" style="background:#333;">💾 Kaydet & İndir</button>
+<div class="sidebar">
+    <div class="sidebar-header">🖋️ ÖYKÜ MİMARI PROJESİ</div>
+    <div id="chapterList" class="chapter-list">
         </div>
+    <button class="btn-add" onclick="createNewChapter()">+ Yeni Bölüm Ekle</button>
+    <button class="btn-add" onclick="downloadFullProject()" style="background: #0056b3;">📥 Tüm Projeyi İndir</button>
+</div>
+
+<div class="main-editor">
+    <div class="editor-header">
+        <input type="text" id="chapterTitleInput" placeholder="Bölüm Başlığı..." oninput="syncData()">
+        <div id="wordCount" style="font-size: 0.8rem; color: #666;">0 Kelime</div>
     </div>
-
-    <div class="grid">
-        <div class="side-panel">
-            <div class="panel">
-                <h2>Olay Örgüsü (Sahneler)</h2>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Sahneleri sürükleyerek sırasını değiştir.</p>
-                <div id="sceneContainer">
-                    </div>
-                <button onclick="addNewScene()" style="width: 100%; background: #333; margin-top:10px;">+ Sahne Ekle</button>
-            </div>
-
-            <div class="panel" style="margin-top: 20px;">
-                <h2>Twist Jeneratörü</h2>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Hikaye tıkandı mı? Bir sürpriz patlat!</p>
-                <button class="btn-twist" onclick="generateTwist()">⚡ Rastgele Twist Üret</button>
-                <div id="twistDisplay"></div>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="panel">
-                <h2>Yazım Atölyesi</h2>
-                <input type="text" id="storyTitle" placeholder="Öykü Başlığı..." style="font-size: 1.5rem; border: none; background: transparent; border-bottom: 1px solid #333;">
-                <textarea id="mainDraft" style="height: 500px; margin-top: 20px; font-size: 1.1rem; line-height: 1.8;" placeholder="Anlatmaya başla..."></textarea>
-                <div class="stats-bar">
-                    <span id="wordCount">0 Kelime</span>
-                    <span>Mod: Odaklanma Açık</span>
-                </div>
-            </div>
+    
+    <div class="text-area-container">
+        <textarea id="editorBody" placeholder="Hikayeni yazmaya başla..." oninput="syncData()"></textarea>
+        
+        <div class="chapter-outline-panel">
+            <h3>Bölüm Olay Akışı</h3>
+            <p style="font-size: 0.75rem; color: #888; margin-bottom: 10px;">Bu bölümde neler olacak? Zaman çizelgesine göre not al.</p>
+            <textarea id="chapterPlanText" placeholder="Örn: Selim eve gelir. Mektubu bulur. Büyük kavga çıkar..." oninput="syncData()"></textarea>
         </div>
     </div>
 </div>
 
 <script>
-    const twists = [
-        "En güvenilir karakterin aslında bir casus olduğu ortaya çıkar.",
-        "Karakterin elindeki gizemli eşya aslında geçmişten gelen bir mesajdır.",
-        "Beklenmedik bir doğal afet (fırtına, deprem) tüm planları bozar.",
-        "Ana karakterin aslında ölü olduğu veya bir simülasyonda olduğu anlaşılır.",
-        "Yardımcı karakter, kahramanın en büyük sırrını topluma açıklar.",
-        "Zaman çizelgesi aniden kırılır; olaylar aslında gelecekte geçiyordur."
+    // VERİ YAPISI
+    // Proje = [ {title, content, plan}, ... ]
+    let project = JSON.parse(localStorage.getItem('my_story_project')) || [
+        { title: "Giriş: İlk Adım", content: "Buraya öykünün girişini yaz...", plan: "Karakter tanıtımı ve ilk çatışma." }
     ];
+    let activeIndex = 0;
 
-    // Sürükle Bırak Mantığı
-    const container = document.getElementById('sceneContainer');
-
-    function addNewScene(content = "") {
-        const id = Date.now();
-        const card = document.createElement('div');
-        card.className = 'scene-card';
-        card.draggable = true;
-        card.innerHTML = `
-            <textarea placeholder="Sahne detayı..." oninput="saveAll()">${content}</textarea>
-            <small style="color: #666; cursor:pointer;" onclick="this.parentElement.remove(); saveAll();">Sil</small>
-        `;
-        
-        card.addEventListener('dragstart', () => card.classList.add('dragging'));
-        card.addEventListener('dragend', () => card.classList.remove('dragging'));
-        
-        container.appendChild(card);
-    }
-
-    container.addEventListener('dragover', e => {
-        e.preventDefault();
-        const afterElement = getDragAfterElement(container, e.clientY);
-        const dragging = document.querySelector('.dragging');
-        if (afterElement == null) {
-            container.appendChild(dragging);
-        } else {
-            container.insertBefore(dragging, afterElement);
-        }
-    });
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.scene-card:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    // Twist Jeneratörü
-    function generateTwist() {
-        const display = document.getElementById('twistDisplay');
-        const randomTwist = twists[Math.floor(Math.random() * twists.length)];
-        display.innerText = "YENİ KRİZ: " + randomTwist;
-        display.style.display = 'block';
-    }
-
-    // Kelime Sayacı
-    document.getElementById('mainDraft').addEventListener('input', function() {
-        const words = this.value.trim().split(/\s+/).filter(x => x.length > 0).length;
-        document.getElementById('wordCount').innerText = words + " Kelime";
-        saveAll();
-    });
-
-    // Kayıt Fonksiyonu
-    function saveAll() {
-        const scenes = [...container.querySelectorAll('textarea')].map(t => t.value);
-        localStorage.setItem('scenes_v3', JSON.stringify(scenes));
-        localStorage.setItem('title_v3', document.getElementById('storyTitle').value);
-        localStorage.setItem('draft_v3', document.getElementById('mainDraft').value);
-    }
-
+    // BAŞLANGIÇ
     window.onload = () => {
-        document.getElementById('storyTitle').value = localStorage.getItem('title_v3') || "";
-        document.getElementById('mainDraft').value = localStorage.getItem('draft_v3') || "";
-        const savedScenes = JSON.parse(localStorage.getItem('scenes_v3') || "[]");
-        savedScenes.forEach(s => addNewScene(s));
+        renderChapterList();
+        loadActiveChapter();
     };
 
-    function exportData() {
-        const title = document.getElementById('storyTitle').value || "Bölüm_1";
-        const content = document.getElementById('mainDraft').value;
-        const blob = new Blob([content], { type: 'text/plain' });
+    function renderChapterList() {
+        const list = document.getElementById('chapterList');
+        list.innerHTML = '';
+        project.forEach((ch, index) => {
+            const div = document.createElement('div');
+            div.className = `chapter-item ${index === activeIndex ? 'active' : ''}`;
+            div.innerHTML = `<span>${index + 1}. ${ch.title || 'Başlıksız'}</span>`;
+            div.onclick = () => switchChapter(index);
+            list.appendChild(div);
+        });
+    }
+
+    function loadActiveChapter() {
+        const ch = project[activeIndex];
+        document.getElementById('chapterTitleInput').value = ch.title;
+        document.getElementById('editorBody').value = ch.content;
+        document.getElementById('chapterPlanText').value = ch.plan;
+        updateWordCount();
+    }
+
+    function switchChapter(index) {
+        activeIndex = index;
+        renderChapterList();
+        loadActiveChapter();
+    }
+
+    function createNewChapter() {
+        project.push({ title: "Yeni Bölüm", content: "", plan: "" });
+        activeIndex = project.length - 1;
+        saveAndRefresh();
+    }
+
+    function syncData() {
+        project[activeIndex].title = document.getElementById('chapterTitleInput').value;
+        project[activeIndex].content = document.getElementById('editorBody').value;
+        project[activeIndex].plan = document.getElementById('chapterPlanText').value;
+        
+        localStorage.setItem('my_story_project', JSON.stringify(project));
+        
+        // Yan paneldeki başlığı anlık güncellemek için listeyi yenile ama focus kaybetme
+        const activeItem = document.querySelector('.chapter-item.active span');
+        if(activeItem) activeItem.innerText = `${activeIndex + 1}. ${project[activeIndex].title}`;
+        
+        updateWordCount();
+    }
+
+    function saveAndRefresh() {
+        localStorage.setItem('my_story_project', JSON.stringify(project));
+        renderChapterList();
+        loadActiveChapter();
+    }
+
+    function updateWordCount() {
+        const text = document.getElementById('editorBody').value.trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        document.getElementById('wordCount').innerText = words + " Kelime";
+    }
+
+    function downloadFullProject() {
+        let fullText = "PROJE TASLAĞI\n\n";
+        project.forEach((ch, i) => {
+            fullText += `\n--- BÖLÜM ${i+1}: ${ch.title.toUpperCase()} ---\n`;
+            fullText += `PLAN: ${ch.plan}\n`;
+            fullText += `\n${ch.content}\n\n`;
+            fullText += "========================================\n";
+        });
+
+        const blob = new Blob([fullText], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = title + ".txt";
+        a.download = 'Oyku_Projesi_Tam_Taslak.txt';
         a.click();
     }
 </script>
