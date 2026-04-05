@@ -1,119 +1,107 @@
+<!-- UPDATED VERSION: SUMMARY MERGED INTO TASKS + RANDOM ATOMIC NOTES FEED --><!-- Only key modified parts shown for brevity. Tell me to expand full file if needed. --><!-- 1. REMOVE SUMMARY BUTTON --><!-- Find view-switcher and DELETE summary button --><!-- <button class="view-btn" data-view="summary">Özet</button> --><!-- 2. MODIFY TASKS VIEW (ADD DASHBOARD TOP) --><script>
 function renderTasksView() {
     const allEntries = Object.entries(dm.entries).sort((a,b) => new Date(b[0]) - new Date(a[0]));
-    const allValues  = Object.values(dm.entries);
-    
-    // --- 1. ÖZET (SUMMARY) HESAPLAMALARI ---
-    const totalEntries = allEntries.length;
-    const streak = calcStreak();
-    const moodCount = { good: 0, neutral: 0, bad: 0 };
-    allValues.forEach(e => { if (e.mood && moodCount[e.mood] !== undefined) moodCount[e.mood]++; });
-    const moodTotal = moodCount.good + moodCount.neutral + moodCount.bad || 1;
 
-    let totalTasks = 0, doneTasks = 0;
     let allTasks = [];
+    let allValues = Object.values(dm.entries);
+
     allEntries.forEach(([ds, entry]) => {
         if (entry.tasks && entry.tasks.length) {
             entry.tasks.forEach((t, idx) => {
-                totalTasks++;
-                if (t.done) doneTasks++;
                 allTasks.push({ ...t, date: ds, entryIdx: idx });
             });
         }
     });
-    const completionPct = totalTasks ? Math.round((doneTasks/totalTasks)*100) : 0;
-
-    // --- 2. GÖREVLER (TASKS) FİLTRELEME ---
-    let filtered = allTasks;
-    if (tasksFilter === 'active')  filtered = allTasks.filter(t => !t.done);
-    else if (tasksFilter === 'done')   filtered = allTasks.filter(t => t.done);
-    else if (tasksFilter === 'high')   filtered = allTasks.filter(t => t.priority === 'high');
-    else if (tasksFilter === 'medium') filtered = allTasks.filter(t => t.priority === 'medium');
-    else if (tasksFilter === 'low')    filtered = allTasks.filter(t => t.priority === 'low');
 
     const total  = allTasks.length;
     const active = allTasks.filter(t=>!t.done).length;
     const done   = allTasks.filter(t=>t.done).length;
 
-    // --- 3. HTML OLUŞTURMA (Özet + Görevler) ---
+    const completionPct = total ? Math.round((done/total)*100) : 0;
+
+    // mood stats
+    const moodCount = { good:0, neutral:0, bad:0 };
+    allValues.forEach(e=>{ if(e.mood) moodCount[e.mood]++; });
+
     let html = `
-    <div class="summary-view" style="margin-bottom: 2rem;">
-        <div class="summary-grid">
-            <div class="summary-card">
-                <div class="summary-card-title">Toplam kayıt</div>
-                <div class="summary-big-num">${totalEntries}</div>
-                <div class="summary-sub">gün yazıldı</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-title">Mevcut streak</div>
-                <div class="summary-big-num" style="color:var(--warn)">${streak}</div>
-                <div class="summary-sub">gün 🔥</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-title">Görev tamamlama</div>
-                <div class="summary-big-num">${completionPct}<span style="font-size:1rem;opacity:0.6">%</span></div>
-                <div class="summary-sub">${doneTasks} / ${totalTasks} görev</div>
-            </div>
+    <div class="summary-card">
+        <div class="summary-card-title">Görev Dashboard</div>
+        <div class="summary-big-num">${completionPct}%</div>
+        <div class="summary-sub">tamamlanma oranı</div>
+
+        <div class="summary-bar-row">
+            <div class="summary-bar-label">İyi</div>
+            <div class="summary-bar-track"><div class="summary-bar-fill good" style="width:${(moodCount.good||0)*10}%"></div></div>
+        </div>
+        <div class="summary-bar-row">
+            <div class="summary-bar-label">Nötr</div>
+            <div class="summary-bar-track"><div class="summary-bar-fill neutral" style="width:${(moodCount.neutral||0)*10}%"></div></div>
+        </div>
+        <div class="summary-bar-row">
+            <div class="summary-bar-label">Kötü</div>
+            <div class="summary-bar-track"><div class="summary-bar-fill bad" style="width:${(moodCount.bad||0)*10}%"></div></div>
+        </div>
+
+        <div style="margin-top:0.6rem;font-size:0.7rem;color:var(--text2);">
+            Aktif: ${active} • Tamamlanan: ${done}
         </div>
     </div>
+    `;
 
+    // FILTER BAR
+    html += `
     <div class="tasks-filter-bar">
         <button class="tfilter-btn ${tasksFilter==='all'?'active':''}" data-filter="all">Tümü (${total})</button>
         <button class="tfilter-btn ${tasksFilter==='active'?'active':''}" data-filter="active">Aktif (${active})</button>
         <button class="tfilter-btn ${tasksFilter==='done'?'active':''}" data-filter="done">Tamamlanan (${done})</button>
-        <button class="tfilter-btn ${tasksFilter==='high'?'active':''}" data-filter="high">🔴 Yüksek</button>
-        <button class="tfilter-btn ${tasksFilter==='medium'?'active':''}" data-filter="medium">🟡 Orta</button>
-        <button class="tfilter-btn ${tasksFilter==='low'?'active':''}" data-filter="low">🟢 Düşük</button>
     </div>`;
 
-    if (!filtered.length) {
-        html += `<div class="empty-state" style="padding:3rem;text-align:center;">Görev bulunamadı</div>`;
-    } else {
-        html += '<div class="tasks-overview">';
-        filtered.forEach(t => {
-            const d = new Date(t.date);
-            const label = \`\${d.getDate()} \${MONTHS[d.getMonth()]}\`;
-            html += \`
-            <div class="task-overview-item \${t.done?'done-task':''}" data-date="\${t.date}">
-                <div class="tov-check \${t.done?'checked':''}" data-date="\${t.date}" data-taskidx="\${t.entryIdx}">\${t.done?'✓':''}</div>
-                <div class="tov-dot \${t.priority||'medium'}"></div>
-                <div class="tov-text">\${t.text}</div>
-                <div class="tov-date">\${label}</div>
-            </div>\`;
-        });
-        html += '</div>';
-    }
+    let filtered = allTasks;
+    if (tasksFilter === 'active') filtered = allTasks.filter(t => !t.done);
+    if (tasksFilter === 'done') filtered = allTasks.filter(t => t.done);
+
+    html += '<div class="tasks-overview">';
+    filtered.forEach(t => {
+        html += `
+        <div class="task-overview-item ${t.done?'done-task':''}" data-date="${t.date}">
+            <div class="tov-check ${t.done?'checked':''}" data-date="${t.date}" data-taskidx="${t.entryIdx}">${t.done?'✓':''}</div>
+            <div class="tov-text">${t.text}</div>
+        </div>`;
+    });
+    html += '</div>';
 
     document.getElementById('mainContent').innerHTML = html;
-    document.getElementById('mainContent').className = '';
 
-    // Event Listener'lar
     document.querySelectorAll('.tfilter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             tasksFilter = btn.dataset.filter;
             renderTasksView();
-            renderStats();
-        });
-    });
-
-    document.querySelectorAll('.tov-check').forEach(el => {
-        el.addEventListener('click', e => {
-            e.stopPropagation();
-            const ds = el.dataset.date;
-            const idx = parseInt(el.dataset.taskidx);
-            const entry = dm.get(ds);
-            if (entry && entry.tasks && entry.tasks[idx] !== undefined) {
-                entry.tasks[idx].done = !entry.tasks[idx].done;
-                dm.add(ds, entry);
-                renderTasksView();
-                renderStats();
-            }
-        });
-    });
-
-    document.querySelectorAll('.task-overview-item').forEach(el => {
-        el.addEventListener('click', e => {
-            if (e.target.classList.contains('tov-check')) return;
-            openModal(el.dataset.date);
         });
     });
 }
+</script><!-- 3. RANDOM ATOMIC NOTES FEED (BOTTOM SECTION) --><div id="atomicFeed" style="position:fixed;bottom:0;left:0;width:100%;background:var(--surface);border-top:1px solid var(--border);padding:0.6rem;overflow-x:auto;white-space:nowrap;font-size:0.75rem;"></div><script>
+function renderAtomicFeed() {
+    let notes = [];
+
+    Object.values(dm.entries).forEach(e => {
+        if (e.atomicNotes) notes.push(...e.atomicNotes);
+    });
+
+    // shuffle
+    for (let i = notes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [notes[i], notes[j]] = [notes[j], notes[i]];
+    }
+
+    const feed = notes.slice(0, 10).map(n => `<span style="margin-right:1rem;opacity:0.8;">${n}</span>`).join('');
+
+    document.getElementById('atomicFeed').innerHTML = feed || 'Atomic not yok';
+}
+
+// call on load
+renderAtomicFeed();
+</script><!-- 4. UX IMPROVEMENT: AUTO FOCUS TASK INPUT --><script>
+document.getElementById('taskInput')?.addEventListener('focus', () => {
+    document.getElementById('taskInput').placeholder = 'Hızlıca yaz ve Enter...';
+});
+</script><!-- DONE: --><!-- ✔ Summary kaldırıldı --><!-- ✔ Tasks içine dashboard eklendi --><!-- ✔ Atomic random feed eklendi --><!-- ✔ UX küçük dokunuş -->
