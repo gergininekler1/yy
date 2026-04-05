@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX.JOURNAL v4.2</title>
+    <title>MATRIX</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,22 +15,22 @@
         }
 
         [data-theme="light"] {
-            --bg: #f0f0f2; --surface: #ffffff; --surface2: #e0e0e5;
-            --border: #bbb; --text1: #1a1a1a; --text2: #555;
+            --bg: #f2f2f5; --surface: #ffffff; --surface2: #e8e8ed;
+            --border: #ccc; --text1: #1a1a1a; --text2: #666;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
         body { background: var(--bg); color: var(--text1); transition: 0.3s; padding: 1rem; line-height: 1.4; }
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* ─── HEADER & NAV ─── */
-        header { border: 2px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); position: relative; }
-        h1 { font-family: 'Orbitron'; letter-spacing: 4px; color: var(--accent); margin-bottom: 1rem; }
+        /* ─── HEADER ─── */
+        header { border: 2px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); }
+        h1 { font-family: 'Orbitron'; letter-spacing: 8px; color: var(--accent); margin-bottom: 1rem; text-transform: uppercase; }
         
-        .sub-header-row { display: flex; gap: 10px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-        .stat-item { background: var(--surface2); padding: 8px 12px; border-left: 3px solid var(--accent); font-size: 0.8rem; }
-        .stat-label { color: var(--text2); font-size: 0.6rem; text-transform: uppercase; }
+        .sub-header-row { display: flex; gap: 10px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+        .stat-item { background: var(--surface2); padding: 8px 12px; border-left: 3px solid var(--accent); }
+        .stat-label { color: var(--text2); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; }
 
         .nav-controls { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .group { display: flex; border: 1px solid var(--border); background: var(--bg); border-radius: 3px; overflow: hidden; }
@@ -42,84 +42,67 @@
         button:hover { color: var(--accent); background: var(--accent-dim); }
         button.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        /* ─── WEEKLY HIERARCHY (GÖRSELDEKİ YAPI) ─── */
-        .weekly-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-        .day-card { 
-            background: var(--surface); border: 1px solid var(--border); padding: 15px; 
-            cursor: pointer; position: relative; transition: 0.2s;
-        }
-        .day-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .day-card.today { border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent-dim); }
+        /* ─── VIEWS ─── */
+        .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
+        .day-card { background: var(--surface); border: 1px solid var(--border); padding: 15px; cursor: pointer; transition: 0.2s; }
+        .day-card:hover { border-color: var(--accent); }
+        .day-card.today { border: 2px solid var(--accent); }
         
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .card-date { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--accent); }
-        .card-day { font-size: 0.7rem; color: var(--text2); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .card-date { font-family: 'Orbitron'; font-size: 1.1rem; color: var(--accent); }
 
-        .habit-status { font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; background: var(--border); color: var(--text2); }
-        .habit-status.active { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
-
-        .card-content { font-size: 0.8rem; color: var(--text2); min-height: 45px; margin: 10px 0; overflow: hidden; }
-        .card-footer { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--accent); }
+        /* AYLIK TAKVİM */
+        .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: var(--border); border: 1px solid var(--border); }
+        .month-day { background: var(--surface); aspect-ratio: 1; padding: 5px; cursor: pointer; position: relative; font-size: 0.7rem; }
+        .month-day:hover { background: var(--accent-dim); }
+        .month-day.other-month { opacity: 0.3; }
+        .month-day.has-entry { border-bottom: 2px solid var(--accent); }
+        .month-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.6rem; color: var(--text2); margin-bottom: 5px; }
 
         /* ─── MODAL ─── */
-        .modal { 
-            display:none; position:fixed; inset:0; background: rgba(0,0,0,0.9); 
-            z-index: 1000; align-items: center; justify-content: center; padding: 15px;
-        }
+        .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
         .modal.active { display: flex; }
-        .modal-content { 
-            background: var(--surface); border: 2px solid var(--accent); width: 100%; 
-            max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 25px;
-        }
+        .modal-content { background: var(--surface); border: 1px solid var(--accent); width: 100%; max-width: 650px; max-height: 95vh; overflow-y: auto; padding: 2rem; }
 
-        .section-tag { color: var(--text2); font-size: 0.6rem; margin-bottom: 8px; letter-spacing: 1px; }
-        textarea { 
-            width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border);
-            color: var(--text1); padding: 12px; margin-bottom: 15px; resize: none;
-        }
-        .input-row { display: flex; gap: 8px; margin-bottom: 15px; }
-        input[type="text"] { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 8px; font-size: 0.8rem; }
+        .habit-row { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .habit-btn { border: 1px solid var(--border); padding: 8px 12px; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .habit-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-        .item-list { margin-bottom: 15px; }
-        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 4px; border-left: 2px solid var(--accent); }
+        textarea { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; margin: 10px 0; resize: none; }
+        .internal-link { color: var(--accent); text-decoration: underline; cursor: pointer; }
         
-        /* ─── RANDOM HISTORY ─── */
-        footer { margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border); }
-        .atomic-stream { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; opacity: 0.7; }
-        .atomic-chip { background: var(--surface2); padding: 5px 12px; border: 1px solid var(--border); font-size: 0.7rem; cursor: default; }
-        .atomic-chip:hover { border-color: var(--accent); color: var(--accent); }
+        .tag-input-area { display: flex; gap: 8px; margin-top: 10px; }
+        .tag-chip { background: var(--surface2); border: 1px solid var(--border); padding: 2px 8px; font-size: 0.65rem; border-radius: 3px; display: inline-flex; align-items: center; gap: 5px; }
 
-        /* ─── FOCUS MODE ─── */
-        body.focus-mode header, body.focus-mode footer, body.focus-mode .fab { opacity: 0; pointer-events: none; }
-        body.focus-mode .weekly-container { filter: blur(2px); }
+        /* ─── FOOTER ─── */
+        footer { margin-top: 3rem; padding: 2rem 0; border-top: 1px solid var(--border); text-align: center; }
+        .random-note-box { max-width: 600px; margin: 0 auto; color: var(--text2); font-style: italic; font-size: 0.85rem; border-left: 2px solid var(--accent); padding-left: 15px; }
 
-        .fab { 
-            position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px;
-            background: var(--accent); color: #000; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.8rem; 
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100;
-        }
+        .fab { position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; z-index: 100; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>MATRIX.JOURNAL v4.2</h1>
+        <h1>Matrix</h1>
         
         <div class="sub-header-row">
-            <button id="focusBtn" style="border:1px solid var(--border)">[👁️ FOCUS]</button>
-            <button id="themeToggle" style="border:1px solid var(--border)">[☀️ THEME]</button>
-            <button id="exportBtn" style="border:1px solid var(--border); margin-left:auto;">[EXPORT]</button>
+            <button id="themeToggle" style="border:1px solid var(--border)">[TEMA]</button>
+            <button id="exportBtn" style="border:1px solid var(--border)">[EXPORT]</button>
+            <button id="importBtn" style="border:1px solid var(--border)">[IMPORT]</button>
+            <input type="file" id="fileInput" hidden>
         </div>
 
-        <div class="stats-bar" id="statsBar"></div>
+        <div class="stats-bar" id="statsBar">
+            </div>
 
         <div class="nav-controls">
             <div class="group">
                 <button class="view-btn active" data-view="weekly">HAFTALIK</button>
+                <button class="view-btn" data-view="monthly">AYLIK</button>
                 <button class="view-btn" data-view="list">ARŞİV</button>
-                <button class="view-btn" data-view="tasks">GÖREVLER</button>
+                <button class="view-btn" data-view="extra">EKSTRA</button>
             </div>
             <div class="group">
                 <button id="prevBtn">&lt;</button>
@@ -132,38 +115,40 @@
     <main id="mainContent"></main>
 
     <footer>
-        <div style="text-align: center; color: var(--text2); font-size: 0.6rem; margin-bottom: 1rem; letter-spacing: 3px;">// RANDOM_ATOMIC_HISTORY</div>
-        <div class="atomic-stream" id="atomicStream"></div>
+        <div style="font-size: 0.5rem; color: var(--text3); letter-spacing: 4px; margin-bottom: 1rem;">// SINGLE_ATOMIC_HISTORY</div>
+        <div id="randomAtomicArea" class="random-note-box">...</div>
     </footer>
 </div>
 
 <div class="modal" id="entryModal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); font-size: 1.1rem;">00-00-0000</h2>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--bg); padding:5px 10px; border:1px solid var(--border);">
-                <input type="checkbox" id="habitCheck">
-                <span style="font-size:0.7rem; font-weight:bold;">DEMİR GİBİ ZİHİN</span>
-            </label>
+        <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom: 1.5rem;">00-00-0000</h2>
+        
+        <div class="habit-row">
+            <div class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><span>[ ]</span> DEMİR GİBİ ZİHİN</div>
+            <div class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><span>[ ]</span> SPOR</div>
+            <div class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><span>[ ]</span> OKUMA</div>
         </div>
 
-        <div class="section-tag">// GÖREV LİSTESİ</div>
-        <div id="modalTaskList" class="item-list"></div>
-        <div class="input-row">
-            <input type="text" id="taskInput" placeholder="Yeni görev ekle...">
-            <button id="addTaskBtn" style="border:1px solid var(--accent); color:var(--accent);">EKLE</button>
+        <div style="color:var(--text2); font-size:0.6rem;">// GÖREVLER</div>
+        <div id="modalTasks" style="margin: 10px 0;"></div>
+        <div style="display:flex; gap:5px; margin-bottom:20px;">
+            <input type="text" id="taskInput" placeholder="Görev..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:5px;">
+            <button onclick="addTask()" style="border:1px solid var(--accent); color:var(--accent); padding:0 10px;">+</button>
         </div>
 
-        <div class="section-tag">// GÜNLÜK NOTLAR</div>
-        <textarea id="entryText" placeholder="Bugün neler başardın?"></textarea>
+        <div style="color:var(--text2); font-size:0.6rem;">// SİSTEM NOTU [[TARİH]]</div>
+        <textarea id="entryText" placeholder="Kayıt giriniz..."></textarea>
 
-        <div class="section-tag">// ATOMİK NOTLAR (ENTER)</div>
-        <div id="modalAtomicList" class="item-list"></div>
-        <input type="text" id="atomicInput" placeholder="Kısa, öz notlar...">
+        <div style="color:var(--text2); font-size:0.6rem;">// ETİKETLER</div>
+        <div id="modalTags" style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;"></div>
+        <div class="tag-input-area">
+            <input type="text" id="tagInput" placeholder="Etiket ekle ve enter..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:5px;">
+        </div>
 
         <div style="display:flex; gap:10px; margin-top:2rem;">
-            <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">SİSTEME İŞLE</button>
-            <button id="closeBtn" style="flex:1; border:1px solid var(--border);">VAZGEÇ</button>
+            <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">SİSTEME KAYDET</button>
+            <button id="closeBtn" style="flex:1; border:1px solid var(--border);">İPTAL</button>
         </div>
     </div>
 </div>
@@ -172,15 +157,15 @@
 
 <script>
 const state = {
-    entries: JSON.parse(localStorage.getItem('mj_v42_data') || '{}'),
+    entries: JSON.parse(localStorage.getItem('matrix_v42_data') || '{}'),
     view: 'weekly',
     cursor: new Date(),
     selectedDate: null,
-    tempTasks: [],
-    tempAtomics: []
+    temp: { tasks: [], habits: [], tags: [] },
+    tagFilter: null
 };
 
-const save = () => localStorage.setItem('mj_v42_data', JSON.stringify(state.entries));
+const save = () => localStorage.setItem('matrix_v42_data', JSON.stringify(state.entries));
 const fmt = (d) => d.toISOString().split('T')[0];
 
 /* ─── RENDER ENGINE ─── */
@@ -189,163 +174,200 @@ const render = () => {
     main.innerHTML = '';
     
     if(state.view === 'weekly') renderWeekly(main);
+    else if(state.view === 'monthly') renderMonthly(main);
     else if(state.view === 'list') renderList(main);
-    else if(state.view === 'tasks') renderTasks(main);
+    else if(state.view === 'extra') renderExtra(main);
 
     updateStats();
-    renderRandomAtomics();
+    renderRandomNote();
 };
 
+// HAFTALIK
 const renderWeekly = (el) => {
     const start = new Date(state.cursor);
     start.setDate(start.getDate() - (start.getDay() || 7) + 1);
-    
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    document.getElementById('currentRange').textContent = `${start.getDate()} - ${end.getDate()} ${start.toLocaleString('tr-TR', {month:'short'})}`;
+    document.getElementById('currentRange').textContent = `${start.getDate()} - ${new Date(new Date(start).setDate(start.getDate()+6)).getDate()} ${start.toLocaleString('tr-TR', {month:'short'})}`;
 
     const grid = document.createElement('div');
-    grid.className = 'weekly-container';
-    
+    grid.className = 'weekly-grid';
     for(let i=0; i<7; i++) {
-        const d = new Date(start);
-        d.setDate(d.getDate() + i);
+        const d = new Date(start); d.setDate(d.getDate() + i);
         const ds = fmt(d);
         const e = state.entries[ds];
-        const isToday = ds === fmt(new Date());
-
         grid.innerHTML += `
-            <div class="day-card ${isToday ? 'today' : ''}" onclick="openEntry('${ds}')">
+            <div class="day-card ${ds === fmt(new Date()) ? 'today' : ''}" onclick="openEntry('${ds}')">
                 <div class="card-header">
                     <div class="card-date">${d.getDate()}</div>
-                    <div class="card-day">${d.toLocaleDateString('tr-TR',{weekday:'long'}).toUpperCase()}</div>
+                    <div style="font-size:0.6rem; color:var(--text2)">${d.toLocaleDateString('tr-TR',{weekday:'short'}).toUpperCase()}</div>
                 </div>
-                <div class="habit-status ${e?.habit ? 'active' : ''}">
-                    ${e?.habit ? '✓ DEMİR GİBİ ZİHİN' : '---'}
+                <div style="margin:10px 0; font-size:0.75rem; min-height:40px;">
+                    ${e ? parseLinks(e.text).substring(0,80) + '...' : '---'}
                 </div>
-                <div class="card-content">
-                    ${e ? e.text.substring(0,80) + (e.text.length > 80 ? '...' : '') : '<span style="opacity:0.2">Kayıt yok...</span>'}
+                <div style="display:flex; gap:5px; font-size:0.5rem; color:var(--accent)">
+                    ${e?.habits?.includes('demir') ? '[ZİHİN]' : ''}
+                    ${e?.habits?.includes('spor') ? '[SPOR]' : ''}
+                    ${e?.habits?.includes('okuma') ? '[OKUMA]' : ''}
                 </div>
-                <div class="card-footer">
-                    <span>GÖREV: ${e?.tasks?.filter(t=>t.done).length || 0}/${e?.tasks?.length || 0}</span>
-                    <span>${e?.atomics?.length || 0} ATOMİK</span>
-                </div>
-            </div>
-        `;
+            </div>`;
     }
     el.appendChild(grid);
 };
 
-const renderList = (el) => {
-    const dates = Object.keys(state.entries).sort().reverse();
-    if(!dates.length) { el.innerHTML = '<p style="text-align:center; padding:2rem;">Henüz kayıtlı veri yok.</p>'; return; }
+// AYLIK
+const renderMonthly = (el) => {
+    const y = state.cursor.getFullYear(), m = state.cursor.getMonth();
+    document.getElementById('currentRange').textContent = state.cursor.toLocaleString('tr-TR', {month:'long', year:'numeric'});
     
-    dates.forEach(d => {
-        const e = state.entries[d];
-        el.innerHTML += `
-            <div style="background:var(--surface); border:1px solid var(--border); padding:1rem; margin-bottom:0.5rem; cursor:pointer;" onclick="openEntry('${d}')">
-                <span style="color:var(--accent); font-family:Orbitron;">${d}</span> | ${e.text.substring(0,100)}...
+    el.innerHTML = `<div class="month-header"><div>PT</div><div>SA</div><div>ÇA</div><div>PE</div><div>CU</div><div>CT</div><div>PZ</div></div>`;
+    const grid = document.createElement('div'); grid.className = 'month-grid';
+    
+    const first = new Date(y, m, 1);
+    const startOffset = (first.getDay() || 7) - 1;
+    const totalDays = new Date(y, m+1, 0).getDate();
+
+    for(let i=0; i<42; i++) {
+        const d = new Date(y, m, i - startOffset + 1);
+        const ds = fmt(d);
+        const isCurrentMonth = d.getMonth() === m;
+        grid.innerHTML += `
+            <div class="month-day ${!isCurrentMonth ? 'other-month' : ''} ${state.entries[ds] ? 'has-entry' : ''}" onclick="openEntry('${ds}')">
+                ${d.getDate()}
+            </div>`;
+    }
+    el.appendChild(grid);
+};
+
+// EKSTRA (GÖREVLER + SPOR/OKUMA İSTATİSTİĞİ + ETİKET FİLTRE)
+const renderExtra = (el) => {
+    const all = Object.values(state.entries);
+    const spor = all.filter(e => e.habits?.includes('spor')).length;
+    const okuma = all.filter(e => e.habits?.includes('okuma')).length;
+    
+    let tags = new Set();
+    all.forEach(e => e.tags?.forEach(t => tags.add(t)));
+
+    el.innerHTML = `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+            <div class="stat-item"><div class="stat-label">TOPLAM SPOR</div><div>${spor} SEANS</div></div>
+            <div class="stat-item"><div class="stat-label">TOPLAM OKUMA</div><div>${okuma} GÜN</div></div>
+        </div>
+        <div style="margin-bottom:20px;">
+            <div class="stat-label">// ETİKET FİLTRESİ</div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">
+                <button onclick="state.tagFilter=null; render();" style="border:1px solid var(--border)">HEPSİ</button>
+                ${Array.from(tags).map(t => `<button onclick="state.tagFilter='${t}'; render();" style="border:1px solid var(--accent); color:var(--accent)">#${t}</button>`).join('')}
             </div>
-        `;
+        </div>
+        <div class="stat-label">// GÖREV HAVUZU ${state.tagFilter ? `(#${state.tagFilter})` : ''}</div>
+        <div id="extraTasks" style="margin-top:10px;"></div>
+    `;
+
+    const taskList = document.getElementById('extraTasks');
+    Object.keys(state.entries).sort().reverse().forEach(date => {
+        const e = state.entries[date];
+        if(state.tagFilter && !e.tags?.includes(state.tagFilter)) return;
+        
+        (e.tasks || []).forEach(t => {
+            taskList.innerHTML += `
+                <div style="display:flex; gap:10px; background:var(--surface); padding:8px; border-bottom:1px solid var(--border); font-size:0.8rem; opacity:${t.done?0.5:1}">
+                    <span style="color:var(--accent); min-width:80px;">[${date}]</span>
+                    <span style="${t.done?'text-decoration:line-through':''}">${t.text}</span>
+                </div>`;
+        });
     });
 };
 
-const renderTasks = (el) => {
-    let count = 0;
+const renderList = (el) => {
     Object.keys(state.entries).sort().reverse().forEach(d => {
-        const tasks = state.entries[d].tasks || [];
-        if(tasks.length) {
-            count++;
-            el.innerHTML += `<div style="color:var(--accent); margin:20px 0 10px; font-size:0.8rem;">>> ${d}</div>`;
-            tasks.forEach(t => {
-                el.innerHTML += `
-                    <div class="list-row" style="opacity:${t.done ? 0.4 : 1}">
-                        <input type="checkbox" ${t.done ? 'checked' : ''} disabled>
-                        <span style="${t.done ? 'text-decoration:line-through' : ''}">${t.text}</span>
-                    </div>
-                `;
-            });
-        }
+        el.innerHTML += `<div class="day-card" style="margin-bottom:5px;" onclick="openEntry('${d}')"><b style="color:var(--accent)">${d}</b> | ${state.entries[d].text.substring(0,100)}...</div>`;
     });
-    if(!count) el.innerHTML = '<p style="text-align:center; padding:2rem;">Aktif görev bulunamadı.</p>';
 };
 
 /* ─── MODAL ─── */
 window.openEntry = (date) => {
     state.selectedDate = date;
-    const e = state.entries[date] || { text:'', habit:false, tasks:[], atomics:[] };
+    const e = state.entries[date] || { text:'', habits:[], tasks:[], tags:[] };
+    state.temp = { tasks:[...(e.tasks||[])], habits:[...(e.habits||[])], tags:[...(e.tags||[])] };
     
     document.getElementById('modalTitle').textContent = date;
     document.getElementById('entryText').value = e.text || '';
-    document.getElementById('habitCheck').checked = !!e.habit;
-    state.tempTasks = [...(e.tasks || [])];
-    state.tempAtomics = [...(e.atomics || [])];
-    
-    renderModalLists();
+    renderModalTemp();
     document.getElementById('entryModal').classList.add('active');
 };
 
-const renderModalLists = () => {
-    document.getElementById('modalTaskList').innerHTML = state.tempTasks.map((t, i) => `
-        <div class="list-row">
-            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="state.tempTasks[${i}].done = !state.tempTasks[${i}].done; renderModalLists();">
-            <span style="flex:1; ${t.done ? 'text-decoration:line-through; opacity:0.5' : ''}">${t.text}</span>
-            <span onclick="state.tempTasks.splice(${i},1); renderModalLists();" style="color:var(--danger); cursor:pointer">×</span>
-        </div>
-    `).join('');
+const renderModalTemp = () => {
+    // Habits
+    ['demir','spor','okuma'].forEach(h => {
+        const btn = document.getElementById(`h_${h}`);
+        const active = state.temp.habits.includes(h);
+        btn.classList.toggle('active', active);
+        btn.querySelector('span').textContent = active ? '[X]' : '[ ]';
+    });
+    // Tasks
+    document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `
+        <div style="display:flex; gap:10px; margin-bottom:5px; font-size:0.8rem;">
+            <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done">
+            <span style="flex:1">${t.text}</span>
+            <span onclick="state.temp.tasks.splice(${i},1); renderModalTemp();" style="color:var(--danger); cursor:pointer;">×</span>
+        </div>`).join('');
+    // Tags
+    document.getElementById('modalTags').innerHTML = state.temp.tags.map((t,i) => `
+        <div class="tag-chip">#${t} <span onclick="state.temp.tags.splice(${i},1); renderModalTemp();" style="cursor:pointer">×</span></div>`).join('');
+};
 
-    document.getElementById('modalAtomicList').innerHTML = state.tempAtomics.map((a, i) => `
-        <div class="list-row" style="border-left-color: #40c4ff">
-            <span style="flex:1; font-size:0.75rem;">${a}</span>
-            <span onclick="state.tempAtomics.splice(${i},1); renderModalLists();" style="color:var(--danger); cursor:pointer">×</span>
-        </div>
-    `).join('');
+window.toggleHabit = (h) => {
+    const idx = state.temp.habits.indexOf(h);
+    if(idx > -1) state.temp.habits.splice(idx, 1);
+    else state.temp.habits.push(h);
+    renderModalTemp();
+};
+
+window.addTask = () => {
+    const input = document.getElementById('taskInput');
+    if(input.value) { state.temp.tasks.push({text:input.value, done:false}); input.value=''; renderModalTemp(); }
+};
+
+document.getElementById('tagInput').onkeydown = (e) => {
+    if(e.key === 'Enter' && e.target.value) {
+        state.temp.tags.push(e.target.value.replace(/\s/g,''));
+        e.target.value = '';
+        renderModalTemp();
+    }
 };
 
 /* ─── HELPERS ─── */
+const parseLinks = (text) => {
+    if(!text) return '';
+    return text.replace(/\[\[(\d{4}-\d{2}-\d{2})\]\]/g, '<span class="internal-link" onclick="event.stopPropagation(); openEntry(\'$1\')">$1</span>');
+};
+
 const updateStats = () => {
     const all = Object.values(state.entries);
-    const habits = all.filter(e => e.habit).length;
-    const totalTasks = all.reduce((a,b) => a + (b.tasks?.length || 0), 0);
-    
+    const demirCount = all.filter(e => e.habits?.includes('demir')).length;
     document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item"><div class="stat-label">TOPLAM GÜN</div><div>${all.length} KAYIT</div></div>
-        <div class="stat-item"><div class="stat-label">DEMİR ZİHİN</div><div>${habits} BAŞARI</div></div>
-        <div class="stat-item"><div class="stat-label">GÖREV HAVUZU</div><div>${totalTasks} KAYIT</div></div>
+        <div class="stat-item"><div class="stat-label">SİSTEM KAYDI</div><div>${all.length} ADET</div></div>
+        <div class="stat-item"><div class="stat-label">DEMİR GİBİ ZİHİN</div><div>${demirCount} GÜN</div></div>
     `;
 };
 
-const renderRandomAtomics = () => {
-    const pool = [];
-    Object.values(state.entries).forEach(e => pool.push(...(e.atomics || [])));
-    const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 15);
-    document.getElementById('atomicStream').innerHTML = shuffled.map(a => `<div class="atomic-chip">${a}</div>`).join('');
+const renderRandomNote = () => {
+    const notes = Object.values(state.entries).map(e => e.text).filter(t => t && t.length > 5);
+    if(notes.length) {
+        document.getElementById('randomAtomicArea').textContent = `"${notes[Math.floor(Math.random() * notes.length)].substring(0,150)}..."`;
+    }
 };
 
-/* ─── EVENTS ─── */
+/* ─── GLOBAL EVENTS ─── */
 document.getElementById('saveBtn').onclick = () => {
     state.entries[state.selectedDate] = {
         text: document.getElementById('entryText').value,
-        habit: document.getElementById('habitCheck').checked,
-        tasks: state.tempTasks,
-        atomics: state.tempAtomics
+        habits: state.temp.habits,
+        tasks: state.temp.tasks,
+        tags: state.temp.tags
     };
     save();
     document.getElementById('entryModal').classList.remove('active');
     render();
-};
-
-document.getElementById('addTaskBtn').onclick = () => {
-    const v = document.getElementById('taskInput').value;
-    if(v) { state.tempTasks.push({text:v, done:false}); document.getElementById('taskInput').value = ''; renderModalLists(); }
-};
-
-document.getElementById('atomicInput').onkeydown = (e) => {
-    if(e.key === 'Enter' && e.target.value) {
-        state.tempAtomics.push(e.target.value);
-        e.target.value = '';
-        renderModalLists();
-    }
 };
 
 document.querySelectorAll('.view-btn').forEach(btn => {
@@ -357,24 +379,38 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     };
 });
 
-document.getElementById('prevBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()-7); render(); };
-document.getElementById('nextBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()+7); render(); };
+document.getElementById('prevBtn').onclick = () => { 
+    if(state.view === 'monthly') state.cursor.setMonth(state.cursor.getMonth() - 1);
+    else state.cursor.setDate(state.cursor.getDate() - 7);
+    render();
+};
+document.getElementById('nextBtn').onclick = () => {
+    if(state.view === 'monthly') state.cursor.setMonth(state.cursor.getMonth() + 1);
+    else state.cursor.setDate(state.cursor.getDate() + 7);
+    render();
+};
+
 document.getElementById('themeToggle').onclick = () => {
     const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', t);
 };
-document.getElementById('focusBtn').onclick = () => document.body.classList.toggle('focus-mode');
-document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
-document.getElementById('closeBtn').onclick = () => document.getElementById('entryModal').classList.remove('active');
+
 document.getElementById('exportBtn').onclick = () => {
-    const data = JSON.stringify(state.entries, null, 2);
-    const blob = new Blob([data], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `matrix_backup_${fmt(new Date())}.json`; a.click();
+    const blob = new Blob([JSON.stringify(state.entries)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `matrix_v42.json`; a.click();
 };
 
-// Start
+document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange = (e) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => { state.entries = JSON.parse(ev.target.result); save(); render(); };
+    reader.readAsText(e.target.files[0]);
+};
+
+document.getElementById('closeBtn').onclick = () => document.getElementById('entryModal').classList.remove('active');
+document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
+
+// INIT
 render();
 </script>
 </body>
