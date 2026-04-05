@@ -3,463 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX - FINAL FIX v51</title>
+    <title>MATRIX v53</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --accent: #2ecc71; 
+            --accent: #2ecc71;
             --accent-dim: rgba(46, 204, 113, 0.1);
             --danger: #e74c3c;
-            --danger-muted: rgba(231, 76, 60, 0.4);
+            --danger-muted: rgba(231, 76, 60, 0.25);
             --bg-grid: #0d0d0d;
             --bg-grid-lines: #161616;
             --bg: var(--bg-grid);
             --surface: #161616; --surface2: #1f1f1f;
-            --border: #2a2a2a; --text1: #d1d1d1; --text2: #777;
+            --border: #2a2a2a; --text1: #d1d1d1; --text2: #666;
             --warning: #f1c40f;
+            --pr-high: #e74c3c;
+            --pr-mid: #e8a838;
+            --pr-low: #2ecc71;
         }
-
         [data-theme="light"] {
-            --bg-grid: #f4f4f7;
-            --bg-grid-lines: #ebebef;
+            --bg-grid: #f4f4f7; --bg-grid-lines: #e8e8ec;
             --bg: var(--bg-grid);
             --surface: #ffffff; --surface2: #ebebef;
-            --border: #d1d1d1; --text1: #222; --text2: #666;
+            --border: #d1d1d1; --text1: #222; --text2: #888;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
         body { background-color: var(--bg-grid); background-image: linear-gradient(var(--bg-grid-lines) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid-lines) 1px, transparent 1px); background-size: 20px 20px; color: var(--text1); padding: 1rem; }
-        
+
         .container { max-width: 1100px; margin: 0 auto; }
         .header-block { border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 0.5rem; background: var(--surface); position: relative; }
         h1 { font-family: 'Orbitron'; letter-spacing: 6px; color: var(--accent); text-transform: uppercase; font-size: 1.8rem; }
-        
+
         .kunye-block { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); }
         .kunye-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
-        
+
         .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
         .stat-item { background: var(--surface2); padding: 10px; border-left: 2px solid var(--accent); border-radius: 4px; }
-        .stat-label { color: var(--text2); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-        .stat-content { font-size: 0.7rem; line-height: 1.2; word-break: break-all; max-height: 50px; overflow-y: auto; }
+        .stat-label { color: var(--text2); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
 
-        .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--accent); padding: 12px; font-size: 0.8rem; margin-bottom: 1rem; }
-        
-        button { background: transparent; border: none; color: var(--text2); padding: 8px 14px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        /* Active tasks mini list */
+        .active-task-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.15s; }
+        .active-task-row:last-child { border-bottom: none; }
+        .active-task-row:hover { opacity: 0.75; }
+        .active-task-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .active-task-date { font-size: 0.55rem; color: var(--text2); flex-shrink: 0; min-width: 38px; }
+        .active-task-text { font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; font-size: 0.8rem; margin-bottom: 1rem; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--accent); }
+        .search-input::placeholder { color: var(--text2); }
+
+        button { background: transparent; border: none; color: var(--text2); padding: 8px 14px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; display: flex; align-items: center; gap: 6px; transition: color 0.15s; }
         button.active { background: var(--accent); color: #000; font-weight: bold; }
 
         .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-        .day-card { background: var(--surface); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; overflow: hidden; border-left: 5px solid var(--border); }
+        .day-card { background: var(--surface); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; overflow: hidden; border-left: 4px solid var(--border); transition: border-color 0.2s, transform 0.15s; }
+        .day-card:hover { transform: translateY(-1px); }
         .day-card.recorded { border-left-color: var(--accent); }
-        .card-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--danger-muted); transition: width 0.4s ease; }
+        .card-progress { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--accent); opacity: 0.5; transition: width 0.4s ease; }
 
-        /* Kritik Durum & Yedekleme Işığı */
-        .critical-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: inline-block; animation: blink 1s infinite; margin-left: 5px; }
+        .critical-dot { width: 7px; height: 7px; background: var(--danger); border-radius: 50%; display: inline-block; animation: blink 1s infinite; margin-left: 4px; }
         .backup-alert { color: var(--warning); animation: blink 1.5s infinite; font-size: 0.8rem; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-        .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
+        .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--bg); border: 1px solid var(--accent); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-radius: 4px; }
-        .modal-block { background: var(--surface); border: 1px solid var(--border); padding: 1.2rem; margin-bottom: 1rem; border-radius: 4px; }
-        
-        textarea { width: 100%; min-height: 150px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 10px; resize: vertical; }
-        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.75rem; }
-        .priority-tag { font-size: 0.5rem; padding: 2px 4px; border-radius: 2px; }
+        .modal-content { background: var(--bg); border: 1px solid var(--border); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-radius: 6px; }
+        .modal-block { background: var(--surface); border: 1px solid var(--border); padding: 1.2rem; margin-bottom: 1rem; border-radius: 6px; }
+
+        /* Day title input */
+        .day-title-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text1); padding: 4px 0 8px; font-size: 0.9rem; outline: none; margin-top: 6px; transition: border-color 0.2s; }
+        .day-title-input:focus { border-bottom-color: var(--accent); }
+        .day-title-input::placeholder { color: var(--text2); font-size: 0.75rem; }
+
+        /* Habit buttons */
+        .habit-btn { border: 1px solid var(--border); color: var(--text2); padding: 6px 12px; border-radius: 4px; font-size: 0.65rem; transition: all 0.15s; }
+        .habit-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
+
+        /* Priority buttons */
+        .pr-btn { border: 1px solid var(--border); border-radius: 4px; font-size: 0.6rem; padding: 5px 10px; transition: all 0.15s; }
+
+        textarea { width: 100%; min-height: 150px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 10px; resize: vertical; outline: none; border-radius: 4px; }
+        textarea:focus { border-color: var(--accent); }
+
+        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.75rem; border-radius: 3px; }
         .tag-chip { background: var(--surface2); color: var(--accent); padding: 4px 8px; font-size: 0.6rem; border-radius: 4px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 5px; }
 
-        .fab { position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 100; }
+        /* Related notes link */
+        .note-link { color: var(--accent); text-decoration: underline; cursor: pointer; font-size: 0.65rem; }
+
+        /* Archive highlight */
+        mark { background: rgba(46,204,113,0.2); color: var(--accent); border-radius: 2px; padding: 0 1px; }
+
+        /* Archive filter bar */
+        .archive-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+        .filter-btn { border: 1px solid var(--border); color: var(--text2); padding: 3px 10px; font-size: 0.55rem; border-radius: 20px; transition: all 0.15s; }
+        .filter-btn.on { border-color: var(--accent); color: var(--accent); }
+
+        .fab { position: fixed; bottom: 2rem; right: 2rem; width: 52px; height: 52px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 20px rgba(46,204,113,0.3); }
+
+        /* Calendar styles */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+        .cal-header-cell { text-align: center; font-size: 0.5rem; color: var(--text2); padding: 6px 0; letter-spacing: 1px; text-transform: uppercase; }
+        .cal-cell { background: var(--surface); border: 1px solid var(--border); min-height: 86px; padding: 6px; border-radius: 4px; cursor: pointer; transition: border-color 0.15s; position: relative; }
+        .cal-cell:hover { border-color: var(--accent); }
+        .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+        .cal-cell.has-entry { border-left: 2px solid var(--accent); }
+        .cal-cell.today { background: rgba(46,204,113,0.06); }
+        .cal-day-num { font-family: 'Orbitron'; font-size: 0.65rem; color: var(--text2); margin-bottom: 4px; }
+        .cal-cell.has-entry .cal-day-num { color: var(--accent); }
+        .cal-cell.today .cal-day-num { color: var(--text1); }
+        .cal-habit-row { display: flex; gap: 3px; margin-top: 3px; flex-wrap: wrap; }
+        .cal-habit-pip { width: 14px; height: 14px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; }
+        .cal-habit-pip.demir { background: rgba(100,180,255,0.15); color: #64b4ff; }
+        .cal-habit-pip.spor { background: rgba(46,204,113,0.15); color: var(--accent); }
+        .cal-habit-pip.okuma { background: rgba(241,196,15,0.15); color: var(--warning); }
+        .cal-task-bar { margin-top: 4px; background: var(--surface2); height: 2px; border-radius: 1px; overflow: hidden; }
+        .cal-task-fill { height: 100%; background: var(--accent); }
+        .cal-snippet { font-size: 0.48rem; color: var(--text2); margin-top: 3px; line-height: 1.3; overflow: hidden; max-height: 20px; }
+        .cal-month-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .cal-sum-card { background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 10px 12px; border-radius: 4px; }
+        .cal-sum-label { font-size: 0.48rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .cal-sum-val { font-size: 1rem; font-family: 'Orbitron'; color: var(--accent); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-block">
-        <div id="themeToggle" style="position:absolute; top:1rem; right:1.5rem; cursor:pointer;"><i class="fa-solid fa-moon"></i></div>
+        <div id="themeToggle" style="position:absolute; top:1rem; right:1.5rem; cursor:pointer; color:var(--text2);"><i class="fa-solid fa-moon"></i></div>
         <h1><i class="fa-solid fa-terminal"></i> Matrix</h1>
-        <div style="font-size: 0.65rem; color: var(--text2); letter-spacing: 2px; text-transform: uppercase;">terminal mod: günlük v51</div>
+        <div style="font-size: 0.6rem; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;">terminal mod: g\u00fcnl\u00fck v53</div>
     </div>
 
     <div class="kunye-block">
-        <div class="kunye-label">// SİSTEM DURUMU</div>
+        <div class="kunye-label">// S\u0130STEM DURUMU</div>
         <div style="display:flex; gap:10px; margin-bottom:1.5rem;">
             <button id="exportBtn"><i class="fa-solid fa-download"></i> [EXPORT] <span id="backupWarning"></span></button>
             <button id="importBtn"><i class="fa-solid fa-upload"></i> [IMPORT]</button>
-            <input type="file" id="fileInput" hidden>
-        </div>
-
-        <div class="stats-bar" id="statsBar"></div>
-
-        <div class="search-container">
-            <input type="text" id="globalSearch" class="search-input" placeholder="Sistem veri tabanında ara...">
-        </div>
-
-        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <div style="display:flex; border:1px solid var(--border); background:var(--bg);">
-                <button class="view-btn active" data-view="weekly">HAFTALIK</button>
-                <button class="view-btn" data-view="monthly">AYLIK</button>
-                <button class="view-btn" data-view="list">ARŞİV</button>
-                <button class="view-btn" data-view="extra">EKSTRA</button>
-            </div>
-            <div style="display:flex; border:1px solid var(--border); background:var(--bg);">
-                <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="currentRange" style="min-width:140px; pointer-events:none;"></button>
-                <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <main id="mainContent"></main>
-
-    <footer>
-        <div id="randomAtomicArea" style="max-width:600px; margin: 3rem auto 0; color:var(--text2); font-style:italic; font-size:0.8rem; border-left:2px solid var(--accent); padding-left:15px;"></div>
-    </footer>
-</div>
-
-<div class="modal" id="entryModal">
-    <div class="modal-content">
-        <div class="modal-block">
-            <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom:1rem;">00-00-0000</h2>
-            <div style="display:flex; gap:5px;">
-                <button class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-brain"></i> ZİHİN</button>
-                <button class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-dumbbell"></i> SPOR</button>
-                <button class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book-open"></i> OKUMA</button>
-            </div>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// GÖREVLER</div>
-            <div id="modalTasks"></div>
-            <div style="display:flex; gap:5px; margin:10px 0;">
-                <input type="text" id="taskInput" placeholder="Yeni görev..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addTask()">
-                <button onclick="addTask()" style="border:1px solid var(--accent); color:var(--accent)">EKLE</button>
-            </div>
-            <div style="display:flex; gap:5px;">
-                <button class="pr-btn active-3" data-p="3" onclick="selectPriority(3)">DÜŞÜK</button>
-                <button class="pr-btn" data-p="2" onclick="selectPriority(2)">ORTA</button>
-                <button class="pr-btn" data-p="1" onclick="selectPriority(1)">YÜKSEK</button>
-            </div>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// ATOMİK NOTLAR</div>
-            <div id="modalAtomics"></div>
-            <div style="display:flex; gap:5px; margin-top:5px;">
-                <input type="text" id="atomicInput" placeholder="Kısa bir not..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addAtomic()">
-                <button onclick="addAtomic()" style="border:1px solid #40c4ff; color:#40c4ff">EKLE</button>
-            </div>
-        </div>
-
-        <div class="modal-block">
-            <textarea id="entryText" oninput="triggerAutoSave()"></textarea>
-            <div id="modalTags" style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;"></div>
-            <div style="display:flex; gap:5px; margin-top:5px;">
-                <input type="text" id="tagInput" placeholder="Etiket..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addTag()">
-                <button onclick="addTag()" style="border:1px solid #f39c12; color:#f39c12">EKLE</button>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:1.5rem;">
-                <button onclick="closeModal()" style="flex:1; border:1px solid var(--border);">KAPAT</button>
-                <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">SİSTEME KAYDET</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="fab" id="fab"><i class="fa-solid fa-plus"></i></div>
-
-<script>
-const state = {
-    entries: JSON.parse(localStorage.getItem('matrix_v51_data') || '{}'),
-    lastBackup: localStorage.getItem('matrix_last_backup') || null,
-    view: 'weekly', cursor: new Date(), selectedDate: null,
-    temp: { tasks: [], habits: [], atomics: [], tags: [] },
-    currentPriority: 3
-};
-
-const save = () => localStorage.setItem('matrix_v51_data', JSON.stringify(state.entries));
-const fmt = (d) => d.toISOString().split('T')[0];
-
-/* AUTO-SAVE */
-let autoSaveTimeout;
-const triggerAutoSave = () => {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(() => {
-        if (state.selectedDate) {
-            state.entries[state.selectedDate] = { 
-                text: document.getElementById('entryText').value,
-                habits: state.temp.habits, tasks: state.temp.tasks, 
-                atomics: state.temp.atomics, tags: state.temp.tags 
-            };
-            save(); updateStats();
-        }
-    }, 800);
-};
-
-/* RENDERS */
-const render = () => {
-    const main = document.getElementById('mainContent');
-    main.innerHTML = '';
-    if(state.view === 'weekly') renderWeekly(main);
-    else if(state.view === 'monthly') renderMonthly(main);
-    else if(state.view === 'list') renderArchive(main);
-    else if(state.view === 'extra') renderExtra(main);
-    updateStats();
-    renderRandomNote();
-};
-
-const renderWeekly = (el) => {
-    const start = new Date(state.cursor);
-    start.setDate(start.getDate() - (start.getDay() || 7) + 1);
-    document.getElementById('currentRange').textContent = `${start.getDate()} - ${new Date(new Date(start).setDate(start.getDate()+6)).getDate()} ${start.toLocaleString('tr-TR', {month:'short'})}`;
-    
-    const grid = document.createElement('div'); grid.className = 'weekly-grid';
-    for(let i=0; i<7; i++) {
-        const d = new Date(start); d.setDate(start.getDate() + i);
-        const ds = fmt(d); const e = state.entries[ds];
-        const isRecorded = e && (e.text || e.tasks?.length || e.habits?.length);
-        
-        const total = e?.tasks?.length || 0;
-        const done = e?.tasks?.filter(t => t.done).length || 0;
-        const pct = total ? (done / total) * 100 : 0;
-
-        grid.innerHTML += `
-            <div class="day-card ${isRecorded ? 'recorded' : ''}" onclick="openEntry('${ds}')">
-                <div class="card-progress" style="width:${pct}%"></div>
-                <div style="color:var(--accent); font-family:'Orbitron'">${d.getDate()} <span style="font-size:0.6rem; color:var(--text2)">${d.toLocaleDateString('tr-TR',{weekday:'short'})}</span></div>
-                <div style="font-size:0.7rem; margin-top:10px; opacity:0.8">${e?.text?.substring(0, 50) || ''}...</div>
-                <div style="position:absolute; bottom:10px; left:15px; font-size:0.55rem; color:var(--text2);">
-                    <i class="fa-solid fa-list"></i> ${total} | <i class="fa-solid fa-atom"></i> ${e?.atomics?.length || 0}
-                </div>
-            </div>`;
-    }
-    el.appendChild(grid);
-};
-
-const renderMonthly = (el) => {
-    const year = state.cursor.getFullYear();
-    const month = state.cursor.getMonth();
-    document.getElementById('currentRange').textContent = state.cursor.toLocaleString('tr-TR', { month: 'long', year: 'numeric' });
-
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startDow = (firstDay.getDay() + 6) % 7; // Monday=0
-
-    const dayNames = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-    const habitIcons = { demir: 'fa-brain', spor: 'fa-dumbbell', okuma: 'fa-book-open' };
-
-    let html = `
-    <style>
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
-        .cal-header-cell { text-align: center; font-size: 0.55rem; color: var(--accent); padding: 6px 0; letter-spacing: 2px; }
-        .cal-cell { background: var(--surface); border: 1px solid var(--border); min-height: 90px; padding: 6px; border-radius: 4px; cursor: pointer; transition: border-color 0.2s; position: relative; }
-        .cal-cell:hover { border-color: var(--accent); }
-        .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
-        .cal-cell.has-entry { border-left: 3px solid var(--accent); }
-        .cal-cell.today { background: rgba(46,204,113,0.08); }
-        .cal-day-num { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text2); margin-bottom: 4px; }
-        .cal-cell.has-entry .cal-day-num { color: var(--accent); }
-        .cal-cell.today .cal-day-num { color: #fff; font-weight: bold; }
-        .cal-habit-icons { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; }
-        .cal-habit-dot { font-size: 0.55rem; width: 16px; height: 16px; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
-        .cal-habit-dot.demir { background: rgba(100,180,255,0.2); color: #64b4ff; }
-        .cal-habit-dot.spor { background: rgba(46,204,113,0.2); color: var(--accent); }
-        .cal-habit-dot.okuma { background: rgba(241,196,15,0.2); color: var(--warning); }
-        .cal-task-bar { margin-top: 4px; background: var(--surface2); height: 3px; border-radius: 2px; overflow: hidden; }
-        .cal-task-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
-        .cal-snippet { font-size: 0.5rem; color: var(--text2); margin-top: 3px; line-height: 1.3; overflow: hidden; max-height: 24px; }
-        .cal-month-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; }
-        .cal-summary-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px; border-radius: 4px; }
-        .cal-summary-label { font-size: 0.5rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
-        .cal-summary-val { font-size: 1.1rem; font-family: 'Orbitron'; color: var(--accent); margin-top: 2px; }
-    </style>`;
-
-    // Month summary stats
-    const today = fmt(new Date());
-    let monthEntries = 0, monthHabits = { demir: 0, spor: 0, okuma: 0 }, monthTasksDone = 0, monthTasksTotal = 0;
-    for (let d = 1; d <= lastDay.getDate(); d++) {
-        const ds = fmt(new Date(year, month, d));
-        const e = state.entries[ds];
-        if (e && (e.text || e.tasks?.length || e.habits?.length)) {
-            monthEntries++;
-            (e.habits || []).forEach(h => { if (monthHabits[h] !== undefined) monthHabits[h]++; });
-            monthTasksDone += (e.tasks || []).filter(t => t.done).length;
-            monthTasksTotal += (e.tasks || []).length;
-        }
-    }
-
-    html += `<div class="cal-month-summary">
-        <div class="cal-summary-card"><div class="cal-summary-label"><i class="fa-solid fa-calendar-check"></i> Kayıtlı Gün</div><div class="cal-summary-val">${monthEntries}</div></div>
-        <div class="cal-summary-card" style="border-left-color:#64b4ff"><div class="cal-summary-label"><i class="fa-solid fa-brain"></i> Zihin</div><div class="cal-summary-val" style="color:#64b4ff">${monthHabits.demir}</div></div>
-        <div class="cal-summary-card"><div class="cal-summary-label"><i class="fa-solid fa-dumbbell"></i> Spor</div><div class="cal-summary-val">${monthHabits.spor}</div></div>
-        <div class="cal-summary-card" style="border-left-color:var(--warning)"><div class="cal-summary-label"><i class="fa-solid fa-book-open"></i> Okuma</div><div class="cal-summary-val" style="color:var(--warning)">${monthHabits.okuma}</div></div>
-        <div class="cal-summary-card"><div class="cal-summary-label"><i class="fa-solid fa-check-double"></i> Görev Tamamlama</div><div class="cal-summary-val">${monthTasksTotal ? Math.round(monthTasksDone/monthTasksTotal*100) : 0}%</div></div>
-    </div>`;
-
-    html += `<div class="cal-grid">`;
-    dayNames.forEach(n => html += `<div class="cal-header-cell">${n}</div>`);
-
-    // Empty cells before first day
-    for (let i = 0; i < startDow; i++) html += `<div class="cal-cell empty"></div>`;
-
-    for (let d = 1; d <= lastDay.getDate(); d++) {
-        const ds = fmt(new Date(year, month, d));
-        const e = state.entries[ds];
-        const hasEntry = e && (e.text || e.tasks?.length || e.habits?.length);
-        const isToday = ds === today;
-        const total = e?.tasks?.length || 0;
-        const done = e?.tasks?.filter(t => t.done).length || 0;
-        const pct = total ? (done / total) * 100 : 0;
-        const habits = e?.habits || [];
-
-        html += `<div class="cal-cell ${hasEntry ? 'has-entry' : ''} ${isToday ? 'today' : ''}" onclick="openEntry('${ds}')">
-            <div class="cal-day-num">${d}</div>`;
-
-        if (habits.length) {
-            html += `<div class="cal-habit-icons">`;
-            habits.forEach(h => html += `<div class="cal-habit-dot ${h}"><i class="fa-solid ${habitIcons[h] || 'fa-circle'}"></i></div>`);
-            html += `</div>`;
-        }
-
-        if (total > 0) html += `<div class="cal-task-bar"><div class="cal-task-fill" style="width:${pct}%"></div></div>`;
-
-        if (e?.text) html += `<div class="cal-snippet">${e.text.substring(0, 40)}</div>`;
-
-        html += `</div>`;
-    }
-
-    html += `</div>`;
-    el.innerHTML = html;
-};
-
-const renderArchive = (el) => {
-    Object.entries(state.entries).sort().reverse().forEach(([d, e]) => {
-        el.innerHTML += `<div class="day-card recorded" style="margin-bottom:10px" onclick="openEntry('${d}')">
-            <b style="color:var(--accent)">${d}</b>
-            <div style="font-size:0.75rem; margin-top:5px;">${e.text?.substring(0, 100) || ''}</div>
-        </div>`;
-    });
-};
-
-const renderExtra = (el) => {
-    el.innerHTML = `
-        <div class="stats-bar">
-            <div class="stat-item"><div class="stat-label">SPOR ZİNCİRİ</div>${getStreak('spor')} GÜN</div>
-            <div class="stat-item"><div class="stat-label">OKUMA ZİNCİRİ</div>${getStreak('okuma')} GÜN</div>
-        </div>
-        <div class="modal-block"><canvas id="taskChart" height="100"></canvas></div>
-        <div class="kunye-label" style="margin-top:20px">// GÖREV HAVUZU (Tıklanabilir)</div>
-        <div id="pool" style="margin-top:10px"></div>
-    `;
-    setTimeout(initChart, 100);
-    const pool = el.querySelector('#pool');
-    Object.entries(state.entries).forEach(([d, e]) => {
-        e.tasks?.forEach(t => {
-            if(!t.done) pool.innerHTML += `<div class="list-row" onclick="openEntry('${d}')" style="cursor:pointer;">[${d}] ${t.text}</div>`;
-        });
-    });
-};
-
-/* LOGIC */
-window.openEntry = (date) => {
-    state.selectedDate = date;
-    const e = state.entries[date] || { text:'', habits:[], tasks:[], atomics:[], tags: [] };
-    state.temp = { tasks: [...(e.tasks || [])], habits: [...(e.habits || [])], atomics: [...(e.atomics || [])], tags: [...(e.tags || [])] };
-    document.getElementById('modalTitle').textContent = date;
-    document.getElementById('entryText').value = e.text || '';
-    renderModalTemp();
-    document.getElementById('entryModal').classList.add('active');
-};
-
-const renderModalTemp = () => {
-    ['demir','spor','okuma'].forEach(h => document.getElementById(`h_${h}`).className = `habit-btn ${state.temp.habits.includes(h) ? 'active' : ''}`);
-    document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row">
-        <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done; triggerAutoSave();">
-        <span class="priority-tag" style="background:${t.priority==1?'var(--danger)':t.priority==2?'#f1c40f':'var(--accent)'}">${t.priority==1?'!':''}</span>
-        <span style="flex:1; ${t.done?'text-decoration:line-through; opacity:0.5':''}">${t.text}</span>
-        <i class="fa-solid fa-trash" onclick="state.temp.tasks.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="cursor:pointer; color:var(--danger)"></i>
-    </div>`).join('');
-    document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row"><span>${a}</span><i class="fa-solid fa-trash" onclick="state.temp.atomics.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="margin-left:auto; cursor:pointer; color:var(--danger)"></i></div>`).join('');
-    document.getElementById('modalTags').innerHTML = state.temp.tags.map((t,i) => `<span class="tag-chip">#${t} <i class="fa-solid fa-times" onclick="state.temp.tags.splice(${i},1); renderModalTemp(); triggerAutoSave();"></i></span>`).join('');
-};
-
-window.addTask = () => { const i = document.getElementById('taskInput'); if(i.value){ state.temp.tasks.push({text:i.value, done:false, priority: state.currentPriority}); i.value=''; renderModalTemp(); triggerAutoSave(); } };
-window.addAtomic = () => { const i = document.getElementById('atomicInput'); if(i.value){ state.temp.atomics.push(i.value); i.value=''; renderModalTemp(); triggerAutoSave(); } };
-window.addTag = () => { const i = document.getElementById('tagInput'); if(i.value){ state.temp.tags.push(i.value.trim()); i.value=''; renderModalTemp(); triggerAutoSave(); } };
-window.toggleHabit = (h) => { const idx = state.temp.habits.indexOf(h); if(idx>-1) state.temp.habits.splice(idx,1); else state.temp.habits.push(h); renderModalTemp(); triggerAutoSave(); };
-window.selectPriority = (p) => { state.currentPriority = p; document.querySelectorAll('.pr-btn').forEach(b => b.classList.toggle(`active-${b.dataset.p}`, parseInt(b.dataset.p)===p)); };
-
-const updateStats = () => {
-    const all = Object.entries(state.entries);
-    const activeDates = all.filter(([d,e]) => e.tasks?.some(t => !t.done)).map(([d]) => d).sort();
-    
-    // Kritik Görev Kontrolü
-    const hasCritical = all.some(([d,e]) => e.tasks?.some(t => t.priority == 1 && !t.done));
-    
-    // Yedekleme Kontrolü
-    const needsBackup = !state.lastBackup || (Date.now() - new Date(state.lastBackup).getTime() > 7*24*60*60*1000);
-    document.getElementById('backupWarning').innerHTML = needsBackup ? `<i class="fa-solid fa-triangle-exclamation backup-alert"></i>` : '';
-
-    document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item"><div class="stat-label">KAYIT SAYISI</div>${all.length}</div>
-        <div class="stat-item"><div class="stat-label">AKTİF GÖREV TARİHLERİ</div><div class="stat-content">${activeDates.join(', ') || 'TEMİZ'}</div></div>
-        <div class="stat-item" style="border-left-color:${hasCritical?'var(--danger)':'var(--accent)'}">
-            <div class="stat-label">KRİTİK DURUM ${hasCritical?'<span class="critical-dot"></span>':''}</div>
-            ${hasCritical ? 'YÜKSEK ÖNCELİKLİ İŞ VAR' : 'SİSTEM STABİL'}
-        </div>
-    `;
-};
-
-const getStreak = (h) => {
-    let s = 0; let d = new Date();
-    for(let i=0; i<365; i++) {
-        const e = state.entries[fmt(d)];
-        if(e?.habits?.includes(h)) s++; else if(i>0) break;
-        d.setDate(d.getDate()-1);
-    }
-    return s;
-};
-
-const initChart = () => {
-    const ctx = document.getElementById('taskChart'); if(!ctx) return;
-    const data = Object.entries(state.entries).slice(-7).map(([d,e]) => e.tasks?.filter(t=>t.done).length || 0);
-    new Chart(ctx, { type:'line', data:{ labels:['1','2','3','4','5','6','7'], datasets:[{label:'Biten Görevler', data:data, borderColor:'#2ecc71', tension:0.3}] }, options:{ scales:{y:{beginAtZero:true, ticks:{stepSize:1}}} } });
-};
-
-const renderRandomNote = () => {
-    const pool = Object.values(state.entries).flatMap(e => e.atomics || []);
-    document.getElementById('randomAtomicArea').textContent = pool.length ? `"${pool[Math.floor(Math.random()*pool.length)]}"` : '';
-};
-
-document.getElementById('exportBtn').onclick = () => {
-    const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v51.json'; a.click();
-    state.lastBackup = new Date().toISOString();
-    localStorage.setItem('matrix_last_backup', state.lastBackup);
-    updateStats();
-};
-document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange = (e) => { const r = new FileReader(); r.onload=(ev)=>{state.entries=JSON.parse(ev.target.result); render();}; r.readAsText(e.target.files[0]); };
-document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.view-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.view = b.dataset.view; render(); });
-document.getElementById('prevBtn').onclick = () => {
-    if (state.view === 'monthly') { state.cursor.setMonth(state.cursor.getMonth()-1); }
-    else { state.cursor.setDate(state.cursor.getDate()-7); }
-    render();
-};
-document.getElementById('nextBtn').onclick = () => {
-    if (state.view === 'monthly') { state.cursor.setMonth(state.cursor.getMonth()+1); }
-    else { state.cursor.setDate(state.cursor.getDate()+7); }
-    render();
-};
-window.closeModal = () => { document.getElementById('entryModal').classList.remove('active'); render(); };
-document.getElementById('saveBtn').onclick = () => {
-    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics, tags: state.temp.tags };
-    save(); closeModal();
-};
-document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
-document.getElementById('themeToggle').onclick = () => { const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', t); };
-
-render();
-</script>
-</body>
-</html>
+            <input
