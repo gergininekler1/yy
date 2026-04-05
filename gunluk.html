@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATRIX.JOURNAL v2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-bg: #0d0208;
+            --matrix-dark: #000000;
+            --matrix-green: #00ff41;
+            --matrix-green-dim: #008f11;
+            --matrix-green-glow: rgba(0, 255, 65, 0.3);
+            --matrix-green-bright: #39ff14;
+            --terminal-border: #00ff41;
+            --text-primary: #00ff41;
+            --text-secondary: #008f11;
+            --text-dim: #003b00;
+            --scanline: rgba(0, 255, 65, 0.05);
+            
+            --priority-high: #ff0000;
+            --priority-medium: #ffff00;
+            --priority-low: #00ff41;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--matrix-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Matrix effect background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--matrix-green), transparent);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Noise texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(0, 255, 65, 0.03) 0px, transparent 1px, transparent 2px, rgba(0, 255, 65, 0.03) 3px);
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 1rem;
+            animation: fadeIn 1s ease;
+        }
+
+        /* Header */
+        header {
+            border: 2px solid var(--terminal-border);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: 0 0 20px var(--matrix-green-glow);
+        }
+
+        header::before {
+            content: '>';
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            font-size: 0.8rem;
+            animation: blink 1s infinite;
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            text-shadow: 0 0 10px var(--matrix-green-glow);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Compact Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--text-dim);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--matrix-green-glow);
+        }
+
+        /* Header Controls */
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Buttons */
+        button, select {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--terminal-border);
+            background: var(--matrix-dark);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        button:hover, select:hover {
+            background: var(--matrix-green-dim);
+            box-shadow: 0 0 15px var(--matrix-green-glow);
+            transform: translateY(-2px);
+        }
+
+        button.active {
+            background: var(--text-primary);
+            color: var(--matrix-dark);
+            box-shadow: 0 0 20px var(--matrix-green-glow);
+        }
+
+        /* View Switcher */
+        .view-switcher {
+            display: flex;
+            gap: 0;
+            border: 2px solid var(--terminal-border);
+        }
+
+        .view-switcher button {
+            border: none;
+            border-right: 1px solid var(--terminal-border);
+        }
+
+        .view-switcher button:last-child {
+            border-right: none;
+        }
+
+        /* Navigation */
+        .date-navigation {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .date-display {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            min-width: 200px;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--matrix-green-glow);
+        }
+
+        /* Main Content - Horizontal Scroll Weekly View */
+        .weekly-scroll-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .weekly-scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .weekly-scroll-container::-webkit-scrollbar-track {
+            background: var(--matrix-dark);
+            border: 1px solid var(--text-dim);
+        }
+
+        .weekly-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--text-primary);
+            box-shadow: 0 0 5px var(--matrix-green-glow);
+        }
+
+        .weekly-view {
+            display: flex;
+            gap: 1rem;
+            min-width: max-content;
+            padding: 0.5rem;
+        }
+
+        .day-card {
+            width: 280px;
+            min-height: 500px;
+            border: 2px solid var(--terminal-border);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                var(--scanline) 2px,
+                var(--scanline) 4px
+            );
+            pointer-events: none;
+        }
+
+        .day-card:hover {
+            border-color: var(--matrix-green-bright);
+            box-shadow: 0 0 30px var(--matrix-green-glow);
+            transform: translateY(-5px);
+        }
+
+        .day-card.today {
+            border-color: var(--matrix-green-bright);
+            background: rgba(0, 255, 65, 0.05);
+            box-shadow: 0 0 20px var(--matrix-green-glow);
+        }
+
+        .day-card.today::after {
+            content: '[ACTIVE]';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.65rem;
+            color: var(--matrix-green-bright);
+            animation: blink 1.5s infinite;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--text-dim);
+        }
+
+        .day-info {
+            flex: 1;
+        }
+
+        .day-name {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .day-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 0 10px var(--matrix-green-glow);
+        }
+
+        .day-month {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .mood-terminal {
+            text-align: right;
+        }
+
+        .mood-indicator {
+            font-size: 2rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .mood-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .terminal-section {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border: 1px solid var(--text-dim);
+            background: rgba(0, 255, 65, 0.02);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        .section-label::before {
+            content: '> ';
+        }
+
+        .note-preview {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 8;
+            -webkit-box-orient: vertical;
+            flex: 1;
+        }
+
+        .note-count {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--text-dim);
+        }
+
+        .tags-terminal {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--terminal-border);
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+
+        .empty-state {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-style: italic;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .empty-state::before {
+            content: '[NO DATA]';
+            display: block;
+            font-size: 0.7rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Calendar View */
+        .calendar-container {
+            border: 2px solid var(--terminal-border);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem;
+        }
+
+        .calendar-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--text-dim);
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--text-dim);
+            margin-bottom: 1px;
+        }
+
+        .calendar-day-name {
+            background: var(--matrix-dark);
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            border: 1px solid var(--text-dim);
+        }
+
+        .calendar-day {
+            background: var(--matrix-dark);
+            padding: 0.75rem;
+            min-height: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--text-dim);
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: rgba(0, 255, 65, 0.05);
+            border-color: var(--terminal-border);
+        }
+
+        .calendar-day.today {
+            background: rgba(0, 255, 65, 0.1);
+            border: 2px solid var(--matrix-green-bright);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .cal-day-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        /* List View */
+        .list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .entry-card {
+            border: 2px solid var(--terminal-border);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .entry-card::before {
+            content: '>';
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            font-size: 0.8rem;
+        }
+
+        .entry-card:hover {
+            border-color: var(--matrix-green-bright);
+            box-shadow: 0 0 20px var(--matrix-green-glow);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--text-dim);
+        }
+
+        .entry-date {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .entry-content {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--matrix-bg);
+            border: 3px solid var(--terminal-border);
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 40px var(--matrix-green-glow);
+            animation: slideIn 0.4s ease;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                var(--scanline) 2px,
+                var(--scanline) 4px
+            );
+            pointer-events: none;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--terminal-border);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 10px var(--matrix-green-glow);
+        }
+
+        .close-btn {
+            background: none;
+            border: 2px solid var(--terminal-border);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem 0.75rem;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .close-btn:hover {
+            background: var(--priority-high);
+            border-color: var(--priority-high);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .form-label::before {
+            content: '> ';
+        }
+
+        textarea, input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--terminal-border);
+            background: var(--matrix-dark);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus, input[type="text"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: var(--matrix-green-bright);
+            box-shadow: 0 0 15px var(--matrix-green-glow);
+        }
+
+        textarea {
+            min-height: 150px;
+            line-height: 1.6;
+        }
+
+        /* Atomic Notes Section */
+        .atomic-notes-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 2px solid var(--text-dim);
+            background: rgba(0, 255, 65, 0.02);
+        }
+
+        .atomic-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--text-dim);
+        }
+
+        .atomic-notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .atomic-note {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--text-dim);
+            background: rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        .atomic-note::before {
+            content: '→';
+            position: absolute;
+            left: 0.5rem;
+            top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .atomic-note-content {
+            flex: 1;
+            padding-left: 1rem;
+        }
+
+        .atomic-note-text {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .atomic-note-delete {
+            background: none;
+            border: 1px solid var(--priority-high);
+            color: var(--priority-high);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .atomic-note-delete:hover {
+            background: var(--priority-high);
+            color: white;
+        }
+
+        .add-atomic-note-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed var(--text-dim);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .add-atomic-note-btn:hover {
+            border-color: var(--terminal-border);
+            background: rgba(0, 255, 65, 0.05);
+            color: var(--text-primary);
+        }
+
+        /* Mood Selector */
+        .mood-selector {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            padding: 1rem;
+            border: 1px solid var(--text-dim);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .mood-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 1rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .mood-option:hover {
+            border-color: var(--text-dim);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .mood-option.selected {
+            border-color: var(--terminal-border);
+            background: rgba(0, 255, 65, 0.1);
+            box-shadow: 0 0 15px var(--matrix-green-glow);
+        }
+
+        .mood-emoji {
+            font-size: 2rem;
+        }
+
+        .mood-name {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        /* Tag Input */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 2px solid var(--terminal-border);
+            background: var(--matrix-dark);
+            min-height: 60px;
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--terminal-border);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            color: var(--priority-high);
+            font-weight: bold;
+            margin-left: 0.25rem;
+        }
+
+        .tag-remove:hover {
+            color: white;
+        }
+
+        #tagInput {
+            border: none;
+            background: transparent;
+            padding: 0.5rem;
+            flex: 1;
+            min-width: 100px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        #tagInput:focus {
+            outline: none;
+        }
+
+        /* FAB */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 70px;
+            height: 70px;
+            border: 3px solid var(--terminal-border);
+            background: var(--matrix-dark);
+            color: var(--text-primary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 0 30px var(--matrix-green-glow);
+        }
+
+        .fab:hover {
+            background: var(--text-primary);
+            color: var(--matrix-dark);
+            box-shadow: 0 0 50px var(--matrix-green-glow);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .fab::before {
+            content: '+';
+            display: block;
+            line-height: 1;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .day-card {
+                width: 250px;
+                min-height: 450px;
+            }
+
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .view-switcher, .date-navigation {
+                width: 100%;
+            }
+
+            .stats-bar {
+                font-size: 0.7rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .fab {
+                width: 60px;
+                height: 60px;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MATRIX.JOURNAL v2.0</h1>
+            
+            <!-- Compact Stats -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">MONTH:</span>
+                    <span class="stat-value" id="monthEntries">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">TOP_TAG:</span>
+                    <span class="stat-value" id="topTag">NULL</span>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="view-switcher">
+                    <button class="view-btn active" data-view="weekly">WEEK</button>
+                    <button class="view-btn" data-view="calendar">CAL</button>
+                    <button class="view-btn" data-view="list">LIST</button>
+                </div>
+                
+                <div class="date-navigation">
+                    <button id="prevPeriod">←</button>
+                    <div class="date-display" id="dateDisplay"></div>
+                    <button id="nextPeriod">→</button>
+                    <button id="today">TODAY</button>
+                </div>
+
+                <div class="data-controls">
+                    <button id="exportData">EXPORT</button>
+                    <button id="importData">IMPORT</button>
+                    <input type="file" id="fileInput" accept=".json" class="hidden">
+                </div>
+            </div>
+        </header>
+
+        <div class="weekly-scroll-container" id="mainContent">
+            <!-- Content will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Entry Modal -->
+    <div class="modal" id="entryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="entryModalTitle">NEW_ENTRY</div>
+                <button class="close-btn" id="closeEntryModal">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">DATE</label>
+                <input type="date" id="entryDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">MOOD_STATUS</label>
+                <div class="mood-selector">
+                    <div class="mood-option" data-mood="great">
+                        <div class="mood-emoji">😄</div>
+                        <div class="mood-name">Great</div>
+                    </div>
+                    <div class="mood-option" data-mood="good">
+                        <div class="mood-emoji">🙂</div>
+                        <div class="mood-name">Good</div>
+                    </div>
+                    <div class="mood-option" data-mood="neutral">
+                        <div class="mood-emoji">😐</div>
+                        <div class="mood-name">Neutral</div>
+                    </div>
+                    <div class="mood-option" data-mood="bad">
+                        <div class="mood-emoji">😟</div>
+                        <div class="mood-name">Bad</div>
+                    </div>
+                    <div class="mood-option" data-mood="terrible">
+                        <div class="mood-emoji">😢</div>
+                        <div class="mood-name">Terrible</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">MAIN_NOTE</label>
+                <textarea id="entryText" placeholder="[INPUT_DATA]"></textarea>
+            </div>
+
+            <!-- Atomic Notes Section -->
+            <div class="atomic-notes-section">
+                <div class="atomic-notes-header">
+                    <label class="form-label" style="margin: 0;">ATOMIC_NOTES</label>
+                    <button id="addAtomicNoteBtn" style="padding: 0.3rem 0.8rem;">+ ADD</button>
+                </div>
+                <div class="atomic-notes-list" id="atomicNotesList">
+                    <!-- Atomic notes will be rendered here -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">TAGS</label>
+                <div class="tag-input-container" id="tagContainer">
+                    <input type="text" id="tagInput" placeholder="[ENTER_TAG]">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button id="saveEntry" style="flex: 1;">SAVE</button>
+                <button id="deleteEntry" class="hidden" style="background: var(--priority-high); color: white; border-color: var(--priority-high);">DELETE</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab" id="fab"></button>
+
+    <script>
+        // Data Storage
+        class DataManager {
+            constructor() {
+                this.entries = this.loadEntries();
+            }
+
+            loadEntries() {
+                const data = localStorage.getItem('matrixJournalEntries');
+                return data ? JSON.parse(data) : {};
+            }
+
+            saveEntries() {
+                localStorage.setItem('matrixJournalEntries', JSON.stringify(this.entries));
+            }
+
+            addEntry(date, entry) {
+                this.entries[date] = entry;
+                this.saveEntries();
+            }
+
+            getEntry(date) {
+                return this.entries[date] || null;
+            }
+
+            deleteEntry(date) {
+                delete this.entries[date];
+                this.saveEntries();
+            }
+
+            exportData() {
+                const data = {
+                    entries: this.entries,
+                    exportDate: new Date().toISOString(),
+                    version: '2.0'
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `matrix-journal-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            importData(data) {
+                if (data.entries) this.entries = data.entries;
+                this.saveEntries();
+            }
+        }
+
+        // App State
+        const dataManager = new DataManager();
+        let currentView = 'weekly';
+        let currentDate = new Date();
+        let selectedDate = null;
+        let editingEntry = null;
+        let currentTags = [];
+        let atomicNotes = [];
+
+        // Date Utilities
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function getWeekDates(date) {
+            const start = new Date(date);
+            start.setDate(start.getDate() - start.getDay() + 1); // Monday
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(start);
+                d.setDate(d.getDate() + i);
+                dates.push(d);
+            }
+            return dates;
+        }
+
+        function getMonthDates(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            const dates = [];
+            const startDay = firstDay.getDay() || 7;
+            
+            for (let i = startDay - 1; i > 0; i--) {
+                const d = new Date(firstDay);
+                d.setDate(d.getDate() - i);
+                dates.push({ date: d, otherMonth: true });
+            }
+            
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                dates.push({ date: new Date(year, month, i), otherMonth: false });
+            }
+            
+            const remaining = 42 - dates.length;
+            for (let i = 1; i <= remaining; i++) {
+                const d = new Date(lastDay);
+                d.setDate(d.getDate() + i);
+                dates.push({ date: d, otherMonth: true });
+            }
+            
+            return dates;
+        }
+
+        function getTurkishDayName(dayIndex) {
+            const days = ['PAZ', 'PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT'];
+            return days[dayIndex];
+        }
+
+        function getTurkishMonthName(monthIndex) {
+            const months = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 
+                           'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
+            return months[monthIndex];
+        }
+
+        const moodEmojis = {
+            'great': '😄',
+            'good': '🙂',
+            'neutral': '😐',
+            'bad': '😟',
+            'terrible': '😢'
+        };
+
+        const moodLabels = {
+            'great': 'GREAT',
+            'good': 'GOOD',
+            'neutral': 'NEUTRAL',
+            'bad': 'BAD',
+            'terrible': 'TERRIBLE'
+        };
+
+        // Render Functions
+        function renderWeeklyView() {
+            const dates = getWeekDates(currentDate);
+            const today = formatDate(new Date());
+            
+            let html = '<div class="weekly-view">';
+            dates.forEach(date => {
+                const dateStr = formatDate(date);
+                const entry = dataManager.getEntry(dateStr);
+                const isToday = dateStr === today;
+                
+                html += `
+                    <div class="day-card ${isToday ? 'today' : ''}" data-date="${dateStr}">
+                        <div class="terminal-header">
+                            <div class="day-info">
+                                <div class="day-name">${getTurkishDayName(date.getDay())}</div>
+                                <div class="day-number">${date.getDate()}</div>
+                                <div class="day-month">${getTurkishMonthName(date.getMonth())}</div>
+                            </div>
+                            ${entry && entry.mood ? `
+                                <div class="mood-terminal">
+                                    <div class="mood-indicator">${moodEmojis[entry.mood]}</div>
+                                    <div class="mood-label">${moodLabels[entry.mood]}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${entry && entry.text ? `
+                            <div class="terminal-section">
+                                <div class="section-label">MAIN_LOG</div>
+                                <div class="note-preview">${entry.text}</div>
+                                ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `
+                                    <div class="note-count">+ ${entry.atomicNotes.length} atomic note(s)</div>
+                                ` : ''}
+                            </div>
+                        ` : '<div class="empty-state">No entry logged</div>'}
+                        
+                        ${entry && entry.tags && entry.tags.length > 0 ? `
+                            <div class="tags-terminal">
+                                ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            document.getElementById('mainContent').innerHTML = html;
+            document.getElementById('mainContent').className = 'weekly-scroll-container';
+            attachDayClickListeners();
+        }
+
+        function renderCalendarView() {
+            const dates = getMonthDates(currentDate);
+            const today = formatDate(new Date());
+            const dayNames = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
+            
+            let html = '<div class="calendar-container"><div class="calendar-header">';
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day-name">${day}</div>`;
+            });
+            html += '</div><div class="calendar-view">';
+            
+            dates.forEach(({ date, otherMonth }) => {
+                const dateStr = formatDate(date);
+                const entry = dataManager.getEntry(dateStr);
+                const isToday = dateStr === today;
+                
+                html += `
+                    <div class="calendar-day ${otherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}" data-date="${dateStr}">
+                        <div class="cal-day-number">${date.getDate()}</div>
+                        ${entry && !otherMonth && entry.mood ? `
+                            <div style="font-size: 1.5rem; margin-top: 0.5rem;">${moodEmojis[entry.mood]}</div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            html += '</div></div>';
+            document.getElementById('mainContent').innerHTML = html;
+            document.getElementById('mainContent').className = '';
+            attachDayClickListeners();
+        }
+
+        function renderListView() {
+            const entries = Object.entries(dataManager.entries)
+                .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+                .slice(0, 30);
+            
+            if (entries.length === 0) {
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="empty-state" style="padding: 4rem;">
+                        <p style="font-size: 1.25rem;">NO ENTRIES FOUND</p>
+                    </div>
+                `;
+                document.getElementById('mainContent').className = '';
+                return;
+            }
+            
+            let html = '<div class="list-view">';
+            entries.forEach(([dateStr, entry]) => {
+                const date = new Date(dateStr);
+                html += `
+                    <div class="entry-card" data-date="${dateStr}">
+                        <div class="entry-header">
+                            <div class="entry-date">
+                                ${date.getDate()} ${getTurkishMonthName(date.getMonth())} ${date.getFullYear()}
+                            </div>
+                            ${entry.mood ? `<div style="font-size: 1.5rem;">${moodEmojis[entry.mood]}</div>` : ''}
+                        </div>
+                        <div class="entry-content">${entry.text}</div>
+                        ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                + ${entry.atomicNotes.length} atomic note(s)
+                            </div>
+                        ` : ''}
+                        ${entry.tags && entry.tags.length > 0 ? `
+                            <div class="tags-terminal">
+                                ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            document.getElementById('mainContent').innerHTML = html;
+            document.getElementById('mainContent').className = '';
+            attachDayClickListeners();
+        }
+
+        function renderStats() {
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+            
+            const monthEntries = Object.keys(dataManager.entries).filter(dateStr => {
+                const date = new Date(dateStr);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            }).length;
+            
+            const allTags = [];
+            Object.values(dataManager.entries).forEach(entry => {
+                if (entry.tags) allTags.push(...entry.tags);
+            });
+            
+            const tagCounts = {};
+            allTags.forEach(tag => {
+                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            });
+            
+            const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0];
+            
+            document.getElementById('monthEntries').textContent = monthEntries;
+            document.getElementById('topTag').textContent = topTag ? topTag[0] : 'NULL';
+        }
+
+        function updateDateDisplay() {
+            const display = document.getElementById('dateDisplay');
+            if (currentView === 'weekly') {
+                const dates = getWeekDates(currentDate);
+                const start = dates[0];
+                const end = dates[6];
+                display.textContent = `${start.getDate()}-${end.getDate()} ${getTurkishMonthName(end.getMonth())} ${end.getFullYear()}`;
+            } else if (currentView === 'calendar') {
+                display.textContent = `${getTurkishMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
+            } else {
+                display.textContent = 'ALL_ENTRIES';
+            }
+        }
+
+        function render() {
+            if (currentView === 'weekly') renderWeeklyView();
+            else if (currentView === 'calendar') renderCalendarView();
+            else renderListView();
+            
+            renderStats();
+            updateDateDisplay();
+        }
+
+        // Event Listeners
+        function attachDayClickListeners() {
+            document.querySelectorAll('.day-card, .calendar-day, .entry-card').forEach(el => {
+                el.addEventListener('click', () => {
+                    const dateStr = el.dataset.date;
+                    openEntryModal(dateStr);
+                });
+            });
+        }
+
+        // Modal Functions
+        function openEntryModal(dateStr) {
+            selectedDate = dateStr;
+            const entry = dataManager.getEntry(dateStr);
+            editingEntry = entry;
+            
+            document.getElementById('entryModalTitle').textContent = entry ? 'EDIT_ENTRY' : 'NEW_ENTRY';
+            document.getElementById('entryDate').value = dateStr;
+            document.getElementById('entryText').value = entry ? entry.text : '';
+            
+            // Mood
+            document.querySelectorAll('.mood-option').forEach(m => m.classList.remove('selected'));
+            if (entry && entry.mood) {
+                document.querySelector(`.mood-option[data-mood="${entry.mood}"]`).classList.add('selected');
+            }
+            
+            // Tags
+            currentTags = entry && entry.tags ? [...entry.tags] : [];
+            renderTagInput();
+            
+            // Atomic Notes
+            atomicNotes = entry && entry.atomicNotes ? [...entry.atomicNotes] : [];
+            renderAtomicNotes();
+            
+            document.getElementById('deleteEntry').classList.toggle('hidden', !entry);
+            document.getElementById('entryModal').classList.add('active');
+        }
+
+        function closeEntryModal() {
+            document.getElementById('entryModal').classList.remove('active');
+            selectedDate = null;
+            editingEntry = null;
+            currentTags = [];
+            atomicNotes = [];
+        }
+
+        function renderTagInput() {
+            const container = document.getElementById('tagContainer');
+            const input = document.getElementById('tagInput');
+            
+            while (container.firstChild && container.firstChild !== input) {
+                container.removeChild(container.firstChild);
+            }
+            
+            currentTags.forEach(tag => {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'tag-item';
+                tagEl.innerHTML = `
+                    <span>${tag}</span>
+                    <span class="tag-remove" data-tag="${tag}">×</span>
+                `;
+                container.insertBefore(tagEl, input);
+            });
+            
+            document.querySelectorAll('.tag-remove').forEach(el => {
+                el.addEventListener('click', () => {
+                    const tag = el.dataset.tag;
+                    currentTags = currentTags.filter(t => t !== tag);
+                    renderTagInput();
+                });
+            });
+        }
+
+        function renderAtomicNotes() {
+            const list = document.getElementById('atomicNotesList');
+            
+            if (atomicNotes.length === 0) {
+                list.innerHTML = '<div class="empty-state" style="padding: 1rem;">No atomic notes</div>';
+                return;
+            }
+            
+            let html = '';
+            atomicNotes.forEach((note, index) => {
+                html += `
+                    <div class="atomic-note">
+                        <div class="atomic-note-content">
+                            <div class="atomic-note-text">${note}</div>
+                        </div>
+                        <button class="atomic-note-delete" data-index="${index}">DEL</button>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+            
+            document.querySelectorAll('.atomic-note-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.index);
+                    atomicNotes.splice(index, 1);
+                    renderAtomicNotes();
+                });
+            });
+        }
+
+        // View Switching
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentView = btn.dataset.view;
+                render();
+            });
+        });
+
+        // Navigation
+        document.getElementById('prevPeriod').addEventListener('click', () => {
+            if (currentView === 'weekly') {
+                currentDate.setDate(currentDate.getDate() - 7);
+            } else if (currentView === 'calendar') {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+            }
+            render();
+        });
+
+        document.getElementById('nextPeriod').addEventListener('click', () => {
+            if (currentView === 'weekly') {
+                currentDate.setDate(currentDate.getDate() + 7);
+            } else if (currentView === 'calendar') {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+            render();
+        });
+
+        document.getElementById('today').addEventListener('click', () => {
+            currentDate = new Date();
+            render();
+        });
+
+        // Entry Modal Events
+        document.getElementById('closeEntryModal').addEventListener('click', closeEntryModal);
+        document.getElementById('entryModal').addEventListener('click', (e) => {
+            if (e.target.id === 'entryModal') closeEntryModal();
+        });
+
+        document.querySelectorAll('.mood-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.mood-option').forEach(m => m.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+
+        document.getElementById('tagInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                e.preventDefault();
+                const tag = e.target.value.trim().toUpperCase();
+                if (!currentTags.includes(tag)) {
+                    currentTags.push(tag);
+                    renderTagInput();
+                }
+                e.target.value = '';
+            }
+        });
+
+        document.getElementById('addAtomicNoteBtn').addEventListener('click', () => {
+            const note = prompt('Enter atomic note:');
+            if (note && note.trim()) {
+                atomicNotes.push(note.trim());
+                renderAtomicNotes();
+            }
+        });
+
+        document.getElementById('saveEntry').addEventListener('click', () => {
+            const dateStr = document.getElementById('entryDate').value;
+            const text = document.getElementById('entryText').value.trim();
+            
+            if (!text) {
+                alert('[ERROR] Main note required');
+                return;
+            }
+            
+            const selectedMood = document.querySelector('.mood-option.selected');
+            const mood = selectedMood ? selectedMood.dataset.mood : null;
+            
+            dataManager.addEntry(dateStr, {
+                text,
+                mood,
+                tags: currentTags,
+                atomicNotes: atomicNotes,
+                updatedAt: new Date().toISOString()
+            });
+            
+            closeEntryModal();
+            render();
+        });
+
+        document.getElementById('deleteEntry').addEventListener('click', () => {
+            if (confirm('[CONFIRM] Delete this entry?')) {
+                dataManager.deleteEntry(selectedDate);
+                closeEntryModal();
+                render();
+            }
+        });
+
+        // FAB
+        document.getElementById('fab').addEventListener('click', () => {
+            openEntryModal(formatDate(new Date()));
+        });
+
+        // Export/Import
+        document.getElementById('exportData').addEventListener('click', () => {
+            dataManager.exportData();
+        });
+
+        document.getElementById('importData').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (confirm('[CONFIRM] Overwrite existing data?')) {
+                            dataManager.importData(data);
+                            render();
+                            alert('[SUCCESS] Data imported');
+                        }
+                    } catch (err) {
+                        alert('[ERROR] Invalid file');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Initial Render
+        render();
+    </script>
+</body>
+</html>
