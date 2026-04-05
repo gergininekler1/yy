@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX - FINAL FIX v50</title>
+    <title>MATRIX - FINAL FIX v51</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,12 +12,13 @@
             --accent: #2ecc71; 
             --accent-dim: rgba(46, 204, 113, 0.1);
             --danger: #e74c3c;
-            --danger-muted: rgba(231, 76, 60, 0.4); /* Solgun kırmızı bar rengi */
+            --danger-muted: rgba(231, 76, 60, 0.4);
             --bg-grid: #0d0d0d;
             --bg-grid-lines: #161616;
             --bg: var(--bg-grid);
             --surface: #161616; --surface2: #1f1f1f;
             --border: #2a2a2a; --text1: #d1d1d1; --text2: #777;
+            --warning: #f1c40f;
         }
 
         [data-theme="light"] {
@@ -29,91 +30,45 @@
         }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
-        
-        body {
-            background-color: var(--bg-grid);
-            background-image: 
-                linear-gradient(var(--bg-grid-lines) 1px, transparent 1px),
-                linear-gradient(90deg, var(--bg-grid-lines) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text1); transition: 0.3s; padding: 1rem; line-height: 1.4;
-        }
+        body { background-color: var(--bg-grid); background-image: linear-gradient(var(--bg-grid-lines) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid-lines) 1px, transparent 1px); background-size: 20px 20px; color: var(--text1); padding: 1rem; }
         
         .container { max-width: 1100px; margin: 0 auto; }
-
         .header-block { border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 0.5rem; background: var(--surface); position: relative; }
-        .theme-icon { position: absolute; top: 1rem; right: 1.5rem; cursor: pointer; color: var(--text2); font-size: 1.2rem; }
-        
         h1 { font-family: 'Orbitron'; letter-spacing: 6px; color: var(--accent); text-transform: uppercase; font-size: 1.8rem; }
-        .sub-title { font-size: 0.65rem; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
         
         .kunye-block { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); }
-        .kunye-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; opacity: 0.7; }
-        .sub-header-row { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+        .kunye-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
         
-        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-        
-        .stat-item { background: var(--surface2); padding: 10px; border-left: 2px solid var(--accent); border-radius: 4px; transition: all 0.3s ease; }
-        .stat-item:hover { transform: translateY(-2px); border-left-color: #fff; }
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+        .stat-item { background: var(--surface2); padding: 10px; border-left: 2px solid var(--accent); border-radius: 4px; }
         .stat-label { color: var(--text2); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-        .stat-content { font-size: 0.75rem; word-break: break-all; max-height: 60px; overflow-y: auto; }
+        .stat-content { font-size: 0.7rem; line-height: 1.2; word-break: break-all; max-height: 50px; overflow-y: auto; }
 
         .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--accent); padding: 12px; font-size: 0.8rem; margin-bottom: 1rem; }
-
-        .nav-controls { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-        .group { display: flex; border: 1px solid var(--border); background: var(--bg); }
         
         button { background: transparent; border: none; color: var(--text2); padding: 8px 14px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
         button.active { background: var(--accent); color: #000; font-weight: bold; }
 
         .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-        
-        .day-card { background: var(--surface); border-left: 5px solid var(--accent); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; overflow: hidden; }
-        
-        /* İlerleme Çubuğu: Kırmızı solgun yapıldı */
+        .day-card { background: var(--surface); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; overflow: hidden; border-left: 5px solid var(--border); }
+        .day-card.recorded { border-left-color: var(--accent); }
         .card-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--danger-muted); transition: width 0.4s ease; }
 
-        .habit-circle { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; border: 1px solid var(--border); border-radius: 50%; }
-        .habit-circle.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); border: none; }
-
-        .card-stats { position: absolute; bottom: 10px; left: 15px; font-size: 0.6rem; color: var(--text2); display: flex; gap: 10px; }
-        .card-stats span { display: flex; align-items: center; gap: 4px; }
-
-        .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); }
-        .month-day { background: var(--surface); aspect-ratio: 1.2; padding: 5px; cursor: pointer; font-size: 0.7rem; }
-        .month-day.other-month { opacity: 0.2; }
-        .month-day.has-entry { border-left: 2px solid var(--accent); }
-
-        textarea { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; resize: vertical; }
-        
-        .rendered h1, .rendered h2 { color: var(--accent); margin: 5px 0; }
-
-        .rich-link { display: inline-flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); color: var(--accent) !important; padding: 2px 6px; border-radius: 4px; text-decoration: none; font-size: 0.65rem; margin: 2px 0; }
+        /* Kritik Durum & Yedekleme Işığı */
+        .critical-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: inline-block; animation: blink 1s infinite; margin-left: 5px; }
+        .backup-alert { color: var(--warning); animation: blink 1.5s infinite; font-size: 0.8rem; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
         .modal.active { display: flex; }
         .modal-content { background: var(--bg); border: 1px solid var(--accent); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-radius: 4px; }
+        .modal-block { background: var(--surface); border: 1px solid var(--border); padding: 1.2rem; margin-bottom: 1rem; border-radius: 4px; }
         
-        .modal-block { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1rem; border-radius: 4px; }
+        textarea { width: 100%; min-height: 150px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 10px; resize: vertical; }
+        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.75rem; }
+        .priority-tag { font-size: 0.5rem; padding: 2px 4px; border-radius: 2px; }
+        .tag-chip { background: var(--surface2); color: var(--accent); padding: 4px 8px; font-size: 0.6rem; border-radius: 4px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 5px; }
 
-        .habit-btn { flex: 1; border: 1px solid var(--border); padding: 10px; font-size: 0.65rem; cursor: pointer; text-align: center; color: var(--text2); }
-        .habit-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-
-        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.8rem; }
-        
-        .priority-tag { font-size: 0.55rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; font-weight: bold; }
-        .priority-1 { background-color: var(--danger); color: #fff; } 
-        .priority-2 { background-color: #f1c40f; color: #000; } 
-        .priority-3 { background-color: var(--accent); color: #000; } 
-
-        .pr-btn { flex: 1; padding: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 0.6rem; text-transform: uppercase; border-radius: 2px; }
-        .pr-btn.active-1 { background: var(--danger); color: #fff; }
-        .pr-btn.active-2 { background: #f1c40f; color: #000; }
-        .pr-btn.active-3 { background: var(--accent); color: #000; }
-        
-        .tag-chip { background: var(--surface2); color: var(--accent); padding: 4px 8px; font-size: 0.65rem; border-radius: 4px; display: inline-flex; align-items: center; border: 1px solid var(--border); }
-        .tag-remove { margin-left: 6px; cursor: pointer; }
-        
         .fab { position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 100; }
     </style>
 </head>
@@ -121,15 +76,15 @@
 
 <div class="container">
     <div class="header-block">
-        <div class="theme-icon" id="themeToggle"><i class="fa-solid fa-moon"></i></div>
-        <h1><i class="fa-solid fa-terminal" style="margin-right: 10px;"></i>Matrix</h1>
-        <div class="sub-title">terminal mod: günlük</div>
+        <div id="themeToggle" style="position:absolute; top:1rem; right:1.5rem; cursor:pointer;"><i class="fa-solid fa-moon"></i></div>
+        <h1><i class="fa-solid fa-terminal"></i> Matrix</h1>
+        <div style="font-size: 0.65rem; color: var(--text2); letter-spacing: 2px; text-transform: uppercase;">terminal mod: günlük v51</div>
     </div>
 
     <div class="kunye-block">
-        <div class="kunye-label">// KÜNYE</div>
-        <div class="sub-header-row">
-            <button id="exportBtn"><i class="fa-solid fa-download"></i> [EXPORT]</button>
+        <div class="kunye-label">// SİSTEM DURUMU</div>
+        <div style="display:flex; gap:10px; margin-bottom:1.5rem;">
+            <button id="exportBtn"><i class="fa-solid fa-download"></i> [EXPORT] <span id="backupWarning"></span></button>
             <button id="importBtn"><i class="fa-solid fa-upload"></i> [IMPORT]</button>
             <input type="file" id="fileInput" hidden>
         </div>
@@ -137,19 +92,19 @@
         <div class="stats-bar" id="statsBar"></div>
 
         <div class="search-container">
-            <input type="text" id="globalSearch" class="search-input" placeholder="Sistemde ara...">
+            <input type="text" id="globalSearch" class="search-input" placeholder="Sistem veri tabanında ara...">
         </div>
 
-        <div class="nav-controls">
-            <div class="group">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; border:1px solid var(--border); background:var(--bg);">
                 <button class="view-btn active" data-view="weekly">HAFTALIK</button>
                 <button class="view-btn" data-view="monthly">AYLIK</button>
                 <button class="view-btn" data-view="list">ARŞİV</button>
                 <button class="view-btn" data-view="extra">EKSTRA</button>
             </div>
-            <div class="group">
+            <div style="display:flex; border:1px solid var(--border); background:var(--bg);">
                 <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="currentRange" style="min-width: 140px; pointer-events: none;"></button>
+                <button id="currentRange" style="min-width:140px; pointer-events:none;"></button>
                 <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </div>
@@ -158,45 +113,54 @@
     <main id="mainContent"></main>
 
     <footer>
-        <div id="randomAtomicArea" style="max-width:600px; margin: 3rem auto 0; color:var(--text2); font-style:italic; font-size:0.8rem; border-left:2px solid var(--accent); padding-left:15px;">Sistem yükleniyor...</div>
+        <div id="randomAtomicArea" style="max-width:600px; margin: 3rem auto 0; color:var(--text2); font-style:italic; font-size:0.8rem; border-left:2px solid var(--accent); padding-left:15px;"></div>
     </footer>
 </div>
 
 <div class="modal" id="entryModal">
     <div class="modal-content">
         <div class="modal-block">
-            <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom: 1.5rem;">00-00-0000</h2>
-            <div style="display:flex; gap:10px;">
-                <div class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-brain"></i> ZİHİN</div>
-                <div class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-dumbbell"></i> SPOR</div>
-                <div class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book-open"></i> OKUMA</div>
+            <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom:1rem;">00-00-0000</h2>
+            <div style="display:flex; gap:5px;">
+                <button class="habit-btn" id="h_demir" onclick="toggleHabit('demir')">ZİHİN</button>
+                <button class="habit-btn" id="h_spor" onclick="toggleHabit('spor')">SPOR</button>
+                <button class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')">OKUMA</button>
             </div>
         </div>
 
         <div class="modal-block">
-            <div style="color:var(--text2); font-size:0.6rem; margin-bottom:5px;">// GÖREVLER</div>
-            <div id="modalTasks" style="margin-bottom:10px"></div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="taskInput" placeholder="Görev..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addTask()">
+            <div class="kunye-label">// GÖREVLER</div>
+            <div id="modalTasks"></div>
+            <div style="display:flex; gap:5px; margin:10px 0;">
+                <input type="text" id="taskInput" placeholder="Yeni görev..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addTask()">
                 <button onclick="addTask()" style="border:1px solid var(--accent); color:var(--accent)">EKLE</button>
             </div>
             <div style="display:flex; gap:5px;">
-                <button class="pr-btn active-3" data-p="3" onclick="selectPriority(3)">Düşük</button>
-                <button class="pr-btn" data-p="2" onclick="selectPriority(2)">Orta</button>
-                <button class="pr-btn" data-p="1" onclick="selectPriority(1)">Yüksek</button>
+                <button class="pr-btn active-3" data-p="3" onclick="selectPriority(3)">DÜŞÜK</button>
+                <button class="pr-btn" data-p="2" onclick="selectPriority(2)">ORTA</button>
+                <button class="pr-btn" data-p="1" onclick="selectPriority(1)">YÜKSEK</button>
+            </div>
+        </div>
+
+        <div class="modal-block">
+            <div class="kunye-label">// ATOMİK NOTLAR</div>
+            <div id="modalAtomics"></div>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="text" id="atomicInput" placeholder="Kısa bir not..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addAtomic()">
+                <button onclick="addAtomic()" style="border:1px solid #40c4ff; color:#40c4ff">EKLE</button>
             </div>
         </div>
 
         <div class="modal-block">
             <textarea id="entryText" oninput="triggerAutoSave()"></textarea>
-            <div style="display:flex; gap:5px; margin-top:10px;">
+            <div id="modalTags" style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;"></div>
+            <div style="display:flex; gap:5px; margin-top:5px;">
                 <input type="text" id="tagInput" placeholder="Etiket..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;" onkeypress="if(event.key==='Enter') addTag()">
                 <button onclick="addTag()" style="border:1px solid #f39c12; color:#f39c12">EKLE</button>
             </div>
-            <div id="modalTags" style="display:flex; gap:5px; flex-wrap:wrap; margin-top:10px;"></div>
             <div style="display:flex; gap:10px; margin-top:1.5rem;">
-                <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">KAYDET</button>
-                <button id="closeBtn" style="flex:1; border:1px solid var(--border);">KAPAT</button>
+                <button onclick="closeModal()" style="flex:1; border:1px solid var(--border);">KAPAT</button>
+                <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">SİSTEME KAYDET</button>
             </div>
         </div>
     </div>
@@ -206,43 +170,33 @@
 
 <script>
 const state = {
-    entries: JSON.parse(localStorage.getItem('matrix_v50_data') || '{}'),
+    entries: JSON.parse(localStorage.getItem('matrix_v51_data') || '{}'),
+    lastBackup: localStorage.getItem('matrix_last_backup') || null,
     view: 'weekly', cursor: new Date(), selectedDate: null,
     temp: { tasks: [], habits: [], atomics: [], tags: [] },
-    currentPrioritySelection: 3
+    currentPriority: 3
 };
 
-const save = () => localStorage.setItem('matrix_v50_data', JSON.stringify(state.entries));
+const save = () => localStorage.setItem('matrix_v51_data', JSON.stringify(state.entries));
 const fmt = (d) => d.toISOString().split('T')[0];
-const getPriorityLabel = (p) => ['Yüksek', 'Orta', 'Düşük'][p-1];
 
-// Auto-Save
+/* AUTO-SAVE */
 let autoSaveTimeout;
 const triggerAutoSave = () => {
     clearTimeout(autoSaveTimeout);
     autoSaveTimeout = setTimeout(() => {
-        if (document.getElementById('entryModal').classList.contains('active')) {
+        if (state.selectedDate) {
             state.entries[state.selectedDate] = { 
-                text: document.getElementById('entryText').value, 
-                habits: state.temp.habits, 
-                tasks: state.temp.tasks, 
-                atomics: state.temp.atomics, 
-                tags: state.temp.tags 
+                text: document.getElementById('entryText').value,
+                habits: state.temp.habits, tasks: state.temp.tasks, 
+                atomics: state.temp.atomics, tags: state.temp.tags 
             };
-            save();
-            updateStats();
+            save(); updateStats();
         }
     }, 800);
 };
 
-// Zengin Link formatlama
-const formatLinks = (text) => {
-    if (!text) return '';
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, '<a href="$1" target="_blank" class="rich-link" onclick="event.stopPropagation()"><i class="fa-solid fa-link"></i> Link</a>');
-};
-
-/* VIEWS */
+/* RENDERS */
 const render = () => {
     const main = document.getElementById('mainContent');
     main.innerHTML = '';
@@ -261,54 +215,53 @@ const renderWeekly = (el) => {
     
     const grid = document.createElement('div'); grid.className = 'weekly-grid';
     for(let i=0; i<7; i++) {
-        const d = new Date(start); d.setDate(d.getDate() + i);
+        const d = new Date(start); d.setDate(start.getDate() + i);
         const ds = fmt(d); const e = state.entries[ds];
+        const isRecorded = e && (e.text || e.tasks?.length || e.habits?.length);
         
-        const totalTasks = e?.tasks?.length || 0;
-        const completedTasks = e?.tasks?.filter(t => t.done).length || 0;
-        const progressPct = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
-        const content = formatLinks(e?.text?.substring(0, 60) || '');
+        const total = e?.tasks?.length || 0;
+        const done = e?.tasks?.filter(t => t.done).length || 0;
+        const pct = total ? (done / total) * 100 : 0;
 
         grid.innerHTML += `
-            <div class="day-card" onclick="openEntry('${ds}')">
-                <div class="card-progress" style="width:${progressPct}%"></div>
-                <div class="habit-circle ${e?.habits?.includes('demir') ? 'active' : ''}"></div>
+            <div class="day-card ${isRecorded ? 'recorded' : ''}" onclick="openEntry('${ds}')">
+                <div class="card-progress" style="width:${pct}%"></div>
                 <div style="color:var(--accent); font-family:'Orbitron'">${d.getDate()} <span style="font-size:0.6rem; color:var(--text2)">${d.toLocaleDateString('tr-TR',{weekday:'short'})}</span></div>
-                <div style="font-size:0.75rem; margin-top:10px">${content}</div>
-                <div class="card-stats">
-                    <span><i class="fa-solid fa-list-check"></i> ${totalTasks}</span>
-                    <span><i class="fa-solid fa-tag"></i> ${e?.tags?.length || 0}</span>
+                <div style="font-size:0.7rem; margin-top:10px; opacity:0.8">${e?.text?.substring(0, 50) || ''}...</div>
+                <div style="position:absolute; bottom:10px; left:15px; font-size:0.55rem; color:var(--text2);">
+                    <i class="fa-solid fa-list"></i> ${total} | <i class="fa-solid fa-atom"></i> ${e?.atomics?.length || 0}
                 </div>
             </div>`;
     }
     el.appendChild(grid);
 };
 
-const renderMonthly = (el) => {
-    const y = state.cursor.getFullYear(), m = state.cursor.getMonth();
-    document.getElementById('currentRange').textContent = state.cursor.toLocaleString('tr-TR', {month:'long', year:'numeric'});
-    const grid = document.createElement('div'); grid.className = 'month-grid';
-    const first = new Date(y, m, 1);
-    const offset = (first.getDay() || 7) - 1;
-    for(let i=0; i<42; i++) {
-        const d = new Date(y, m, i - offset + 1);
-        const ds = fmt(d);
-        grid.innerHTML += `<div class="month-day ${d.getMonth()!==m?'other-month':''} ${state.entries[ds]?'has-entry':''}" onclick="openEntry('${ds}')">${d.getDate()}</div>`;
-    }
-    el.appendChild(grid);
-};
-
 const renderArchive = (el) => {
     Object.entries(state.entries).sort().reverse().forEach(([d, e]) => {
-        el.innerHTML += `<div class="day-card" style="margin-bottom:10px" onclick="openEntry('${d}')">
+        el.innerHTML += `<div class="day-card recorded" style="margin-bottom:10px" onclick="openEntry('${d}')">
             <b style="color:var(--accent)">${d}</b>
-            <div style="font-size:0.8rem; margin-top:5px; opacity:0.8">${e.text?.substring(0, 150) || ''}</div>
+            <div style="font-size:0.75rem; margin-top:5px;">${e.text?.substring(0, 100) || ''}</div>
         </div>`;
     });
 };
 
 const renderExtra = (el) => {
-    el.innerHTML = `<div style="color:var(--text2); font-size:0.8rem; padding:20px; border:1px solid var(--border);">İstatistikler ve Grafik modülü aktif.</div>`;
+    el.innerHTML = `
+        <div class="stats-bar">
+            <div class="stat-item"><div class="stat-label">SPOR ZİNCİRİ</div>${getStreak('spor')} GÜN</div>
+            <div class="stat-item"><div class="stat-label">OKUMA ZİNCİRİ</div>${getStreak('okuma')} GÜN</div>
+        </div>
+        <div class="modal-block"><canvas id="taskChart" height="100"></canvas></div>
+        <div class="kunye-label" style="margin-top:20px">// GÖREV HAVUZU (Tıklanabilir)</div>
+        <div id="pool" style="margin-top:10px"></div>
+    `;
+    setTimeout(initChart, 100);
+    const pool = el.querySelector('#pool');
+    Object.entries(state.entries).forEach(([d, e]) => {
+        e.tasks?.forEach(t => {
+            if(!t.done) pool.innerHTML += `<div class="list-row" onclick="openEntry('${d}')" style="cursor:pointer;">[${d}] ${t.text}</div>`;
+        });
+    });
 };
 
 /* LOGIC */
@@ -323,80 +276,84 @@ window.openEntry = (date) => {
 };
 
 const renderModalTemp = () => {
-    ['demir','spor','okuma'].forEach(h => document.getElementById(`h_${h}`).classList.toggle('active', state.temp.habits.includes(h)));
+    ['demir','spor','okuma'].forEach(h => document.getElementById(`h_${h}`).className = `habit-btn ${state.temp.habits.includes(h) ? 'active' : ''}`);
     document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row">
         <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done; triggerAutoSave();">
-        <span class="priority-tag priority-${t.priority || 3}">[${getPriorityLabel(t.priority || 3)}]</span>
+        <span class="priority-tag" style="background:${t.priority==1?'var(--danger)':t.priority==2?'#f1c40f':'var(--accent)'}">${t.priority==1?'!':''}</span>
         <span style="flex:1; ${t.done?'text-decoration:line-through; opacity:0.5':''}">${t.text}</span>
-        <i class="fa-solid fa-trash" onclick="state.temp.tasks.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="cursor:pointer; color:var(--danger);"></i>
+        <i class="fa-solid fa-trash" onclick="state.temp.tasks.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="cursor:pointer; color:var(--danger)"></i>
     </div>`).join('');
-    document.getElementById('modalTags').innerHTML = state.temp.tags.map((tag, i) => `<span class="tag-chip">#${tag} <i class="fa-solid fa-times" onclick="state.temp.tags.splice(${i},1); renderModalTemp(); triggerAutoSave();"></i></span>`).join('');
+    document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row"><span>${a}</span><i class="fa-solid fa-trash" onclick="state.temp.atomics.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="margin-left:auto; cursor:pointer; color:var(--danger)"></i></div>`).join('');
+    document.getElementById('modalTags').innerHTML = state.temp.tags.map((t,i) => `<span class="tag-chip">#${t} <i class="fa-solid fa-times" onclick="state.temp.tags.splice(${i},1); renderModalTemp(); triggerAutoSave();"></i></span>`).join('');
 };
 
-window.selectPriority = (p) => {
-    state.currentPrioritySelection = p;
-    document.querySelectorAll('.pr-btn').forEach(btn => {
-        btn.classList.toggle(`active-${btn.dataset.p}`, parseInt(btn.dataset.p) === p);
-    });
-};
-
-window.addTask = () => {
-    const i = document.getElementById('taskInput');
-    if(i.value){
-        state.temp.tasks.push({text:i.value, done:false, priority: state.currentPrioritySelection});
-        i.value=''; renderModalTemp(); triggerAutoSave();
-    }
-};
-
-window.addTag = () => {
-    const i = document.getElementById('tagInput');
-    if(i.value){
-        state.temp.tags.push(i.value.trim());
-        i.value=''; renderModalTemp(); triggerAutoSave();
-    }
-};
-
+window.addTask = () => { const i = document.getElementById('taskInput'); if(i.value){ state.temp.tasks.push({text:i.value, done:false, priority: state.currentPriority}); i.value=''; renderModalTemp(); triggerAutoSave(); } };
+window.addAtomic = () => { const i = document.getElementById('atomicInput'); if(i.value){ state.temp.atomics.push(i.value); i.value=''; renderModalTemp(); triggerAutoSave(); } };
+window.addTag = () => { const i = document.getElementById('tagInput'); if(i.value){ state.temp.tags.push(i.value.trim()); i.value=''; renderModalTemp(); triggerAutoSave(); } };
 window.toggleHabit = (h) => { const idx = state.temp.habits.indexOf(h); if(idx>-1) state.temp.habits.splice(idx,1); else state.temp.habits.push(h); renderModalTemp(); triggerAutoSave(); };
-
-document.getElementById('saveBtn').onclick = () => {
-    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, tags: state.temp.tags };
-    save(); document.getElementById('entryModal').classList.remove('active'); render();
-};
+window.selectPriority = (p) => { state.currentPriority = p; document.querySelectorAll('.pr-btn').forEach(b => b.classList.toggle(`active-${b.dataset.p}`, parseInt(b.dataset.p)===p)); };
 
 const updateStats = () => {
-    const allEntries = Object.entries(state.entries);
-    // Aktif görevleri tarihlerine göre bul
-    const activeTaskDates = allEntries
-        .filter(([date, entry]) => entry.tasks?.some(t => !t.done))
-        .map(([date]) => date)
-        .sort();
+    const all = Object.entries(state.entries);
+    const activeDates = all.filter(([d,e]) => e.tasks?.some(t => !t.done)).map(([d]) => d).sort();
+    
+    // Kritik Görev Kontrolü
+    const hasCritical = all.some(([d,e]) => e.tasks?.some(t => t.priority == 1 && !t.done));
+    
+    // Yedekleme Kontrolü
+    const needsBackup = !state.lastBackup || (Date.now() - new Date(state.lastBackup).getTime() > 7*24*60*60*1000);
+    document.getElementById('backupWarning').innerHTML = needsBackup ? `<i class="fa-solid fa-triangle-exclamation backup-alert"></i>` : '';
 
     document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-database"></i> KAYIT</div>${allEntries.length}</div>
-        <div class="stat-item">
-            <div class="stat-label"><i class="fa-solid fa-list-check"></i> AKTİF GÖREV TARİHLERİ</div>
-            <div class="stat-content">${activeTaskDates.length > 0 ? activeTaskDates.join(', ') : 'Temiz'}</div>
+        <div class="stat-item"><div class="stat-label">KAYIT SAYISI</div>${all.length}</div>
+        <div class="stat-item"><div class="stat-label">AKTİF GÖREV TARİHLERİ</div><div class="stat-content">${activeDates.join(', ') || 'TEMİZ'}</div></div>
+        <div class="stat-item" style="border-left-color:${hasCritical?'var(--danger)':'var(--accent)'}">
+            <div class="stat-label">KRİTİK DURUM ${hasCritical?'<span class="critical-dot"></span>':''}</div>
+            ${hasCritical ? 'YÜKSEK ÖNCELİKLİ İŞ VAR' : 'SİSTEM STABİL'}
         </div>
-        <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-brain"></i> DEMİR ZİHİN</div>${allEntries.filter(([d,e])=>e.habits?.includes('demir')).length}</div>
     `;
+};
+
+const getStreak = (h) => {
+    let s = 0; let d = new Date();
+    for(let i=0; i<365; i++) {
+        const e = state.entries[fmt(d)];
+        if(e?.habits?.includes(h)) s++; else if(i>0) break;
+        d.setDate(d.getDate()-1);
+    }
+    return s;
+};
+
+const initChart = () => {
+    const ctx = document.getElementById('taskChart'); if(!ctx) return;
+    const data = Object.entries(state.entries).slice(-7).map(([d,e]) => e.tasks?.filter(t=>t.done).length || 0);
+    new Chart(ctx, { type:'line', data:{ labels:['1','2','3','4','5','6','7'], datasets:[{label:'Biten Görevler', data:data, borderColor:'#2ecc71', tension:0.3}] }, options:{ scales:{y:{beginAtZero:true, ticks:{stepSize:1}}} } });
 };
 
 const renderRandomNote = () => {
     const pool = Object.values(state.entries).flatMap(e => e.atomics || []);
-    if(pool.length) document.getElementById('randomAtomicArea').textContent = `"${pool[Math.floor(Math.random()*pool.length)]}"`;
+    document.getElementById('randomAtomicArea').textContent = pool.length ? `"${pool[Math.floor(Math.random()*pool.length)]}"` : '';
 };
 
-document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { 
-    document.querySelectorAll('.view-btn').forEach(x=>x.classList.remove('active')); 
-    b.classList.add('active'); state.view = b.dataset.view; render(); 
-});
-
-document.getElementById('prevBtn').onclick = () => { if(state.view==='monthly') state.cursor.setMonth(state.cursor.getMonth()-1); else state.cursor.setDate(state.cursor.getDate()-7); render(); };
-document.getElementById('nextBtn').onclick = () => { if(state.view==='monthly') state.cursor.setMonth(state.cursor.getMonth()+1); else state.cursor.setDate(state.cursor.getDate()+7); render(); };
-document.getElementById('themeToggle').onclick = () => { const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', t); };
-document.getElementById('exportBtn').onclick = () => { const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v50.json'; a.click(); };
-document.getElementById('closeBtn').onclick = () => { document.getElementById('entryModal').classList.remove('active'); render(); };
+document.getElementById('exportBtn').onclick = () => {
+    const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v51.json'; a.click();
+    state.lastBackup = new Date().toISOString();
+    localStorage.setItem('matrix_last_backup', state.lastBackup);
+    updateStats();
+};
+document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange = (e) => { const r = new FileReader(); r.onload=(ev)=>{state.entries=JSON.parse(ev.target.result); render();}; r.readAsText(e.target.files[0]); };
+document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.view-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.view = b.dataset.view; render(); });
+document.getElementById('prevBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()-7); render(); };
+document.getElementById('nextBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()+7); render(); };
+window.closeModal = () => { document.getElementById('entryModal').classList.remove('active'); render(); };
+document.getElementById('saveBtn').onclick = () => {
+    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics, tags: state.temp.tags };
+    save(); closeModal();
+};
 document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
+document.getElementById('themeToggle').onclick = () => { const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', t); };
 
 render();
 </script>
