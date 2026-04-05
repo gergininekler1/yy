@@ -1,214 +1,314 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX.JOURNAL v2.0</title>
+    <title>MATRIX.JOURNAL v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        /* ─── THEME TOKENS ─── */
         :root {
-            --bg: #0e0e10;
-            --surface: #141417;
-            --surface2: #1a1a1f;
-            --border: #2a2a32;
-            --border-accent: #3a3a46;
             --accent: #00e676;
-            --accent-dim: rgba(0, 230, 118, 0.12);
-            --accent-glow: rgba(0, 230, 118, 0.2);
-            --text-primary: #e8e8ec;
-            --text-secondary: #7a7a8a;
-            --text-muted: #3a3a46;
+            --accent-dim: rgba(0,230,118,0.12);
+            --accent-glow: rgba(0,230,118,0.22);
             --danger: #ff4d6d;
-            --danger-dim: rgba(255, 77, 109, 0.15);
+            --danger-dim: rgba(255,77,109,0.14);
+            --warn: #ffb300;
+            --warn-dim: rgba(255,179,0,0.14);
+            --info: #40c4ff;
+            --info-dim: rgba(64,196,255,0.12);
+            --p-high: #ff4d6d;
+            --p-med:  #ffb300;
+            --p-low:  #69f0ae;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        @keyframes blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
+        [data-theme="dark"] {
+            --bg:       #0e0e11;
+            --surface:  #141418;
+            --surface2: #1b1b20;
+            --surface3: #222228;
+            --border:   #28282f;
+            --border2:  #38383f;
+            --text1:    #e8e8ec;
+            --text2:    #7a7a8c;
+            --text3:    #3a3a46;
         }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+        [data-theme="light"] {
+            --bg:       #f4f4f6;
+            --surface:  #ffffff;
+            --surface2: #f0f0f3;
+            --surface3: #e8e8ed;
+            --border:   #d8d8e0;
+            --border2:  #c4c4cc;
+            --text1:    #18181c;
+            --text2:    #6a6a7a;
+            --text3:    #b0b0bc;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes slideIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
 
         body {
             font-family: 'Share Tech Mono', monospace;
             background: var(--bg);
-            color: var(--text-primary);
+            color: var(--text1);
             overflow-x: hidden;
             min-height: 100vh;
+            transition: background 0.25s, color 0.25s;
         }
 
-        .container {
-            max-width: 100%;
-            padding: 1rem;
-            animation: fadeUp 0.5s ease;
-        }
+        .container { max-width:100%; padding:1rem; animation:fadeUp 0.45s ease; }
 
-        /* ─── HEADER ─── */
+        /* ══════════════════════════════
+           HEADER
+        ══════════════════════════════ */
         header {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 1.25rem 1.5rem;
-            margin-bottom: 1.25rem;
+            border-radius: 6px;
+            padding: 1.1rem 1.4rem;
+            margin-bottom: 1rem;
         }
 
         .header-top {
             display: flex;
-            align-items: baseline;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.9rem;
             flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         h1 {
             font-family: 'Orbitron', monospace;
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             font-weight: 900;
-            letter-spacing: 0.15em;
-            color: var(--text-primary);
+            letter-spacing: 0.14em;
+            color: var(--text1);
         }
+        h1 .dot { color: var(--accent); }
 
-        h1 span {
-            color: var(--accent);
+        /* Theme toggle */
+        .theme-btn {
+            font-size: 1rem;
+            padding: 0.35rem 0.7rem;
+            border: 1px solid var(--border2);
+            background: var(--surface2);
+            color: var(--text2);
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.2s;
+            line-height: 1;
         }
+        .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-        /* Stats bar */
+        /* ─── STATS BAR ─── */
         .stats-bar {
             display: flex;
-            gap: 1.5rem;
+            gap: 0;
             flex-wrap: wrap;
-            padding: 0.75rem 1rem;
             background: var(--surface2);
             border: 1px solid var(--border);
-            border-radius: 3px;
-            margin-bottom: 1rem;
+            border-radius: 4px;
+            margin-bottom: 0.9rem;
+            overflow: hidden;
         }
 
         .stat-item {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.72rem;
+            padding: 0.55rem 1rem;
+            gap: 0.15rem;
+            flex: 1;
+            min-width: 80px;
+            border-right: 1px solid var(--border);
         }
+        .stat-item:last-child { border-right: none; }
 
         .stat-label {
-            color: var(--text-secondary);
+            font-size: 0.58rem;
+            color: var(--text2);
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
         }
-
         .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
             color: var(--accent);
-            font-weight: bold;
+            line-height: 1;
+        }
+        .stat-value.neutral { color: var(--text1); }
+        .stat-value.fire { color: var(--warn); }
+
+        /* ─── SEARCH BAR ─── */
+        .search-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.9rem;
+            align-items: center;
         }
 
-        .stat-value.neutral {
-            color: var(--text-primary);
+        .search-input {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--border2);
+            background: var(--surface2);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text1);
+            border-radius: 4px;
+            transition: border-color 0.2s;
         }
+        .search-input:focus { outline: none; border-color: var(--accent); }
+        .search-input::placeholder { color: var(--text3); }
 
-        .stat-divider {
-            width: 1px;
-            height: 14px;
-            background: var(--border);
+        .search-clear {
+            padding: 0.5rem 0.7rem;
+            font-size: 0.75rem;
         }
 
         /* ─── CONTROLS ─── */
         .header-controls {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.6rem;
             flex-wrap: wrap;
             align-items: center;
         }
 
-        .control-row {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        button, select {
+        button {
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.78rem;
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-accent);
+            font-size: 0.75rem;
+            padding: 0.45rem 0.9rem;
+            border: 1px solid var(--border2);
             background: var(--surface2);
-            color: var(--text-secondary);
+            color: var(--text2);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.18s;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             border-radius: 3px;
             white-space: nowrap;
         }
-
-        button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-dim);
-        }
-
-        button.active {
-            background: var(--accent-dim);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+        button.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
         .view-switcher {
             display: flex;
-            gap: 0;
-            border: 1px solid var(--border-accent);
-            border-radius: 3px;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
             overflow: hidden;
         }
+        .view-switcher button { border:none; border-right:1px solid var(--border2); border-radius:0; }
+        .view-switcher button:last-child { border-right:none; }
 
-        .view-switcher button {
-            border: none;
-            border-right: 1px solid var(--border-accent);
-            border-radius: 0;
-            padding: 0.5rem 1.1rem;
-        }
-
-        .view-switcher button:last-child { border-right: none; }
-
-        .date-navigation {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: nowrap;
-        }
+        .date-navigation { display:flex; align-items:center; gap:0.4rem; }
 
         .date-display {
             font-family: 'Orbitron', monospace;
-            font-size: 0.8rem;
-            min-width: 160px;
+            font-size: 0.75rem;
+            min-width: 148px;
             text-align: center;
-            color: var(--text-primary);
+            color: var(--text1);
             font-weight: 700;
-            letter-spacing: 0.05em;
         }
 
-        .nav-btn {
-            padding: 0.5rem 0.8rem;
-        }
+        .data-controls { display:flex; gap:0.4rem; margin-left:auto; }
 
-        .data-controls {
+        /* ══════════════════════════════
+           SEARCH RESULTS PANEL
+        ══════════════════════════════ */
+        .search-results-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            animation: slideDown 0.2s ease;
+        }
+        .search-results-title {
+            font-size: 0.68rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+        .search-result-item {
             display: flex;
-            gap: 0.5rem;
-            margin-left: auto;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            background: var(--surface2);
+            animation: slideIn 0.2s ease;
         }
+        .search-result-item:hover { border-color: var(--accent); }
+        .search-result-date { font-size: 0.7rem; color: var(--text2); margin-bottom: 0.25rem; }
+        .search-result-text { font-size: 0.82rem; color: var(--text1); line-height: 1.4; }
+        .search-result-tags { display:flex; gap:0.3rem; flex-wrap:wrap; margin-top:0.3rem; }
+        .search-empty { font-size:0.82rem; color:var(--text3); padding:0.5rem 0; }
 
-        /* ─── WEEKLY SCROLL ─── */
+        /* ══════════════════════════════
+           MOOD CHART
+        ══════════════════════════════ */
+        .mood-chart-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 0.65rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+        .section-title::before { content: '/ '; color: var(--accent); }
+
+        .mood-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 60px;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        .mood-bar-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+        .mood-bar {
+            width: 22px;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.4s ease;
+            cursor: default;
+            position: relative;
+        }
+        .mood-bar[data-mood="great"]   { background: var(--accent); }
+        .mood-bar[data-mood="good"]    { background: var(--info); }
+        .mood-bar[data-mood="neutral"] { background: var(--text3); }
+        .mood-bar[data-mood="bad"]     { background: var(--warn); }
+        .mood-bar[data-mood="terrible"]{ background: var(--danger); }
+        .mood-bar-label { font-size:0.5rem; color:var(--text2); text-align:center; }
+
+        /* ══════════════════════════════
+           WEEKLY SCROLL
+        ══════════════════════════════ */
         .weekly-scroll-container {
             overflow-x: auto;
             overflow-y: hidden;
@@ -216,50 +316,34 @@
             margin-bottom: 5rem;
             -webkit-overflow-scrolling: touch;
         }
+        .weekly-scroll-container::-webkit-scrollbar { height:4px; }
+        .weekly-scroll-container::-webkit-scrollbar-track { background:var(--surface); }
+        .weekly-scroll-container::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
 
-        .weekly-scroll-container::-webkit-scrollbar { height: 4px; }
-        .weekly-scroll-container::-webkit-scrollbar-track { background: var(--surface); }
-        .weekly-scroll-container::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
-
-        .weekly-view {
-            display: flex;
-            gap: 0.75rem;
-            min-width: max-content;
-            padding: 0.25rem 0;
-        }
+        .weekly-view { display:flex; gap:0.65rem; min-width:max-content; padding:0.25rem 0; }
 
         /* ─── DAY CARD ─── */
         .day-card {
-            width: 260px;
+            width: 250px;
             min-height: 460px;
             border: 1px solid var(--border);
             background: var(--surface);
-            padding: 1.25rem;
+            padding: 1.1rem;
             cursor: pointer;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s, box-shadow 0.2s;
             position: relative;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            border-radius: 4px;
+            border-radius: 5px;
         }
-
-        .day-card:hover {
-            border-color: var(--border-accent);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-        }
-
-        .day-card.today {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 1px var(--accent-dim);
-        }
-
+        .day-card:hover { border-color: var(--border2); box-shadow:0 4px 20px rgba(0,0,0,0.25); }
+        .day-card.today { border-color: var(--accent); }
         .day-card.today::after {
             content: '●';
             position: absolute;
-            top: 10px;
-            right: 12px;
-            font-size: 0.5rem;
+            top:9px; right:11px;
+            font-size:0.45rem;
             color: var(--accent);
             animation: blink 1.5s infinite;
         }
@@ -268,1210 +352,1275 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
+            padding-bottom: 0.65rem;
             border-bottom: 1px solid var(--border);
         }
 
-        .day-name {
+        .day-name  { font-size:0.6rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:0.15rem; }
+        .day-number { font-family:'Orbitron',monospace; font-size:2rem; font-weight:900; line-height:1; color:var(--text1); }
+        .day-card.today .day-number { color:var(--accent); }
+        .day-month { font-size:0.6rem; color:var(--text2); text-transform:uppercase; margin-top:0.15rem; }
+
+        /* Mood badge (3-level) */
+        .mood-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .mood-badge-pill {
             font-size: 0.65rem;
-            color: var(--text-secondary);
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-weight: bold;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 0.2rem;
         }
-
-        .day-number {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.2rem;
-            font-weight: 900;
-            line-height: 1;
-            color: var(--text-primary);
-        }
-
-        .day-card.today .day-number { color: var(--accent); }
-
-        .day-month {
-            font-size: 0.65rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-top: 0.2rem;
-        }
-
-        .mood-terminal { text-align: right; }
-        .mood-indicator { font-size: 1.75rem; line-height: 1; margin-bottom: 0.2rem; }
-        .mood-label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+        .mood-badge-pill.great, .mood-badge-pill.good { background:rgba(0,230,118,0.15); color:var(--accent); border:1px solid rgba(0,230,118,0.3); }
+        .mood-badge-pill.neutral                      { background:var(--surface3); color:var(--text2); border:1px solid var(--border2); }
+        .mood-badge-pill.bad, .mood-badge-pill.terrible{ background:rgba(255,77,109,0.13); color:var(--danger); border:1px solid rgba(255,77,109,0.3); }
 
         .terminal-section {
-            margin-top: 0.75rem;
-            padding: 0.75rem;
+            margin-top: 0.65rem;
+            padding: 0.65rem;
             border: 1px solid var(--border);
             background: var(--surface2);
             border-radius: 3px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+            flex:1;
+            display:flex;
+            flex-direction:column;
         }
 
         .section-label {
-            font-size: 0.6rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.1em;
+            font-size:0.58rem;
+            color:var(--text2);
+            text-transform:uppercase;
+            margin-bottom:0.4rem;
+            letter-spacing:0.1em;
         }
-
-        .section-label::before { content: '/ '; color: var(--accent); }
+        .section-label::before { content:'/ '; color:var(--accent); }
 
         .note-preview {
-            font-size: 0.82rem;
-            line-height: 1.55;
-            color: var(--text-primary);
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 8;
-            -webkit-box-orient: vertical;
-            flex: 1;
+            font-size:0.8rem;
+            line-height:1.5;
+            color:var(--text1);
+            overflow:hidden;
+            display:-webkit-box;
+            -webkit-line-clamp:7;
+            -webkit-box-orient:vertical;
+            flex:1;
         }
 
         .note-count {
-            font-size: 0.65rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
+            font-size:0.62rem;
+            color:var(--text2);
+            margin-top:0.4rem;
+            padding-top:0.4rem;
+            border-top:1px solid var(--border);
+        }
+
+        /* Task mini preview on card */
+        .task-mini {
+            font-size: 0.68rem;
+            color: var(--text2);
+            margin-top: 0.3rem;
+            padding-top: 0.3rem;
             border-top: 1px solid var(--border);
-        }
-
-        .tags-terminal {
             display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-            margin-top: 0.75rem;
+            gap: 0.5rem;
         }
+        .task-mini-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:3px; }
 
+        .tags-terminal { display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.65rem; }
         .tag {
-            font-size: 0.65rem;
-            padding: 0.2rem 0.6rem;
-            border: 1px solid var(--border-accent);
-            background: var(--surface2);
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            border-radius: 2px;
+            font-size:0.6rem;
+            padding:0.18rem 0.55rem;
+            border:1px solid var(--border2);
+            background:var(--surface2);
+            color:var(--text2);
+            text-transform:uppercase;
+            border-radius:2px;
         }
 
         .empty-state {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            text-align: center;
-            padding: 2rem 0;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color:var(--text3);
+            font-size:0.78rem;
+            text-align:center;
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
         }
 
-        /* ─── CALENDAR ─── */
+        /* ══════════════════════════════
+           CALENDAR VIEW
+        ══════════════════════════════ */
         .calendar-container {
-            border: 1px solid var(--border);
-            background: var(--surface);
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 5rem;
+            border:1px solid var(--border);
+            background:var(--surface);
+            padding:1rem;
+            border-radius:5px;
+            margin-bottom:5rem;
         }
-
-        .calendar-header {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: var(--border);
-            margin-bottom: 1px;
-        }
-
-        .calendar-view {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: var(--border);
-        }
-
-        .calendar-day-name {
-            background: var(--surface2);
-            padding: 0.5rem;
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
+        .calendar-header { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--border); margin-bottom:1px; }
+        .calendar-view   { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--border); }
+        .calendar-day-name { background:var(--surface2); padding:0.4rem; text-align:center; font-size:0.65rem; color:var(--text2); text-transform:uppercase; }
         .calendar-day {
-            background: var(--surface);
-            padding: 0.6rem;
-            min-height: 80px;
-            cursor: pointer;
-            transition: background 0.15s ease;
-            position: relative;
+            background:var(--surface);
+            padding:0.5rem;
+            min-height:70px;
+            cursor:pointer;
+            transition:background 0.15s;
         }
+        .calendar-day:hover { background:var(--surface2); }
+        .calendar-day.today { background:var(--accent-dim); outline:1px solid var(--accent); }
+        .calendar-day.other-month { opacity:0.3; }
+        .cal-day-number { font-size:0.9rem; font-weight:bold; color:var(--text2); }
+        .calendar-day.today .cal-day-number { color:var(--accent); }
 
-        .calendar-day:hover { background: var(--surface2); }
-
-        .calendar-day.today {
-            background: var(--accent-dim);
-            outline: 1px solid var(--accent);
-        }
-
-        .calendar-day.other-month { opacity: 0.3; }
-
-        .cal-day-number {
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--text-secondary);
-        }
-
-        .calendar-day.today .cal-day-number { color: var(--accent); }
-
-        /* ─── LIST VIEW ─── */
-        .list-view {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 5rem;
-        }
+        /* ══════════════════════════════
+           LIST VIEW
+        ══════════════════════════════ */
+        .list-view { display:flex; flex-direction:column; gap:0.65rem; margin-bottom:5rem; }
 
         .entry-card {
-            border: 1px solid var(--border);
-            background: var(--surface);
-            padding: 1.25rem 1.5rem;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
-            border-radius: 4px;
+            border:1px solid var(--border);
+            background:var(--surface);
+            padding:1.1rem 1.3rem;
+            cursor:pointer;
+            transition:border-color 0.15s;
+            border-radius:5px;
         }
-
-        .entry-card:hover { border-color: var(--border-accent); }
+        .entry-card:hover { border-color:var(--border2); }
 
         .entry-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 1px solid var(--border);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:0.65rem;
+            padding-bottom:0.5rem;
+            border-bottom:1px solid var(--border);
         }
+        .entry-date { font-family:'Orbitron',monospace; font-size:0.8rem; font-weight:700; text-transform:uppercase; color:var(--text1); }
+        .entry-content { color:var(--text1); line-height:1.6; font-size:0.85rem; margin-bottom:0.6rem; }
 
-        .entry-date {
-            font-family: 'Orbitron', monospace;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-primary);
-        }
-
-        .entry-content {
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-size: 0.88rem;
-            margin-bottom: 0.75rem;
-        }
-
-        /* ─── MODAL ─── */
+        /* ══════════════════════════════
+           MODAL
+        ══════════════════════════════ */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 1000;
-            overflow-y: auto;
+            display:none;
+            position:fixed; top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0,0,0,0.8);
+            z-index:1000;
+            overflow-y:auto;
         }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeUp 0.25s ease;
-        }
+        .modal.active { display:flex; align-items:center; justify-content:center; animation:fadeUp 0.22s ease; }
 
         .modal-content {
-            background: var(--surface);
-            border: 1px solid var(--border-accent);
-            padding: 2rem;
-            max-width: 680px;
-            width: 94%;
-            max-height: 92vh;
-            overflow-y: auto;
-            position: relative;
-            border-radius: 6px;
-            animation: slideDown 0.3s ease;
+            background:var(--surface);
+            border:1px solid var(--border2);
+            padding:1.75rem;
+            max-width:660px;
+            width:94%;
+            max-height:92vh;
+            overflow-y:auto;
+            border-radius:7px;
+            animation:slideDown 0.25s ease;
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.75rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:1.5rem;
+            padding-bottom:0.9rem;
+            border-bottom:1px solid var(--border);
         }
 
         .modal-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.1rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-primary);
+            font-family:'Orbitron',monospace;
+            font-size:1rem;
+            font-weight:900;
+            text-transform:uppercase;
+            letter-spacing:0.1em;
         }
 
         .close-btn {
-            background: none;
-            border: 1px solid var(--border-accent);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.25rem 0.7rem;
-            line-height: 1;
-            color: var(--text-secondary);
-            border-radius: 3px;
+            background:none;
+            border:1px solid var(--border2);
+            font-size:1rem;
+            padding:0.2rem 0.6rem;
+            color:var(--text2);
+            border-radius:3px;
         }
+        .close-btn:hover { background:var(--danger-dim); border-color:var(--danger); color:var(--danger); }
 
-        .close-btn:hover {
-            background: var(--danger-dim);
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .form-group { margin-bottom: 1.5rem; }
+        .form-group { margin-bottom:1.3rem; }
 
         .form-label {
-            font-size: 0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            display: block;
-            margin-bottom: 0.6rem;
-            color: var(--text-secondary);
+            font-size:0.65rem;
+            text-transform:uppercase;
+            letter-spacing:0.12em;
+            display:block;
+            margin-bottom:0.55rem;
+            color:var(--text2);
         }
-
-        .form-label::before { content: '/ '; color: var(--accent); }
+        .form-label::before { content:'/ '; color:var(--accent); }
 
         textarea, input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-accent);
-            background: var(--surface2);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            resize: vertical;
-            transition: border-color 0.2s ease;
-            border-radius: 3px;
+            width:100%;
+            padding:0.65rem 0.75rem;
+            border:1px solid var(--border2);
+            background:var(--surface2);
+            font-family:'Share Tech Mono',monospace;
+            font-size:0.88rem;
+            color:var(--text1);
+            resize:vertical;
+            transition:border-color 0.18s;
+            border-radius:3px;
         }
+        textarea:focus, input[type="text"]:focus, input[type="date"]:focus { outline:none; border-color:var(--accent); }
+        textarea { min-height:130px; line-height:1.6; }
+        ::placeholder { color:var(--text3); }
 
-        textarea:focus, input[type="text"]:focus, input[type="date"]:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        textarea { min-height: 140px; line-height: 1.6; }
-
-        /* ─── MOOD SELECTOR ─── */
+        /* ─── MOOD SELECTOR (3-level) ─── */
         .mood-selector {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 0.5rem;
-            flex-wrap: wrap;
         }
 
         .mood-option {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.4rem;
             cursor: pointer;
-            padding: 0.75rem 1rem;
+            padding: 0.9rem 0.5rem;
             border: 1px solid var(--border);
             background: var(--surface2);
-            transition: all 0.2s ease;
-            border-radius: 3px;
-            flex: 1;
-            min-width: 60px;
+            transition: all 0.18s;
+            border-radius: 4px;
+            user-select: none;
         }
+        .mood-option:hover { border-color:var(--border2); }
 
-        .mood-option:hover { border-color: var(--border-accent); }
+        .mood-option[data-mood="good"].selected   { border-color:var(--accent); background:rgba(0,230,118,0.1); }
+        .mood-option[data-mood="neutral"].selected{ border-color:var(--border2); background:var(--surface3); }
+        .mood-option[data-mood="bad"].selected    { border-color:var(--danger); background:var(--danger-dim); }
 
-        .mood-option.selected {
-            border-color: var(--accent);
-            background: var(--accent-dim);
+        .mood-icon {
+            font-size: 1.5rem;
+            line-height: 1;
         }
-
-        .mood-emoji { font-size: 1.6rem; }
-
-        .mood-name {
-            font-size: 0.6rem;
-            color: var(--text-secondary);
+        .mood-label-text {
+            font-size: 0.65rem;
+            color: var(--text2);
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.08em;
         }
+        .mood-option[data-mood="good"].selected   .mood-label-text { color:var(--accent); }
+        .mood-option[data-mood="bad"].selected    .mood-label-text { color:var(--danger); }
+        .mood-option[data-mood="neutral"].selected .mood-label-text{ color:var(--text1); }
+
+        /* ─── TASKS SECTION ─── */
+        .tasks-section {
+            padding:1.1rem;
+            border:1px solid var(--border);
+            background:var(--surface2);
+            border-radius:4px;
+            margin-bottom:0;
+        }
+
+        .tasks-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:0.85rem;
+            padding-bottom:0.5rem;
+            border-bottom:1px solid var(--border);
+        }
+
+        .tasks-list { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:0.65rem; }
+
+        .task-item {
+            display:flex;
+            align-items:center;
+            gap:0.6rem;
+            padding:0.55rem 0.7rem;
+            border:1px solid var(--border);
+            background:var(--surface);
+            border-radius:3px;
+            animation:slideIn 0.2s ease;
+            transition:opacity 0.2s;
+        }
+        .task-item.done { opacity:0.5; }
+
+        .task-checkbox {
+            width:16px; height:16px;
+            border:1px solid var(--border2);
+            border-radius:2px;
+            cursor:pointer;
+            flex-shrink:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:0.6rem;
+            transition:all 0.15s;
+            background:var(--surface2);
+        }
+        .task-checkbox.checked { background:var(--accent); border-color:var(--accent); color:#000; }
+
+        .task-priority-dot {
+            width:7px; height:7px;
+            border-radius:50%;
+            flex-shrink:0;
+        }
+        .task-priority-dot.high    { background:var(--p-high); }
+        .task-priority-dot.medium  { background:var(--p-med); }
+        .task-priority-dot.low     { background:var(--p-low); }
+
+        .task-text {
+            flex:1;
+            font-size:0.82rem;
+            color:var(--text1);
+            line-height:1.4;
+        }
+        .task-item.done .task-text { text-decoration:line-through; color:var(--text2); }
+
+        .task-del-btn {
+            background:none;
+            border:none;
+            color:var(--text3);
+            font-size:0.9rem;
+            padding:0 0.2rem;
+            cursor:pointer;
+            letter-spacing:0;
+        }
+        .task-del-btn:hover { color:var(--danger); background:none; border:none; }
+
+        .task-add-row {
+            display:flex;
+            gap:0.4rem;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+
+        .task-add-row input { flex:1; min-width:120px; padding:0.45rem 0.65rem; font-size:0.8rem; }
+
+        .priority-select {
+            font-family:'Share Tech Mono',monospace;
+            font-size:0.72rem;
+            padding:0.45rem 0.6rem;
+            border:1px solid var(--border2);
+            background:var(--surface2);
+            color:var(--text2);
+            border-radius:3px;
+            cursor:pointer;
+        }
+        .priority-select:focus { outline:none; border-color:var(--accent); }
 
         /* ─── ATOMIC NOTES ─── */
         .atomic-notes-section {
-            margin-top: 0;
-            padding: 1.25rem;
-            border: 1px solid var(--border);
-            background: var(--surface2);
-            border-radius: 3px;
+            padding:1.1rem;
+            border:1px solid var(--border);
+            background:var(--surface2);
+            border-radius:4px;
         }
 
-        .atomic-notes-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
+        .section-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:0.75rem;
+            padding-bottom:0.45rem;
+            border-bottom:1px solid var(--border);
         }
 
-        .atomic-notes-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
+        .atomic-notes-list { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:0.6rem; }
 
         .atomic-note {
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-start;
-            padding: 0.65rem 0.75rem;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            border-radius: 3px;
-            animation: slideDown 0.2s ease;
+            display:flex;
+            align-items:flex-start;
+            gap:0.6rem;
+            padding:0.55rem 0.7rem;
+            border:1px solid var(--border);
+            background:var(--surface);
+            border-radius:3px;
+            animation:slideIn 0.2s ease;
         }
 
-        .atomic-note-text {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-primary);
-            flex: 1;
-        }
+        .atomic-note-text { flex:1; font-size:0.82rem; color:var(--text1); line-height:1.4; }
 
-        .atomic-note-delete {
-            background: none;
-            border: 1px solid var(--border-accent);
-            color: var(--text-secondary);
-            padding: 0.2rem 0.5rem;
-            font-size: 0.7rem;
-            cursor: pointer;
-            border-radius: 2px;
-            flex-shrink: 0;
-            transition: all 0.15s ease;
+        .atom-del-btn {
+            background:none; border:none;
+            color:var(--text3); font-size:0.9rem;
+            padding:0 0.2rem; cursor:pointer;
         }
+        .atom-del-btn:hover { color:var(--danger); background:none; border:none; }
 
-        .atomic-note-delete:hover {
-            background: var(--danger-dim);
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        /* Inline add area */
-        .atomic-add-row {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .atomic-add-row input {
-            flex: 1;
-            padding: 0.5rem 0.75rem;
-            margin: 0;
-            font-size: 0.82rem;
-        }
-
-        .atomic-add-row button {
-            padding: 0.5rem 0.85rem;
-            flex-shrink: 0;
-        }
+        .inline-add-row { display:flex; gap:0.4rem; }
+        .inline-add-row input { flex:1; padding:0.45rem 0.65rem; font-size:0.8rem; }
+        .inline-add-row button { padding:0.45rem 0.75rem; }
 
         /* ─── TAGS ─── */
         .tag-input-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            padding: 0.6rem 0.75rem;
-            border: 1px solid var(--border-accent);
-            background: var(--surface2);
-            min-height: 50px;
-            border-radius: 3px;
-            align-items: center;
+            display:flex;
+            flex-wrap:wrap;
+            gap:0.35rem;
+            padding:0.5rem 0.65rem;
+            border:1px solid var(--border2);
+            background:var(--surface2);
+            min-height:46px;
+            border-radius:3px;
+            align-items:center;
         }
-
-        .tag-input-container:focus-within {
-            border-color: var(--accent);
-        }
+        .tag-input-container:focus-within { border-color:var(--accent); }
 
         .tag-item {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.2rem 0.6rem;
-            background: var(--accent-dim);
-            border: 1px solid var(--accent);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            border-radius: 2px;
-            color: var(--accent);
+            display:flex;
+            align-items:center;
+            gap:0.35rem;
+            padding:0.18rem 0.55rem;
+            background:var(--accent-dim);
+            border:1px solid var(--accent);
+            font-size:0.68rem;
+            text-transform:uppercase;
+            border-radius:2px;
+            color:var(--accent);
         }
-
-        .tag-remove {
-            cursor: pointer;
-            color: var(--accent);
-            font-weight: bold;
-            opacity: 0.7;
-        }
-
-        .tag-remove:hover { opacity: 1; }
+        .tag-remove { cursor:pointer; opacity:0.7; }
+        .tag-remove:hover { opacity:1; }
 
         #tagInput {
-            border: none;
-            background: transparent;
-            padding: 0.3rem;
-            flex: 1;
-            min-width: 90px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.82rem;
-            color: var(--text-primary);
+            border:none; background:transparent;
+            padding:0.25rem;
+            flex:1; min-width:80px;
+            font-family:'Share Tech Mono',monospace;
+            font-size:0.8rem;
+            color:var(--text1);
         }
+        #tagInput:focus { outline:none; }
 
-        #tagInput:focus { outline: none; }
+        /* ─── MODAL FOOTER ─── */
+        .modal-footer { display:flex; gap:0.6rem; margin-top:1.5rem; }
+        .btn-primary { flex:1; background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+        .btn-primary:hover { background:var(--accent); color:#000; }
+        .btn-danger { background:var(--danger-dim); border-color:var(--danger); color:var(--danger); }
+        .btn-danger:hover { background:var(--danger); color:white; }
 
         /* ─── FAB ─── */
         .fab {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            width: 56px;
-            height: 56px;
-            border: 1px solid var(--accent);
-            background: var(--accent-dim);
-            color: var(--accent);
-            font-size: 1.6rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 100;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position:fixed; bottom:1.5rem; right:1.5rem;
+            width:52px; height:52px;
+            border:1px solid var(--accent);
+            background:var(--accent-dim);
+            color:var(--accent);
+            font-size:1.5rem;
+            cursor:pointer;
+            transition:all 0.2s;
+            z-index:100;
+            border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
         }
-
-        .fab:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 4px 20px var(--accent-glow);
-            transform: scale(1.08);
-        }
-
-        .fab::before {
-            content: '+';
-            display: block;
-            line-height: 1;
-        }
-
-        /* ─── MODAL FOOTER ─── */
-        .modal-footer {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.75rem;
-        }
-
-        .btn-primary {
-            flex: 1;
-            background: var(--accent-dim);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .btn-primary:hover {
-            background: var(--accent);
-            color: #000;
-        }
-
-        .btn-danger {
-            background: var(--danger-dim);
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background: var(--danger);
-            color: white;
-        }
+        .fab:hover { background:var(--accent); color:#000; box-shadow:0 4px 18px var(--accent-glow); transform:scale(1.07); }
+        .fab::before { content:'+'; display:block; line-height:1; }
 
         /* ─── UTILITY ─── */
-        .hidden { display: none !important; }
+        .hidden { display:none !important; }
 
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 640px) {
-            h1 { font-size: 1.1rem; }
+        /* ══════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════ */
+        @media (max-width:640px) {
+            h1 { font-size:1rem; }
 
-            .header-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
+            .header-controls { flex-direction:column; align-items:stretch; }
+            .date-navigation { flex-wrap:wrap; }
+            .date-display { min-width:110px; font-size:0.68rem; }
+            .data-controls { margin-left:0; }
 
-            .control-row {
-                justify-content: space-between;
-            }
+            .day-card { width:220px; min-height:400px; }
+            .modal-content { width:97%; padding:1.1rem; }
 
-            .date-navigation {
-                flex: 1;
-            }
+            .stats-bar { overflow-x:auto; flex-wrap:nowrap; }
+            .stat-item { min-width:72px; }
 
-            .date-display {
-                min-width: 120px;
-                font-size: 0.7rem;
-            }
-
-            .data-controls {
-                margin-left: 0;
-            }
-
-            .day-card { width: 230px; min-height: 420px; }
-
-            .modal-content { width: 96%; padding: 1.25rem; }
-
-            .stats-bar { gap: 1rem; }
-
-            .stat-divider { display: none; }
-
-            .mood-option { padding: 0.5rem 0.6rem; }
-
-            .mood-name { display: none; }
+            .mood-selector { grid-template-columns:repeat(3,1fr); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-top">
-                <h1>MATRIX<span>.</span>JOURNAL <span style="font-size:0.75em; opacity:0.6;">v2.0</span></h1>
+<div class="container">
+    <header>
+        <div class="header-top">
+            <h1>MATRIX<span class="dot">.</span>JOURNAL <span style="font-size:0.72em;opacity:0.5;">v3</span></h1>
+            <button class="theme-btn" id="themeToggle" title="Tema değiştir">☀️</button>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Streak</span>
+                <span class="stat-value fire" id="streakCount">0</span>
             </div>
-
-            <!-- Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <span class="stat-label">Aktif görevler</span>
-                    <span class="stat-value" id="activeTaskCount">—</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <span class="stat-label">Tamamlanma</span>
-                    <span class="stat-value" id="completionRate">—</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <span class="stat-label">Bu hafta</span>
-                    <span class="stat-value neutral" id="weekEntries">0</span>
-                    <span class="stat-label">kayıt</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <span class="stat-label">Popüler tag</span>
-                    <span class="stat-value neutral" id="topTag">—</span>
-                </div>
+            <div class="stat-item">
+                <span class="stat-label">Aktif görev</span>
+                <span class="stat-value" id="activeTaskCount">0</span>
             </div>
-
-            <div class="header-controls">
-                <div class="control-row">
-                    <div class="view-switcher">
-                        <button class="view-btn active" data-view="weekly">Hafta</button>
-                        <button class="view-btn" data-view="calendar">Takvim</button>
-                        <button class="view-btn" data-view="list">Liste</button>
-                    </div>
-
-                    <div class="date-navigation">
-                        <button id="prevPeriod" class="nav-btn">←</button>
-                        <div class="date-display" id="dateDisplay"></div>
-                        <button id="nextPeriod" class="nav-btn">→</button>
-                        <button id="today">Bugün</button>
-                    </div>
-                </div>
-
-                <div class="control-row">
-                    <div class="data-controls">
-                        <button id="exportData">↑ Export</button>
-                        <button id="importData">↓ Import</button>
-                        <input type="file" id="fileInput" accept=".json" class="hidden">
-                    </div>
-                </div>
+            <div class="stat-item">
+                <span class="stat-label">Tamamlandı</span>
+                <span class="stat-value" id="completionRate">—</span>
             </div>
-        </header>
-
-        <div class="weekly-scroll-container" id="mainContent"></div>
-    </div>
-
-    <!-- Entry Modal -->
-    <div class="modal" id="entryModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="entryModalTitle">Yeni kayıt</div>
-                <button class="close-btn" id="closeEntryModal">✕</button>
+            <div class="stat-item">
+                <span class="stat-label">Bu hafta</span>
+                <span class="stat-value neutral" id="weekEntries">0</span>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Tarih</label>
-                <input type="date" id="entryDate">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Ruh hali</label>
-                <div class="mood-selector">
-                    <div class="mood-option" data-mood="great"><div class="mood-emoji">😄</div><div class="mood-name">Harika</div></div>
-                    <div class="mood-option" data-mood="good"><div class="mood-emoji">🙂</div><div class="mood-name">İyi</div></div>
-                    <div class="mood-option" data-mood="neutral"><div class="mood-emoji">😐</div><div class="mood-name">Nötr</div></div>
-                    <div class="mood-option" data-mood="bad"><div class="mood-emoji">😟</div><div class="mood-name">Kötü</div></div>
-                    <div class="mood-option" data-mood="terrible"><div class="mood-emoji">😢</div><div class="mood-name">Berbat</div></div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Ana not</label>
-                <textarea id="entryText" placeholder="Bugün ne oldu?"></textarea>
-            </div>
-
-            <!-- Atomic Notes Section -->
-            <div class="form-group">
-                <div class="atomic-notes-section">
-                    <div class="atomic-notes-header">
-                        <label class="form-label" style="margin:0;">Atomic notlar</label>
-                    </div>
-                    <div class="atomic-notes-list" id="atomicNotesList"></div>
-                    <div class="atomic-add-row">
-                        <input type="text" id="atomicNoteInput" placeholder="Yeni not ekle...">
-                        <button id="addAtomicNoteBtn">+ Ekle</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Etiketler</label>
-                <div class="tag-input-container" id="tagContainer">
-                    <input type="text" id="tagInput" placeholder="Etiket yaz, Enter'a bas">
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button id="saveEntry" class="btn-primary">Kaydet</button>
-                <button id="deleteEntry" class="hidden btn-danger">Sil</button>
+            <div class="stat-item">
+                <span class="stat-label">Top tag</span>
+                <span class="stat-value neutral" id="topTag">—</span>
             </div>
         </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍  Kayıt, tag veya not ara...">
+            <button class="search-clear hidden" id="searchClear">✕ Temizle</button>
+        </div>
+
+        <!-- Controls -->
+        <div class="header-controls">
+            <div class="view-switcher">
+                <button class="view-btn active" data-view="weekly">Hafta</button>
+                <button class="view-btn" data-view="calendar">Takvim</button>
+                <button class="view-btn" data-view="list">Liste</button>
+            </div>
+
+            <div class="date-navigation">
+                <button id="prevPeriod">←</button>
+                <div class="date-display" id="dateDisplay"></div>
+                <button id="nextPeriod">→</button>
+                <button id="today">Bugün</button>
+            </div>
+
+            <div class="data-controls">
+                <button id="exportData">↑ Export</button>
+                <button id="importData">↓ Import</button>
+                <input type="file" id="fileInput" accept=".json" class="hidden">
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Results -->
+    <div class="search-results-panel hidden" id="searchPanel"></div>
+
+    <!-- Mood Chart -->
+    <div class="mood-chart-section">
+        <div class="section-title">Son 14 gün — ruh hali grafiği</div>
+        <div class="mood-chart" id="moodChart"></div>
     </div>
 
-    <button class="fab" id="fab"></button>
+    <!-- Main Content -->
+    <div id="mainContent"></div>
+</div>
 
-    <script>
-        // ─── DATA MANAGER ───
-        class DataManager {
-            constructor() {
-                this.entries = this.loadEntries();
-            }
+<!-- Entry Modal -->
+<div class="modal" id="entryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title" id="entryModalTitle">Yeni kayıt</div>
+            <button class="close-btn" id="closeEntryModal">✕</button>
+        </div>
 
-            loadEntries() {
-                const data = localStorage.getItem('matrixJournalEntries');
-                return data ? JSON.parse(data) : {};
-            }
+        <div class="form-group">
+            <label class="form-label">Tarih</label>
+            <input type="date" id="entryDate">
+        </div>
 
-            saveEntries() {
-                localStorage.setItem('matrixJournalEntries', JSON.stringify(this.entries));
-            }
-
-            addEntry(date, entry) {
-                this.entries[date] = entry;
-                this.saveEntries();
-            }
-
-            getEntry(date) { return this.entries[date] || null; }
-
-            deleteEntry(date) {
-                delete this.entries[date];
-                this.saveEntries();
-            }
-
-            exportData() {
-                const data = { entries: this.entries, exportDate: new Date().toISOString(), version: '2.0' };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `matrix-journal-${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-            }
-
-            importData(data) {
-                if (data.entries) this.entries = data.entries;
-                this.saveEntries();
-            }
-        }
-
-        // ─── APP STATE ───
-        const dataManager = new DataManager();
-        let currentView = 'weekly';
-        let currentDate = new Date();
-        let selectedDate = null;
-        let editingEntry = null;
-        let currentTags = [];
-        let atomicNotes = [];
-
-        // ─── DATE UTILITIES ───
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        function getWeekDates(date) {
-            const start = new Date(date);
-            start.setDate(start.getDate() - start.getDay() + 1);
-            const dates = [];
-            for (let i = 0; i < 7; i++) {
-                const d = new Date(start);
-                d.setDate(d.getDate() + i);
-                dates.push(d);
-            }
-            return dates;
-        }
-
-        function getMonthDates(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const dates = [];
-            const startDay = firstDay.getDay() || 7;
-
-            for (let i = startDay - 1; i > 0; i--) {
-                const d = new Date(firstDay);
-                d.setDate(d.getDate() - i);
-                dates.push({ date: d, otherMonth: true });
-            }
-            for (let i = 1; i <= lastDay.getDate(); i++) {
-                dates.push({ date: new Date(year, month, i), otherMonth: false });
-            }
-            const remaining = 42 - dates.length;
-            for (let i = 1; i <= remaining; i++) {
-                const d = new Date(lastDay);
-                d.setDate(d.getDate() + i);
-                dates.push({ date: d, otherMonth: true });
-            }
-            return dates;
-        }
-
-        function getTurkishDayName(dayIndex) {
-            return ['PAZ', 'PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT'][dayIndex];
-        }
-
-        function getTurkishMonthName(monthIndex) {
-            return ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
-                    'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'][monthIndex];
-        }
-
-        const moodEmojis = { great:'😄', good:'🙂', neutral:'😐', bad:'😟', terrible:'😢' };
-        const moodLabels = { great:'Harika', good:'İyi', neutral:'Nötr', bad:'Kötü', terrible:'Berbat' };
-
-        // ─── RENDER ───
-        function renderWeeklyView() {
-            const dates = getWeekDates(currentDate);
-            const today = formatDate(new Date());
-
-            let html = '<div class="weekly-view">';
-            dates.forEach(date => {
-                const dateStr = formatDate(date);
-                const entry = dataManager.getEntry(dateStr);
-                const isToday = dateStr === today;
-
-                html += `
-                    <div class="day-card ${isToday ? 'today' : ''}" data-date="${dateStr}">
-                        <div class="terminal-header">
-                            <div class="day-info">
-                                <div class="day-name">${getTurkishDayName(date.getDay())}</div>
-                                <div class="day-number">${date.getDate()}</div>
-                                <div class="day-month">${getTurkishMonthName(date.getMonth())}</div>
-                            </div>
-                            ${entry && entry.mood ? `
-                                <div class="mood-terminal">
-                                    <div class="mood-indicator">${moodEmojis[entry.mood]}</div>
-                                    <div class="mood-label">${moodLabels[entry.mood]}</div>
-                                </div>
-                            ` : ''}
-                        </div>
-
-                        ${entry && entry.text ? `
-                            <div class="terminal-section">
-                                <div class="section-label">Ana log</div>
-                                <div class="note-preview">${entry.text}</div>
-                                ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `
-                                    <div class="note-count">+ ${entry.atomicNotes.length} atomic not</div>
-                                ` : ''}
-                            </div>
-                        ` : '<div class="empty-state">Henüz kayıt yok</div>'}
-
-                        ${entry && entry.tags && entry.tags.length > 0 ? `
-                            <div class="tags-terminal">
-                                ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
-            html += '</div>';
-
-            document.getElementById('mainContent').innerHTML = html;
-            document.getElementById('mainContent').className = 'weekly-scroll-container';
-            attachDayClickListeners();
-        }
-
-        function renderCalendarView() {
-            const dates = getMonthDates(currentDate);
-            const today = formatDate(new Date());
-            const dayNames = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
-
-            let html = '<div class="calendar-container"><div class="calendar-header">';
-            dayNames.forEach(day => { html += `<div class="calendar-day-name">${day}</div>`; });
-            html += '</div><div class="calendar-view">';
-
-            dates.forEach(({ date, otherMonth }) => {
-                const dateStr = formatDate(date);
-                const entry = dataManager.getEntry(dateStr);
-                const isToday = dateStr === today;
-
-                html += `
-                    <div class="calendar-day ${otherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}" data-date="${dateStr}">
-                        <div class="cal-day-number">${date.getDate()}</div>
-                        ${entry && !otherMonth && entry.mood ? `<div style="font-size:1.3rem;margin-top:0.3rem;">${moodEmojis[entry.mood]}</div>` : ''}
-                    </div>
-                `;
-            });
-
-            html += '</div></div>';
-            document.getElementById('mainContent').innerHTML = html;
-            document.getElementById('mainContent').className = '';
-            attachDayClickListeners();
-        }
-
-        function renderListView() {
-            const entries = Object.entries(dataManager.entries)
-                .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-                .slice(0, 50);
-
-            if (entries.length === 0) {
-                document.getElementById('mainContent').innerHTML = `
-                    <div class="empty-state" style="padding:4rem; text-align:center;">Henüz kayıt yok</div>
-                `;
-                document.getElementById('mainContent').className = '';
-                return;
-            }
-
-            let html = '<div class="list-view">';
-            entries.forEach(([dateStr, entry]) => {
-                const date = new Date(dateStr);
-                html += `
-                    <div class="entry-card" data-date="${dateStr}">
-                        <div class="entry-header">
-                            <div class="entry-date">${date.getDate()} ${getTurkishMonthName(date.getMonth())} ${date.getFullYear()}</div>
-                            ${entry.mood ? `<div style="font-size:1.4rem;">${moodEmojis[entry.mood]}</div>` : ''}
-                        </div>
-                        <div class="entry-content">${entry.text}</div>
-                        ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `
-                            <div style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.5rem;">+ ${entry.atomicNotes.length} atomic not</div>
-                        ` : ''}
-                        ${entry.tags && entry.tags.length > 0 ? `
-                            <div class="tags-terminal">${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
-                        ` : ''}
-                    </div>
-                `;
-            });
-            html += '</div>';
-
-            document.getElementById('mainContent').innerHTML = html;
-            document.getElementById('mainContent').className = '';
-            attachDayClickListeners();
-        }
-
-        function renderStats() {
-            // Week entries
-            const weekDates = getWeekDates(currentDate).map(d => formatDate(d));
-            const weekEntries = weekDates.filter(d => dataManager.getEntry(d)).length;
-            document.getElementById('weekEntries').textContent = weekEntries;
-
-            // Active tasks = entries with atomic notes (incomplete)
-            // We treat entries that exist this week as "active"
-            // More meaningful: total atomic notes across all entries
-            const allEntries = Object.values(dataManager.entries);
-            const totalAtomicNotes = allEntries.reduce((sum, e) => sum + (e.atomicNotes ? e.atomicNotes.length : 0), 0);
-            document.getElementById('activeTaskCount').textContent = totalAtomicNotes > 0 ? totalAtomicNotes : '0';
-
-            // Completion rate: entries with mood logged vs total entries
-            const total = allEntries.length;
-            const withMood = allEntries.filter(e => e.mood).length;
-            const rate = total > 0 ? Math.round((withMood / total) * 100) : 0;
-            document.getElementById('completionRate').textContent = total > 0 ? `%${rate}` : '—';
-
-            // Top tag
-            const allTags = [];
-            allEntries.forEach(e => { if (e.tags) allTags.push(...e.tags); });
-            const tagCounts = {};
-            allTags.forEach(tag => { tagCounts[tag] = (tagCounts[tag] || 0) + 1; });
-            const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0];
-            document.getElementById('topTag').textContent = topTag ? topTag[0] : '—';
-        }
-
-        function updateDateDisplay() {
-            const display = document.getElementById('dateDisplay');
-            if (currentView === 'weekly') {
-                const dates = getWeekDates(currentDate);
-                const start = dates[0];
-                const end = dates[6];
-                display.textContent = `${start.getDate()}–${end.getDate()} ${getTurkishMonthName(end.getMonth())}`;
-            } else if (currentView === 'calendar') {
-                display.textContent = `${getTurkishMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
-            } else {
-                display.textContent = 'Tüm kayıtlar';
-            }
-        }
-
-        function render() {
-            if (currentView === 'weekly') renderWeeklyView();
-            else if (currentView === 'calendar') renderCalendarView();
-            else renderListView();
-            renderStats();
-            updateDateDisplay();
-        }
-
-        // ─── CLICK LISTENERS ───
-        function attachDayClickListeners() {
-            document.querySelectorAll('.day-card, .calendar-day, .entry-card').forEach(el => {
-                el.addEventListener('click', () => {
-                    const dateStr = el.dataset.date;
-                    openEntryModal(dateStr);
-                });
-            });
-        }
-
-        // ─── MODAL ───
-        function openEntryModal(dateStr) {
-            selectedDate = dateStr;
-            const entry = dataManager.getEntry(dateStr);
-            editingEntry = entry;
-
-            document.getElementById('entryModalTitle').textContent = entry ? 'Kaydı düzenle' : 'Yeni kayıt';
-            document.getElementById('entryDate').value = dateStr;
-            document.getElementById('entryText').value = entry ? entry.text : '';
-
-            document.querySelectorAll('.mood-option').forEach(m => m.classList.remove('selected'));
-            if (entry && entry.mood) {
-                const moodEl = document.querySelector(`.mood-option[data-mood="${entry.mood}"]`);
-                if (moodEl) moodEl.classList.add('selected');
-            }
-
-            currentTags = entry && entry.tags ? [...entry.tags] : [];
-            renderTagInput();
-
-            atomicNotes = entry && entry.atomicNotes ? [...entry.atomicNotes] : [];
-            renderAtomicNotes();
-
-            document.getElementById('atomicNoteInput').value = '';
-            document.getElementById('deleteEntry').classList.toggle('hidden', !entry);
-            document.getElementById('entryModal').classList.add('active');
-        }
-
-        function closeEntryModal() {
-            document.getElementById('entryModal').classList.remove('active');
-            selectedDate = null;
-            editingEntry = null;
-            currentTags = [];
-            atomicNotes = [];
-        }
-
-        // ─── TAG INPUT ───
-        function renderTagInput() {
-            const container = document.getElementById('tagContainer');
-            const input = document.getElementById('tagInput');
-
-            while (container.firstChild && container.firstChild !== input) {
-                container.removeChild(container.firstChild);
-            }
-
-            currentTags.forEach(tag => {
-                const tagEl = document.createElement('div');
-                tagEl.className = 'tag-item';
-                tagEl.innerHTML = `<span>${tag}</span><span class="tag-remove" data-tag="${tag}">×</span>`;
-                container.insertBefore(tagEl, input);
-            });
-
-            document.querySelectorAll('.tag-remove').forEach(el => {
-                el.addEventListener('click', () => {
-                    currentTags = currentTags.filter(t => t !== el.dataset.tag);
-                    renderTagInput();
-                });
-            });
-        }
-
-        // ─── ATOMIC NOTES ───
-        function renderAtomicNotes() {
-            const list = document.getElementById('atomicNotesList');
-
-            if (atomicNotes.length === 0) {
-                list.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);padding:0.5rem 0;">Henüz atomic not yok</div>';
-                return;
-            }
-
-            list.innerHTML = atomicNotes.map((note, index) => `
-                <div class="atomic-note">
-                    <span class="atomic-note-text">${note}</span>
-                    <button class="atomic-note-delete" data-index="${index}">✕</button>
+        <!-- Mood: 3 levels -->
+        <div class="form-group">
+            <label class="form-label">Ruh hali</label>
+            <div class="mood-selector">
+                <div class="mood-option" data-mood="good">
+                    <div class="mood-icon">🙂</div>
+                    <div class="mood-label-text">İyi</div>
                 </div>
-            `).join('');
+                <div class="mood-option" data-mood="neutral">
+                    <div class="mood-icon">😐</div>
+                    <div class="mood-label-text">Nötr</div>
+                </div>
+                <div class="mood-option" data-mood="bad">
+                    <div class="mood-icon">😔</div>
+                    <div class="mood-label-text">Kötü</div>
+                </div>
+            </div>
+        </div>
 
-            document.querySelectorAll('.atomic-note-delete').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    atomicNotes.splice(parseInt(btn.dataset.index), 1);
-                    renderAtomicNotes();
-                });
+        <div class="form-group">
+            <label class="form-label">Ana not</label>
+            <textarea id="entryText" placeholder="Bugün ne oldu?"></textarea>
+        </div>
+
+        <!-- Tasks -->
+        <div class="form-group">
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <label class="form-label" style="margin:0;">Görevler</label>
+                    <span id="taskProgress" style="font-size:0.65rem;color:var(--text2);"></span>
+                </div>
+                <div class="tasks-list" id="tasksList"></div>
+                <div class="task-add-row">
+                    <input type="text" id="taskInput" placeholder="Yeni görev...">
+                    <select class="priority-select" id="taskPriority">
+                        <option value="high">🔴 Yüksek</option>
+                        <option value="medium" selected>🟡 Orta</option>
+                        <option value="low">🟢 Düşük</option>
+                    </select>
+                    <button id="addTaskBtn">+ Ekle</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Atomic Notes -->
+        <div class="form-group">
+            <div class="atomic-notes-section">
+                <div class="section-header">
+                    <label class="form-label" style="margin:0;">Atomic notlar</label>
+                </div>
+                <div class="atomic-notes-list" id="atomicNotesList"></div>
+                <div class="inline-add-row">
+                    <input type="text" id="atomicNoteInput" placeholder="Yeni not ekle...">
+                    <button id="addAtomicNoteBtn">+ Ekle</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Etiketler</label>
+            <div class="tag-input-container" id="tagContainer">
+                <input type="text" id="tagInput" placeholder="Etiket yaz, Enter'a bas">
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button id="saveEntry" class="btn-primary">Kaydet</button>
+            <button id="deleteEntry" class="hidden btn-danger">Sil</button>
+        </div>
+    </div>
+</div>
+
+<button class="fab" id="fab"></button>
+
+<script>
+// ══════════════════════════════════════
+// DATA MANAGER
+// ══════════════════════════════════════
+class DataManager {
+    constructor() { this.entries = this.load(); }
+    load() { try { return JSON.parse(localStorage.getItem('mjv3') || '{}'); } catch(e){ return {}; } }
+    save() { localStorage.setItem('mjv3', JSON.stringify(this.entries)); }
+    add(date, entry) { this.entries[date] = entry; this.save(); }
+    get(date) { return this.entries[date] || null; }
+    del(date) { delete this.entries[date]; this.save(); }
+    export() {
+        const blob = new Blob([JSON.stringify({entries:this.entries,v:'3.0',date:new Date().toISOString()},null,2)],{type:'application/json'});
+        const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`mj-${fmtDate(new Date())}.json`});
+        a.click();
+    }
+    import(data) { if(data.entries) { this.entries=data.entries; this.save(); } }
+}
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const dm = new DataManager();
+let currentView = 'weekly';
+let currentDate  = new Date();
+let selectedDate = null;
+let currentTags  = [];
+let atomicNotes  = [];
+let tasks        = [];
+let searchQuery  = '';
+
+// ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+function fmtDate(d) { return d.toISOString().split('T')[0]; }
+
+function weekDates(d) {
+    const s = new Date(d);
+    s.setDate(s.getDate() - s.getDay() + 1);
+    return Array.from({length:7}, (_,i) => { const x=new Date(s); x.setDate(x.getDate()+i); return x; });
+}
+
+function monthDates(d) {
+    const y=d.getFullYear(), m=d.getMonth();
+    const first=new Date(y,m,1), last=new Date(y,m+1,0);
+    const dates=[];
+    const start = first.getDay()||7;
+    for(let i=start-1;i>0;i--){ const x=new Date(first); x.setDate(x.getDate()-i); dates.push({date:x,other:true}); }
+    for(let i=1;i<=last.getDate();i++) dates.push({date:new Date(y,m,i),other:false});
+    for(let i=1;dates.length<42;i++){ const x=new Date(last); x.setDate(x.getDate()+i); dates.push({date:x,other:true}); }
+    return dates;
+}
+
+const DAYS   = ['PAZ','PZT','SAL','ÇAR','PER','CUM','CMT'];
+const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+const MOOD_LABELS = { good:'İyi', neutral:'Nötr', bad:'Kötü' };
+const MOOD_CHART_H = { good:50, neutral:28, bad:10 };  // bar height px
+
+function moodBadgeHTML(mood) {
+    if (!mood) return '';
+    return `<div class="mood-badge"><span class="mood-badge-pill ${mood}">${MOOD_LABELS[mood]||mood}</span></div>`;
+}
+
+// ══════════════════════════════════════
+// STATS
+// ══════════════════════════════════════
+function calcStreak() {
+    let streak = 0;
+    const today = fmtDate(new Date());
+    let check = new Date();
+    while(true) {
+        const ds = fmtDate(check);
+        if (ds === today && !dm.get(ds)) { check.setDate(check.getDate()-1); continue; }
+        if (dm.get(ds)) { streak++; check.setDate(check.getDate()-1); }
+        else break;
+    }
+    return streak;
+}
+
+function renderStats() {
+    const allEntries = Object.values(dm.entries);
+    const wDates = weekDates(currentDate).map(fmtDate);
+    const weekCount = wDates.filter(d=>dm.get(d)).length;
+
+    // Active tasks: all incomplete tasks across all entries
+    let activeTasks=0, totalTasks=0, doneTasks=0;
+    allEntries.forEach(e => {
+        if(e.tasks) {
+            e.tasks.forEach(t => {
+                totalTasks++;
+                if(t.done) doneTasks++;
+                else activeTasks++;
             });
         }
+    });
 
-        function addAtomicNote() {
-            const input = document.getElementById('atomicNoteInput');
-            const val = input.value.trim();
-            if (val) {
-                atomicNotes.push(val);
-                input.value = '';
-                renderAtomicNotes();
-                input.focus();
-            }
+    const rate = totalTasks > 0 ? Math.round((doneTasks/totalTasks)*100)+'%' : '—';
+
+    // top tag
+    const allTags = [];
+    allEntries.forEach(e => { if(e.tags) allTags.push(...e.tags); });
+    const tc = {};
+    allTags.forEach(t=>tc[t]=(tc[t]||0)+1);
+    const top = Object.entries(tc).sort((a,b)=>b[1]-a[1])[0];
+
+    document.getElementById('streakCount').textContent    = calcStreak() + ' 🔥';
+    document.getElementById('activeTaskCount').textContent = activeTasks;
+    document.getElementById('completionRate').textContent  = rate;
+    document.getElementById('weekEntries').textContent     = weekCount;
+    document.getElementById('topTag').textContent          = top ? top[0] : '—';
+}
+
+// ══════════════════════════════════════
+// MOOD CHART
+// ══════════════════════════════════════
+function renderMoodChart() {
+    const days = 14;
+    let html = '';
+    for(let i=days-1; i>=0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate()-i);
+        const ds = fmtDate(d);
+        const entry = dm.get(ds);
+        const mood = entry ? entry.mood : null;
+        const h = mood ? MOOD_CHART_H[mood] : 4;
+        const label = d.getDate() + '/' + (d.getMonth()+1);
+        html += `
+            <div class="mood-bar-wrap" title="${label}${mood?' — '+MOOD_LABELS[mood]:''}">
+                <div class="mood-bar" data-mood="${mood||'none'}" style="height:${h}px;${!mood?'background:var(--border);':''}" ></div>
+                <div class="mood-bar-label">${d.getDate()}</div>
+            </div>`;
+    }
+    document.getElementById('moodChart').innerHTML = html;
+}
+
+// ══════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════
+function doSearch(q) {
+    q = q.toLowerCase().trim();
+    const panel = document.getElementById('searchPanel');
+    const clearBtn = document.getElementById('searchClear');
+
+    if (!q) {
+        panel.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        return;
+    }
+
+    clearBtn.classList.remove('hidden');
+    const results = Object.entries(dm.entries).filter(([date, entry]) => {
+        return (
+            (entry.text && entry.text.toLowerCase().includes(q)) ||
+            (entry.tags && entry.tags.some(t => t.toLowerCase().includes(q))) ||
+            (entry.atomicNotes && entry.atomicNotes.some(n => n.toLowerCase().includes(q))) ||
+            (entry.tasks && entry.tasks.some(t => t.text.toLowerCase().includes(q)))
+        );
+    }).sort((a,b) => new Date(b[0]) - new Date(a[0]));
+
+    if (results.length === 0) {
+        panel.innerHTML = `<div class="search-results-title">Arama sonuçları</div><div class="search-empty">Sonuç bulunamadı.</div>`;
+    } else {
+        let html = `<div class="search-results-title">${results.length} sonuç bulundu — "${q}"</div>`;
+        results.forEach(([ds, entry]) => {
+            const d = new Date(ds);
+            const tagsHTML = entry.tags && entry.tags.length
+                ? `<div class="search-result-tags">${entry.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : '';
+            html += `
+                <div class="search-result-item" data-date="${ds}">
+                    <div style="flex:1;">
+                        <div class="search-result-date">${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>
+                        <div class="search-result-text">${(entry.text||'').substring(0,120)}${entry.text&&entry.text.length>120?'…':''}</div>
+                        ${tagsHTML}
+                    </div>
+                    ${entry.mood ? `<div style="font-size:1.1rem;margin-left:0.5rem;">${{good:'🙂',neutral:'😐',bad:'😔'}[entry.mood]||''}</div>` : ''}
+                </div>`;
+        });
+        panel.innerHTML = html;
+        panel.querySelectorAll('.search-result-item').forEach(el => {
+            el.addEventListener('click', () => openModal(el.dataset.date));
+        });
+    }
+    panel.classList.remove('hidden');
+}
+
+// ══════════════════════════════════════
+// RENDER VIEWS
+// ══════════════════════════════════════
+function renderWeekly() {
+    const dates = weekDates(currentDate);
+    const today  = fmtDate(new Date());
+    let html = '<div class="weekly-view">';
+
+    dates.forEach(date => {
+        const ds = fmtDate(date);
+        const entry = dm.get(ds);
+        const isToday = ds === today;
+
+        // Task summary for card
+        let taskSummary = '';
+        if (entry && entry.tasks && entry.tasks.length > 0) {
+            const done = entry.tasks.filter(t=>t.done).length;
+            const total = entry.tasks.length;
+            taskSummary = `<div class="task-mini"><span>${done}/${total} görev tamamlandı</span></div>`;
         }
 
-        // ─── EVENT LISTENERS ───
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentView = btn.dataset.view;
-                render();
-            });
+        html += `
+            <div class="day-card ${isToday?'today':''}" data-date="${ds}">
+                <div class="terminal-header">
+                    <div>
+                        <div class="day-name">${DAYS[date.getDay()]}</div>
+                        <div class="day-number">${date.getDate()}</div>
+                        <div class="day-month">${MONTHS[date.getMonth()]}</div>
+                    </div>
+                    ${entry && entry.mood ? moodBadgeHTML(entry.mood) : ''}
+                </div>
+                ${entry && entry.text ? `
+                    <div class="terminal-section">
+                        <div class="section-label">Ana log</div>
+                        <div class="note-preview">${entry.text}</div>
+                        ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `<div class="note-count">+ ${entry.atomicNotes.length} atomic not</div>` : ''}
+                        ${taskSummary}
+                    </div>
+                ` : `<div class="empty-state">Henüz kayıt yok</div>`}
+                ${entry && entry.tags && entry.tags.length > 0 ? `
+                    <div class="tags-terminal">${entry.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                ` : ''}
+            </div>`;
+    });
+    html += '</div>';
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('mainContent').className = 'weekly-scroll-container';
+    attachClicks();
+}
+
+function renderCalendar() {
+    const dates = monthDates(currentDate);
+    const today  = fmtDate(new Date());
+    const DNAMES = ['PZT','SAL','ÇAR','PER','CUM','CMT','PAZ'];
+    const moodIcons = {good:'🙂',neutral:'😐',bad:'😔'};
+
+    let html = '<div class="calendar-container"><div class="calendar-header">';
+    DNAMES.forEach(n => html += `<div class="calendar-day-name">${n}</div>`);
+    html += '</div><div class="calendar-view">';
+
+    dates.forEach(({date,other}) => {
+        const ds = fmtDate(date);
+        const entry = dm.get(ds);
+        const isToday = ds === today;
+        html += `
+            <div class="calendar-day ${other?'other-month':''} ${isToday?'today':''}" data-date="${ds}">
+                <div class="cal-day-number">${date.getDate()}</div>
+                ${entry && !other && entry.mood ? `<div style="font-size:1.2rem;margin-top:0.25rem;">${moodIcons[entry.mood]||''}</div>` : ''}
+                ${entry && !other && entry.tasks ? `<div style="font-size:0.55rem;color:var(--text2);margin-top:0.2rem;">${entry.tasks.filter(t=>t.done).length}/${entry.tasks.length} görev</div>` : ''}
+            </div>`;
+    });
+
+    html += '</div></div>';
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('mainContent').className = '';
+    attachClicks();
+}
+
+function renderList() {
+    const entries = Object.entries(dm.entries)
+        .sort((a,b)=>new Date(b[0])-new Date(a[0]))
+        .slice(0,60);
+
+    if (!entries.length) {
+        document.getElementById('mainContent').innerHTML = `<div class="empty-state" style="padding:4rem;text-align:center;">Henüz kayıt yok</div>`;
+        document.getElementById('mainContent').className = '';
+        return;
+    }
+
+    const moodIcons = {good:'🙂',neutral:'😐',bad:'😔'};
+    let html = '<div class="list-view">';
+    entries.forEach(([ds, entry]) => {
+        const d = new Date(ds);
+        const activeTasks = entry.tasks ? entry.tasks.filter(t=>!t.done).length : 0;
+        html += `
+            <div class="entry-card" data-date="${ds}">
+                <div class="entry-header">
+                    <div class="entry-date">${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        ${activeTasks > 0 ? `<span style="font-size:0.65rem;color:var(--warn);">${activeTasks} açık görev</span>` : ''}
+                        ${entry.mood ? `<div style="font-size:1.3rem;">${moodIcons[entry.mood]||''}</div>` : ''}
+                    </div>
+                </div>
+                <div class="entry-content">${(entry.text||'').substring(0,200)}${entry.text&&entry.text.length>200?'…':''}</div>
+                ${entry.tags && entry.tags.length ? `<div class="tags-terminal">${entry.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+            </div>`;
+    });
+    html += '</div>';
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('mainContent').className = '';
+    attachClicks();
+}
+
+function updateDateDisplay() {
+    const el = document.getElementById('dateDisplay');
+    if (currentView === 'weekly') {
+        const dates = weekDates(currentDate);
+        el.textContent = `${dates[0].getDate()}–${dates[6].getDate()} ${MONTHS[dates[6].getMonth()]}`;
+    } else if (currentView === 'calendar') {
+        el.textContent = `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    } else {
+        el.textContent = 'Tüm kayıtlar';
+    }
+}
+
+function render() {
+    if (currentView === 'weekly') renderWeekly();
+    else if (currentView === 'calendar') renderCalendar();
+    else renderList();
+    renderStats();
+    renderMoodChart();
+    updateDateDisplay();
+}
+
+function attachClicks() {
+    document.querySelectorAll('.day-card, .calendar-day, .entry-card').forEach(el => {
+        el.addEventListener('click', () => openModal(el.dataset.date));
+    });
+}
+
+// ══════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════
+function openModal(ds) {
+    selectedDate = ds;
+    const entry = dm.get(ds);
+
+    document.getElementById('entryModalTitle').textContent = entry ? 'Kaydı düzenle' : 'Yeni kayıt';
+    document.getElementById('entryDate').value = ds;
+    document.getElementById('entryText').value = entry ? (entry.text||'') : '';
+
+    // Mood (3-level)
+    document.querySelectorAll('.mood-option').forEach(m => m.classList.remove('selected'));
+    if (entry && entry.mood) {
+        const el = document.querySelector(`.mood-option[data-mood="${entry.mood}"]`);
+        if (el) el.classList.add('selected');
+    }
+
+    // Tasks
+    tasks = entry && entry.tasks ? JSON.parse(JSON.stringify(entry.tasks)) : [];
+    renderTasksList();
+
+    // Atomic notes
+    atomicNotes = entry && entry.atomicNotes ? [...entry.atomicNotes] : [];
+    renderAtomicNotes();
+
+    // Tags
+    currentTags = entry && entry.tags ? [...entry.tags] : [];
+    renderTagInput();
+
+    document.getElementById('atomicNoteInput').value = '';
+    document.getElementById('taskInput').value = '';
+    document.getElementById('deleteEntry').classList.toggle('hidden', !entry);
+    document.getElementById('entryModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('entryModal').classList.remove('active');
+    selectedDate = null;
+    currentTags = []; atomicNotes = []; tasks = [];
+}
+
+// ─── TASKS ───
+function renderTasksList() {
+    const list = document.getElementById('tasksList');
+    const prog = document.getElementById('taskProgress');
+
+    if (!tasks.length) {
+        list.innerHTML = '<div style="font-size:0.75rem;color:var(--text3);padding:0.3rem 0;">Henüz görev yok</div>';
+        prog.textContent = '';
+        return;
+    }
+
+    const done = tasks.filter(t=>t.done).length;
+    prog.textContent = `${done}/${tasks.length} tamamlandı`;
+
+    list.innerHTML = tasks.map((t,i) => `
+        <div class="task-item ${t.done?'done':''}" data-index="${i}">
+            <div class="task-checkbox ${t.done?'checked':''}" data-index="${i}">${t.done?'✓':''}</div>
+            <div class="task-priority-dot ${t.priority||'medium'}"></div>
+            <div class="task-text">${t.text}</div>
+            <button class="task-del-btn" data-index="${i}">✕</button>
+        </div>
+    `).join('');
+
+    list.querySelectorAll('.task-checkbox').forEach(el => {
+        el.addEventListener('click', e => {
+            e.stopPropagation();
+            const i = parseInt(el.dataset.index);
+            tasks[i].done = !tasks[i].done;
+            renderTasksList();
         });
-
-        document.getElementById('prevPeriod').addEventListener('click', () => {
-            if (currentView === 'weekly') currentDate.setDate(currentDate.getDate() - 7);
-            else if (currentView === 'calendar') currentDate.setMonth(currentDate.getMonth() - 1);
-            render();
+    });
+    list.querySelectorAll('.task-del-btn').forEach(el => {
+        el.addEventListener('click', e => {
+            e.stopPropagation();
+            tasks.splice(parseInt(el.dataset.index), 1);
+            renderTasksList();
         });
+    });
+}
 
-        document.getElementById('nextPeriod').addEventListener('click', () => {
-            if (currentView === 'weekly') currentDate.setDate(currentDate.getDate() + 7);
-            else if (currentView === 'calendar') currentDate.setMonth(currentDate.getMonth() + 1);
-            render();
+function addTask() {
+    const input = document.getElementById('taskInput');
+    const priority = document.getElementById('taskPriority').value;
+    const val = input.value.trim();
+    if (!val) return;
+    tasks.push({ text: val, priority, done: false });
+    input.value = '';
+    renderTasksList();
+    input.focus();
+}
+
+// ─── ATOMIC NOTES ───
+function renderAtomicNotes() {
+    const list = document.getElementById('atomicNotesList');
+    if (!atomicNotes.length) {
+        list.innerHTML = '<div style="font-size:0.75rem;color:var(--text3);padding:0.3rem 0;">Henüz atomic not yok</div>';
+        return;
+    }
+    list.innerHTML = atomicNotes.map((n,i) => `
+        <div class="atomic-note">
+            <span class="atomic-note-text">${n}</span>
+            <button class="atom-del-btn" data-index="${i}">✕</button>
+        </div>`).join('');
+    list.querySelectorAll('.atom-del-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            atomicNotes.splice(parseInt(btn.dataset.index),1);
+            renderAtomicNotes();
         });
+    });
+}
 
-        document.getElementById('today').addEventListener('click', () => {
-            currentDate = new Date();
-            render();
+function addAtomicNote() {
+    const input = document.getElementById('atomicNoteInput');
+    const val = input.value.trim();
+    if (!val) return;
+    atomicNotes.push(val);
+    input.value = '';
+    renderAtomicNotes();
+    input.focus();
+}
+
+// ─── TAGS ───
+function renderTagInput() {
+    const container = document.getElementById('tagContainer');
+    const input = document.getElementById('tagInput');
+    while (container.firstChild && container.firstChild !== input) container.removeChild(container.firstChild);
+    currentTags.forEach(tag => {
+        const el = document.createElement('div');
+        el.className = 'tag-item';
+        el.innerHTML = `<span>${tag}</span><span class="tag-remove" data-tag="${tag}">×</span>`;
+        container.insertBefore(el, input);
+    });
+    container.querySelectorAll('.tag-remove').forEach(el => {
+        el.addEventListener('click', () => {
+            currentTags = currentTags.filter(t => t !== el.dataset.tag);
+            renderTagInput();
         });
+    });
+}
 
-        document.getElementById('closeEntryModal').addEventListener('click', closeEntryModal);
-        document.getElementById('entryModal').addEventListener('click', (e) => {
-            if (e.target.id === 'entryModal') closeEntryModal();
-        });
+// ══════════════════════════════════════
+// EVENT LISTENERS
+// ══════════════════════════════════════
 
-        document.querySelectorAll('.mood-option').forEach(option => {
-            option.addEventListener('click', () => {
-                document.querySelectorAll('.mood-option').forEach(m => m.classList.remove('selected'));
-                option.classList.add('selected');
-            });
-        });
+// Theme toggle
+const themeBtn = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('mjTheme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-        document.getElementById('tagInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.target.value.trim()) {
-                e.preventDefault();
-                const tag = e.target.value.trim().toUpperCase();
-                if (!currentTags.includes(tag)) {
-                    currentTags.push(tag);
-                    renderTagInput();
-                }
-                e.target.value = '';
-            }
-        });
+themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('mjTheme', next);
+    themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+});
 
-        document.getElementById('addAtomicNoteBtn').addEventListener('click', addAtomicNote);
-
-        document.getElementById('atomicNoteInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addAtomicNote();
-            }
-        });
-
-        document.getElementById('saveEntry').addEventListener('click', () => {
-            const dateStr = document.getElementById('entryDate').value;
-            const text = document.getElementById('entryText').value.trim();
-
-            if (!text) {
-                document.getElementById('entryText').focus();
-                document.getElementById('entryText').style.borderColor = 'var(--danger)';
-                setTimeout(() => document.getElementById('entryText').style.borderColor = '', 1500);
-                return;
-            }
-
-            const selectedMood = document.querySelector('.mood-option.selected');
-            dataManager.addEntry(dateStr, {
-                text,
-                mood: selectedMood ? selectedMood.dataset.mood : null,
-                tags: currentTags,
-                atomicNotes: atomicNotes,
-                updatedAt: new Date().toISOString()
-            });
-
-            closeEntryModal();
-            render();
-        });
-
-        document.getElementById('deleteEntry').addEventListener('click', () => {
-            if (confirm('Bu kaydı silmek istediğine emin misin?')) {
-                dataManager.deleteEntry(selectedDate);
-                closeEntryModal();
-                render();
-            }
-        });
-
-        document.getElementById('fab').addEventListener('click', () => {
-            openEntryModal(formatDate(new Date()));
-        });
-
-        document.getElementById('exportData').addEventListener('click', () => {
-            dataManager.exportData();
-        });
-
-        document.getElementById('importData').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
-        });
-
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (confirm('Mevcut veriler silinecek. Devam edilsin mi?')) {
-                            dataManager.importData(data);
-                            render();
-                        }
-                    } catch (err) {
-                        alert('Geçersiz dosya.');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        // ─── INIT ───
+// View switch
+document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        currentView = btn.dataset.view;
         render();
-    </script>
+    });
+});
+
+// Navigation
+document.getElementById('prevPeriod').addEventListener('click', () => {
+    if (currentView==='weekly') currentDate.setDate(currentDate.getDate()-7);
+    else if (currentView==='calendar') currentDate.setMonth(currentDate.getMonth()-1);
+    render();
+});
+document.getElementById('nextPeriod').addEventListener('click', () => {
+    if (currentView==='weekly') currentDate.setDate(currentDate.getDate()+7);
+    else if (currentView==='calendar') currentDate.setMonth(currentDate.getMonth()+1);
+    render();
+});
+document.getElementById('today').addEventListener('click', () => { currentDate=new Date(); render(); });
+
+// Modal
+document.getElementById('closeEntryModal').addEventListener('click', closeModal);
+document.getElementById('entryModal').addEventListener('click', e => { if(e.target.id==='entryModal') closeModal(); });
+
+// Mood
+document.querySelectorAll('.mood-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+        document.querySelectorAll('.mood-option').forEach(m=>m.classList.remove('selected'));
+        opt.classList.add('selected');
+    });
+});
+
+// Tasks
+document.getElementById('addTaskBtn').addEventListener('click', addTask);
+document.getElementById('taskInput').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addTask();} });
+
+// Atomic notes
+document.getElementById('addAtomicNoteBtn').addEventListener('click', addAtomicNote);
+document.getElementById('atomicNoteInput').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();addAtomicNote();} });
+
+// Tags
+document.getElementById('tagInput').addEventListener('keydown', e => {
+    if (e.key==='Enter' && e.target.value.trim()) {
+        e.preventDefault();
+        const tag = e.target.value.trim().toUpperCase();
+        if (!currentTags.includes(tag)) { currentTags.push(tag); renderTagInput(); }
+        e.target.value = '';
+    }
+});
+
+// Save
+document.getElementById('saveEntry').addEventListener('click', () => {
+    const ds   = document.getElementById('entryDate').value;
+    const text = document.getElementById('entryText').value.trim();
+    if (!text) {
+        const ta = document.getElementById('entryText');
+        ta.style.borderColor = 'var(--danger)';
+        ta.focus();
+        setTimeout(()=>ta.style.borderColor='',1600);
+        return;
+    }
+    const moodEl = document.querySelector('.mood-option.selected');
+    dm.add(ds, {
+        text, tasks, atomicNotes,
+        mood: moodEl ? moodEl.dataset.mood : null,
+        tags: currentTags,
+        updatedAt: new Date().toISOString()
+    });
+    closeModal();
+    render();
+});
+
+// Delete
+document.getElementById('deleteEntry').addEventListener('click', () => {
+    if (confirm('Bu kaydı silmek istediğine emin misin?')) {
+        dm.del(selectedDate);
+        closeModal();
+        render();
+    }
+});
+
+// FAB
+document.getElementById('fab').addEventListener('click', () => openModal(fmtDate(new Date())));
+
+// Export/Import
+document.getElementById('exportData').addEventListener('click', () => dm.export());
+document.getElementById('importData').addEventListener('click', () => document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const data = JSON.parse(ev.target.result);
+            if (confirm('Mevcut veriler silinecek. Devam edilsin mi?')) {
+                dm.import(data);
+                render();
+            }
+        } catch { alert('Geçersiz dosya.'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+});
+
+// Search
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => doSearch(e.target.value), 280);
+});
+document.getElementById('searchClear').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    doSearch('');
+});
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+render();
+</script>
 </body>
 </html>
