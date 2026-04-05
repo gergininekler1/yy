@@ -7,306 +7,260 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --matrix-bg: #0d0208;
-            --matrix-dark: #000000;
-            --matrix-green: #00ff41;
-            --matrix-green-dim: #008f11;
-            --matrix-green-glow: rgba(0, 255, 65, 0.3);
-            --matrix-green-bright: #39ff14;
-            --terminal-border: #00ff41;
-            --text-primary: #00ff41;
-            --text-secondary: #008f11;
-            --text-dim: #003b00;
-            --scanline: rgba(0, 255, 65, 0.05);
-            
-            --priority-high: #ff0000;
-            --priority-medium: #ffff00;
-            --priority-low: #00ff41;
+            --bg: #0e0e10;
+            --surface: #141417;
+            --surface2: #1a1a1f;
+            --border: #2a2a32;
+            --border-accent: #3a3a46;
+            --accent: #00e676;
+            --accent-dim: rgba(0, 230, 118, 0.12);
+            --accent-glow: rgba(0, 230, 118, 0.2);
+            --text-primary: #e8e8ec;
+            --text-secondary: #7a7a8a;
+            --text-muted: #3a3a46;
+            --danger: #ff4d6d;
+            --danger-dim: rgba(255, 77, 109, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100vh); }
-        }
-
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         @keyframes blink {
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0; }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         body {
             font-family: 'Share Tech Mono', monospace;
-            background: var(--matrix-bg);
+            background: var(--bg);
             color: var(--text-primary);
             overflow-x: hidden;
-            position: relative;
             min-height: 100vh;
-        }
-
-        /* Matrix effect background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--matrix-green), transparent);
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-            z-index: 9999;
-        }
-
-        /* Noise texture */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, rgba(0, 255, 65, 0.03) 0px, transparent 1px, transparent 2px, rgba(0, 255, 65, 0.03) 3px);
-            pointer-events: none;
-            z-index: 9998;
         }
 
         .container {
             max-width: 100%;
             padding: 1rem;
-            animation: fadeIn 1s ease;
+            animation: fadeUp 0.5s ease;
         }
 
-        /* Header */
+        /* ─── HEADER ─── */
         header {
-            border: 2px solid var(--terminal-border);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            box-shadow: 0 0 20px var(--matrix-green-glow);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
-        header::before {
-            content: '>';
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            font-size: 0.8rem;
-            animation: blink 1s infinite;
+        .header-top {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
 
         h1 {
             font-family: 'Orbitron', monospace;
-            font-size: 2rem;
+            font-size: 1.4rem;
             font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            text-shadow: 0 0 10px var(--matrix-green-glow);
-            margin-bottom: 0.5rem;
+            letter-spacing: 0.15em;
+            color: var(--text-primary);
         }
 
-        /* Compact Stats Bar */
+        h1 span {
+            color: var(--accent);
+        }
+
+        /* Stats bar */
         .stats-bar {
             display: flex;
             gap: 1.5rem;
-            font-size: 0.75rem;
             flex-wrap: wrap;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--text-dim);
+            padding: 0.75rem 1rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            margin-bottom: 1rem;
         }
 
         .stat-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.72rem;
         }
 
         .stat-label {
             color: var(--text-secondary);
             text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         .stat-value {
-            color: var(--text-primary);
+            color: var(--accent);
             font-weight: bold;
-            text-shadow: 0 0 5px var(--matrix-green-glow);
         }
 
-        /* Header Controls */
+        .stat-value.neutral {
+            color: var(--text-primary);
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 14px;
+            background: var(--border);
+        }
+
+        /* ─── CONTROLS ─── */
         .header-controls {
             display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
             align-items: center;
         }
 
-        /* Buttons */
-        button, select {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            padding: 0.6rem 1.2rem;
-            border: 2px solid var(--terminal-border);
-            background: var(--matrix-dark);
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            position: relative;
+        .control-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        button:hover, select:hover {
-            background: var(--matrix-green-dim);
-            box-shadow: 0 0 15px var(--matrix-green-glow);
-            transform: translateY(-2px);
+        button, select {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-accent);
+            background: var(--surface2);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-dim);
         }
 
         button.active {
-            background: var(--text-primary);
-            color: var(--matrix-dark);
-            box-shadow: 0 0 20px var(--matrix-green-glow);
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
-        /* View Switcher */
         .view-switcher {
             display: flex;
             gap: 0;
-            border: 2px solid var(--terminal-border);
+            border: 1px solid var(--border-accent);
+            border-radius: 3px;
+            overflow: hidden;
         }
 
         .view-switcher button {
             border: none;
-            border-right: 1px solid var(--terminal-border);
+            border-right: 1px solid var(--border-accent);
+            border-radius: 0;
+            padding: 0.5rem 1.1rem;
         }
 
-        .view-switcher button:last-child {
-            border-right: none;
-        }
+        .view-switcher button:last-child { border-right: none; }
 
-        /* Navigation */
         .date-navigation {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
         }
 
         .date-display {
             font-family: 'Orbitron', monospace;
-            font-size: 1rem;
-            min-width: 200px;
+            font-size: 0.8rem;
+            min-width: 160px;
             text-align: center;
-            text-transform: uppercase;
+            color: var(--text-primary);
             font-weight: 700;
-            text-shadow: 0 0 10px var(--matrix-green-glow);
+            letter-spacing: 0.05em;
         }
 
-        /* Main Content - Horizontal Scroll Weekly View */
+        .nav-btn {
+            padding: 0.5rem 0.8rem;
+        }
+
+        .data-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        /* ─── WEEKLY SCROLL ─── */
         .weekly-scroll-container {
             overflow-x: auto;
             overflow-y: hidden;
-            padding: 1rem 0;
-            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            margin-bottom: 5rem;
             -webkit-overflow-scrolling: touch;
         }
 
-        .weekly-scroll-container::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .weekly-scroll-container::-webkit-scrollbar-track {
-            background: var(--matrix-dark);
-            border: 1px solid var(--text-dim);
-        }
-
-        .weekly-scroll-container::-webkit-scrollbar-thumb {
-            background: var(--text-primary);
-            box-shadow: 0 0 5px var(--matrix-green-glow);
-        }
+        .weekly-scroll-container::-webkit-scrollbar { height: 4px; }
+        .weekly-scroll-container::-webkit-scrollbar-track { background: var(--surface); }
+        .weekly-scroll-container::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 2px; }
 
         .weekly-view {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             min-width: max-content;
-            padding: 0.5rem;
+            padding: 0.25rem 0;
         }
 
+        /* ─── DAY CARD ─── */
         .day-card {
-            width: 280px;
-            min-height: 500px;
-            border: 2px solid var(--terminal-border);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 1.5rem;
+            width: 260px;
+            min-height: 460px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            padding: 1.25rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
             position: relative;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-        }
-
-        .day-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                var(--scanline) 2px,
-                var(--scanline) 4px
-            );
-            pointer-events: none;
+            border-radius: 4px;
         }
 
         .day-card:hover {
-            border-color: var(--matrix-green-bright);
-            box-shadow: 0 0 30px var(--matrix-green-glow);
-            transform: translateY(-5px);
+            border-color: var(--border-accent);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
         }
 
         .day-card.today {
-            border-color: var(--matrix-green-bright);
-            background: rgba(0, 255, 65, 0.05);
-            box-shadow: 0 0 20px var(--matrix-green-glow);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-dim);
         }
 
         .day-card.today::after {
-            content: '[ACTIVE]';
+            content: '●';
             position: absolute;
             top: 10px;
-            right: 10px;
-            font-size: 0.65rem;
-            color: var(--matrix-green-bright);
+            right: 12px;
+            font-size: 0.5rem;
+            color: var(--accent);
             animation: blink 1.5s infinite;
         }
 
@@ -315,76 +269,63 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--text-dim);
-        }
-
-        .day-info {
-            flex: 1;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .day-name {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.2rem;
         }
 
         .day-number {
             font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 900;
             line-height: 1;
-            text-shadow: 0 0 10px var(--matrix-green-glow);
+            color: var(--text-primary);
         }
+
+        .day-card.today .day-number { color: var(--accent); }
 
         .day-month {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        .mood-terminal {
-            text-align: right;
-        }
-
-        .mood-indicator {
-            font-size: 2rem;
-            line-height: 1;
-            margin-bottom: 0.25rem;
-        }
-
-        .mood-label {
             font-size: 0.65rem;
             color: var(--text-secondary);
             text-transform: uppercase;
+            margin-top: 0.2rem;
         }
 
+        .mood-terminal { text-align: right; }
+        .mood-indicator { font-size: 1.75rem; line-height: 1; margin-bottom: 0.2rem; }
+        .mood-label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+
         .terminal-section {
-            margin-top: 1rem;
+            margin-top: 0.75rem;
             padding: 0.75rem;
-            border: 1px solid var(--text-dim);
-            background: rgba(0, 255, 65, 0.02);
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            border-radius: 3px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
         .section-label {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             margin-bottom: 0.5rem;
             letter-spacing: 0.1em;
         }
 
-        .section-label::before {
-            content: '> ';
-        }
+        .section-label::before { content: '/ '; color: var(--accent); }
 
         .note-preview {
-            font-size: 0.85rem;
-            line-height: 1.5;
+            font-size: 0.82rem;
+            line-height: 1.55;
             color: var(--text-primary);
             overflow: hidden;
             display: -webkit-box;
@@ -394,168 +335,151 @@
         }
 
         .note-count {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
             margin-top: 0.5rem;
             padding-top: 0.5rem;
-            border-top: 1px solid var(--text-dim);
+            border-top: 1px solid var(--border);
         }
 
         .tags-terminal {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
-            margin-top: 1rem;
+            margin-top: 0.75rem;
         }
 
         .tag {
-            font-size: 0.7rem;
-            padding: 0.25rem 0.75rem;
-            border: 1px solid var(--terminal-border);
-            background: rgba(0, 255, 65, 0.1);
-            color: var(--text-primary);
+            font-size: 0.65rem;
+            padding: 0.2rem 0.6rem;
+            border: 1px solid var(--border-accent);
+            background: var(--surface2);
+            color: var(--text-secondary);
             text-transform: uppercase;
+            border-radius: 2px;
         }
 
         .empty-state {
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.8rem;
             text-align: center;
             padding: 2rem 0;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .empty-state::before {
-            content: '[NO DATA]';
-            display: block;
-            font-size: 0.7rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        /* Calendar View */
+        /* ─── CALENDAR ─── */
         .calendar-container {
-            border: 2px solid var(--terminal-border);
-            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--border);
+            background: var(--surface);
             padding: 1rem;
-        }
-
-        .calendar-view {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: var(--text-dim);
+            border-radius: 4px;
+            margin-bottom: 5rem;
         }
 
         .calendar-header {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
-            background: var(--text-dim);
+            background: var(--border);
             margin-bottom: 1px;
         }
 
+        .calendar-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border);
+        }
+
         .calendar-day-name {
-            background: var(--matrix-dark);
+            background: var(--surface2);
             padding: 0.5rem;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            border: 1px solid var(--text-dim);
         }
 
         .calendar-day {
-            background: var(--matrix-dark);
-            padding: 0.75rem;
-            min-height: 100px;
+            background: var(--surface);
+            padding: 0.6rem;
+            min-height: 80px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid var(--text-dim);
+            transition: background 0.15s ease;
             position: relative;
         }
 
-        .calendar-day:hover {
-            background: rgba(0, 255, 65, 0.05);
-            border-color: var(--terminal-border);
-        }
+        .calendar-day:hover { background: var(--surface2); }
 
         .calendar-day.today {
-            background: rgba(0, 255, 65, 0.1);
-            border: 2px solid var(--matrix-green-bright);
+            background: var(--accent-dim);
+            outline: 1px solid var(--accent);
         }
 
-        .calendar-day.other-month {
-            opacity: 0.3;
-        }
+        .calendar-day.other-month { opacity: 0.3; }
 
         .cal-day-number {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: bold;
-            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
         }
 
-        /* List View */
+        .calendar-day.today .cal-day-number { color: var(--accent); }
+
+        /* ─── LIST VIEW ─── */
         .list-view {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
+            margin-bottom: 5rem;
         }
 
         .entry-card {
-            border: 2px solid var(--terminal-border);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 1.5rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+            transition: border-color 0.2s ease;
+            border-radius: 4px;
         }
 
-        .entry-card::before {
-            content: '>';
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            font-size: 0.8rem;
-        }
-
-        .entry-card:hover {
-            border-color: var(--matrix-green-bright);
-            box-shadow: 0 0 20px var(--matrix-green-glow);
-        }
+        .entry-card:hover { border-color: var(--border-accent); }
 
         .entry-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--text-dim);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .entry-date {
             font-family: 'Orbitron', monospace;
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
+            color: var(--text-primary);
         }
 
         .entry-content {
             color: var(--text-primary);
             line-height: 1.6;
-            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            margin-bottom: 0.75rem;
         }
 
-        /* Modal */
+        /* ─── MODAL ─── */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
             overflow-y: auto;
         }
 
@@ -563,120 +487,135 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeUp 0.25s ease;
         }
 
         .modal-content {
-            background: var(--matrix-bg);
-            border: 3px solid var(--terminal-border);
+            background: var(--surface);
+            border: 1px solid var(--border-accent);
             padding: 2rem;
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
+            max-width: 680px;
+            width: 94%;
+            max-height: 92vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 0 40px var(--matrix-green-glow);
-            animation: slideIn 0.4s ease;
-        }
-
-        .modal-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                var(--scanline) 2px,
-                var(--scanline) 4px
-            );
-            pointer-events: none;
+            border-radius: 6px;
+            animation: slideDown 0.3s ease;
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem;
             padding-bottom: 1rem;
-            border-bottom: 2px solid var(--terminal-border);
+            border-bottom: 1px solid var(--border);
         }
 
         .modal-title {
             font-family: 'Orbitron', monospace;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            text-shadow: 0 0 10px var(--matrix-green-glow);
+            color: var(--text-primary);
         }
 
         .close-btn {
             background: none;
-            border: 2px solid var(--terminal-border);
-            font-size: 1.5rem;
+            border: 1px solid var(--border-accent);
+            font-size: 1.2rem;
             cursor: pointer;
-            padding: 0.25rem 0.75rem;
+            padding: 0.25rem 0.7rem;
             line-height: 1;
-            color: var(--text-primary);
+            color: var(--text-secondary);
+            border-radius: 3px;
         }
 
         .close-btn:hover {
-            background: var(--priority-high);
-            border-color: var(--priority-high);
-            color: white;
+            background: var(--danger-dim);
+            border-color: var(--danger);
+            color: var(--danger);
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
 
         .form-label {
-            font-family: 'Orbitron', monospace;
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
             display: block;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.6rem;
             color: var(--text-secondary);
         }
 
-        .form-label::before {
-            content: '> ';
-        }
+        .form-label::before { content: '/ '; color: var(--accent); }
 
         textarea, input[type="text"], input[type="date"] {
             width: 100%;
             padding: 0.75rem;
-            border: 2px solid var(--terminal-border);
-            background: var(--matrix-dark);
+            border: 1px solid var(--border-accent);
+            background: var(--surface2);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-primary);
             resize: vertical;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s ease;
+            border-radius: 3px;
         }
 
         textarea:focus, input[type="text"]:focus, input[type="date"]:focus {
             outline: none;
-            border-color: var(--matrix-green-bright);
-            box-shadow: 0 0 15px var(--matrix-green-glow);
+            border-color: var(--accent);
         }
 
-        textarea {
-            min-height: 150px;
-            line-height: 1.6;
+        textarea { min-height: 140px; line-height: 1.6; }
+
+        /* ─── MOOD SELECTOR ─── */
+        .mood-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        /* Atomic Notes Section */
+        .mood-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            transition: all 0.2s ease;
+            border-radius: 3px;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .mood-option:hover { border-color: var(--border-accent); }
+
+        .mood-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .mood-emoji { font-size: 1.6rem; }
+
+        .mood-name {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ─── ATOMIC NOTES ─── */
         .atomic-notes-section {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border: 2px solid var(--text-dim);
-            background: rgba(0, 255, 65, 0.02);
+            margin-top: 0;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            border-radius: 3px;
         }
 
         .atomic-notes-header {
@@ -685,189 +624,148 @@
             align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--text-dim);
+            border-bottom: 1px solid var(--border);
         }
 
         .atomic-notes-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .atomic-note {
             display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border: 1px solid var(--text-dim);
-            background: rgba(0, 0, 0, 0.5);
-            position: relative;
-            animation: slideIn 0.3s ease;
-        }
-
-        .atomic-note::before {
-            content: '→';
-            position: absolute;
-            left: 0.5rem;
-            top: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .atomic-note-content {
-            flex: 1;
-            padding-left: 1rem;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 3px;
+            animation: slideDown 0.2s ease;
         }
 
         .atomic-note-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1.5;
             color: var(--text-primary);
+            flex: 1;
         }
 
         .atomic-note-delete {
             background: none;
-            border: 1px solid var(--priority-high);
-            color: var(--priority-high);
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
+            border: 1px solid var(--border-accent);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 2px;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
         }
 
         .atomic-note-delete:hover {
-            background: var(--priority-high);
-            color: white;
+            background: var(--danger-dim);
+            border-color: var(--danger);
+            color: var(--danger);
         }
 
-        .add-atomic-note-btn {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px dashed var(--text-dim);
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .add-atomic-note-btn:hover {
-            border-color: var(--terminal-border);
-            background: rgba(0, 255, 65, 0.05);
-            color: var(--text-primary);
-        }
-
-        /* Mood Selector */
-        .mood-selector {
+        /* Inline add area */
+        .atomic-add-row {
             display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            padding: 1rem;
-            border: 1px solid var(--text-dim);
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .mood-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             gap: 0.5rem;
-            cursor: pointer;
-            padding: 1rem;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
+            margin-top: 0.5rem;
         }
 
-        .mood-option:hover {
-            border-color: var(--text-dim);
-            background: rgba(0, 255, 65, 0.05);
+        .atomic-add-row input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            margin: 0;
+            font-size: 0.82rem;
         }
 
-        .mood-option.selected {
-            border-color: var(--terminal-border);
-            background: rgba(0, 255, 65, 0.1);
-            box-shadow: 0 0 15px var(--matrix-green-glow);
+        .atomic-add-row button {
+            padding: 0.5rem 0.85rem;
+            flex-shrink: 0;
         }
 
-        .mood-emoji {
-            font-size: 2rem;
-        }
-
-        .mood-name {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        /* Tag Input */
+        /* ─── TAGS ─── */
         .tag-input-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            border: 2px solid var(--terminal-border);
-            background: var(--matrix-dark);
-            min-height: 60px;
+            gap: 0.4rem;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border-accent);
+            background: var(--surface2);
+            min-height: 50px;
+            border-radius: 3px;
+            align-items: center;
+        }
+
+        .tag-input-container:focus-within {
+            border-color: var(--accent);
         }
 
         .tag-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px solid var(--terminal-border);
-            font-size: 0.75rem;
+            gap: 0.4rem;
+            padding: 0.2rem 0.6rem;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent);
+            font-size: 0.7rem;
             text-transform: uppercase;
+            border-radius: 2px;
+            color: var(--accent);
         }
 
         .tag-remove {
             cursor: pointer;
-            color: var(--priority-high);
+            color: var(--accent);
             font-weight: bold;
-            margin-left: 0.25rem;
+            opacity: 0.7;
         }
 
-        .tag-remove:hover {
-            color: white;
-        }
+        .tag-remove:hover { opacity: 1; }
 
         #tagInput {
             border: none;
             background: transparent;
-            padding: 0.5rem;
+            padding: 0.3rem;
             flex: 1;
-            min-width: 100px;
+            min-width: 90px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-primary);
         }
 
-        #tagInput:focus {
-            outline: none;
-        }
+        #tagInput:focus { outline: none; }
 
-        /* FAB */
+        /* ─── FAB ─── */
         .fab {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 70px;
-            height: 70px;
-            border: 3px solid var(--terminal-border);
-            background: var(--matrix-dark);
-            color: var(--text-primary);
-            font-size: 2rem;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 56px;
+            height: 56px;
+            border: 1px solid var(--accent);
+            background: var(--accent-dim);
+            color: var(--accent);
+            font-size: 1.6rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             z-index: 100;
-            box-shadow: 0 0 30px var(--matrix-green-glow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .fab:hover {
-            background: var(--text-primary);
-            color: var(--matrix-dark);
-            box-shadow: 0 0 50px var(--matrix-green-glow);
-            transform: scale(1.1) rotate(90deg);
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transform: scale(1.08);
         }
 
         .fab::before {
@@ -876,164 +774,192 @@
             line-height: 1;
         }
 
-        /* Utility */
-        .hidden {
-            display: none !important;
-        }
-
-        .flex-between {
+        /* ─── MODAL FOOTER ─── */
+        .modal-footer {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.75rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5rem;
-            }
+        .btn-primary {
+            flex: 1;
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
-            .day-card {
-                width: 250px;
-                min-height: 450px;
-            }
+        .btn-primary:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-danger {
+            background: var(--danger-dim);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ─── UTILITY ─── */
+        .hidden { display: none !important; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 640px) {
+            h1 { font-size: 1.1rem; }
 
             .header-controls {
                 flex-direction: column;
-                width: 100%;
+                align-items: stretch;
             }
 
-            .view-switcher, .date-navigation {
-                width: 100%;
+            .control-row {
+                justify-content: space-between;
             }
 
-            .stats-bar {
+            .date-navigation {
+                flex: 1;
+            }
+
+            .date-display {
+                min-width: 120px;
                 font-size: 0.7rem;
             }
 
-            .modal-content {
-                width: 95%;
-                padding: 1.5rem;
+            .data-controls {
+                margin-left: 0;
             }
 
-            .fab {
-                width: 60px;
-                height: 60px;
-                bottom: 1rem;
-                right: 1rem;
-            }
+            .day-card { width: 230px; min-height: 420px; }
+
+            .modal-content { width: 96%; padding: 1.25rem; }
+
+            .stats-bar { gap: 1rem; }
+
+            .stat-divider { display: none; }
+
+            .mood-option { padding: 0.5rem 0.6rem; }
+
+            .mood-name { display: none; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>MATRIX.JOURNAL v2.0</h1>
-            
-            <!-- Compact Stats -->
+            <div class="header-top">
+                <h1>MATRIX<span>.</span>JOURNAL <span style="font-size:0.75em; opacity:0.6;">v2.0</span></h1>
+            </div>
+
+            <!-- Stats Bar -->
             <div class="stats-bar">
                 <div class="stat-item">
-                    <span class="stat-label">MONTH:</span>
-                    <span class="stat-value" id="monthEntries">0</span>
+                    <span class="stat-label">Aktif görevler</span>
+                    <span class="stat-value" id="activeTaskCount">—</span>
                 </div>
+                <div class="stat-divider"></div>
                 <div class="stat-item">
-                    <span class="stat-label">TOP_TAG:</span>
-                    <span class="stat-value" id="topTag">NULL</span>
+                    <span class="stat-label">Tamamlanma</span>
+                    <span class="stat-value" id="completionRate">—</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Bu hafta</span>
+                    <span class="stat-value neutral" id="weekEntries">0</span>
+                    <span class="stat-label">kayıt</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Popüler tag</span>
+                    <span class="stat-value neutral" id="topTag">—</span>
                 </div>
             </div>
-            
+
             <div class="header-controls">
-                <div class="view-switcher">
-                    <button class="view-btn active" data-view="weekly">WEEK</button>
-                    <button class="view-btn" data-view="calendar">CAL</button>
-                    <button class="view-btn" data-view="list">LIST</button>
-                </div>
-                
-                <div class="date-navigation">
-                    <button id="prevPeriod">←</button>
-                    <div class="date-display" id="dateDisplay"></div>
-                    <button id="nextPeriod">→</button>
-                    <button id="today">TODAY</button>
+                <div class="control-row">
+                    <div class="view-switcher">
+                        <button class="view-btn active" data-view="weekly">Hafta</button>
+                        <button class="view-btn" data-view="calendar">Takvim</button>
+                        <button class="view-btn" data-view="list">Liste</button>
+                    </div>
+
+                    <div class="date-navigation">
+                        <button id="prevPeriod" class="nav-btn">←</button>
+                        <div class="date-display" id="dateDisplay"></div>
+                        <button id="nextPeriod" class="nav-btn">→</button>
+                        <button id="today">Bugün</button>
+                    </div>
                 </div>
 
-                <div class="data-controls">
-                    <button id="exportData">EXPORT</button>
-                    <button id="importData">IMPORT</button>
-                    <input type="file" id="fileInput" accept=".json" class="hidden">
+                <div class="control-row">
+                    <div class="data-controls">
+                        <button id="exportData">↑ Export</button>
+                        <button id="importData">↓ Import</button>
+                        <input type="file" id="fileInput" accept=".json" class="hidden">
+                    </div>
                 </div>
             </div>
         </header>
 
-        <div class="weekly-scroll-container" id="mainContent">
-            <!-- Content will be rendered here -->
-        </div>
+        <div class="weekly-scroll-container" id="mainContent"></div>
     </div>
 
     <!-- Entry Modal -->
     <div class="modal" id="entryModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title" id="entryModalTitle">NEW_ENTRY</div>
-                <button class="close-btn" id="closeEntryModal">×</button>
+                <div class="modal-title" id="entryModalTitle">Yeni kayıt</div>
+                <button class="close-btn" id="closeEntryModal">✕</button>
             </div>
-            
+
             <div class="form-group">
-                <label class="form-label">DATE</label>
+                <label class="form-label">Tarih</label>
                 <input type="date" id="entryDate">
             </div>
 
             <div class="form-group">
-                <label class="form-label">MOOD_STATUS</label>
+                <label class="form-label">Ruh hali</label>
                 <div class="mood-selector">
-                    <div class="mood-option" data-mood="great">
-                        <div class="mood-emoji">😄</div>
-                        <div class="mood-name">Great</div>
-                    </div>
-                    <div class="mood-option" data-mood="good">
-                        <div class="mood-emoji">🙂</div>
-                        <div class="mood-name">Good</div>
-                    </div>
-                    <div class="mood-option" data-mood="neutral">
-                        <div class="mood-emoji">😐</div>
-                        <div class="mood-name">Neutral</div>
-                    </div>
-                    <div class="mood-option" data-mood="bad">
-                        <div class="mood-emoji">😟</div>
-                        <div class="mood-name">Bad</div>
-                    </div>
-                    <div class="mood-option" data-mood="terrible">
-                        <div class="mood-emoji">😢</div>
-                        <div class="mood-name">Terrible</div>
-                    </div>
+                    <div class="mood-option" data-mood="great"><div class="mood-emoji">😄</div><div class="mood-name">Harika</div></div>
+                    <div class="mood-option" data-mood="good"><div class="mood-emoji">🙂</div><div class="mood-name">İyi</div></div>
+                    <div class="mood-option" data-mood="neutral"><div class="mood-emoji">😐</div><div class="mood-name">Nötr</div></div>
+                    <div class="mood-option" data-mood="bad"><div class="mood-emoji">😟</div><div class="mood-name">Kötü</div></div>
+                    <div class="mood-option" data-mood="terrible"><div class="mood-emoji">😢</div><div class="mood-name">Berbat</div></div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">MAIN_NOTE</label>
-                <textarea id="entryText" placeholder="[INPUT_DATA]"></textarea>
+                <label class="form-label">Ana not</label>
+                <textarea id="entryText" placeholder="Bugün ne oldu?"></textarea>
             </div>
 
             <!-- Atomic Notes Section -->
-            <div class="atomic-notes-section">
-                <div class="atomic-notes-header">
-                    <label class="form-label" style="margin: 0;">ATOMIC_NOTES</label>
-                    <button id="addAtomicNoteBtn" style="padding: 0.3rem 0.8rem;">+ ADD</button>
-                </div>
-                <div class="atomic-notes-list" id="atomicNotesList">
-                    <!-- Atomic notes will be rendered here -->
+            <div class="form-group">
+                <div class="atomic-notes-section">
+                    <div class="atomic-notes-header">
+                        <label class="form-label" style="margin:0;">Atomic notlar</label>
+                    </div>
+                    <div class="atomic-notes-list" id="atomicNotesList"></div>
+                    <div class="atomic-add-row">
+                        <input type="text" id="atomicNoteInput" placeholder="Yeni not ekle...">
+                        <button id="addAtomicNoteBtn">+ Ekle</button>
+                    </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">TAGS</label>
+                <label class="form-label">Etiketler</label>
                 <div class="tag-input-container" id="tagContainer">
-                    <input type="text" id="tagInput" placeholder="[ENTER_TAG]">
+                    <input type="text" id="tagInput" placeholder="Etiket yaz, Enter'a bas">
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button id="saveEntry" style="flex: 1;">SAVE</button>
-                <button id="deleteEntry" class="hidden" style="background: var(--priority-high); color: white; border-color: var(--priority-high);">DELETE</button>
+            <div class="modal-footer">
+                <button id="saveEntry" class="btn-primary">Kaydet</button>
+                <button id="deleteEntry" class="hidden btn-danger">Sil</button>
             </div>
         </div>
     </div>
@@ -1041,7 +967,7 @@
     <button class="fab" id="fab"></button>
 
     <script>
-        // Data Storage
+        // ─── DATA MANAGER ───
         class DataManager {
             constructor() {
                 this.entries = this.loadEntries();
@@ -1061,9 +987,7 @@
                 this.saveEntries();
             }
 
-            getEntry(date) {
-                return this.entries[date] || null;
-            }
+            getEntry(date) { return this.entries[date] || null; }
 
             deleteEntry(date) {
                 delete this.entries[date];
@@ -1071,11 +995,7 @@
             }
 
             exportData() {
-                const data = {
-                    entries: this.entries,
-                    exportDate: new Date().toISOString(),
-                    version: '2.0'
-                };
+                const data = { entries: this.entries, exportDate: new Date().toISOString(), version: '2.0' };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -1091,7 +1011,7 @@
             }
         }
 
-        // App State
+        // ─── APP STATE ───
         const dataManager = new DataManager();
         let currentView = 'weekly';
         let currentDate = new Date();
@@ -1100,14 +1020,14 @@
         let currentTags = [];
         let atomicNotes = [];
 
-        // Date Utilities
+        // ─── DATE UTILITIES ───
         function formatDate(date) {
             return date.toISOString().split('T')[0];
         }
 
         function getWeekDates(date) {
             const start = new Date(date);
-            start.setDate(start.getDate() - start.getDay() + 1); // Monday
+            start.setDate(start.getDate() - start.getDay() + 1);
             const dates = [];
             for (let i = 0; i < 7; i++) {
                 const d = new Date(start);
@@ -1122,68 +1042,49 @@
             const month = date.getMonth();
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
-            
             const dates = [];
             const startDay = firstDay.getDay() || 7;
-            
+
             for (let i = startDay - 1; i > 0; i--) {
                 const d = new Date(firstDay);
                 d.setDate(d.getDate() - i);
                 dates.push({ date: d, otherMonth: true });
             }
-            
             for (let i = 1; i <= lastDay.getDate(); i++) {
                 dates.push({ date: new Date(year, month, i), otherMonth: false });
             }
-            
             const remaining = 42 - dates.length;
             for (let i = 1; i <= remaining; i++) {
                 const d = new Date(lastDay);
                 d.setDate(d.getDate() + i);
                 dates.push({ date: d, otherMonth: true });
             }
-            
             return dates;
         }
 
         function getTurkishDayName(dayIndex) {
-            const days = ['PAZ', 'PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT'];
-            return days[dayIndex];
+            return ['PAZ', 'PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT'][dayIndex];
         }
 
         function getTurkishMonthName(monthIndex) {
-            const months = ['OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN', 
-                           'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'];
-            return months[monthIndex];
+            return ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+                    'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'][monthIndex];
         }
 
-        const moodEmojis = {
-            'great': '😄',
-            'good': '🙂',
-            'neutral': '😐',
-            'bad': '😟',
-            'terrible': '😢'
-        };
+        const moodEmojis = { great:'😄', good:'🙂', neutral:'😐', bad:'😟', terrible:'😢' };
+        const moodLabels = { great:'Harika', good:'İyi', neutral:'Nötr', bad:'Kötü', terrible:'Berbat' };
 
-        const moodLabels = {
-            'great': 'GREAT',
-            'good': 'GOOD',
-            'neutral': 'NEUTRAL',
-            'bad': 'BAD',
-            'terrible': 'TERRIBLE'
-        };
-
-        // Render Functions
+        // ─── RENDER ───
         function renderWeeklyView() {
             const dates = getWeekDates(currentDate);
             const today = formatDate(new Date());
-            
+
             let html = '<div class="weekly-view">';
             dates.forEach(date => {
                 const dateStr = formatDate(date);
                 const entry = dataManager.getEntry(dateStr);
                 const isToday = dateStr === today;
-                
+
                 html += `
                     <div class="day-card ${isToday ? 'today' : ''}" data-date="${dateStr}">
                         <div class="terminal-header">
@@ -1199,17 +1100,17 @@
                                 </div>
                             ` : ''}
                         </div>
-                        
+
                         ${entry && entry.text ? `
                             <div class="terminal-section">
-                                <div class="section-label">MAIN_LOG</div>
+                                <div class="section-label">Ana log</div>
                                 <div class="note-preview">${entry.text}</div>
                                 ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `
-                                    <div class="note-count">+ ${entry.atomicNotes.length} atomic note(s)</div>
+                                    <div class="note-count">+ ${entry.atomicNotes.length} atomic not</div>
                                 ` : ''}
                             </div>
-                        ` : '<div class="empty-state">No entry logged</div>'}
-                        
+                        ` : '<div class="empty-state">Henüz kayıt yok</div>'}
+
                         ${entry && entry.tags && entry.tags.length > 0 ? `
                             <div class="tags-terminal">
                                 ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
@@ -1219,7 +1120,7 @@
                 `;
             });
             html += '</div>';
-            
+
             document.getElementById('mainContent').innerHTML = html;
             document.getElementById('mainContent').className = 'weekly-scroll-container';
             attachDayClickListeners();
@@ -1229,28 +1130,24 @@
             const dates = getMonthDates(currentDate);
             const today = formatDate(new Date());
             const dayNames = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
-            
+
             let html = '<div class="calendar-container"><div class="calendar-header">';
-            dayNames.forEach(day => {
-                html += `<div class="calendar-day-name">${day}</div>`;
-            });
+            dayNames.forEach(day => { html += `<div class="calendar-day-name">${day}</div>`; });
             html += '</div><div class="calendar-view">';
-            
+
             dates.forEach(({ date, otherMonth }) => {
                 const dateStr = formatDate(date);
                 const entry = dataManager.getEntry(dateStr);
                 const isToday = dateStr === today;
-                
+
                 html += `
                     <div class="calendar-day ${otherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}" data-date="${dateStr}">
                         <div class="cal-day-number">${date.getDate()}</div>
-                        ${entry && !otherMonth && entry.mood ? `
-                            <div style="font-size: 1.5rem; margin-top: 0.5rem;">${moodEmojis[entry.mood]}</div>
-                        ` : ''}
+                        ${entry && !otherMonth && entry.mood ? `<div style="font-size:1.3rem;margin-top:0.3rem;">${moodEmojis[entry.mood]}</div>` : ''}
                     </div>
                 `;
             });
-            
+
             html += '</div></div>';
             document.getElementById('mainContent').innerHTML = html;
             document.getElementById('mainContent').className = '';
@@ -1260,73 +1157,68 @@
         function renderListView() {
             const entries = Object.entries(dataManager.entries)
                 .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-                .slice(0, 30);
-            
+                .slice(0, 50);
+
             if (entries.length === 0) {
                 document.getElementById('mainContent').innerHTML = `
-                    <div class="empty-state" style="padding: 4rem;">
-                        <p style="font-size: 1.25rem;">NO ENTRIES FOUND</p>
-                    </div>
+                    <div class="empty-state" style="padding:4rem; text-align:center;">Henüz kayıt yok</div>
                 `;
                 document.getElementById('mainContent').className = '';
                 return;
             }
-            
+
             let html = '<div class="list-view">';
             entries.forEach(([dateStr, entry]) => {
                 const date = new Date(dateStr);
                 html += `
                     <div class="entry-card" data-date="${dateStr}">
                         <div class="entry-header">
-                            <div class="entry-date">
-                                ${date.getDate()} ${getTurkishMonthName(date.getMonth())} ${date.getFullYear()}
-                            </div>
-                            ${entry.mood ? `<div style="font-size: 1.5rem;">${moodEmojis[entry.mood]}</div>` : ''}
+                            <div class="entry-date">${date.getDate()} ${getTurkishMonthName(date.getMonth())} ${date.getFullYear()}</div>
+                            ${entry.mood ? `<div style="font-size:1.4rem;">${moodEmojis[entry.mood]}</div>` : ''}
                         </div>
                         <div class="entry-content">${entry.text}</div>
                         ${entry.atomicNotes && entry.atomicNotes.length > 0 ? `
-                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-                                + ${entry.atomicNotes.length} atomic note(s)
-                            </div>
+                            <div style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.5rem;">+ ${entry.atomicNotes.length} atomic not</div>
                         ` : ''}
                         ${entry.tags && entry.tags.length > 0 ? `
-                            <div class="tags-terminal">
-                                ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                            </div>
+                            <div class="tags-terminal">${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
                         ` : ''}
                     </div>
                 `;
             });
             html += '</div>';
-            
+
             document.getElementById('mainContent').innerHTML = html;
             document.getElementById('mainContent').className = '';
             attachDayClickListeners();
         }
 
         function renderStats() {
-            const currentMonth = currentDate.getMonth();
-            const currentYear = currentDate.getFullYear();
-            
-            const monthEntries = Object.keys(dataManager.entries).filter(dateStr => {
-                const date = new Date(dateStr);
-                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-            }).length;
-            
+            // Week entries
+            const weekDates = getWeekDates(currentDate).map(d => formatDate(d));
+            const weekEntries = weekDates.filter(d => dataManager.getEntry(d)).length;
+            document.getElementById('weekEntries').textContent = weekEntries;
+
+            // Active tasks = entries with atomic notes (incomplete)
+            // We treat entries that exist this week as "active"
+            // More meaningful: total atomic notes across all entries
+            const allEntries = Object.values(dataManager.entries);
+            const totalAtomicNotes = allEntries.reduce((sum, e) => sum + (e.atomicNotes ? e.atomicNotes.length : 0), 0);
+            document.getElementById('activeTaskCount').textContent = totalAtomicNotes > 0 ? totalAtomicNotes : '0';
+
+            // Completion rate: entries with mood logged vs total entries
+            const total = allEntries.length;
+            const withMood = allEntries.filter(e => e.mood).length;
+            const rate = total > 0 ? Math.round((withMood / total) * 100) : 0;
+            document.getElementById('completionRate').textContent = total > 0 ? `%${rate}` : '—';
+
+            // Top tag
             const allTags = [];
-            Object.values(dataManager.entries).forEach(entry => {
-                if (entry.tags) allTags.push(...entry.tags);
-            });
-            
+            allEntries.forEach(e => { if (e.tags) allTags.push(...e.tags); });
             const tagCounts = {};
-            allTags.forEach(tag => {
-                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-            });
-            
+            allTags.forEach(tag => { tagCounts[tag] = (tagCounts[tag] || 0) + 1; });
             const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0];
-            
-            document.getElementById('monthEntries').textContent = monthEntries;
-            document.getElementById('topTag').textContent = topTag ? topTag[0] : 'NULL';
+            document.getElementById('topTag').textContent = topTag ? topTag[0] : '—';
         }
 
         function updateDateDisplay() {
@@ -1335,11 +1227,11 @@
                 const dates = getWeekDates(currentDate);
                 const start = dates[0];
                 const end = dates[6];
-                display.textContent = `${start.getDate()}-${end.getDate()} ${getTurkishMonthName(end.getMonth())} ${end.getFullYear()}`;
+                display.textContent = `${start.getDate()}–${end.getDate()} ${getTurkishMonthName(end.getMonth())}`;
             } else if (currentView === 'calendar') {
                 display.textContent = `${getTurkishMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
             } else {
-                display.textContent = 'ALL_ENTRIES';
+                display.textContent = 'Tüm kayıtlar';
             }
         }
 
@@ -1347,12 +1239,11 @@
             if (currentView === 'weekly') renderWeeklyView();
             else if (currentView === 'calendar') renderCalendarView();
             else renderListView();
-            
             renderStats();
             updateDateDisplay();
         }
 
-        // Event Listeners
+        // ─── CLICK LISTENERS ───
         function attachDayClickListeners() {
             document.querySelectorAll('.day-card, .calendar-day, .entry-card').forEach(el => {
                 el.addEventListener('click', () => {
@@ -1362,30 +1253,29 @@
             });
         }
 
-        // Modal Functions
+        // ─── MODAL ───
         function openEntryModal(dateStr) {
             selectedDate = dateStr;
             const entry = dataManager.getEntry(dateStr);
             editingEntry = entry;
-            
-            document.getElementById('entryModalTitle').textContent = entry ? 'EDIT_ENTRY' : 'NEW_ENTRY';
+
+            document.getElementById('entryModalTitle').textContent = entry ? 'Kaydı düzenle' : 'Yeni kayıt';
             document.getElementById('entryDate').value = dateStr;
             document.getElementById('entryText').value = entry ? entry.text : '';
-            
-            // Mood
+
             document.querySelectorAll('.mood-option').forEach(m => m.classList.remove('selected'));
             if (entry && entry.mood) {
-                document.querySelector(`.mood-option[data-mood="${entry.mood}"]`).classList.add('selected');
+                const moodEl = document.querySelector(`.mood-option[data-mood="${entry.mood}"]`);
+                if (moodEl) moodEl.classList.add('selected');
             }
-            
-            // Tags
+
             currentTags = entry && entry.tags ? [...entry.tags] : [];
             renderTagInput();
-            
-            // Atomic Notes
+
             atomicNotes = entry && entry.atomicNotes ? [...entry.atomicNotes] : [];
             renderAtomicNotes();
-            
+
+            document.getElementById('atomicNoteInput').value = '';
             document.getElementById('deleteEntry').classList.toggle('hidden', !entry);
             document.getElementById('entryModal').classList.add('active');
         }
@@ -1398,65 +1288,66 @@
             atomicNotes = [];
         }
 
+        // ─── TAG INPUT ───
         function renderTagInput() {
             const container = document.getElementById('tagContainer');
             const input = document.getElementById('tagInput');
-            
+
             while (container.firstChild && container.firstChild !== input) {
                 container.removeChild(container.firstChild);
             }
-            
+
             currentTags.forEach(tag => {
                 const tagEl = document.createElement('div');
                 tagEl.className = 'tag-item';
-                tagEl.innerHTML = `
-                    <span>${tag}</span>
-                    <span class="tag-remove" data-tag="${tag}">×</span>
-                `;
+                tagEl.innerHTML = `<span>${tag}</span><span class="tag-remove" data-tag="${tag}">×</span>`;
                 container.insertBefore(tagEl, input);
             });
-            
+
             document.querySelectorAll('.tag-remove').forEach(el => {
                 el.addEventListener('click', () => {
-                    const tag = el.dataset.tag;
-                    currentTags = currentTags.filter(t => t !== tag);
+                    currentTags = currentTags.filter(t => t !== el.dataset.tag);
                     renderTagInput();
                 });
             });
         }
 
+        // ─── ATOMIC NOTES ───
         function renderAtomicNotes() {
             const list = document.getElementById('atomicNotesList');
-            
+
             if (atomicNotes.length === 0) {
-                list.innerHTML = '<div class="empty-state" style="padding: 1rem;">No atomic notes</div>';
+                list.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);padding:0.5rem 0;">Henüz atomic not yok</div>';
                 return;
             }
-            
-            let html = '';
-            atomicNotes.forEach((note, index) => {
-                html += `
-                    <div class="atomic-note">
-                        <div class="atomic-note-content">
-                            <div class="atomic-note-text">${note}</div>
-                        </div>
-                        <button class="atomic-note-delete" data-index="${index}">DEL</button>
-                    </div>
-                `;
-            });
-            
-            list.innerHTML = html;
-            
+
+            list.innerHTML = atomicNotes.map((note, index) => `
+                <div class="atomic-note">
+                    <span class="atomic-note-text">${note}</span>
+                    <button class="atomic-note-delete" data-index="${index}">✕</button>
+                </div>
+            `).join('');
+
             document.querySelectorAll('.atomic-note-delete').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const index = parseInt(btn.dataset.index);
-                    atomicNotes.splice(index, 1);
+                    atomicNotes.splice(parseInt(btn.dataset.index), 1);
                     renderAtomicNotes();
                 });
             });
         }
 
-        // View Switching
+        function addAtomicNote() {
+            const input = document.getElementById('atomicNoteInput');
+            const val = input.value.trim();
+            if (val) {
+                atomicNotes.push(val);
+                input.value = '';
+                renderAtomicNotes();
+                input.focus();
+            }
+        }
+
+        // ─── EVENT LISTENERS ───
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
@@ -1466,22 +1357,15 @@
             });
         });
 
-        // Navigation
         document.getElementById('prevPeriod').addEventListener('click', () => {
-            if (currentView === 'weekly') {
-                currentDate.setDate(currentDate.getDate() - 7);
-            } else if (currentView === 'calendar') {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-            }
+            if (currentView === 'weekly') currentDate.setDate(currentDate.getDate() - 7);
+            else if (currentView === 'calendar') currentDate.setMonth(currentDate.getMonth() - 1);
             render();
         });
 
         document.getElementById('nextPeriod').addEventListener('click', () => {
-            if (currentView === 'weekly') {
-                currentDate.setDate(currentDate.getDate() + 7);
-            } else if (currentView === 'calendar') {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-            }
+            if (currentView === 'weekly') currentDate.setDate(currentDate.getDate() + 7);
+            else if (currentView === 'calendar') currentDate.setMonth(currentDate.getMonth() + 1);
             render();
         });
 
@@ -1490,7 +1374,6 @@
             render();
         });
 
-        // Entry Modal Events
         document.getElementById('closeEntryModal').addEventListener('click', closeEntryModal);
         document.getElementById('entryModal').addEventListener('click', (e) => {
             if (e.target.id === 'entryModal') closeEntryModal();
@@ -1515,52 +1398,51 @@
             }
         });
 
-        document.getElementById('addAtomicNoteBtn').addEventListener('click', () => {
-            const note = prompt('Enter atomic note:');
-            if (note && note.trim()) {
-                atomicNotes.push(note.trim());
-                renderAtomicNotes();
+        document.getElementById('addAtomicNoteBtn').addEventListener('click', addAtomicNote);
+
+        document.getElementById('atomicNoteInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addAtomicNote();
             }
         });
 
         document.getElementById('saveEntry').addEventListener('click', () => {
             const dateStr = document.getElementById('entryDate').value;
             const text = document.getElementById('entryText').value.trim();
-            
+
             if (!text) {
-                alert('[ERROR] Main note required');
+                document.getElementById('entryText').focus();
+                document.getElementById('entryText').style.borderColor = 'var(--danger)';
+                setTimeout(() => document.getElementById('entryText').style.borderColor = '', 1500);
                 return;
             }
-            
+
             const selectedMood = document.querySelector('.mood-option.selected');
-            const mood = selectedMood ? selectedMood.dataset.mood : null;
-            
             dataManager.addEntry(dateStr, {
                 text,
-                mood,
+                mood: selectedMood ? selectedMood.dataset.mood : null,
                 tags: currentTags,
                 atomicNotes: atomicNotes,
                 updatedAt: new Date().toISOString()
             });
-            
+
             closeEntryModal();
             render();
         });
 
         document.getElementById('deleteEntry').addEventListener('click', () => {
-            if (confirm('[CONFIRM] Delete this entry?')) {
+            if (confirm('Bu kaydı silmek istediğine emin misin?')) {
                 dataManager.deleteEntry(selectedDate);
                 closeEntryModal();
                 render();
             }
         });
 
-        // FAB
         document.getElementById('fab').addEventListener('click', () => {
             openEntryModal(formatDate(new Date()));
         });
 
-        // Export/Import
         document.getElementById('exportData').addEventListener('click', () => {
             dataManager.exportData();
         });
@@ -1576,20 +1458,19 @@
                 reader.onload = (e) => {
                     try {
                         const data = JSON.parse(e.target.result);
-                        if (confirm('[CONFIRM] Overwrite existing data?')) {
+                        if (confirm('Mevcut veriler silinecek. Devam edilsin mi?')) {
                             dataManager.importData(data);
                             render();
-                            alert('[SUCCESS] Data imported');
                         }
                     } catch (err) {
-                        alert('[ERROR] Invalid file');
+                        alert('Geçersiz dosya.');
                     }
                 };
                 reader.readAsText(file);
             }
         });
 
-        // Initial Render
+        // ─── INIT ───
         render();
     </script>
 </body>
