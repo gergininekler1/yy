@@ -122,9 +122,9 @@
         <div class="modal-block">
             <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom:1rem;">00-00-0000</h2>
             <div style="display:flex; gap:5px;">
-                <button class="habit-btn" id="h_demir" onclick="toggleHabit('demir')">ZİHİN</button>
-                <button class="habit-btn" id="h_spor" onclick="toggleHabit('spor')">SPOR</button>
-                <button class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')">OKUMA</button>
+                <button class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-brain"></i> ZİHİN</button>
+                <button class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-dumbbell"></i> SPOR</button>
+                <button class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book-open"></i> OKUMA</button>
             </div>
         </div>
 
@@ -236,6 +236,102 @@ const renderWeekly = (el) => {
     el.appendChild(grid);
 };
 
+const renderMonthly = (el) => {
+    const year = state.cursor.getFullYear();
+    const month = state.cursor.getMonth();
+    document.getElementById('currentRange').textContent = state.cursor.toLocaleString('tr-TR', { month: 'long', year: 'numeric' });
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDow = (firstDay.getDay() + 6) % 7; // Monday=0
+
+    const dayNames = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+    const habitIcons = { demir: 'fa-brain', spor: 'fa-dumbbell', okuma: 'fa-book-open' };
+
+    let html = `
+    <style>
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+        .cal-header-cell { text-align: center; font-size: 0.55rem; color: var(--accent); padding: 6px 0; letter-spacing: 2px; }
+        .cal-cell { background: var(--surface); border: 1px solid var(--border); min-height: 90px; padding: 6px; border-radius: 4px; cursor: pointer; transition: border-color 0.2s; position: relative; }
+        .cal-cell:hover { border-color: var(--accent); }
+        .cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+        .cal-cell.has-entry { border-left: 3px solid var(--accent); }
+        .cal-cell.today { background: rgba(46,204,113,0.08); }
+        .cal-day-num { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text2); margin-bottom: 4px; }
+        .cal-cell.has-entry .cal-day-num { color: var(--accent); }
+        .cal-cell.today .cal-day-num { color: #fff; font-weight: bold; }
+        .cal-habit-icons { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; }
+        .cal-habit-dot { font-size: 0.55rem; width: 16px; height: 16px; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+        .cal-habit-dot.demir { background: rgba(100,180,255,0.2); color: #64b4ff; }
+        .cal-habit-dot.spor { background: rgba(46,204,113,0.2); color: var(--accent); }
+        .cal-habit-dot.okuma { background: rgba(241,196,15,0.2); color: var(--warning); }
+        .cal-task-bar { margin-top: 4px; background: var(--surface2); height: 3px; border-radius: 2px; overflow: hidden; }
+        .cal-task-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+        .cal-snippet { font-size: 0.5rem; color: var(--text2); margin-top: 3px; line-height: 1.3; overflow: hidden; max-height: 24px; }
+        .cal-month-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .cal-summary-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 10px; border-radius: 4px; }
+        .cal-summary-label { font-size: 0.5rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+        .cal-summary-val { font-size: 1.1rem; font-family: 'Orbitron'; color: var(--accent); margin-top: 2px; }
+    </style>`;
+
+    // Month summary stats
+    const today = fmt(new Date());
+    let monthEntries = 0, monthHabits = { demir: 0, spor: 0, okuma: 0 }, monthTasksDone = 0, monthTasksTotal = 0;
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+        const ds = fmt(new Date(year, month, d));
+        const e = state.entries[ds];
+        if (e && (e.text || e.tasks?.length || e.habits?.length)) {
+            monthEntries++;
+            (e.habits || []).forEach(h => { if (monthHabits[h] !== undefined) monthHabits[h]++; });
+            monthTasksDone += (e.tasks || []).filter(t => t.done).length;
+            monthTasksTotal += (e.tasks || []).length;
+        }
+    }
+
+    html += `<div class="cal-month-summary">
+        <div class="cal-summary-card"><div class="cal-summary-label"><i class="fa-solid fa-calendar-check"></i> Kayıtlı Gün</div><div class="cal-summary-val">${monthEntries}</div></div>
+        <div class="cal-summary-card" style="border-left-color:#64b4ff"><div class="cal-summary-label"><i class="fa-solid fa-brain"></i> Zihin</div><div class="cal-summary-val" style="color:#64b4ff">${monthHabits.demir}</div></div>
+        <div class="cal-summary-card"><div class="cal-summary-label"><i class="fa-solid fa-dumbbell"></i> Spor</div><div class="cal-summary-val">${monthHabits.spor}</div></div>
+        <div class="cal-summary-card" style="border-left-color:var(--warning)"><div class="cal-summary-label"><i class="fa-solid fa-book-open"></i> Okuma</div><div class="cal-summary-val" style="color:var(--warning)">${monthHabits.okuma}</div></div>
+        <div class="cal-summary-card"><div class="cal-summary-label"><i class="fa-solid fa-check-double"></i> Görev Tamamlama</div><div class="cal-summary-val">${monthTasksTotal ? Math.round(monthTasksDone/monthTasksTotal*100) : 0}%</div></div>
+    </div>`;
+
+    html += `<div class="cal-grid">`;
+    dayNames.forEach(n => html += `<div class="cal-header-cell">${n}</div>`);
+
+    // Empty cells before first day
+    for (let i = 0; i < startDow; i++) html += `<div class="cal-cell empty"></div>`;
+
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+        const ds = fmt(new Date(year, month, d));
+        const e = state.entries[ds];
+        const hasEntry = e && (e.text || e.tasks?.length || e.habits?.length);
+        const isToday = ds === today;
+        const total = e?.tasks?.length || 0;
+        const done = e?.tasks?.filter(t => t.done).length || 0;
+        const pct = total ? (done / total) * 100 : 0;
+        const habits = e?.habits || [];
+
+        html += `<div class="cal-cell ${hasEntry ? 'has-entry' : ''} ${isToday ? 'today' : ''}" onclick="openEntry('${ds}')">
+            <div class="cal-day-num">${d}</div>`;
+
+        if (habits.length) {
+            html += `<div class="cal-habit-icons">`;
+            habits.forEach(h => html += `<div class="cal-habit-dot ${h}"><i class="fa-solid ${habitIcons[h] || 'fa-circle'}"></i></div>`);
+            html += `</div>`;
+        }
+
+        if (total > 0) html += `<div class="cal-task-bar"><div class="cal-task-fill" style="width:${pct}%"></div></div>`;
+
+        if (e?.text) html += `<div class="cal-snippet">${e.text.substring(0, 40)}</div>`;
+
+        html += `</div>`;
+    }
+
+    html += `</div>`;
+    el.innerHTML = html;
+};
+
 const renderArchive = (el) => {
     Object.entries(state.entries).sort().reverse().forEach(([d, e]) => {
         el.innerHTML += `<div class="day-card recorded" style="margin-bottom:10px" onclick="openEntry('${d}')">
@@ -345,8 +441,16 @@ document.getElementById('exportBtn').onclick = () => {
 document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange = (e) => { const r = new FileReader(); r.onload=(ev)=>{state.entries=JSON.parse(ev.target.result); render();}; r.readAsText(e.target.files[0]); };
 document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { document.querySelectorAll('.view-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.view = b.dataset.view; render(); });
-document.getElementById('prevBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()-7); render(); };
-document.getElementById('nextBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()+7); render(); };
+document.getElementById('prevBtn').onclick = () => {
+    if (state.view === 'monthly') { state.cursor.setMonth(state.cursor.getMonth()-1); }
+    else { state.cursor.setDate(state.cursor.getDate()-7); }
+    render();
+};
+document.getElementById('nextBtn').onclick = () => {
+    if (state.view === 'monthly') { state.cursor.setMonth(state.cursor.getMonth()+1); }
+    else { state.cursor.setDate(state.cursor.getDate()+7); }
+    render();
+};
 window.closeModal = () => { document.getElementById('entryModal').classList.remove('active'); render(); };
 document.getElementById('saveBtn').onclick = () => {
     state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics, tags: state.temp.tags };
