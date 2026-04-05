@@ -1,1001 +1,437 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX - REVIZE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Kişisel Yönetim Paneli</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --accent: #2ecc71; 
-            --accent-dim: rgba(46, 204, 113, 0.1);
-            --danger: #e74c3c;
-            --warning: #f1c40f;
-            --bg-grid: #0d0d0d;
-            --bg-grid-lines: #161616;
-            --bg: var(--bg-grid);
-            --surface: #161616; 
-            --surface2: #1f1f1f;
-            --border: #2a2a2a; 
-            --text1: #d1d1d1; 
-            --text2: #777;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --danger: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
         }
 
-        [data-theme="light"] {
-            --bg-grid: #f4f4f7;
-            --bg-grid-lines: #ebebef;
-            --bg: var(--bg-grid);
-            --surface: #ffffff; 
-            --surface2: #ebebef;
-            --border: #d1d1d1; 
-            --text1: #222; 
-            --text2: #666;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
-        body { background-color: var(--bg-grid); background-image: linear-gradient(var(--bg-grid-lines) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid-lines) 1px, transparent 1px); background-size: 20px 20px; color: var(--text1); padding: 1rem; }
-        
-        .container { max-width: 1100px; margin: 0 auto; }
-        .header-block { border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 0.5rem; background: var(--surface); position: relative; }
-        h1 { font-family: 'Orbitron'; letter-spacing: 6px; color: var(--accent); text-transform: uppercase; font-size: 1.8rem; }
-        
-        .kunye-block { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); }
-        .kunye-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-        .stat-item { background: var(--surface2); padding: 12px; border-left: 2px solid var(--accent); border-radius: 4px; }
-        .stat-label { color: var(--text2); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
-        .stat-content { font-size: 0.7rem; line-height: 1.4; word-break: break-word; }
-        .stat-content .task-chip { display: inline-block; background: var(--surface); border: 1px solid var(--border); padding: 3px 8px; margin: 2px; border-radius: 3px; font-size: 0.65rem; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
 
-        .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--accent); padding: 12px; font-size: 0.8rem; margin-bottom: 1rem; }
-        
-        button { background: transparent; border: none; color: var(--text2); padding: 8px 14px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; display: flex; align-items: center; gap: 6px; transition: all 0.2s; position: relative; overflow: hidden; }
-        button:hover { opacity: 0.8; }
-        button.active { background: var(--accent); color: #000; font-weight: bold; }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
 
-        /* Ripple Effect */
-        .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple-anim 0.6s linear; background-color: rgba(255, 255, 255, 0.3); pointer-events: none; }
-        [data-theme="light"] .ripple { background-color: rgba(0, 0, 0, 0.15); }
-        @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+        /* Üst Bar ve Arama */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-        /* Toast Notifications */
-        .toast { padding: 12px 20px; border-radius: 6px; color: #fff; font-size: 0.85rem; font-family: 'Share Tech Mono', monospace; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards; background: var(--surface2); border-left: 4px solid var(--accent); display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        .toast.error { border-left-color: var(--danger); }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; } }
+        .header h1 {
+            font-size: 24px;
+            color: var(--primary);
+        }
 
-        .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-        .day-card { background: var(--surface); padding: 15px; cursor: pointer; position: relative; min-height: 140px; border-radius: 4px; overflow: hidden; border-left: 5px solid var(--border); transition: all 0.2s; }
-        .day-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        
-        /* Gradient Arka Plan */
-        .day-card.recorded { border-left-color: var(--accent); background: linear-gradient(135deg, var(--surface) 30%, var(--accent-dim) 150%); }
-        
-        .status-light { position: absolute; top: 10px; right: 10px; width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
-        .status-light.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        
-        .day-stats { display: flex; gap: 8px; margin-top: 8px; font-size: 0.65rem; color: var(--text2); }
-        .day-stat { display: flex; align-items: center; gap: 3px; }
-        
-        .day-header { font-size: 0.65rem; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .day-title { font-size: 0.9rem; color: var(--accent); margin-bottom: 8px; font-weight: bold; }
-        
-        .habit-icons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-        .habit-icon { width: 24px; height: 24px; background: var(--surface2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
-        
-        .task-progress { margin-top: 10px; font-size: 0.65rem; color: var(--text2); }
-        .progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 4px; }
-        .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+        .search-box {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-        .critical-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: inline-block; animation: blink 1s infinite; margin-left: 5px; }
-        .backup-alert { color: var(--warning); animation: blink 1.5s infinite; font-size: 0.8rem; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .search-box input {
+            border: none;
+            padding: 10px 15px;
+            outline: none;
+            width: 250px;
+        }
 
-        /* Glassmorphism Effect */
-        .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
-        .modal.active { display: flex; }
-        .modal-content { background: rgba(22, 22, 22, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--accent); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        [data-theme="light"] .modal-content { background: rgba(255, 255, 255, 0.75); }
-        
-        .modal-block { background: var(--surface); border: 1px solid var(--border); padding: 1.2rem; margin-bottom: 1rem; border-radius: 8px; }
-        
-        .day-title-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--accent); padding: 10px; font-size: 0.9rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: bold; }
-        
-        textarea { width: 100%; min-height: 150px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 10px; resize: vertical; }
-        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.75rem; border-radius: 3px; }
-        .priority-tag { font-size: 0.5rem; padding: 3px 6px; border-radius: 3px; font-weight: bold; }
-        .tag-chip { background: var(--surface2); color: var(--accent); padding: 4px 8px; font-size: 0.6rem; border-radius: 4px; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
-        .tag-chip:hover { background: var(--accent); color: #000; }
+        .search-box button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-        /* Yeni Habit Butonları (Yan yana Icon ve Baş Harf) */
-        .habit-btn { background: var(--surface); border: 2px solid var(--border); padding: 10px 16px; margin: 0; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; font-weight: bold; color: var(--text2); }
-        .habit-btn.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+        .search-box button:hover {
+            background: var(--primary-hover);
+        }
 
-        .pr-btn { border: 1px solid var(--border); margin-right: 5px; transition: all 0.2s; }
-        .pr-btn.active-1 { background: var(--danger); color: #fff; border-color: var(--danger); }
-        .pr-btn.active-2 { background: var(--warning); color: #000; border-color: var(--warning); }
-        .pr-btn.active-3 { background: var(--accent); color: #000; border-color: var(--accent); }
+        /* İstatistik Kutuları (Yan Yana) */
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-        .fab { position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 100; box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4); transition: all 0.2s; }
-        .fab:hover { transform: scale(1.1); }
+        .stat-card {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .highlight { background: #f1c40f; color: #000; padding: 2px 4px; border-radius: 2px; }
+        .stat-card i {
+            font-size: 24px;
+        }
 
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-        .filter-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text1); padding: 8px 12px; font-size: 0.7rem; border-radius: 4px; }
+        .stat-card.total i { color: var(--primary); }
+        .stat-card.active i { color: var(--success); }
+        .stat-card.critical i { color: var(--danger); }
 
-        .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 2rem; }
-        .chart-block { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px; }
-        .chart-title { font-size: 0.7rem; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+        }
 
-        .linked-notes { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-        .linked-note-item { background: var(--surface2); padding: 8px 12px; margin-bottom: 8px; font-size: 0.7rem; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
-        .linked-note-item:hover { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+        .stat-title {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Sekmeler (İkonlu) */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            color: var(--primary);
+            background: #EEF2FF;
+        }
+
+        /* Sekme İçerikleri */
+        .tab-content {
+            display: none;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 300px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Zihin Bölümü */
+        .zihin-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .zihin-input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .zihin-input-area button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .zihin-list {
+            list-style: none;
+        }
+
+        .zihin-list li {
+            padding: 15px;
+            background: #F9FAFB;
+            border-left: 4px solid var(--success);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+
+        /* Ekstra Bölümü (Öncelik Filtreli) */
+        .filter-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .filter-area select {
+            padding: 8px 15px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-list li {
+            padding: 15px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge.high { background: var(--danger); }
+        .badge.medium { background: var(--warning); }
+        .badge.low { background: var(--success); }
+
+        /* Arşiv Bölümü */
+        .last-activity {
+            background: #EEF2FF;
+            border: 1px solid #C7D2FE;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .last-activity i {
+            font-size: 30px;
+            color: var(--primary);
+        }
+
     </style>
 </head>
 <body>
 
-<div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;"></div>
-
 <div class="container">
-    <div class="header-block">
-        <div id="themeToggle" style="position:absolute; top:1rem; right:1.5rem; cursor:pointer;"><i class="fa-solid fa-moon"></i></div>
-        <h1><i class="fa-solid fa-terminal"></i> Matrix</h1>
-        <div style="font-size: 0.65rem; color: var(--text2); letter-spacing: 2px; text-transform: uppercase;">terminal mod: revize</div>
-    </div>
-
-    <div class="kunye-block">
-        <div class="kunye-label">// SİSTEM DURUMU</div>
-        <div style="display:flex; gap:10px; margin-bottom:1.5rem; flex-wrap:wrap;">
-            <button id="exportBtn"><i class="fa-solid fa-download"></i> [EXPORT] <span id="backupWarning"></span></button>
-            <button id="importBtn"><i class="fa-solid fa-upload"></i> [IMPORT]</button>
-            <input type="file" id="fileInput" hidden>
-        </div>
-
-        <div class="stats-bar" id="statsBar"></div>
-
-        <div class="search-container">
-            <input type="text" id="globalSearch" class="search-input" placeholder="Sistem veri tabanında ara...">
-        </div>
-
-        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <div style="display:flex; border:1px solid var(--border); background:var(--bg);">
-                <button class="view-btn active" data-view="weekly">HAFTALIK</button>
-                <button class="view-btn" data-view="monthly">AYLIK</button>
-                <button class="view-btn" data-view="list">ARŞİV</button>
-                <button class="view-btn" data-view="extra">EKSTRA</button>
-            </div>
-            <div style="display:flex; border:1px solid var(--border); background:var(--bg);">
-                <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="currentRange" style="min-width:140px; pointer-events:none;"></button>
-                <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
+    
+    <div class="header">
+        <h1><i class="fa-solid fa-layer-group"></i> Yönetim Paneli</h1>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Görev veya not ara...">
+            <button onclick="performSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
     </div>
 
-    <main id="mainContent"></main>
+    <div class="stats-container">
+        <div class="stat-card total">
+            <i class="fa-solid fa-database"></i>
+            <div class="stat-value">142</div>
+            <div class="stat-title">Toplam Kayıt Sayısı</div>
+        </div>
+        <div class="stat-card active">
+            <i class="fa-solid fa-list-check"></i>
+            <div class="stat-value">18</div>
+            <div class="stat-title">Aktif Görevler</div>
+        </div>
+        <div class="stat-card critical">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div class="stat-value">3</div>
+            <div class="stat-title">Kritik Durum</div>
+        </div>
+    </div>
 
-    <footer>
-        <div id="randomAtomicArea" style="max-width:600px; margin: 3rem auto 0; color:var(--text2); font-style:italic; font-size:0.8rem; border-left:2px solid var(--accent); padding-left:15px;"></div>
-    </footer>
-</div>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('zihin')"><i class="fa-solid fa-brain"></i> Zihin</button>
+        <button class="tab-btn" onclick="openTab('haftalik')"><i class="fa-solid fa-calendar-week"></i> Haftalık</button>
+        <button class="tab-btn" onclick="openTab('aylik')"><i class="fa-solid fa-calendar-days"></i> Aylık</button>
+        <button class="tab-btn" onclick="openTab('ekstra')"><i class="fa-solid fa-bolt"></i> Ekstra</button>
+        <button class="tab-btn" onclick="openTab('arsiv')"><i class="fa-solid fa-box-archive"></i> Arşiv</button>
+    </div>
 
-<div class="modal" id="entryModal">
-    <div class="modal-content">
+    <div id="zihin" class="tab-content active">
+        <h2 style="margin-bottom: 15px; color: var(--primary);">Zihin Köşesi</h2>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Bugün kendini nasıl hissediyorsun? İyi hissettiğin anları ve güzel düşüncelerini buraya not al.</p>
         
-        <div class="modal-block">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <div id="modalTitle" style="color:var(--accent); font-size:1.2rem; font-weight:bold;"></div>
-                <i class="fa-solid fa-times" onclick="closeModal()" style="cursor:pointer; font-size:1.5rem;"></i>
-            </div>
-            
-            <input type="text" id="dayTitle" class="day-title-input" placeholder="Gün Başlığı (opsiyonel)">
-            
-            <div style="display:flex; gap:10px; margin-bottom:1rem;">
-                <button class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-dumbbell"></i> D</button>
-                <button class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-running"></i> S</button>
-                <button class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book"></i> O</button>
-            </div>
+        <div class="zihin-input-area">
+            <input type="text" id="zihinInput" placeholder="Harika bir fikir veya güzel bir anı yaz...">
+            <button onclick="addZihin()">Ekle</button>
         </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// GÖREVLER <span id="taskProgress" style="margin-left:10px; color:var(--accent);"></span></div>
-            <div style="display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap;">
-                <button class="pr-btn" data-p="1" onclick="selectPriority(1)">KRİTİK</button>
-                <button class="pr-btn" data-p="2" onclick="selectPriority(2)">ORTA</button>
-                <button class="pr-btn active-3" data-p="3" onclick="selectPriority(3)">DÜŞÜK</button>
-            </div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="taskInput" placeholder="Görev ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
-                <button onclick="addTask()" style="background:var(--accent); color:#000; padding:8px 15px;"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="modalTasks"></div>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// ZİHİN NOTU</div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="atomicInput" placeholder="Atomic note ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
-                <button onclick="addAtomic()" style="background:var(--accent); color:#000; padding:8px 15px;"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="modalAtomics"></div>
-        </div>
-        
-        <div class="modal-block">
-            <div class="kunye-label">// GÜN NOTU</div>
-            <textarea id="entryText"></textarea>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// ETİKETLER</div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="tagInput" placeholder="#etiket ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
-                <button onclick="addTag()" style="background:var(--accent); color:#000; padding:8px 15px;"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="modalTags"></div>
-            
-            <div id="linkedNotes" class="linked-notes" style="display:none;">
-                <div class="kunye-label">// BAĞLANTILI NOTLAR</div>
-                <div id="linkedNotesList"></div>
-            </div>
-        </div>
-
-        <div style="text-align:right;">
-            <button id="saveBtn" style="background:var(--accent); color:#000; padding:10px 20px; font-weight:bold;"><i class="fa-solid fa-save"></i> KAYDET</button>
-        </div>
+        <ul class="zihin-list" id="zihinList">
+            <li>Bugün sabah yürüyüşü zihnimi çok açtı, yeni projeye odaklanmaya hazırım.</li>
+            <li>Güneşli hava motivasyonumu artırdı.</li>
+        </ul>
     </div>
-</div>
 
-<div class="fab" id="fab"><i class="fa-solid fa-plus"></i></div>
+    <div id="haftalik" class="tab-content">
+        <h2>Haftalık Planlar</h2>
+        <p style="margin-top:10px; color:var(--text-light);">Bu haftanın öne çıkan görevleri burada listelenecek.</p>
+    </div>
+
+    <div id="aylik" class="tab-content">
+        <h2>Aylık Hedefler</h2>
+        <p style="margin-top:10px; color:var(--text-light);">Bu ay tamamlanması gereken uzun vadeli hedefler.</p>
+    </div>
+
+    <div id="ekstra" class="tab-content">
+        <div class="filter-area">
+            <h2 style="margin: 0;">Ekstra Görevler</h2>
+            <div>
+                <label for="priorityFilter" style="margin-right: 10px; font-weight: 600;">Öncelik Filtresi:</label>
+                <select id="priorityFilter" onchange="filterTasks()">
+                    <option value="all">Tümünü Göster</option>
+                    <option value="high">Yüksek Öncelik</option>
+                    <option value="medium">Orta Öncelik</option>
+                    <option value="low">Düşük Öncelik</option>
+                </select>
+            </div>
+        </div>
+
+        <ul class="task-list" id="ekstraTaskList">
+            <li class="task-item" data-priority="high">
+                <span>Sunum dosyalarını acil olarak güncelle</span>
+                <span class="badge high">Yüksek</span>
+            </li>
+            <li class="task-item" data-priority="medium">
+                <span>Yeni yazılım araçlarını araştır</span>
+                <span class="badge medium">Orta</span>
+            </li>
+            <li class="task-item" data-priority="low">
+                <span>Masaüstü klasörlerini düzenle</span>
+                <span class="badge low">Düşük</span>
+            </li>
+            <li class="task-item" data-priority="high">
+                <span>Müşteri geri bildirimlerini raporla</span>
+                <span class="badge high">Yüksek</span>
+            </li>
+        </ul>
+    </div>
+
+    <div id="arsiv" class="tab-content">
+        <div class="last-activity">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <div>
+                <h3 style="margin-bottom: 5px; color: var(--text-dark);">En Son Yapılan Aktivite</h3>
+                <p style="color: var(--text-light);">"Veritabanı optimizasyonu tamamlandı ve rapor gönderildi." - <em style="font-size: 12px;">Bugün, 14:30</em></p>
+            </div>
+        </div>
+        <h2>Geçmiş Kayıtlar</h2>
+        <p style="margin-top:10px; color:var(--text-light);">Tamamlanmış ve arşive kaldırılmış tüm süreçler burada yer alır.</p>
+    </div>
+
+</div>
 
 <script>
-// --- YARDIMCI FONKSIYONLAR ---
-const fmt = (d) => d.toISOString().split('T')[0];
-
-window.showToast = (msg, type = 'success') => {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-    const color = type === 'success' ? 'var(--accent)' : 'var(--danger)';
-    toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}"></i> ${msg}`;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-};
-
-// Ripple Effect
-document.addEventListener('click', function(e) {
-    const btn = e.target.closest('button');
-    if (btn) {
-        const circle = document.createElement('span');
-        const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-        const radius = diameter / 2;
-        const rect = btn.getBoundingClientRect();
+    // Sekme Değiştirme Fonksiyonu
+    function openTab(tabName) {
+        let contents = document.querySelectorAll('.tab-content');
+        let btns = document.querySelectorAll('.tab-btn');
         
-        circle.style.width = circle.style.height = `${diameter}px`;
-        circle.style.left = `${e.clientX - rect.left - radius}px`;
-        circle.style.top = `${e.clientY - rect.top - radius}px`;
-        circle.classList.add('ripple');
+        contents.forEach(content => content.classList.remove('active'));
+        btns.forEach(btn => btn.classList.remove('active'));
         
-        const existing = btn.querySelector('.ripple');
-        if (existing) existing.remove();
-        
-        btn.appendChild(circle);
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
     }
-});
 
-// Sayı Animasyonu
-const animateValue = (obj, start, end, duration) => {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor(progress * (end - start) + start);
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
+    // Arama Butonu Fonksiyonu
+    function performSearch() {
+        let query = document.getElementById('searchInput').value;
+        if(query.trim() === "") {
+            alert("Lütfen aramak için bir kelime girin!");
         } else {
-            obj.innerHTML = end;
+            // Şimdilik sadece uyarı veriyor, projeye göre veritabanı araması eklenebilir.
+            alert("'" + query + "' için arama sonuçları getiriliyor...");
         }
-    };
-    window.requestAnimationFrame(step);
-};
+    }
 
-const runCounters = () => {
-    document.querySelectorAll('.counter:not(.animated)').forEach(el => {
-        el.classList.add('animated');
-        const target = parseInt(el.getAttribute('data-target') || 0);
-        if (target > 0) {
-            animateValue(el, 0, target, 800);
-        } else {
-            el.innerHTML = target;
+    // Arama kutusunda Enter'a basınca aramayı tetikleme
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            performSearch();
         }
     });
-};
 
-// --- DEVAM EDEN MANTIK ---
-const state = {
-    entries: JSON.parse(localStorage.getItem('matrix_entries') || '{}'),
-    lastBackup: localStorage.getItem('matrix_last_backup'),
-    view: 'weekly',
-    cursor: new Date(),
-    selectedDate: null,
-    temp: { tasks:[], habits:[], atomics:[], tags:[], title:'' },
-    currentPriority: 3,
-    searchTerm: '',
-    archiveFilter: { tag: '', habit: '', month: '' }
-};
-
-const save = () => { 
-    localStorage.setItem('matrix_entries', JSON.stringify(state.entries)); 
-    updateStats(); 
-    renderRandomNote(); 
-};
-
-let autoSaveTimer = null;
-const triggerAutoSave = () => {
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(() => {
-        if (state.selectedDate) {
-            state.entries[state.selectedDate] = {
-                text: document.getElementById('entryText').value,
-                title: document.getElementById('dayTitle').value,
-                habits: state.temp.habits,
-                tasks: state.temp.tasks,
-                atomics: state.temp.atomics,
-                tags: state.temp.tags
-            };
-            save();
+    // Zihin Köşesine Not Ekleme
+    function addZihin() {
+        let input = document.getElementById('zihinInput');
+        let text = input.value.trim();
+        
+        if(text !== "") {
+            let ul = document.getElementById('zihinList');
+            let li = document.createElement('li');
+            li.innerText = text;
+            ul.prepend(li); // En üste ekler
+            input.value = ""; // Kutuyu temizler
         }
-    }, 1000);
-};
-
-const highlightText = (text, term) => {
-    if (!term) return text;
-    const regex = new RegExp(`(${term})`, 'gi');
-    return text.replace(regex, '<span class="highlight">$1</span>');
-};
-
-document.getElementById('globalSearch').addEventListener('input', (e) => {
-    state.searchTerm = e.target.value.toLowerCase();
-    render();
-});
-
-const render = () => {
-    const el = document.getElementById('mainContent');
-    updateStats();
-    
-    if (state.view === 'weekly') renderWeekly(el);
-    else if (state.view === 'monthly') renderMonthly(el);
-    else if (state.view === 'list') renderList(el);
-    else if (state.view === 'extra') renderExtra(el);
-    
-    const start = new Date(state.cursor);
-    const end = new Date(state.cursor);
-    if (state.view === 'monthly') {
-        start.setDate(1);
-        end.setMonth(end.getMonth() + 1, 0);
-        document.getElementById('currentRange').textContent = start.toLocaleDateString('tr-TR', { year:'numeric', month:'long' });
-    } else {
-        start.setDate(start.getDate() - start.getDay());
-        end.setDate(start.getDate() + 6);
-        document.getElementById('currentRange').textContent = `${start.getDate()} - ${end.getDate()} ${start.toLocaleDateString('tr-TR', {month:'short'})}`;
     }
-};
 
-const renderWeekly = (el) => {
-    const start = new Date(state.cursor);
-    start.setDate(start.getDate() - start.getDay());
-    el.innerHTML = '<div class="weekly-grid"></div>';
-    const grid = el.querySelector('.weekly-grid');
-    
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        const key = fmt(d);
-        const e = state.entries[key] || {};
-        
-        const hasRecords = e.text || (e.habits && e.habits.length) || (e.tasks && e.tasks.length) || (e.atomics && e.atomics.length);
-        const doneTasks = (e.tasks || []).filter(t => t.done).length;
-        const totalTasks = (e.tasks || []).length;
-        const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
-        
-        const hasDemir = e.habits && e.habits.includes('demir');
-        const taskCount = (e.tasks || []).length;
-        const atomicCount = (e.atomics || []).length;
-        
-        let habitIcons = '';
-        if (e.habits) {
-            if (e.habits.includes('demir')) habitIcons += '<div class="habit-icon" title="Demir"><i class="fa-solid fa-dumbbell"></i></div>';
-            if (e.habits.includes('spor')) habitIcons += '<div class="habit-icon" title="Spor"><i class="fa-solid fa-running"></i></div>';
-            if (e.habits.includes('okuma')) habitIcons += '<div class="habit-icon" title="Okuma"><i class="fa-solid fa-book"></i></div>';
-        }
-        
-        const dayTitle = e.title ? `<div class="day-title">${e.title}</div>` : '';
-        
-        grid.innerHTML += `
-            <div class="day-card ${hasRecords ? 'recorded' : ''}" onclick="openEntry('${key}')">
-                <div class="status-light ${hasDemir ? 'active' : ''}"></div>
-                <div class="day-header">${d.toLocaleDateString('tr-TR', { weekday:'short', day:'numeric', month:'short' })}</div>
-                ${dayTitle}
-                ${habitIcons ? `<div class="habit-icons">${habitIcons}</div>` : ''}
-                <div class="day-stats">
-                    ${taskCount > 0 ? `<div class="day-stat"><i class="fa-solid fa-tasks"></i> ${taskCount}</div>` : ''}
-                    ${atomicCount > 0 ? `<div class="day-stat"><i class="fa-solid fa-brain"></i> ${atomicCount}</div>` : ''}
-                </div>
-                ${totalTasks > 0 ? `
-                    <div class="task-progress">
-                        %${progress}
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width:${progress}%"></div>
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-    }
-};
+    // Ekstra Sekmesi Öncelik Filtreleme
+    function filterTasks() {
+        let filterValue = document.getElementById('priorityFilter').value;
+        let tasks = document.querySelectorAll('.task-item');
 
-const renderMonthly = (el) => {
-    const y = state.cursor.getFullYear();
-    const m = state.cursor.getMonth();
-    const firstDay = new Date(y, m, 1);
-    const lastDay = new Date(y, m + 1, 0);
-    const days = lastDay.getDate();
-    const startDay = firstDay.getDay();
-    
-    el.innerHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>';
-    const grid = el.querySelector('div');
-    
-    ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'].forEach(day => {
-        grid.innerHTML += `<div style="text-align:center; color:var(--accent); font-size:0.65rem; padding:5px; text-transform:uppercase;">${day}</div>`;
-    });
-    
-    for (let i = 0; i < startDay; i++) {
-        grid.innerHTML += '<div></div>';
-    }
-    
-    for (let i = 1; i <= days; i++) {
-        const d = new Date(y, m, i);
-        const key = fmt(d);
-        const e = state.entries[key] || {};
-        
-        const hasRecords = e.text || (e.habits && e.habits.length) || (e.tasks && e.tasks.length) || (e.atomics && e.atomics.length);
-        const doneTasks = (e.tasks || []).filter(t => t.done).length;
-        const totalTasks = (e.tasks || []).length;
-        const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
-        
-        const hasDemir = e.habits && e.habits.includes('demir');
-        const taskCount = (e.tasks || []).length;
-        const atomicCount = (e.atomics || []).length;
-        
-        let habitIcons = '';
-        if (e.habits) {
-            if (e.habits.includes('demir')) habitIcons += '<div class="habit-icon" title="Demir"><i class="fa-solid fa-dumbbell"></i></div>';
-            if (e.habits.includes('spor')) habitIcons += '<div class="habit-icon" title="Spor"><i class="fa-solid fa-running"></i></div>';
-            if (e.habits.includes('okuma')) habitIcons += '<div class="habit-icon" title="Okuma"><i class="fa-solid fa-book"></i></div>';
-        }
-        
-        const dayTitle = e.title ? `<div class="day-title">${e.title}</div>` : '';
-        
-        grid.innerHTML += `
-            <div class="day-card ${hasRecords ? 'recorded' : ''}" onclick="openEntry('${key}')" style="min-height:100px;">
-                <div class="status-light ${hasDemir ? 'active' : ''}"></div>
-                <div class="day-header">${i}</div>
-                ${dayTitle}
-                ${habitIcons ? `<div class="habit-icons">${habitIcons}</div>` : ''}
-                <div class="day-stats">
-                    ${taskCount > 0 ? `<div class="day-stat"><i class="fa-solid fa-tasks"></i> ${taskCount}</div>` : ''}
-                    ${atomicCount > 0 ? `<div class="day-stat"><i class="fa-solid fa-brain"></i> ${atomicCount}</div>` : ''}
-                </div>
-                ${totalTasks > 0 ? `
-                    <div class="task-progress">
-                        %${progress}
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width:${progress}%"></div>
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-    }
-};
-
-const renderList = (el) => {
-    let entries = Object.entries(state.entries).sort((a, b) => b[0].localeCompare(a[0]));
-    
-    const { tag, habit, month } = state.archiveFilter;
-    if (tag) entries = entries.filter(([d, e]) => e.tags?.some(t => t.toLowerCase().includes(tag.toLowerCase())));
-    if (habit) entries = entries.filter(([d, e]) => e.habits?.includes(habit));
-    if (month) entries = entries.filter(([d]) => d.startsWith(month));
-    
-    if (state.searchTerm) {
-        entries = entries.filter(([d, e]) => {
-            const searchIn = [
-                e.text || '',
-                ...(e.tasks || []).map(t => t.text),
-                ...(e.atomics || []),
-                ...(e.tags || []),
-                e.title || ''
-            ].join(' ').toLowerCase();
-            return searchIn.includes(state.searchTerm);
+        tasks.forEach(task => {
+            if (filterValue === 'all' || task.getAttribute('data-priority') === filterValue) {
+                task.style.display = 'flex';
+            } else {
+                task.style.display = 'none';
+            }
         });
     }
-    
-    const allTags = [...new Set(Object.values(state.entries).flatMap(e => e.tags || []))];
-    const allMonths = [...new Set(Object.keys(state.entries).map(d => d.substring(0, 7)))].sort().reverse();
-    
-    el.innerHTML = `
-        <div class="filter-bar">
-            <select class="filter-select" id="filterTag" onchange="state.archiveFilter.tag = this.value; render();">
-                <option value="">Tüm Etiketler</option>
-                ${allTags.map(t => `<option value="${t}" ${tag === t ? 'selected' : ''}>#${t}</option>`).join('')}
-            </select>
-            <select class="filter-select" id="filterHabit" onchange="state.archiveFilter.habit = this.value; render();">
-                <option value="">Tüm Habitler</option>
-                <option value="demir" ${habit === 'demir' ? 'selected' : ''}>Demir</option>
-                <option value="spor" ${habit === 'spor' ? 'selected' : ''}>Spor</option>
-                <option value="okuma" ${habit === 'okuma' ? 'selected' : ''}>Okuma</option>
-            </select>
-            <select class="filter-select" id="filterMonth" onchange="state.archiveFilter.month = this.value; render();">
-                <option value="">Tüm Aylar</option>
-                ${allMonths.map(m => `<option value="${m}" ${month === m ? 'selected' : ''}>${m}</option>`).join('')}
-            </select>
-            <button onclick="state.archiveFilter = {tag:'', habit:'', month:''}; render();" style="background:var(--surface2); border:1px solid var(--border);">
-                <i class="fa-solid fa-times"></i> Filtreleri Temizle
-            </button>
-        </div>
-        <div class="kunye-label">// ARŞİV (${entries.length} kayıt)</div>
-        ${entries.map(([d, e]) => {
-            const text = highlightText(e.text || '', state.searchTerm);
-            const title = e.title ? highlightText(e.title, state.searchTerm) : '';
-            return `
-                <div class="list-row" onclick="openEntry('${d}')" style="cursor:pointer; flex-direction:column; align-items:start; padding:12px;">
-                    <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
-                        <strong>${d}</strong>
-                        ${title ? `<span style="color:var(--accent);">${title}</span>` : ''}
-                    </div>
-                    ${text ? `<div style="font-size:0.7rem; color:var(--text2);">${text.substring(0, 150)}...</div>` : ''}
-                    ${e.tags && e.tags.length ? `<div style="margin-top:5px;">${e.tags.map(t => `<span class="tag-chip">#${highlightText(t, state.searchTerm)}</span>`).join('')}</div>` : ''}
-                </div>
-            `;
-        }).join('')}
-    `;
-};
-
-const renderExtra = (el) => {
-    el.innerHTML = `
-        <div class="chart-grid">
-            <div class="chart-block">
-                <div class="chart-title">ZİHİN NOTLARI (7 Gün)</div>
-                <canvas id="atomicChart"></canvas>
-            </div>
-            <div class="chart-block">
-                <div class="chart-title">SPOR AKTİVİTESİ (30 Gün)</div>
-                <canvas id="sporChart"></canvas>
-            </div>
-            <div class="chart-block">
-                <div class="chart-title">OKUMA AKTİVİTESİ (30 Gün)</div>
-                <canvas id="okumaChart"></canvas>
-            </div>
-        </div>
-        
-        <div class="stats-bar">
-            <div class="stat-item"><div class="stat-label">DEMİR ZİNCİRİ</div><span class="counter" data-target="${getStreak('demir')}">0</span> GÜN</div>
-            <div class="stat-item"><div class="stat-label">SPOR ZİNCİRİ</div><span class="counter" data-target="${getStreak('spor')}">0</span> GÜN</div>
-            <div class="stat-item"><div class="stat-label">OKUMA ZİNCİRİ</div><span class="counter" data-target="${getStreak('okuma')}">0</span> GÜN</div>
-        </div>
-        
-        <div class="modal-block" style="margin-top:20px;">
-            <div class="kunye-label">// GÖREV HAVUZU (Tıklanabilir)</div>
-            <div id="pool" style="margin-top:10px"></div>
-        </div>
-    `;
-    
-    setTimeout(() => {
-        initAtomicChart();
-        initSporChart();
-        initOkumaChart();
-        runCounters(); // Extra paneli açıldığında sayaçları çalıştır
-    }, 100);
-    
-    const pool = el.querySelector('#pool');
-    Object.entries(state.entries).forEach(([d, e]) => {
-        e.tasks?.forEach(t => {
-            if(!t.done) pool.innerHTML += `<div class="list-row" onclick="openEntry('${d}')" style="cursor:pointer;">[${d}] ${t.text}</div>`;
-        });
-    });
-};
-
-/* LOGIC */
-window.openEntry = (date) => {
-    state.selectedDate = date;
-    const e = state.entries[date] || { text:'', title:'', habits:[], tasks:[], atomics:[], tags: [] };
-    state.temp = { 
-        tasks: [...(e.tasks || [])], 
-        habits: [...(e.habits || [])], 
-        atomics: [...(e.atomics || [])], 
-        tags: [...(e.tags || [])],
-        title: e.title || ''
-    };
-    document.getElementById('modalTitle').textContent = date;
-    document.getElementById('dayTitle').value = e.title || '';
-    document.getElementById('entryText').value = e.text || '';
-    renderModalTemp();
-    updateLinkedNotes();
-    document.getElementById('entryModal').classList.add('active');
-};
-
-const updateLinkedNotes = () => {
-    const currentTags = state.temp.tags;
-    if (currentTags.length === 0) {
-        document.getElementById('linkedNotes').style.display = 'none';
-        return;
-    }
-    
-    const linked = [];
-    Object.entries(state.entries).forEach(([d, e]) => {
-        if (d === state.selectedDate) return;
-        if (e.tags && e.tags.some(t => currentTags.includes(t))) {
-            linked.push({ date: d, entry: e, commonTags: e.tags.filter(t => currentTags.includes(t)) });
-        }
-    });
-    
-    if (linked.length > 0) {
-        document.getElementById('linkedNotes').style.display = 'block';
-        document.getElementById('linkedNotesList').innerHTML = linked
-            .sort((a, b) => b.date.localeCompare(a.date))
-            .map(l => `
-                <div class="linked-note-item" onclick="openEntry('${l.date}')">
-                    <strong>${l.date}</strong> ${l.entry.title ? `- ${l.entry.title}` : ''}<br>
-                    <span style="font-size:0.65rem; color:var(--text2);">
-                        Ortak etiketler: ${l.commonTags.map(t => `#${t}`).join(', ')}
-                    </span>
-                </div>
-            `).join('');
-    } else {
-        document.getElementById('linkedNotes').style.display = 'none';
-    }
-};
-
-const updateTaskProgress = () => {
-    const done = state.temp.tasks.filter(t => t.done).length;
-    const total = state.temp.tasks.length;
-    const progress = total > 0 ? Math.round((done / total) * 100) : 0;
-    document.getElementById('taskProgress').textContent = total > 0 ? `(%${progress})` : '';
-};
-
-const renderModalTemp = () => {
-    ['demir','spor','okuma'].forEach(h => {
-        const btn = document.getElementById(`h_${h}`);
-        if(state.temp.habits.includes(h)) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
-    
-    document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row">
-        <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done; renderModalTemp(); triggerAutoSave();">
-        <span class="priority-tag" style="background:${t.priority==1?'var(--danger)':t.priority==2?'var(--warning)':'var(--accent)'}; color:${t.priority==2?'#000':'#fff'}">${t.priority==1?'!!':t.priority==2?'!':''}</span>
-        <span style="flex:1; ${t.done?'text-decoration:line-through; opacity:0.5':''}">${t.text}</span>
-        <i class="fa-solid fa-trash" onclick="state.temp.tasks.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="cursor:pointer; color:var(--danger)"></i>
-    </div>`).join('');
-    
-    document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row"><span>${a}</span><i class="fa-solid fa-trash" onclick="state.temp.atomics.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="margin-left:auto; cursor:pointer; color:var(--danger)"></i></div>`).join('');
-    
-    document.getElementById('modalTags').innerHTML = state.temp.tags.map((t,i) => `<span class="tag-chip">#${t} <i class="fa-solid fa-times" onclick="state.temp.tags.splice(${i},1); renderModalTemp(); updateLinkedNotes(); triggerAutoSave();" style="cursor:pointer;"></i></span>`).join('');
-    
-    updateTaskProgress();
-    updateLinkedNotes();
-};
-
-window.addTask = () => { 
-    const i = document.getElementById('taskInput'); 
-    if(i.value){ 
-        state.temp.tasks.push({text:i.value, done:false, priority: state.currentPriority}); 
-        i.value=''; 
-        renderModalTemp(); 
-        triggerAutoSave(); 
-    } 
-};
-
-window.addAtomic = () => { 
-    const i = document.getElementById('atomicInput'); 
-    if(i.value){ 
-        state.temp.atomics.push(i.value); 
-        i.value=''; 
-        renderModalTemp(); 
-        triggerAutoSave(); 
-    } 
-};
-
-window.addTag = () => { 
-    const i = document.getElementById('tagInput'); 
-    if(i.value){ 
-        const tag = i.value.trim().replace('#', '');
-        if (!state.temp.tags.includes(tag)) {
-            state.temp.tags.push(tag); 
-            i.value=''; 
-            renderModalTemp(); 
-            updateLinkedNotes();
-            triggerAutoSave(); 
-        }
-    } 
-};
-
-window.toggleHabit = (h) => { 
-    const idx = state.temp.habits.indexOf(h); 
-    if(idx>-1) state.temp.habits.splice(idx,1); 
-    else state.temp.habits.push(h); 
-    renderModalTemp(); 
-    triggerAutoSave(); 
-};
-
-window.selectPriority = (p) => { 
-    state.currentPriority = p; 
-    document.querySelectorAll('.pr-btn').forEach(b => {
-        b.classList.remove('active-1', 'active-2', 'active-3');
-        if(parseInt(b.dataset.p) === p) {
-            b.classList.add(`active-${p}`);
-        }
-    });
-};
-
-const updateStats = () => {
-    const all = Object.entries(state.entries);
-    const activeTasks = all.filter(([d,e]) => e.tasks?.some(t => !t.done));
-    
-    const hasCritical = all.some(([d,e]) => e.tasks?.some(t => t.priority == 1 && !t.done));
-    
-    const needsBackup = !state.lastBackup || (Date.now() - new Date(state.lastBackup).getTime() > 7*24*60*60*1000);
-    document.getElementById('backupWarning').innerHTML = needsBackup ? `<i class="fa-solid fa-triangle-exclamation backup-alert"></i>` : '';
-
-    const activeTasksHtml = activeTasks.length > 0 
-        ? activeTasks.slice(0, 5).map(([d,e]) => {
-            const incompleteTasks = e.tasks.filter(t => !t.done);
-            return `<div class="task-chip" onclick="openEntry('${d}')" style="cursor:pointer;">${d} (${incompleteTasks.length})</div>`;
-        }).join('') + (activeTasks.length > 5 ? `<div class="task-chip">+${activeTasks.length - 5} daha...</div>` : '')
-        : 'TEMİZ';
-
-    document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item">
-            <div class="stat-label">KAYIT SAYISI</div>
-            <div class="stat-content"><span class="counter" data-target="${all.length}">0</span></div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">AKTİF GÖREVLER</div>
-            <div class="stat-content">${activeTasksHtml}</div>
-        </div>
-        <div class="stat-item" style="border-left-color:${hasCritical?'var(--danger)':'var(--accent)'}">
-            <div class="stat-label">KRİTİK DURUM ${hasCritical?'<span class="critical-dot"></span>':''}</div>
-            <div class="stat-content">${hasCritical ? 'YÜKSEK ÖNCELİKLİ İŞ VAR' : 'SİSTEM STABİL'}</div>
-        </div>
-    `;
-    
-    setTimeout(runCounters, 50);
-};
-
-const getStreak = (h) => {
-    let s = 0; 
-    let d = new Date();
-    for(let i=0; i<365; i++) {
-        const e = state.entries[fmt(d)];
-        if(e?.habits?.includes(h)) s++; 
-        else if(i>0) break;
-        d.setDate(d.getDate()-1);
-    }
-    return s;
-};
-
-const initAtomicChart = () => {
-    const ctx = document.getElementById('atomicChart'); 
-    if(!ctx) return;
-    const data = Object.entries(state.entries).slice(-7).map(([d,e]) => (e.atomics || []).length);
-    const labels = Object.keys(state.entries).slice(-7).map(d => d.substring(5));
-    new Chart(ctx, { 
-        type:'bar', 
-        data:{ 
-            labels: labels, 
-            datasets:[{
-                label:'Zihin Notları', 
-                data:data, 
-                backgroundColor:'rgba(46, 204, 113, 0.5)',
-                borderColor:'#2ecc71',
-                borderWidth: 2
-            }] 
-        }, 
-        options:{ 
-            scales:{
-                y:{
-                    beginAtZero:true, 
-                    ticks:{stepSize:1}
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        } 
-    });
-};
-
-const initSporChart = () => {
-    const ctx = document.getElementById('sporChart'); 
-    if(!ctx) return;
-    const last30 = [];
-    const d = new Date();
-    for(let i = 0; i < 30; i++) {
-        const key = fmt(new Date(d.getTime() - i * 24 * 60 * 60 * 1000));
-        const e = state.entries[key];
-        last30.unshift(e?.habits?.includes('spor') ? 1 : 0);
-    }
-    new Chart(ctx, { 
-        type:'line', 
-        data:{ 
-            labels: Array.from({length: 30}, (_, i) => i + 1), 
-            datasets:[{
-                label:'Spor', 
-                data: last30, 
-                borderColor:'#3498db',
-                backgroundColor:'rgba(52, 152, 219, 0.1)',
-                tension:0.4,
-                fill: true
-            }] 
-        }, 
-        options:{ 
-            scales:{
-                y:{
-                    beginAtZero:true, 
-                    max: 1,
-                    ticks:{stepSize:1}
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        } 
-    });
-};
-
-const initOkumaChart = () => {
-    const ctx = document.getElementById('okumaChart'); 
-    if(!ctx) return;
-    const last30 = [];
-    const d = new Date();
-    for(let i = 0; i < 30; i++) {
-        const key = fmt(new Date(d.getTime() - i * 24 * 60 * 60 * 1000));
-        const e = state.entries[key];
-        last30.unshift(e?.habits?.includes('okuma') ? 1 : 0);
-    }
-    new Chart(ctx, { 
-        type:'line', 
-        data:{ 
-            labels: Array.from({length: 30}, (_, i) => i + 1), 
-            datasets:[{
-                label:'Okuma', 
-                data: last30, 
-                borderColor:'#e74c3c',
-                backgroundColor:'rgba(231, 76, 60, 0.1)',
-                tension:0.4,
-                fill: true
-            }] 
-        }, 
-        options:{ 
-            scales:{
-                y:{
-                    beginAtZero:true, 
-                    max: 1,
-                    ticks:{stepSize:1}
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        } 
-    });
-};
-
-const renderRandomNote = () => {
-    const pool = Object.values(state.entries).flatMap(e => e.atomics || []);
-    document.getElementById('randomAtomicArea').textContent = pool.length ? `"${pool[Math.floor(Math.random()*pool.length)]}"` : '';
-};
-
-const saveTheme = (theme) => {
-    localStorage.setItem('matrix_theme', theme);
-};
-
-const loadTheme = () => {
-    const savedTheme = localStorage.getItem('matrix_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-};
-
-const updateThemeIcon = (theme) => {
-    const icon = document.querySelector('#themeToggle i');
-    icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-};
-
-document.getElementById('exportBtn').onclick = () => {
-    const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'});
-    const a = document.createElement('a'); 
-    a.href = URL.createObjectURL(b); 
-    a.download='matrix_revize.json'; 
-    a.click();
-    state.lastBackup = new Date().toISOString();
-    localStorage.setItem('matrix_last_backup', state.lastBackup);
-    updateStats();
-    showToast('Yedek başarıyla indirildi.', 'success');
-};
-
-document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange = (e) => { 
-    const r = new FileReader(); 
-    r.onload=(ev)=>{
-        try {
-            state.entries=JSON.parse(ev.target.result); 
-            save();
-            render();
-            showToast('Veri aktarımı başarılı.', 'success');
-        } catch(err) {
-            showToast('Geçersiz dosya formatı.', 'error');
-        }
-    }; 
-    r.readAsText(e.target.files[0]); 
-};
-
-document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { 
-    document.querySelectorAll('.view-btn').forEach(x=>x.classList.remove('active')); 
-    b.classList.add('active'); 
-    state.view = b.dataset.view; 
-    render(); 
-});
-
-document.getElementById('prevBtn').onclick = () => {
-    if (state.view === 'monthly') { state.cursor.setMonth(state.cursor.getMonth()-1); }
-    else { state.cursor.setDate(state.cursor.getDate()-7); }
-    render();
-};
-
-document.getElementById('nextBtn').onclick = () => {
-    if (state.view === 'monthly') { state.cursor.setMonth(state.cursor.getMonth()+1); }
-    else { state.cursor.setDate(state.cursor.getDate()+7); }
-    render();
-};
-
-window.closeModal = () => { 
-    document.getElementById('entryModal').classList.remove('active'); 
-    render(); 
-};
-
-document.getElementById('saveBtn').onclick = () => {
-    state.entries[state.selectedDate] = { 
-        text: document.getElementById('entryText').value, 
-        title: document.getElementById('dayTitle').value,
-        habits: state.temp.habits, 
-        tasks: state.temp.tasks, 
-        atomics: state.temp.atomics, 
-        tags: state.temp.tags 
-    };
-    save(); 
-    showToast('Gün başarıyla kaydedildi.', 'success');
-    closeModal();
-};
-
-document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
-
-document.getElementById('themeToggle').onclick = () => { 
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    saveTheme(newTheme);
-    updateThemeIcon(newTheme);
-};
-
-loadTheme();
-render();
 </script>
+
 </body>
 </html>
