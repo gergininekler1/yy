@@ -51,7 +51,10 @@
         .sub-header-row { display: flex; gap: 10px; margin-bottom: 1.5rem; }
         
         .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-        .stat-item { background: var(--surface2); padding: 10px; border-left: 2px solid var(--accent); }
+        
+        /* Künye için görsel iyileştirmeler */
+        .stat-item { background: var(--surface2); padding: 10px; border-left: 2px solid var(--accent); border-radius: 4px; transition: all 0.3s ease; }
+        .stat-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); border-left-color: #fff; }
         .stat-label { color: var(--text2); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
 
         .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--accent); padding: 12px; font-size: 0.8rem; margin-bottom: 1rem; }
@@ -64,11 +67,10 @@
 
         .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
         
-        /* Progress Bar eklentisi için day-card overflow hidden yapıldı */
         .day-card { background: var(--surface); border-left: 5px solid var(--accent); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; overflow: hidden; }
         
-        /* Özellik 6: İnce Görev İlerleme Çubuğu */
-        .card-progress { position: absolute; top: 0; left: 0; height: 3px; background: var(--accent); transition: width 0.4s ease; box-shadow: 0 0 5px var(--accent); }
+        /* Özellik 6: İnce Görev İlerleme Çubuğu - Alt Kısma Alındı */
+        .card-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--accent); transition: width 0.4s ease; box-shadow: 0 0 5px var(--accent); }
 
         .habit-circle { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; border: 1px solid var(--border); border-radius: 50%; }
         .habit-circle.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); border: none; }
@@ -383,9 +385,9 @@ const renderExtra = (el) => {
 
     el.innerHTML = `
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-label">BU HAFTA HABITS</div>Spor: ${countHabit('spor', thisWeek)} | Okuma: ${countHabit('okuma', thisWeek)}</div>
-            <div class="stat-item"><div class="stat-label">GENEL HABITS</div>Spor: ${countHabit('spor', all)} | Okuma: ${countHabit('okuma', all)}</div>
-            <div class="stat-item"><div class="stat-label">GÖREV ÖNCELİKLERİ</div>Hi: ${priorityCounts[1] || 0} | Med: ${priorityCounts[2] || 0} | Low: ${priorityCounts[3] || 0}</div>
+            <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-calendar-week"></i> BU HAFTA HABITS</div>Spor: ${countHabit('spor', thisWeek)} | Okuma: ${countHabit('okuma', thisWeek)}</div>
+            <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-chart-pie"></i> GENEL HABITS</div>Spor: ${countHabit('spor', all)} | Okuma: ${countHabit('okuma', all)}</div>
+            <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-layer-group"></i> GÖREV ÖNCELİKLERİ</div>Hi: ${priorityCounts[1] || 0} | Med: ${priorityCounts[2] || 0} | Low: ${priorityCounts[3] || 0}</div>
         </div>
         
         <div class="kunye-label" style="margin-top:20px">// AYLIK GÖREV TAMAMLAMA ORANI</div>
@@ -469,13 +471,19 @@ window.openEntry = (date) => {
 const renderModalTemp = () => {
     ['demir','spor','okuma'].forEach(h => document.getElementById(`h_${h}`).classList.toggle('active', state.temp.habits.includes(h)));
     
+    // GÖREVLERE SİLME BUTONU EKLENDİ
     document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row">
         <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done; updateStats();">
         <span class="priority-tag priority-${t.priority || 3}">[${getPriorityLabel(t.priority || 3)}]</span>
         <span style="flex:1; ${t.done?'text-decoration:line-through; opacity:0.5':''}">${t.text}</span>
+        <i class="fa-solid fa-trash" onclick="removeTask(${i})" style="cursor:pointer; color:var(--danger); font-size:0.7rem; margin-left:auto;" title="Görevi Sil"></i>
     </div>`).join('');
     
-    document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row" style="border-left:2px solid #40c4ff"><span>${a}</span></div>`).join('');
+    // ATOMİK NOTLARA SİLME BUTONU EKLENDİ
+    document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row" style="border-left:2px solid #40c4ff">
+        <span style="flex:1;">${a}</span>
+        <i class="fa-solid fa-trash" onclick="removeAtomic(${i})" style="cursor:pointer; color:var(--danger); font-size:0.7rem; margin-left:auto;" title="Notu Sil"></i>
+    </div>`).join('');
     
     document.getElementById('modalTags').innerHTML = state.temp.tags.map((tag, i) => `<span class="tag-chip">#${tag} <i class="fa-solid fa-times tag-remove" onclick="removeTag(${i})"></i></span>`).join('');
 };
@@ -498,6 +506,11 @@ window.addTask = () => {
 };
 
 window.addAtomic = () => { const i = document.getElementById('atomicInput'); if(i.value){state.temp.atomics.push(i.value); i.value=''; renderModalTemp();} };
+
+// SİLME FONKSİYONLARI EKLENDİ
+window.removeTask = (idx) => { state.temp.tasks.splice(idx, 1); updateStats(); renderModalTemp(); };
+window.removeAtomic = (idx) => { state.temp.atomics.splice(idx, 1); renderModalTemp(); };
+
 window.toggleHabit = (h) => { const idx = state.temp.habits.indexOf(h); if(idx>-1) state.temp.habits.splice(idx,1); else state.temp.habits.push(h); renderModalTemp(); };
 
 window.addTag = () => {
@@ -530,10 +543,11 @@ document.getElementById('saveBtn').onclick = () => {
 const updateStats = () => {
     const all = Object.values(state.entries);
     const active = all.reduce((s, e) => s + (e.tasks?.filter(t => !t.done).length || 0), 0);
+    // İKONLAR EKLENDİ
     document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item"><div class="stat-label">KAYIT</div>${all.length}</div>
-        <div class="stat-item"><div class="stat-label">AKTİF GÖREV</div>${active}</div>
-        <div class="stat-item"><div class="stat-label">DEMİR ZİHİN</div>${all.filter(e=>e.habits?.includes('demir')).length}</div>
+        <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-database"></i> KAYIT</div>${all.length}</div>
+        <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-list-check"></i> AKTİF GÖREV</div>${active}</div>
+        <div class="stat-item"><div class="stat-label"><i class="fa-solid fa-brain"></i> DEMİR ZİHİN</div>${all.filter(e=>e.habits?.includes('demir')).length}</div>
     `;
 };
 
