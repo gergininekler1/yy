@@ -168,6 +168,7 @@
 
 <div class="modal" id="entryModal">
     <div class="modal-content">
+        
         <div class="modal-block">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                 <div id="modalTitle" style="color:var(--accent); font-size:1.2rem; font-weight:bold;"></div>
@@ -176,12 +177,6 @@
             
             <input type="text" id="dayTitle" class="day-title-input" placeholder="Gün Başlığı (opsiyonel)">
             
-            <div class="kunye-label">// GÜN NOTU</div>
-            <textarea id="entryText"></textarea>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// HABİTLER</div>
             <div style="display:flex; flex-wrap:wrap; gap:5px;">
                 <button class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-dumbbell"></i> DEMİR</button>
                 <button class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-running"></i> SPOR</button>
@@ -210,6 +205,11 @@
                 <button onclick="addAtomic()" style="background:var(--accent); color:#000; padding:8px 15px;"><i class="fa-solid fa-plus"></i></button>
             </div>
             <div id="modalAtomics"></div>
+        </div>
+        
+        <div class="modal-block">
+            <div class="kunye-label">// GÜN NOTU</div>
+            <textarea id="entryText"></textarea>
         </div>
 
         <div class="modal-block">
@@ -369,14 +369,17 @@ const renderMonthly = (el) => {
     el.innerHTML = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>';
     const grid = el.querySelector('div');
     
+    // Haftanın günlerini başlık olarak ekle
     ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'].forEach(day => {
         grid.innerHTML += `<div style="text-align:center; color:var(--accent); font-size:0.65rem; padding:5px; text-transform:uppercase;">${day}</div>`;
     });
     
+    // Boş hücreler ekle
     for (let i = 0; i < startDay; i++) {
         grid.innerHTML += '<div></div>';
     }
     
+    // Günleri ekle
     for (let i = 1; i <= days; i++) {
         const d = new Date(y, m, i);
         const key = fmt(d);
@@ -426,11 +429,13 @@ const renderMonthly = (el) => {
 const renderList = (el) => {
     let entries = Object.entries(state.entries).sort((a, b) => b[0].localeCompare(a[0]));
     
+    // Filtreler
     const { tag, habit, month } = state.archiveFilter;
     if (tag) entries = entries.filter(([d, e]) => e.tags?.some(t => t.toLowerCase().includes(tag.toLowerCase())));
     if (habit) entries = entries.filter(([d, e]) => e.habits?.includes(habit));
     if (month) entries = entries.filter(([d]) => d.startsWith(month));
     
+    // Arama
     if (state.searchTerm) {
         entries = entries.filter(([d, e]) => {
             const searchIn = [
@@ -444,6 +449,7 @@ const renderList = (el) => {
         });
     }
     
+    // Tüm etiketler, habitler ve aylar
     const allTags = [...new Set(Object.values(state.entries).flatMap(e => e.tags || []))];
     const allMonths = [...new Set(Object.keys(state.entries).map(d => d.substring(0, 7)))].sort().reverse();
     
@@ -528,6 +534,7 @@ const renderExtra = (el) => {
     });
 };
 
+/* LOGIC */
 window.openEntry = (date) => {
     state.selectedDate = date;
     const e = state.entries[date] || { text:'', title:'', habits:[], tasks:[], atomics:[], tags: [] };
@@ -661,7 +668,11 @@ window.selectPriority = (p) => {
 const updateStats = () => {
     const all = Object.entries(state.entries);
     const activeTasks = all.filter(([d,e]) => e.tasks?.some(t => !t.done));
+    
+    // Kritik Görev Kontrolü
     const hasCritical = all.some(([d,e]) => e.tasks?.some(t => t.priority == 1 && !t.done));
+    
+    // Yedekleme Kontrolü
     const needsBackup = !state.lastBackup || (Date.now() - new Date(state.lastBackup).getTime() > 7*24*60*60*1000);
     document.getElementById('backupWarning').innerHTML = needsBackup ? `<i class="fa-solid fa-triangle-exclamation backup-alert"></i>` : '';
 
@@ -703,9 +714,8 @@ const getStreak = (h) => {
 const initAtomicChart = () => {
     const ctx = document.getElementById('atomicChart'); 
     if(!ctx) return;
-    const last7 = Object.entries(state.entries).slice(-7);
-    const data = last7.map(([d,e]) => (e.atomics || []).length);
-    const labels = last7.map(([d,e]) => d.substring(5));
+    const data = Object.entries(state.entries).slice(-7).map(([d,e]) => (e.atomics || []).length);
+    const labels = Object.keys(state.entries).slice(-7).map(d => d.substring(5));
     new Chart(ctx, { 
         type:'bar', 
         data:{ 
@@ -719,8 +729,15 @@ const initAtomicChart = () => {
             }] 
         }, 
         options:{ 
-            scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } },
-            plugins: { legend: { display: false } }
+            scales:{
+                y:{
+                    beginAtZero:true, 
+                    ticks:{stepSize:1}
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
         } 
     });
 };
@@ -749,8 +766,16 @@ const initSporChart = () => {
             }] 
         }, 
         options:{ 
-            scales:{ y:{ beginAtZero:true, max: 1, ticks:{stepSize:1} } },
-            plugins: { legend: { display: false } }
+            scales:{
+                y:{
+                    beginAtZero:true, 
+                    max: 1,
+                    ticks:{stepSize:1}
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
         } 
     });
 };
@@ -779,8 +804,16 @@ const initOkumaChart = () => {
             }] 
         }, 
         options:{ 
-            scales:{ y:{ beginAtZero:true, max: 1, ticks:{stepSize:1} } },
-            plugins: { legend: { display: false } }
+            scales:{
+                y:{
+                    beginAtZero:true, 
+                    max: 1,
+                    ticks:{stepSize:1}
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
         } 
     });
 };
@@ -790,7 +823,10 @@ const renderRandomNote = () => {
     document.getElementById('randomAtomicArea').textContent = pool.length ? `"${pool[Math.floor(Math.random()*pool.length)]}"` : '';
 };
 
-const saveTheme = (theme) => localStorage.setItem('matrix_theme', theme);
+// Tema değişikliğini localStorage'a kaydet
+const saveTheme = (theme) => {
+    localStorage.setItem('matrix_theme', theme);
+};
 
 const loadTheme = () => {
     const savedTheme = localStorage.getItem('matrix_theme') || 'dark';
@@ -872,6 +908,7 @@ document.getElementById('themeToggle').onclick = () => {
     updateThemeIcon(newTheme);
 };
 
+// Sayfa yüklendiğinde tema ve diğer verileri yükle
 loadTheme();
 render();
 </script>
