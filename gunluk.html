@@ -1,35 +1,31 @@
-<!DOCTYPE html><html lang="tr" data-theme="dark">
+<!DOCTYPE html><html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MATRIX.JOURNAL v5</title><style>
-:root{
- --accent:#00e676;--bg:#0e0e11;--surface:#141418;--border:#28282f;--text:#e8e8ec;--sub:#7a7a8c;
-}
-body{font-family:monospace;background:var(--bg);color:var(--text);margin:0}
+<title>MATRIX JOURNAL V5</title><style>
+body{margin:0;font-family:monospace;background:#0e0e11;color:#eee}
 .container{padding:1rem}
-button{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.4rem 0.7rem}
-.task{display:flex;gap:0.5rem;padding:0.5rem;border-bottom:1px solid var(--border)}
-.done{text-decoration:line-through;opacity:0.5}
-#atomicFeed{position:fixed;bottom:0;left:0;width:100%;background:var(--surface);padding:0.5rem;overflow-x:auto;white-space:nowrap}
-.score{font-size:1.2rem;color:var(--accent)}
-.quick{position:fixed;bottom:70px;right:20px;background:var(--accent);color:#000;padding:10px;border-radius:50%}
-</style></head>
-<body>
-<div class="container">
-<h2>MATRIX JOURNAL v5</h2><div id="dashboard"></div>
+.task{padding:8px;border-bottom:1px solid #222;cursor:pointer}
+.done{text-decoration:line-through;opacity:.5}
+.dashboard{padding:10px;border:1px solid #222;margin-bottom:10px}
+#atomicFeed{position:fixed;bottom:0;width:100%;background:#111;padding:8px;font-size:12px;white-space:nowrap;overflow-x:auto}
+.fab{position:fixed;bottom:60px;right:20px;background:#00e676;color:#000;border:none;padding:15px;border-radius:50%}
+</style></head><body><div class="container">
+<h2>MATRIX JOURNAL V5</h2><div id="dashboard"></div>
 <div id="tasks"></div></div><div id="atomicFeed"></div>
-<button class="quick" onclick="quickAdd()">+</button><script>
-let data = JSON.parse(localStorage.getItem('v5')||'{}');
+<button class="fab" onclick="quickAdd()">+</button><script>
 
-function save(){localStorage.setItem('v5',JSON.stringify(data))}
+let data = JSON.parse(localStorage.getItem('mjv5')||'{}');
+
+function save(){localStorage.setItem('mjv5',JSON.stringify(data))}
 
 function today(){return new Date().toISOString().split('T')[0]}
 
-function get(){return data[today()]||{tasks:[],notes:[],mood:'neutral'}}
+function get(){return data[today()]||{tasks:[],atomicNotes:[],mood:'neutral'}}
 
-function set(entry){data[today()]=entry;save();render()}
+function set(e){data[today()]=e;save();render()}
 
+// 🔥 SCORE
 function calcScore(e){
  let s=0;
  e.tasks.forEach(t=>{if(t.done)s+=10});
@@ -39,45 +35,56 @@ function calcScore(e){
  return s;
 }
 
+// 🔥 RENDER
 function render(){
  let e=get();
 
- // dashboard
  document.getElementById('dashboard').innerHTML=`
- <div class="score">SCORE: ${calcScore(e)}</div>
- <div>${e.tasks.filter(t=>t.done).length}/${e.tasks.length} görev</div>`;
+ <div class="dashboard">
+ <b>SCORE:</b> ${calcScore(e)}<br>
+ ${e.tasks.filter(t=>t.done).length}/${e.tasks.length} görev tamamlandı
+ </div>`;
 
- // tasks
  let html='';
  e.tasks.forEach((t,i)=>{
  html+=`<div class="task ${t.done?'done':''}" onclick="toggle(${i})">${t.text}</div>`
- })
+ });
+
  document.getElementById('tasks').innerHTML=html;
 
  renderFeed();
 }
 
+// ✔ TASK TOGGLE
 function toggle(i){
  let e=get();
  e.tasks[i].done=!e.tasks[i].done;
  set(e);
 }
 
+// ⚡ QUICK ADD
 function quickAdd(){
- let text=prompt('Görev gir');
- if(!text)return;
+ let t=prompt('Görev gir');
+ if(!t)return;
  let e=get();
- e.tasks.push({text,done:false});
+ e.tasks.push({text:t,done:false});
  set(e);
 }
 
+// 🔀 ATOMIC FEED
 function renderFeed(){
  let notes=[];
- Object.values(data).forEach(d=>{if(d.notes)notes.push(...d.notes)});
+ Object.values(data).forEach(d=>{
+  if(d.atomicNotes)notes.push(...d.atomicNotes);
+ });
+
  notes.sort(()=>Math.random()-0.5);
- document.getElementById('atomicFeed').innerHTML=notes.slice(0,10).join(' • ');
+
+ document.getElementById('atomicFeed').innerHTML=
+ notes.slice(0,10).join(' • ') || 'Atomic not yok';
 }
 
 render();
+
 </script></body>
 </html>
