@@ -41,12 +41,14 @@
         
         .container { max-width: 1100px; margin: 0 auto; }
 
-        header { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); position: relative; }
-        .theme-icon { position: absolute; top: 1.5rem; right: 1.5rem; cursor: pointer; color: var(--text2); font-size: 1.2rem; }
+        /* Structure update: Separate header blocks */
+        .header-block { border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 0.5rem; background: var(--surface); position: relative; }
+        .theme-icon { position: absolute; top: 1rem; right: 1.5rem; cursor: pointer; color: var(--text2); font-size: 1.2rem; }
         
         h1 { font-family: 'Orbitron'; letter-spacing: 6px; color: var(--accent); text-transform: uppercase; font-size: 1.8rem; }
         .sub-title { font-size: 0.65rem; color: var(--text2); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
         
+        .kunye-block { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); }
         .kunye-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; opacity: 0.7; }
         .sub-header-row { display: flex; gap: 10px; margin-bottom: 1.5rem; }
         
@@ -64,9 +66,16 @@
 
         /* VIEWS */
         .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-        .day-card { background: var(--surface); border: 1px solid var(--border); padding: 15px; cursor: pointer; position: relative; min-height: 120px; }
+        
+        /* Updated design for weekly card with left green border */
+        .day-card { background: var(--surface); border-left: 5px solid var(--accent); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; }
+        
         .habit-circle { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; border: 1px solid var(--border); border-radius: 50%; }
         .habit-circle.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); border: none; }
+
+        /* Minimal stats at bottom of weekly card */
+        .card-stats { position: absolute; bottom: 10px; left: 15px; font-size: 0.6rem; color: var(--text2); display: flex; gap: 10px; }
+        .card-stats span { display: flex; align-items: center; gap: 4px; }
 
         .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); }
         .month-day { background: var(--surface); aspect-ratio: 1.2; padding: 5px; cursor: pointer; font-size: 0.7rem; }
@@ -74,11 +83,8 @@
         .month-day.has-entry { border-left: 2px solid var(--accent); }
 
         /* EDITOR & RENDER */
-        .editor-toolbar { display: flex; gap: 5px; background: var(--surface2); padding: 5px; border: 1px solid var(--border); border-bottom: none; }
-        .tool-btn { padding: 4px 8px; font-size: 0.65rem; border: 1px solid var(--border); cursor: pointer; color: var(--text2); }
-        
-        /* contenteditable div style, replacing textarea */
-        [contenteditable] { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; resize: vertical; overflow-y: auto; }
+        /* Toolbar removed from editor modal */
+        textarea { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; resize: vertical; }
         
         .rendered h1, .rendered h2 { color: var(--accent); margin: 5px 0; }
         .rendered b { color: #fff; }
@@ -111,12 +117,14 @@
 <body>
 
 <div class="container">
-    <header>
+    <div class="header-block">
         <div class="theme-icon" id="themeToggle"><i class="fa-solid fa-moon"></i></div>
         <h1><i class="fa-solid fa-terminal" style="margin-right: 10px;"></i>Matrix</h1>
         <div class="sub-title">terminal mod: günlük</div>
+    </div>
 
-        <div class="kunye-label" style="margin-top:20px">// KÜNYE</div>
+    <div class="kunye-block">
+        <div class="kunye-label">// KÜNYE</div>
         <div class="sub-header-row">
             <button id="exportBtn"><i class="fa-solid fa-download"></i> [EXPORT]</button>
             <button id="importBtn"><i class="fa-solid fa-upload"></i> [IMPORT]</button>
@@ -142,7 +150,7 @@
                 <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </div>
-    </header>
+    </div>
 
     <main id="mainContent"></main>
 
@@ -180,13 +188,7 @@
             <button onclick="addAtomic()" style="border:1px solid #40c4ff; color:#40c4ff">EKLE</button>
         </div>
 
-        <div class="editor-toolbar">
-            <div class="tool-btn" onclick="wrap('bold')">B</div>
-            <div class="tool-btn" onclick="wrap('italic')">I</div>
-            <div class="tool-btn" onclick="wrap('formatBlock', '<h1>')">H1</div>
-            <div class="tool-btn" onclick="wrap('foreColor', var(--accent))">YEŞİL</div>
-        </div>
-        <div id="entryTextEditor" contenteditable="true"></div>
+        <textarea id="entryText"></textarea>
 
         <div style="display:flex; gap:10px; margin-top:2rem;">
             <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">KAYDET</button>
@@ -230,12 +232,16 @@ const renderWeekly = (el) => {
     for(let i=0; i<7; i++) {
         const d = new Date(start); d.setDate(d.getDate() + i);
         const ds = fmt(d); const e = state.entries[ds];
-        const content = e?.text ? e.text.substring(0, 60).replace(/<[^>]+>/g, '') : '...'; // Basic tag stripping for preview
+        const content = e?.text ? e.text.substring(0, 60) : '...';
         grid.innerHTML += `
             <div class="day-card" onclick="openEntry('${ds}')">
                 <div class="habit-circle ${e?.habits?.includes('demir') ? 'active' : ''}"></div>
                 <div style="color:var(--accent); font-family:'Orbitron'">${d.getDate()} <span style="font-size:0.6rem; color:var(--text2)">${d.toLocaleDateString('tr-TR',{weekday:'short'})}</span></div>
                 <div class="rendered" style="font-size:0.75rem; margin-top:10px">${content}</div>
+                <div class="card-stats">
+                    <span><i class="fa-solid fa-list-check"></i> Tasks: ${e?.tasks?.length || 0}</span>
+                    <span><i class="fa-solid fa-atom"></i> Atomics: ${e?.atomics?.length || 0}</span>
+                </div>
             </div>`;
     }
     el.appendChild(grid);
@@ -316,7 +322,7 @@ window.openEntry = (date) => {
     const e = state.entries[date] || { text:'', habits:[], tasks:[], atomics:[] };
     state.temp = { tasks: [...(e.tasks || [])], habits: [...(e.habits || [])], atomics: [...(e.atomics || [])] };
     document.getElementById('modalTitle').textContent = date;
-    document.getElementById('entryTextEditor').innerHTML = e.text || ''; // Load HTML into contenteditable
+    document.getElementById('entryText').value = e.text || '';
     renderModalTemp();
     document.getElementById('entryModal').classList.add('active');
 };
@@ -344,10 +350,7 @@ window.addTask = () => {
 window.addAtomic = () => { const i = document.getElementById('atomicInput'); if(i.value){state.temp.atomics.push(i.value); i.value=''; renderModalTemp();} };
 window.toggleHabit = (h) => { const idx = state.temp.habits.indexOf(h); if(idx>-1) state.temp.habits.splice(idx,1); else state.temp.habits.push(h); renderModalTemp(); };
 
-// Updated wrap function for contenteditable using execCommand
-window.wrap = (cmd, val=null) => {
-    document.execCommand(cmd, false, val);
-};
+// Wrap function removed from JavaScript
 
 window.setTaskFilter = (f) => {
     state.currentTaskFilter = f;
@@ -355,8 +358,7 @@ window.setTaskFilter = (f) => {
 };
 
 document.getElementById('saveBtn').onclick = () => {
-    const text = document.getElementById('entryTextEditor').innerHTML; // Save HTML
-    state.entries[state.selectedDate] = { text: text, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics };
+    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics };
     save(); document.getElementById('entryModal').classList.remove('active'); render();
 };
 
