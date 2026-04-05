@@ -1,107 +1,83 @@
-<!-- UPDATED VERSION: SUMMARY MERGED INTO TASKS + RANDOM ATOMIC NOTES FEED --><!-- Only key modified parts shown for brevity. Tell me to expand full file if needed. --><!-- 1. REMOVE SUMMARY BUTTON --><!-- Find view-switcher and DELETE summary button --><!-- <button class="view-btn" data-view="summary">Özet</button> --><!-- 2. MODIFY TASKS VIEW (ADD DASHBOARD TOP) --><script>
-function renderTasksView() {
-    const allEntries = Object.entries(dm.entries).sort((a,b) => new Date(b[0]) - new Date(a[0]));
-
-    let allTasks = [];
-    let allValues = Object.values(dm.entries);
-
-    allEntries.forEach(([ds, entry]) => {
-        if (entry.tasks && entry.tasks.length) {
-            entry.tasks.forEach((t, idx) => {
-                allTasks.push({ ...t, date: ds, entryIdx: idx });
-            });
-        }
-    });
-
-    const total  = allTasks.length;
-    const active = allTasks.filter(t=>!t.done).length;
-    const done   = allTasks.filter(t=>t.done).length;
-
-    const completionPct = total ? Math.round((done/total)*100) : 0;
-
-    // mood stats
-    const moodCount = { good:0, neutral:0, bad:0 };
-    allValues.forEach(e=>{ if(e.mood) moodCount[e.mood]++; });
-
-    let html = `
-    <div class="summary-card">
-        <div class="summary-card-title">Görev Dashboard</div>
-        <div class="summary-big-num">${completionPct}%</div>
-        <div class="summary-sub">tamamlanma oranı</div>
-
-        <div class="summary-bar-row">
-            <div class="summary-bar-label">İyi</div>
-            <div class="summary-bar-track"><div class="summary-bar-fill good" style="width:${(moodCount.good||0)*10}%"></div></div>
-        </div>
-        <div class="summary-bar-row">
-            <div class="summary-bar-label">Nötr</div>
-            <div class="summary-bar-track"><div class="summary-bar-fill neutral" style="width:${(moodCount.neutral||0)*10}%"></div></div>
-        </div>
-        <div class="summary-bar-row">
-            <div class="summary-bar-label">Kötü</div>
-            <div class="summary-bar-track"><div class="summary-bar-fill bad" style="width:${(moodCount.bad||0)*10}%"></div></div>
-        </div>
-
-        <div style="margin-top:0.6rem;font-size:0.7rem;color:var(--text2);">
-            Aktif: ${active} • Tamamlanan: ${done}
-        </div>
-    </div>
-    `;
-
-    // FILTER BAR
-    html += `
-    <div class="tasks-filter-bar">
-        <button class="tfilter-btn ${tasksFilter==='all'?'active':''}" data-filter="all">Tümü (${total})</button>
-        <button class="tfilter-btn ${tasksFilter==='active'?'active':''}" data-filter="active">Aktif (${active})</button>
-        <button class="tfilter-btn ${tasksFilter==='done'?'active':''}" data-filter="done">Tamamlanan (${done})</button>
-    </div>`;
-
-    let filtered = allTasks;
-    if (tasksFilter === 'active') filtered = allTasks.filter(t => !t.done);
-    if (tasksFilter === 'done') filtered = allTasks.filter(t => t.done);
-
-    html += '<div class="tasks-overview">';
-    filtered.forEach(t => {
-        html += `
-        <div class="task-overview-item ${t.done?'done-task':''}" data-date="${t.date}">
-            <div class="tov-check ${t.done?'checked':''}" data-date="${t.date}" data-taskidx="${t.entryIdx}">${t.done?'✓':''}</div>
-            <div class="tov-text">${t.text}</div>
-        </div>`;
-    });
-    html += '</div>';
-
-    document.getElementById('mainContent').innerHTML = html;
-
-    document.querySelectorAll('.tfilter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            tasksFilter = btn.dataset.filter;
-            renderTasksView();
-        });
-    });
+<!DOCTYPE html><html lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MATRIX.JOURNAL v5</title><style>
+:root{
+ --accent:#00e676;--bg:#0e0e11;--surface:#141418;--border:#28282f;--text:#e8e8ec;--sub:#7a7a8c;
 }
-</script><!-- 3. RANDOM ATOMIC NOTES FEED (BOTTOM SECTION) --><div id="atomicFeed" style="position:fixed;bottom:0;left:0;width:100%;background:var(--surface);border-top:1px solid var(--border);padding:0.6rem;overflow-x:auto;white-space:nowrap;font-size:0.75rem;"></div><script>
-function renderAtomicFeed() {
-    let notes = [];
+body{font-family:monospace;background:var(--bg);color:var(--text);margin:0}
+.container{padding:1rem}
+button{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.4rem 0.7rem}
+.task{display:flex;gap:0.5rem;padding:0.5rem;border-bottom:1px solid var(--border)}
+.done{text-decoration:line-through;opacity:0.5}
+#atomicFeed{position:fixed;bottom:0;left:0;width:100%;background:var(--surface);padding:0.5rem;overflow-x:auto;white-space:nowrap}
+.score{font-size:1.2rem;color:var(--accent)}
+.quick{position:fixed;bottom:70px;right:20px;background:var(--accent);color:#000;padding:10px;border-radius:50%}
+</style></head>
+<body>
+<div class="container">
+<h2>MATRIX JOURNAL v5</h2><div id="dashboard"></div>
+<div id="tasks"></div></div><div id="atomicFeed"></div>
+<button class="quick" onclick="quickAdd()">+</button><script>
+let data = JSON.parse(localStorage.getItem('v5')||'{}');
 
-    Object.values(dm.entries).forEach(e => {
-        if (e.atomicNotes) notes.push(...e.atomicNotes);
-    });
+function save(){localStorage.setItem('v5',JSON.stringify(data))}
 
-    // shuffle
-    for (let i = notes.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [notes[i], notes[j]] = [notes[j], notes[i]];
-    }
+function today(){return new Date().toISOString().split('T')[0]}
 
-    const feed = notes.slice(0, 10).map(n => `<span style="margin-right:1rem;opacity:0.8;">${n}</span>`).join('');
+function get(){return data[today()]||{tasks:[],notes:[],mood:'neutral'}}
 
-    document.getElementById('atomicFeed').innerHTML = feed || 'Atomic not yok';
+function set(entry){data[today()]=entry;save();render()}
+
+function calcScore(e){
+ let s=0;
+ e.tasks.forEach(t=>{if(t.done)s+=10});
+ if(e.text)s+=5;
+ if(e.mood==='good')s+=5;
+ if(e.mood==='bad')s-=5;
+ return s;
 }
 
-// call on load
-renderAtomicFeed();
-</script><!-- 4. UX IMPROVEMENT: AUTO FOCUS TASK INPUT --><script>
-document.getElementById('taskInput')?.addEventListener('focus', () => {
-    document.getElementById('taskInput').placeholder = 'Hızlıca yaz ve Enter...';
-});
-</script><!-- DONE: --><!-- ✔ Summary kaldırıldı --><!-- ✔ Tasks içine dashboard eklendi --><!-- ✔ Atomic random feed eklendi --><!-- ✔ UX küçük dokunuş -->
+function render(){
+ let e=get();
+
+ // dashboard
+ document.getElementById('dashboard').innerHTML=`
+ <div class="score">SCORE: ${calcScore(e)}</div>
+ <div>${e.tasks.filter(t=>t.done).length}/${e.tasks.length} görev</div>`;
+
+ // tasks
+ let html='';
+ e.tasks.forEach((t,i)=>{
+ html+=`<div class="task ${t.done?'done':''}" onclick="toggle(${i})">${t.text}</div>`
+ })
+ document.getElementById('tasks').innerHTML=html;
+
+ renderFeed();
+}
+
+function toggle(i){
+ let e=get();
+ e.tasks[i].done=!e.tasks[i].done;
+ set(e);
+}
+
+function quickAdd(){
+ let text=prompt('Görev gir');
+ if(!text)return;
+ let e=get();
+ e.tasks.push({text,done:false});
+ set(e);
+}
+
+function renderFeed(){
+ let notes=[];
+ Object.values(data).forEach(d=>{if(d.notes)notes.push(...d.notes)});
+ notes.sort(()=>Math.random()-0.5);
+ document.getElementById('atomicFeed').innerHTML=notes.slice(0,10).join(' • ');
+}
+
+render();
+</script></body>
+</html>
