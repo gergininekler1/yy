@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX.JOURNAL v4.1</title>
+    <title>MATRIX.JOURNAL v4.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,108 +15,113 @@
         }
 
         [data-theme="light"] {
-            --bg: #f5f5f7; --surface: #ffffff; --surface2: #ebebed;
-            --border: #ccc; --text1: #1a1a1a; --text2: #666;
+            --bg: #f0f0f2; --surface: #ffffff; --surface2: #e0e0e5;
+            --border: #bbb; --text1: #1a1a1a; --text2: #555;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
-        body { background: var(--bg); color: var(--text1); transition: background 0.3s; padding: 1rem; }
-        
-        .container { max-width: 1000px; margin: 0 auto; }
+        body { background: var(--bg); color: var(--text1); transition: 0.3s; padding: 1rem; line-height: 1.4; }
+        .container { max-width: 1100px; margin: 0 auto; }
 
-        /* ─── HEADER & CONTROLS ─── */
-        header { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1rem; background: var(--surface); }
-        h1 { font-family: 'Orbitron'; letter-spacing: 5px; color: var(--accent); margin-bottom: 0.5rem; }
+        /* ─── HEADER & NAV ─── */
+        header { border: 2px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); position: relative; }
+        h1 { font-family: 'Orbitron'; letter-spacing: 4px; color: var(--accent); margin-bottom: 1rem; }
         
-        .sub-header-controls { display: flex; gap: 10px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-        
-        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1rem; }
-        .stat-item { background: var(--surface2); padding: 0.5rem 1rem; border-left: 2px solid var(--accent); }
-        .stat-label { font-size: 0.6rem; color: var(--text2); }
+        .sub-header-row { display: flex; gap: 10px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+        .stat-item { background: var(--surface2); padding: 8px 12px; border-left: 3px solid var(--accent); font-size: 0.8rem; }
+        .stat-label { color: var(--text2); font-size: 0.6rem; text-transform: uppercase; }
 
-        .main-nav { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-        .btn-group { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .nav-controls { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .group { display: flex; border: 1px solid var(--border); background: var(--bg); border-radius: 3px; overflow: hidden; }
         
         button { 
-            background: transparent; border: none; color: var(--text2); padding: 8px 15px; 
-            cursor: pointer; font-size: 0.8rem; transition: 0.2s;
+            background: transparent; border: none; color: var(--text2); padding: 8px 16px; 
+            cursor: pointer; font-size: 0.75rem; transition: 0.2s; text-transform: uppercase;
         }
         button:hover { color: var(--accent); background: var(--accent-dim); }
         button.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        /* ─── VIEWS ─── */
-        .view-section { margin-top: 1.5rem; }
-        .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        /* ─── WEEKLY HIERARCHY (GÖRSELDEKİ YAPI) ─── */
+        .weekly-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
         .day-card { 
-            background: var(--surface); border: 1px solid var(--border); padding: 1rem; 
-            cursor: pointer; transition: 0.2s; position: relative;
+            background: var(--surface); border: 1px solid var(--border); padding: 15px; 
+            cursor: pointer; position: relative; transition: 0.2s;
         }
-        .day-card:hover { border-color: var(--accent); }
-        .day-card.today { border-color: var(--accent); border-width: 2px; }
+        .day-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .day-card.today { border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent-dim); }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .card-date { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--accent); }
+        .card-day { font-size: 0.7rem; color: var(--text2); }
 
-        .habit-indicator { 
-            width: 10px; height: 10px; border-radius: 50%; background: var(--border); 
-            display: inline-block; margin-right: 5px; 
-        }
-        .habit-indicator.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .habit-status { font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; background: var(--border); color: var(--text2); }
+        .habit-status.active { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+
+        .card-content { font-size: 0.8rem; color: var(--text2); min-height: 45px; margin: 10px 0; overflow: hidden; }
+        .card-footer { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--accent); }
 
         /* ─── MODAL ─── */
         .modal { 
             display:none; position:fixed; inset:0; background: rgba(0,0,0,0.9); 
-            z-index: 1000; align-items: center; justify-content: center; padding: 10px;
+            z-index: 1000; align-items: center; justify-content: center; padding: 15px;
         }
         .modal.active { display: flex; }
         .modal-content { 
-            background: var(--surface2); border: 1px solid var(--accent); width: 100%; 
-            max-width: 650px; max-height: 95vh; overflow-y: auto; padding: 2rem;
+            background: var(--surface); border: 2px solid var(--accent); width: 100%; 
+            max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 25px;
         }
 
+        .section-tag { color: var(--text2); font-size: 0.6rem; margin-bottom: 8px; letter-spacing: 1px; }
         textarea { 
-            width: 100%; min-height: 200px; background: var(--bg); border: 1px solid var(--border);
-            color: var(--text1); padding: 1rem; margin-top: 10px; resize: none;
+            width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text1); padding: 12px; margin-bottom: 15px; resize: none;
         }
+        .input-row { display: flex; gap: 8px; margin-bottom: 15px; }
+        input[type="text"] { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 8px; font-size: 0.8rem; }
 
-        .task-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; background: var(--bg); padding: 5px; }
+        .item-list { margin-bottom: 15px; }
+        .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 4px; border-left: 2px solid var(--accent); }
+        
+        /* ─── RANDOM HISTORY ─── */
+        footer { margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border); }
+        .atomic-stream { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; opacity: 0.7; }
+        .atomic-chip { background: var(--surface2); padding: 5px 12px; border: 1px solid var(--border); font-size: 0.7rem; cursor: default; }
+        .atomic-chip:hover { border-color: var(--accent); color: var(--accent); }
 
         /* ─── FOCUS MODE ─── */
         body.focus-mode header, body.focus-mode footer, body.focus-mode .fab { opacity: 0; pointer-events: none; }
-        body.focus-mode .view-section { transform: translateY(-50px); }
-
-        /* ─── FOOTER ─── */
-        footer { margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 2rem; }
-        .atomic-stream { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .atomic-chip { background: var(--surface2); padding: 4px 12px; border: 1px solid var(--border); font-size: 0.75rem; color: var(--text2); }
+        body.focus-mode .weekly-container { filter: blur(2px); }
 
         .fab { 
-            position: fixed; bottom: 2rem; right: 2rem; width: 50px; height: 50px;
+            position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px;
             background: var(--accent); color: #000; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; 
-            cursor: pointer; box-shadow: 0 0 20px rgba(0,230,118,0.3);
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem; 
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100;
         }
-
-        .list-item { background: var(--surface); border: 1px solid var(--border); padding: 1rem; margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>MATRIX.JOURNAL v4.1</h1>
+        <h1>MATRIX.JOURNAL v4.2</h1>
         
-        <div class="sub-header-controls">
-            <button id="focusBtn" style="border:1px solid var(--border)">[👁️ FOCUS MODE]</button>
-            <button id="themeToggle" style="border:1px solid var(--border)">[☀️ LIGHT/DARK]</button>
+        <div class="sub-header-row">
+            <button id="focusBtn" style="border:1px solid var(--border)">[👁️ FOCUS]</button>
+            <button id="themeToggle" style="border:1px solid var(--border)">[☀️ THEME]</button>
+            <button id="exportBtn" style="border:1px solid var(--border); margin-left:auto;">[EXPORT]</button>
         </div>
 
         <div class="stats-bar" id="statsBar"></div>
 
-        <div class="main-nav">
-            <div class="btn-group">
+        <div class="nav-controls">
+            <div class="group">
                 <button class="view-btn active" data-view="weekly">HAFTALIK</button>
-                <button class="view-btn" data-view="list">LİSTE</button>
-                <button class="view-btn" data-view="tasks">TÜM GÖREVLER</button>
+                <button class="view-btn" data-view="list">ARŞİV</button>
+                <button class="view-btn" data-view="tasks">GÖREVLER</button>
             </div>
-            <div class="btn-group">
+            <div class="group">
                 <button id="prevBtn">&lt;</button>
                 <button id="currentRange" style="min-width: 140px; pointer-events: none;"></button>
                 <button id="nextBtn">&gt;</button>
@@ -124,48 +129,41 @@
         </div>
     </header>
 
-    <main id="mainContent" class="view-section"></main>
+    <main id="mainContent"></main>
 
-    <footer id="footer">
-        <div style="text-align: center; color: var(--text2); font-size: 0.6rem; margin-bottom: 1rem;">// RANDOM_ATOMIC_HISTORY</div>
+    <footer>
+        <div style="text-align: center; color: var(--text2); font-size: 0.6rem; margin-bottom: 1rem; letter-spacing: 3px;">// RANDOM_ATOMIC_HISTORY</div>
         <div class="atomic-stream" id="atomicStream"></div>
     </footer>
 </div>
 
 <div class="modal" id="entryModal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom: 1rem;">00-00-0000</h2>
-        
-        <div style="margin-bottom: 1.5rem; background: var(--bg); padding: 10px; border: 1px solid var(--border);">
-            <label style="cursor:pointer; display: flex; align-items: center; gap: 10px;">
-                <input type="checkbox" id="habitDemir" style="width:18px; height:18px;">
-                <span style="font-weight: bold; color: var(--accent);">DEMİR GİBİ ZİHİN</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); font-size: 1.1rem;">00-00-0000</h2>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--bg); padding:5px 10px; border:1px solid var(--border);">
+                <input type="checkbox" id="habitCheck">
+                <span style="font-size:0.7rem; font-weight:bold;">DEMİR GİBİ ZİHİN</span>
             </label>
         </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <div style="color:var(--text2); font-size:0.7rem; margin-bottom:5px;">// GÖREVLER</div>
-            <div id="modalTaskList"></div>
-            <div style="display:flex; gap:5px; margin-top:10px;">
-                <input type="text" id="taskInput" placeholder="Yeni görev..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:5px;">
-                <button id="addTaskBtn" style="border:1px solid var(--accent); color:var(--accent);">EKLE</button>
-            </div>
+        <div class="section-tag">// GÖREV LİSTESİ</div>
+        <div id="modalTaskList" class="item-list"></div>
+        <div class="input-row">
+            <input type="text" id="taskInput" placeholder="Yeni görev ekle...">
+            <button id="addTaskBtn" style="border:1px solid var(--accent); color:var(--accent);">EKLE</button>
         </div>
 
-        <div>
-            <div style="color:var(--text2); font-size:0.7rem;">// GÜNLÜK NOT</div>
-            <textarea id="entryText" placeholder="Sistem kaydı girin..."></textarea>
-        </div>
+        <div class="section-tag">// GÜNLÜK NOTLAR</div>
+        <textarea id="entryText" placeholder="Bugün neler başardın?"></textarea>
 
-        <div style="margin-top: 1.5rem;">
-            <div style="color:var(--text2); font-size:0.7rem;">// ATOMİK NOTLAR (ENTER)</div>
-            <div id="modalAtomicList" style="margin-bottom: 5px;"></div>
-            <input type="text" id="atomicInput" placeholder="Hızlı not ekle..." style="width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:5px;">
-        </div>
+        <div class="section-tag">// ATOMİK NOTLAR (ENTER)</div>
+        <div id="modalAtomicList" class="item-list"></div>
+        <input type="text" id="atomicInput" placeholder="Kısa, öz notlar...">
 
         <div style="display:flex; gap:10px; margin-top:2rem;">
-            <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">SİSTEME KAYDET</button>
-            <button id="closeBtn" style="flex:1; border:1px solid var(--border);">İPTAL</button>
+            <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">SİSTEME İŞLE</button>
+            <button id="closeBtn" style="flex:1; border:1px solid var(--border);">VAZGEÇ</button>
         </div>
     </div>
 </div>
@@ -174,58 +172,63 @@
 
 <script>
 const state = {
-    entries: JSON.parse(localStorage.getItem('mj_v41_data') || '{}'),
+    entries: JSON.parse(localStorage.getItem('mj_v42_data') || '{}'),
     view: 'weekly',
-    date: new Date(),
+    cursor: new Date(),
     selectedDate: null,
     tempTasks: [],
     tempAtomics: []
 };
 
-const save = () => localStorage.setItem('mj_v41_data', JSON.stringify(state.entries));
+const save = () => localStorage.setItem('mj_v42_data', JSON.stringify(state.entries));
 const fmt = (d) => d.toISOString().split('T')[0];
 
-/* ─── RENDERING ─── */
+/* ─── RENDER ENGINE ─── */
 const render = () => {
-    const container = document.getElementById('mainContent');
-    container.innerHTML = '';
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '';
     
-    if(state.view === 'weekly') {
-        renderWeekly(container);
-    } else if(state.view === 'list') {
-        renderList(container);
-    } else if(state.view === 'tasks') {
-        renderAllTasks(container);
-    }
+    if(state.view === 'weekly') renderWeekly(main);
+    else if(state.view === 'list') renderList(main);
+    else if(state.view === 'tasks') renderTasks(main);
 
     updateStats();
-    renderAtomics();
+    renderRandomAtomics();
 };
 
 const renderWeekly = (el) => {
-    const start = new Date(state.date);
+    const start = new Date(state.cursor);
     start.setDate(start.getDate() - (start.getDay() || 7) + 1);
-    document.getElementById('currentRange').textContent = `${start.getDate()} - ${new Date(new Date(start).setDate(start.getDate()+6)).getDate()} ${start.toLocaleString('tr-TR', {month:'short'})}`;
+    
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    document.getElementById('currentRange').textContent = `${start.getDate()} - ${end.getDate()} ${start.toLocaleString('tr-TR', {month:'short'})}`;
 
     const grid = document.createElement('div');
-    grid.className = 'weekly-grid';
+    grid.className = 'weekly-container';
     
     for(let i=0; i<7; i++) {
         const d = new Date(start);
         d.setDate(d.getDate() + i);
         const ds = fmt(d);
-        const entry = state.entries[ds];
+        const e = state.entries[ds];
         const isToday = ds === fmt(new Date());
 
         grid.innerHTML += `
             <div class="day-card ${isToday ? 'today' : ''}" onclick="openEntry('${ds}')">
-                <div style="display:flex; justify-content:space-between;">
-                    <span style="font-size:0.7rem; color:var(--text2)">${d.toLocaleDateString('tr-TR',{weekday:'short'}).toUpperCase()}</span>
-                    <span class="habit-indicator ${entry?.habit ? 'active' : ''}"></span>
+                <div class="card-header">
+                    <div class="card-date">${d.getDate()}</div>
+                    <div class="card-day">${d.toLocaleDateString('tr-TR',{weekday:'long'}).toUpperCase()}</div>
                 </div>
-                <div style="font-family:'Orbitron'; font-size:1.2rem; margin: 5px 0;">${d.getDate()}</div>
-                <div style="font-size:0.75rem; color:var(--text2); height:40px; overflow:hidden;">
-                    ${entry ? entry.text.substring(0,60) + '...' : '---'}
+                <div class="habit-status ${e?.habit ? 'active' : ''}">
+                    ${e?.habit ? '✓ DEMİR GİBİ ZİHİN' : '---'}
+                </div>
+                <div class="card-content">
+                    ${e ? e.text.substring(0,80) + (e.text.length > 80 ? '...' : '') : '<span style="opacity:0.2">Kayıt yok...</span>'}
+                </div>
+                <div class="card-footer">
+                    <span>GÖREV: ${e?.tasks?.filter(t=>t.done).length || 0}/${e?.tasks?.length || 0}</span>
+                    <span>${e?.atomics?.length || 0} ATOMİK</span>
                 </div>
             </div>
         `;
@@ -234,28 +237,29 @@ const renderWeekly = (el) => {
 };
 
 const renderList = (el) => {
-    const sorted = Object.keys(state.entries).sort().reverse();
-    if(!sorted.length) el.innerHTML = '<div style="text-align:center">Kayıt bulunamadı.</div>';
-    sorted.forEach(date => {
-        const e = state.entries[date];
+    const dates = Object.keys(state.entries).sort().reverse();
+    if(!dates.length) { el.innerHTML = '<p style="text-align:center; padding:2rem;">Henüz kayıtlı veri yok.</p>'; return; }
+    
+    dates.forEach(d => {
+        const e = state.entries[d];
         el.innerHTML += `
-            <div class="list-item" onclick="openEntry('${date}')">
-                <b style="color:var(--accent)">${date}</b> - ${e.text.substring(0,100)}...
+            <div style="background:var(--surface); border:1px solid var(--border); padding:1rem; margin-bottom:0.5rem; cursor:pointer;" onclick="openEntry('${d}')">
+                <span style="color:var(--accent); font-family:Orbitron;">${d}</span> | ${e.text.substring(0,100)}...
             </div>
         `;
     });
 };
 
-const renderAllTasks = (el) => {
-    let hasTasks = false;
-    Object.keys(state.entries).forEach(date => {
-        const tasks = state.entries[date].tasks || [];
+const renderTasks = (el) => {
+    let count = 0;
+    Object.keys(state.entries).sort().reverse().forEach(d => {
+        const tasks = state.entries[d].tasks || [];
         if(tasks.length) {
-            hasTasks = true;
-            el.innerHTML += `<div style="color:var(--accent); margin:15px 0 5px; font-size:0.8rem;">[${date}]</div>`;
+            count++;
+            el.innerHTML += `<div style="color:var(--accent); margin:20px 0 10px; font-size:0.8rem;">>> ${d}</div>`;
             tasks.forEach(t => {
                 el.innerHTML += `
-                    <div class="task-row" style="opacity: ${t.done ? 0.5 : 1}">
+                    <div class="list-row" style="opacity:${t.done ? 0.4 : 1}">
                         <input type="checkbox" ${t.done ? 'checked' : ''} disabled>
                         <span style="${t.done ? 'text-decoration:line-through' : ''}">${t.text}</span>
                     </div>
@@ -263,49 +267,66 @@ const renderAllTasks = (el) => {
             });
         }
     });
-    if(!hasTasks) el.innerHTML = '<div style="text-align:center">Aktif görev bulunamadı.</div>';
+    if(!count) el.innerHTML = '<p style="text-align:center; padding:2rem;">Aktif görev bulunamadı.</p>';
 };
 
-/* ─── MODAL LOGIC ─── */
+/* ─── MODAL ─── */
 window.openEntry = (date) => {
     state.selectedDate = date;
-    const e = state.entries[date] || { text: '', tasks: [], atomics: [], habit: false };
+    const e = state.entries[date] || { text:'', habit:false, tasks:[], atomics:[] };
     
     document.getElementById('modalTitle').textContent = date;
     document.getElementById('entryText').value = e.text || '';
-    document.getElementById('habitDemir').checked = !!e.habit;
+    document.getElementById('habitCheck').checked = !!e.habit;
     state.tempTasks = [...(e.tasks || [])];
     state.tempAtomics = [...(e.atomics || [])];
     
-    renderModalTasks();
-    renderModalAtomics();
+    renderModalLists();
     document.getElementById('entryModal').classList.add('active');
 };
 
-const renderModalTasks = () => {
+const renderModalLists = () => {
     document.getElementById('modalTaskList').innerHTML = state.tempTasks.map((t, i) => `
-        <div class="task-row">
-            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="state.tempTasks[${i}].done = !state.tempTasks[${i}].done; renderModalTasks();">
-            <span style="flex:1; ${t.done ? 'text-decoration:line-through; color:var(--text2)' : ''}">${t.text}</span>
-            <span onclick="state.tempTasks.splice(${i},1); renderModalTasks();" style="color:var(--danger); cursor:pointer">×</span>
+        <div class="list-row">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="state.tempTasks[${i}].done = !state.tempTasks[${i}].done; renderModalLists();">
+            <span style="flex:1; ${t.done ? 'text-decoration:line-through; opacity:0.5' : ''}">${t.text}</span>
+            <span onclick="state.tempTasks.splice(${i},1); renderModalLists();" style="color:var(--danger); cursor:pointer">×</span>
+        </div>
+    `).join('');
+
+    document.getElementById('modalAtomicList').innerHTML = state.tempAtomics.map((a, i) => `
+        <div class="list-row" style="border-left-color: #40c4ff">
+            <span style="flex:1; font-size:0.75rem;">${a}</span>
+            <span onclick="state.tempAtomics.splice(${i},1); renderModalLists();" style="color:var(--danger); cursor:pointer">×</span>
         </div>
     `).join('');
 };
 
-const renderModalAtomics = () => {
-    document.getElementById('modalAtomicList').innerHTML = state.tempAtomics.map((a, i) => `
-        <div class="task-row" style="border-left: 2px solid var(--accent)">
-            <span style="flex:1; font-size:0.8rem;">${a}</span>
-            <span onclick="state.tempAtomics.splice(${i},1); renderModalAtomics();" style="color:var(--danger); cursor:pointer">×</span>
-        </div>
-    `).join('');
+/* ─── HELPERS ─── */
+const updateStats = () => {
+    const all = Object.values(state.entries);
+    const habits = all.filter(e => e.habit).length;
+    const totalTasks = all.reduce((a,b) => a + (b.tasks?.length || 0), 0);
+    
+    document.getElementById('statsBar').innerHTML = `
+        <div class="stat-item"><div class="stat-label">TOPLAM GÜN</div><div>${all.length} KAYIT</div></div>
+        <div class="stat-item"><div class="stat-label">DEMİR ZİHİN</div><div>${habits} BAŞARI</div></div>
+        <div class="stat-item"><div class="stat-label">GÖREV HAVUZU</div><div>${totalTasks} KAYIT</div></div>
+    `;
+};
+
+const renderRandomAtomics = () => {
+    const pool = [];
+    Object.values(state.entries).forEach(e => pool.push(...(e.atomics || [])));
+    const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 15);
+    document.getElementById('atomicStream').innerHTML = shuffled.map(a => `<div class="atomic-chip">${a}</div>`).join('');
 };
 
 /* ─── EVENTS ─── */
 document.getElementById('saveBtn').onclick = () => {
     state.entries[state.selectedDate] = {
         text: document.getElementById('entryText').value,
-        habit: document.getElementById('habitDemir').checked,
+        habit: document.getElementById('habitCheck').checked,
         tasks: state.tempTasks,
         atomics: state.tempAtomics
     };
@@ -315,15 +336,15 @@ document.getElementById('saveBtn').onclick = () => {
 };
 
 document.getElementById('addTaskBtn').onclick = () => {
-    const val = document.getElementById('taskInput').value;
-    if(val) { state.tempTasks.push({text: val, done: false}); document.getElementById('taskInput').value = ''; renderModalTasks(); }
+    const v = document.getElementById('taskInput').value;
+    if(v) { state.tempTasks.push({text:v, done:false}); document.getElementById('taskInput').value = ''; renderModalLists(); }
 };
 
 document.getElementById('atomicInput').onkeydown = (e) => {
     if(e.key === 'Enter' && e.target.value) {
         state.tempAtomics.push(e.target.value);
         e.target.value = '';
-        renderModalAtomics();
+        renderModalLists();
     }
 };
 
@@ -336,33 +357,24 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     };
 });
 
+document.getElementById('prevBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()-7); render(); };
+document.getElementById('nextBtn').onclick = () => { state.cursor.setDate(state.cursor.getDate()+7); render(); };
 document.getElementById('themeToggle').onclick = () => {
     const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', t);
 };
-
 document.getElementById('focusBtn').onclick = () => document.body.classList.toggle('focus-mode');
-document.getElementById('prevBtn').onclick = () => { state.date.setDate(state.date.getDate()-7); render(); };
-document.getElementById('nextBtn').onclick = () => { state.date.setDate(state.date.getDate()+7); render(); };
-document.getElementById('closeBtn').onclick = () => document.getElementById('entryModal').classList.remove('active');
 document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
-
-const updateStats = () => {
-    const all = Object.values(state.entries);
-    const habits = all.filter(e => e.habit).length;
-    document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item"><div class="stat-label">TOPLAM KAYIT</div><div>${all.length}</div></div>
-        <div class="stat-item"><div class="stat-label">DEMİR GİBİ ZİHİN</div><div>${habits} GÜN</div></div>
-    `;
+document.getElementById('closeBtn').onclick = () => document.getElementById('entryModal').classList.remove('active');
+document.getElementById('exportBtn').onclick = () => {
+    const data = JSON.stringify(state.entries, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `matrix_backup_${fmt(new Date())}.json`; a.click();
 };
 
-const renderAtomics = () => {
-    const atomics = [];
-    Object.values(state.entries).forEach(e => atomics.push(...(e.atomics || [])));
-    const shuffled = atomics.sort(() => 0.5 - Math.random()).slice(0, 15);
-    document.getElementById('atomicStream').innerHTML = shuffled.map(a => `<div class="atomic-chip">${a}</div>`).join('');
-};
-
+// Start
 render();
 </script>
 </body>
