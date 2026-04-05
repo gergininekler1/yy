@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX - FINAL FIX</title>
+    <title>MATRIX - FINAL FIX v47 (Prioritized)</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,17 +11,34 @@
             --accent: #2ecc71; 
             --accent-dim: rgba(46, 204, 113, 0.1);
             --danger: #e74c3c;
-            --bg: #0d0d0d; --surface: #161616; --surface2: #1f1f1f;
+            /* Grid Background Colors */
+            --bg-grid: #0d0d0d;
+            --bg-grid-lines: #161616;
+            --bg: var(--bg-grid);
+            --surface: #161616; --surface2: #1f1f1f;
             --border: #2a2a2a; --text1: #d1d1d1; --text2: #777;
         }
 
         [data-theme="light"] {
-            --bg: #f4f4f7; --surface: #ffffff; --surface2: #ebebef;
+            --bg-grid: #f4f4f7;
+            --bg-grid-lines: #ebebef;
+            --bg: var(--bg-grid);
+            --surface: #ffffff; --surface2: #ebebef;
             --border: #d1d1d1; --text1: #222; --text2: #666;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
-        body { background: var(--bg); color: var(--text1); transition: 0.3s; padding: 1rem; line-height: 1.4; }
+        
+        /* Grid Background Pattern */
+        body {
+            background-color: var(--bg-grid);
+            background-image: 
+                linear-gradient(var(--bg-grid-lines) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-grid-lines) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text1); transition: 0.3s; padding: 1rem; line-height: 1.4;
+        }
+        
         .container { max-width: 1100px; margin: 0 auto; }
 
         header { border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--surface); position: relative; }
@@ -59,7 +76,9 @@
         /* EDITOR & RENDER */
         .editor-toolbar { display: flex; gap: 5px; background: var(--surface2); padding: 5px; border: 1px solid var(--border); border-bottom: none; }
         .tool-btn { padding: 4px 8px; font-size: 0.65rem; border: 1px solid var(--border); cursor: pointer; color: var(--text2); }
-        textarea { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; resize: vertical; }
+        
+        /* contenteditable div style, replacing textarea */
+        [contenteditable] { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; resize: vertical; overflow-y: auto; }
         
         .rendered h1, .rendered h2 { color: var(--accent); margin: 5px 0; }
         .rendered b { color: #fff; }
@@ -75,6 +94,17 @@
         .habit-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
         .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.8rem; }
+        
+        /* Priority tags in task pool and modal */
+        .priority-tag { font-size: 0.55rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; font-weight: bold; }
+        .priority-1 { background-color: var(--danger); color: #fff; } /* High */
+        .priority-2 { background-color: #f1c40f; color: #000; } /* Medium */
+        .priority-3 { background-color: var(--accent); color: #000; } /* Low */
+        
+        /* Filter buttons in Ekstra view */
+        .filter-btn { border: 1px solid var(--border); color: var(--text2); font-size: 0.6rem; padding: 4px 8px; }
+        .filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
         .fab { position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 100; }
     </style>
 </head>
@@ -135,6 +165,11 @@
         <div id="modalTasks" style="margin-bottom:10px"></div>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
             <input type="text" id="taskInput" placeholder="Görev ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
+            <select id="taskPrioritySelect" style="background:var(--bg); border:1px solid var(--border); color:var(--accent); padding:8px; font-size:0.7rem;">
+                <option value="3">Düşük</option>
+                <option value="2">Orta</option>
+                <option value="1">Yüksek</option>
+            </select>
             <button onclick="addTask()" style="border:1px solid var(--accent); color:var(--accent)">EKLE</button>
         </div>
 
@@ -146,12 +181,12 @@
         </div>
 
         <div class="editor-toolbar">
-            <div class="tool-btn" onclick="wrap('b')">B</div>
-            <div class="tool-btn" onclick="wrap('i')">I</div>
-            <div class="tool-btn" onclick="wrap('h1')">H1</div>
-            <div class="tool-btn" onclick="wrap('span', 'class=\'hl\'')">YEŞİL</div>
+            <div class="tool-btn" onclick="wrap('bold')">B</div>
+            <div class="tool-btn" onclick="wrap('italic')">I</div>
+            <div class="tool-btn" onclick="wrap('formatBlock', '<h1>')">H1</div>
+            <div class="tool-btn" onclick="wrap('foreColor', var(--accent))">YEŞİL</div>
         </div>
-        <textarea id="entryText"></textarea>
+        <div id="entryTextEditor" contenteditable="true"></div>
 
         <div style="display:flex; gap:10px; margin-top:2rem;">
             <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">KAYDET</button>
@@ -164,13 +199,16 @@
 
 <script>
 const state = {
-    entries: JSON.parse(localStorage.getItem('matrix_v46_data') || '{}'),
+    entries: JSON.parse(localStorage.getItem('matrix_v47_data') || '{}'),
     view: 'weekly', cursor: new Date(), selectedDate: null,
-    temp: { tasks: [], habits: [], atomics: [] }, searchQuery: ''
+    temp: { tasks: [], habits: [], atomics: [] }, searchQuery: '',
+    currentTaskFilter: 'all'
 };
 
-const save = () => localStorage.setItem('matrix_v46_data', JSON.stringify(state.entries));
+const save = () => localStorage.setItem('matrix_v47_data', JSON.stringify(state.entries));
 const fmt = (d) => d.toISOString().split('T')[0];
+
+const getPriorityLabel = (p) => ['Yüksek', 'Orta', 'Düşük'][p-1];
 
 /* VIEWS */
 const render = () => {
@@ -192,11 +230,12 @@ const renderWeekly = (el) => {
     for(let i=0; i<7; i++) {
         const d = new Date(start); d.setDate(d.getDate() + i);
         const ds = fmt(d); const e = state.entries[ds];
+        const content = e?.text ? e.text.substring(0, 60).replace(/<[^>]+>/g, '') : '...'; // Basic tag stripping for preview
         grid.innerHTML += `
             <div class="day-card" onclick="openEntry('${ds}')">
                 <div class="habit-circle ${e?.habits?.includes('demir') ? 'active' : ''}"></div>
                 <div style="color:var(--accent); font-family:'Orbitron'">${d.getDate()} <span style="font-size:0.6rem; color:var(--text2)">${d.toLocaleDateString('tr-TR',{weekday:'short'})}</span></div>
-                <div class="rendered" style="font-size:0.75rem; margin-top:10px">${e?.text ? e.text.substring(0,60) : '...'}</div>
+                <div class="rendered" style="font-size:0.75rem; margin-top:10px">${content}</div>
             </div>`;
     }
     el.appendChild(grid);
@@ -237,18 +276,38 @@ const renderExtra = (el) => {
         return dd >= s;
     });
 
+    const priorityCounts = all.flatMap(([d, e]) => e.tasks || []).reduce((sums, task) => {
+        const p = task.priority || 3;
+        sums[p] = (sums[p] || 0) + 1;
+        return sums;
+    }, {});
+
     el.innerHTML = `
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-label">BU HAFTA</div>Spor: ${countHabit('spor', thisWeek)} | Okuma: ${countHabit('okuma', thisWeek)}</div>
-            <div class="stat-item"><div class="stat-label">GENEL</div>Spor: ${countHabit('spor', all)} | Okuma: ${countHabit('okuma', all)}</div>
+            <div class="stat-item"><div class="stat-label">BU HAFTA HABITS</div>Spor: ${countHabit('spor', thisWeek)} | Okuma: ${countHabit('okuma', thisWeek)}</div>
+            <div class="stat-item"><div class="stat-label">GENEL HABITS</div>Spor: ${countHabit('spor', all)} | Okuma: ${countHabit('okuma', all)}</div>
+            <div class="stat-item"><div class="stat-label">GÖREV ÖNCELİKLERİ</div>Hi: ${priorityCounts[1] || 0} | Med: ${priorityCounts[2] || 0} | Low: ${priorityCounts[3] || 0}</div>
         </div>
-        <div class="kunye-label" style="margin-top:20px">// TÜM GÖREV HAVUZU</div>
+        <div class="kunye-label" style="margin-top:20px">// ÖNCELİKLİ GÖREV HAVUZU (SIRALANMIŞ / FİLTRELİ)</div>
+        <div class="filter-row" style="display:flex; gap:5px; margin-bottom:15px;">
+            <button class="filter-btn ${state.currentTaskFilter === 'all' ? 'active' : ''}" onclick="setTaskFilter('all')">TÜMÜ</button>
+            <button class="filter-btn ${state.currentTaskFilter === '1' ? 'active' : ''}" onclick="setTaskFilter('1')">YÜKSEK</button>
+            <button class="filter-btn ${state.currentTaskFilter === '2' ? 'active' : ''}" onclick="setTaskFilter('2')">ORTA</button>
+            <button class="filter-btn ${state.currentTaskFilter === '3' ? 'active' : ''}" onclick="setTaskFilter('3')">DÜŞÜK</button>
+        </div>
         <div id="pool" style="margin-top:10px"></div>
     `;
     const pool = el.querySelector('#pool');
-    all.forEach(([d, e]) => (e.tasks || []).forEach(t => {
-        pool.innerHTML += `<div class="list-row" style="opacity:${t.done?0.4:1}">[${d}] ${t.text}</div>`;
-    }));
+    
+    const allSortedTasks = all.flatMap(([d, e]) => (e.tasks || []).map(t => ({...t, date: d})))
+                             .filter(t => state.currentTaskFilter === 'all' || t.priority == state.currentTaskFilter)
+                             .sort((a, b) => (a.priority || 3) - (b.priority || 3) || a.date.localeCompare(b.date)); // Priority first, then date
+
+    allSortedTasks.forEach(t => {
+        pool.innerHTML += `<div class="list-row" style="opacity:${t.done?0.4:1}">
+            [${t.date}] <span class="priority-tag priority-${t.priority || 3}">[${getPriorityLabel(t.priority || 3)}]</span> ${t.text}
+        </div>`;
+    });
 };
 
 /* LOGIC */
@@ -257,24 +316,47 @@ window.openEntry = (date) => {
     const e = state.entries[date] || { text:'', habits:[], tasks:[], atomics:[] };
     state.temp = { tasks: [...(e.tasks || [])], habits: [...(e.habits || [])], atomics: [...(e.atomics || [])] };
     document.getElementById('modalTitle').textContent = date;
-    document.getElementById('entryText').value = e.text || '';
+    document.getElementById('entryTextEditor').innerHTML = e.text || ''; // Load HTML into contenteditable
     renderModalTemp();
     document.getElementById('entryModal').classList.add('active');
 };
 
 const renderModalTemp = () => {
     ['demir','spor','okuma'].forEach(h => document.getElementById(`h_${h}`).classList.toggle('active', state.temp.habits.includes(h)));
-    document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row"><input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done"> <span style="flex:1">${t.text}</span></div>`).join('');
+    document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row">
+        <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done">
+        <span class="priority-tag priority-${t.priority || 3}">[${getPriorityLabel(t.priority || 3)}]</span>
+        <span style="flex:1">${t.text}</span>
+    </div>`).join('');
     document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row" style="border-left:2px solid #40c4ff"><span>${a}</span></div>`).join('');
 };
 
-window.addTask = () => { const i = document.getElementById('taskInput'); if(i.value){state.temp.tasks.push({text:i.value,done:false}); i.value=''; renderModalTemp();} };
+window.addTask = () => {
+    const i = document.getElementById('taskInput');
+    const p = document.getElementById('taskPrioritySelect').value;
+    if(i.value){
+        state.temp.tasks.push({text:i.value, done:false, priority: parseInt(p)});
+        i.value='';
+        document.getElementById('taskPrioritySelect').value = '3'; // Reset to low
+        renderModalTemp();
+    }
+};
 window.addAtomic = () => { const i = document.getElementById('atomicInput'); if(i.value){state.temp.atomics.push(i.value); i.value=''; renderModalTemp();} };
 window.toggleHabit = (h) => { const idx = state.temp.habits.indexOf(h); if(idx>-1) state.temp.habits.splice(idx,1); else state.temp.habits.push(h); renderModalTemp(); };
-window.wrap = (tag, attr='') => { const a = document.getElementById('entryText'); const s = a.selectionStart, e = a.selectionEnd, v = a.value; a.value = v.substring(0,s) + `<${tag}${attr?' '+attr:''}>` + v.substring(s,e) + `</${tag}>` + v.substring(e); };
+
+// Updated wrap function for contenteditable using execCommand
+window.wrap = (cmd, val=null) => {
+    document.execCommand(cmd, false, val);
+};
+
+window.setTaskFilter = (f) => {
+    state.currentTaskFilter = f;
+    render();
+};
 
 document.getElementById('saveBtn').onclick = () => {
-    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics };
+    const text = document.getElementById('entryTextEditor').innerHTML; // Save HTML
+    state.entries[state.selectedDate] = { text: text, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics };
     save(); document.getElementById('entryModal').classList.remove('active'); render();
 };
 
@@ -297,7 +379,7 @@ document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { document
 document.getElementById('prevBtn').onclick = () => { if(state.view==='monthly') state.cursor.setMonth(state.cursor.getMonth()-1); else state.cursor.setDate(state.cursor.getDate()-7); render(); };
 document.getElementById('nextBtn').onclick = () => { if(state.view==='monthly') state.cursor.setMonth(state.cursor.getMonth()+1); else state.cursor.setDate(state.cursor.getDate()+7); render(); };
 document.getElementById('themeToggle').onclick = () => { const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', t); document.getElementById('themeToggle').innerHTML = t==='dark'?'<i class="fa-solid fa-moon"></i>':'<i class="fa-solid fa-sun"></i>'; };
-document.getElementById('exportBtn').onclick = () => { const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v46.json'; a.click(); };
+document.getElementById('exportBtn').onclick = () => { const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v47.json'; a.click(); };
 document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange = (e) => { const r = new FileReader(); r.onload=(ev)=>{state.entries=JSON.parse(ev.target.result); render();}; r.readAsText(e.target.files[0]); };
 document.getElementById('closeBtn').onclick = () => document.getElementById('entryModal').classList.remove('active');
