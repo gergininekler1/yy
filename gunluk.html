@@ -300,9 +300,9 @@
             position: relative;
         }
         .mood-bar[data-mood="great"]   { background: var(--accent); }
-        .mood-bar[data-mood="good"]    { background: var(--info); }
-        .mood-bar[data-mood="neutral"] { background: var(--text3); }
-        .mood-bar[data-mood="bad"]     { background: var(--warn); }
+        .mood-bar[data-mood="good"]    { background: var(--accent); }
+        .mood-bar[data-mood="neutral"] { background: var(--text2); }
+        .mood-bar[data-mood="bad"]     { background: var(--danger); }
         .mood-bar[data-mood="terrible"]{ background: var(--danger); }
         .mood-bar-label { font-size:0.5rem; color:var(--text2); text-align:center; }
 
@@ -380,7 +380,6 @@
         .mood-badge-pill.great, .mood-badge-pill.good { background:rgba(0,230,118,0.15); color:var(--accent); border:1px solid rgba(0,230,118,0.3); }
         .mood-badge-pill.neutral                      { background:var(--surface3); color:var(--text2); border:1px solid var(--border2); }
         .mood-badge-pill.bad, .mood-badge-pill.terrible{ background:rgba(255,77,109,0.13); color:var(--danger); border:1px solid rgba(255,77,109,0.3); }
-
         .terminal-section {
             margin-top: 0.65rem;
             padding: 0.65rem;
@@ -504,6 +503,70 @@
         }
         .entry-date { font-family:'Orbitron',monospace; font-size:0.8rem; font-weight:700; text-transform:uppercase; color:var(--text1); }
         .entry-content { color:var(--text1); line-height:1.6; font-size:0.85rem; margin-bottom:0.6rem; }
+
+        /* ══════════════════════════════
+           TASKS VIEW
+        ══════════════════════════════ */
+        .tasks-overview { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:5rem; }
+
+        .tasks-filter-bar {
+            display:flex; gap:0.4rem; flex-wrap:wrap;
+            margin-bottom:0.75rem;
+        }
+        .tasks-filter-bar button.active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+        .task-overview-item {
+            display:flex;
+            align-items:center;
+            gap:0.65rem;
+            padding:0.65rem 0.9rem;
+            border:1px solid var(--border);
+            background:var(--surface);
+            border-radius:4px;
+            animation:slideIn 0.2s ease;
+            transition:border-color 0.15s, opacity 0.2s;
+            cursor:pointer;
+        }
+        .task-overview-item:hover { border-color:var(--border2); }
+        .task-overview-item.done-task { opacity:0.45; }
+        .task-overview-item.done-task .tov-text { text-decoration:line-through; color:var(--text2); }
+
+        .tov-check {
+            width:17px; height:17px;
+            border:1px solid var(--border2);
+            border-radius:2px;
+            flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.6rem;
+            background:var(--surface2);
+            transition:all 0.15s;
+        }
+        .tov-check.checked { background:var(--accent); border-color:var(--accent); color:#000; }
+
+        .tov-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .tov-dot.high   { background:var(--p-high); }
+        .tov-dot.medium { background:var(--p-med); }
+        .tov-dot.low    { background:var(--p-low); }
+
+        .tov-text { flex:1; font-size:0.83rem; color:var(--text1); line-height:1.4; }
+
+        .tov-date {
+            font-size:0.62rem;
+            color:var(--text2);
+            flex-shrink:0;
+            font-family:'Orbitron',monospace;
+        }
+
+        .tasks-section-header {
+            font-size:0.62rem;
+            color:var(--text2);
+            text-transform:uppercase;
+            letter-spacing:0.1em;
+            padding:0.5rem 0 0.3rem 0;
+            border-bottom:1px solid var(--border);
+            margin-bottom:0.3rem;
+        }
+        .tasks-section-header::before { content:'/ '; color:var(--accent); }
 
         /* ══════════════════════════════
            MODAL
@@ -896,16 +959,17 @@
                 <button class="view-btn active" data-view="weekly">Hafta</button>
                 <button class="view-btn" data-view="calendar">Takvim</button>
                 <button class="view-btn" data-view="list">Liste</button>
+                <button class="view-btn" data-view="tasks">Görevler</button>
             </div>
 
             <div class="date-navigation">
                 <button id="prevPeriod">←</button>
                 <div class="date-display" id="dateDisplay"></div>
                 <button id="nextPeriod">→</button>
-                <button id="today">Bugün</button>
             </div>
 
             <div class="data-controls">
+                <button id="today">Bugün</button>
                 <button id="exportData">↑ Export</button>
                 <button id="importData">↓ Import</button>
                 <input type="file" id="fileInput" accept=".json" class="hidden">
@@ -1319,14 +1383,113 @@ function updateDateDisplay() {
         el.textContent = `${dates[0].getDate()}–${dates[6].getDate()} ${MONTHS[dates[6].getMonth()]}`;
     } else if (currentView === 'calendar') {
         el.textContent = `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    } else if (currentView === 'tasks') {
+        el.textContent = 'Tüm görevler';
     } else {
         el.textContent = 'Tüm kayıtlar';
     }
+    // Hide/show nav arrows based on view
+    const navBtns = document.querySelectorAll('#prevPeriod, #nextPeriod');
+    navBtns.forEach(b => b.style.visibility = (currentView==='list'||currentView==='tasks') ? 'hidden' : 'visible');
+}
+
+// ─── TASKS VIEW FILTER STATE ───
+let tasksFilter = 'all'; // 'all' | 'active' | 'done' | 'high' | 'medium' | 'low'
+
+function renderTasksView() {
+    const allEntries = Object.entries(dm.entries).sort((a,b) => new Date(b[0]) - new Date(a[0]));
+
+    // Collect all tasks with date info
+    let allTasks = [];
+    allEntries.forEach(([ds, entry]) => {
+        if (entry.tasks && entry.tasks.length) {
+            entry.tasks.forEach((t, idx) => {
+                allTasks.push({ ...t, date: ds, entryIdx: idx });
+            });
+        }
+    });
+
+    // Filter
+    let filtered = allTasks;
+    if (tasksFilter === 'active')  filtered = allTasks.filter(t => !t.done);
+    else if (tasksFilter === 'done')   filtered = allTasks.filter(t => t.done);
+    else if (tasksFilter === 'high')   filtered = allTasks.filter(t => t.priority === 'high');
+    else if (tasksFilter === 'medium') filtered = allTasks.filter(t => t.priority === 'medium');
+    else if (tasksFilter === 'low')    filtered = allTasks.filter(t => t.priority === 'low');
+
+    const total  = allTasks.length;
+    const active = allTasks.filter(t=>!t.done).length;
+    const done   = allTasks.filter(t=>t.done).length;
+
+    let html = `
+    <div class="tasks-filter-bar">
+        <button class="tfilter-btn ${tasksFilter==='all'?'active':''}" data-filter="all">Tümü (${total})</button>
+        <button class="tfilter-btn ${tasksFilter==='active'?'active':''}" data-filter="active">Aktif (${active})</button>
+        <button class="tfilter-btn ${tasksFilter==='done'?'active':''}" data-filter="done">Tamamlanan (${done})</button>
+        <button class="tfilter-btn ${tasksFilter==='high'?'active':''}" data-filter="high">🔴 Yüksek</button>
+        <button class="tfilter-btn ${tasksFilter==='medium'?'active':''}" data-filter="medium">🟡 Orta</button>
+        <button class="tfilter-btn ${tasksFilter==='low'?'active':''}" data-filter="low">🟢 Düşük</button>
+    </div>`;
+
+    if (!filtered.length) {
+        html += `<div class="empty-state" style="padding:3rem;text-align:center;">Görev bulunamadı</div>`;
+    } else {
+        html += '<div class="tasks-overview">';
+        filtered.forEach(t => {
+            const d = new Date(t.date);
+            const label = `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+            html += `
+            <div class="task-overview-item ${t.done?'done-task':''}" data-date="${t.date}">
+                <div class="tov-check ${t.done?'checked':''}" data-date="${t.date}" data-taskidx="${t.entryIdx}">${t.done?'✓':''}</div>
+                <div class="tov-dot ${t.priority||'medium'}"></div>
+                <div class="tov-text">${t.text}</div>
+                <div class="tov-date">${label}</div>
+            </div>`;
+        });
+        html += '</div>';
+    }
+
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('mainContent').className = '';
+
+    // Filter button events
+    document.querySelectorAll('.tfilter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            tasksFilter = btn.dataset.filter;
+            renderTasksView();
+            renderStats();
+        });
+    });
+
+    // Checkbox toggle
+    document.querySelectorAll('.tov-check').forEach(el => {
+        el.addEventListener('click', e => {
+            e.stopPropagation();
+            const ds = el.dataset.date;
+            const idx = parseInt(el.dataset.taskidx);
+            const entry = dm.get(ds);
+            if (entry && entry.tasks && entry.tasks[idx] !== undefined) {
+                entry.tasks[idx].done = !entry.tasks[idx].done;
+                dm.add(ds, entry);
+                renderTasksView();
+                renderStats();
+            }
+        });
+    });
+
+    // Click card to open modal
+    document.querySelectorAll('.task-overview-item').forEach(el => {
+        el.addEventListener('click', e => {
+            if (e.target.classList.contains('tov-check')) return;
+            openModal(el.dataset.date);
+        });
+    });
 }
 
 function render() {
     if (currentView === 'weekly') renderWeekly();
     else if (currentView === 'calendar') renderCalendar();
+    else if (currentView === 'tasks') renderTasksView();
     else renderList();
     renderStats();
     renderMoodChart();
