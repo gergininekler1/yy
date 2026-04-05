@@ -1,1409 +1,655 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX - REVIZE</title>
+    <title>Matrix Core - Günlük Takip Sistemi</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Matrix Temalı CSS */
         :root {
-            --accent: #2ecc71;
-            --accent-dim: rgba(46, 204, 113, 0.1);
-            --danger: #e74c3c;
-            --warning: #f1c40f;
-            --bg-grid: #0d0d0d;
-            --bg-grid-lines: #161616;
-            --bg: var(--bg-grid);
-            --surface: #161616;
-            --surface2: #1f1f1f;
-            --border: #2a2a2a;
-            --text1: #d1d1d1;
-            --text2: #777;
+            --bg-color: #0d0d0d;
+            --accent-blue: #3498db;
+            --accent-red: #e74c3c;
+            --text-green: #2ecc71;
+            --text-main: #d1d1d1;
+            --surface-color: #1a1a1a;
+            --surface-variant: #262626;
+            --border-color: #333;
+            --font-main: 'Share Tech Mono', monospace;
+            --font-accent: 'Orbitron', sans-serif;
         }
-        [data-theme="light"] {
-            --bg-grid: #f0f0f4;
-            --bg-grid-lines: #e4e4ea;
-            --bg: var(--bg-grid);
-            --surface: #ffffff;
-            --surface2: #ebebef;
-            --border: #d1d1d1;
-            --text1: #222;
-            --text2: #666;
-        }
-
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
 
         body {
-            background-color: var(--bg-grid);
-            background-image: linear-gradient(var(--bg-grid-lines) 1px, transparent 1px),
-                              linear-gradient(90deg, var(--bg-grid-lines) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text1);
-            padding: 1rem;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; }
-
-        /* ── HEADER ── */
-        .header-block {
-            border: 1px solid var(--border);
-            padding: 1rem 1.5rem 1rem;
-            margin-bottom: 0.5rem;
-            background: var(--surface);
+        .phone-mockup {
+            width: 360px;
+            height: 780px;
+            border: 16px solid #222;
+            border-radius: 36px;
+            background-color: var(--bg-color);
             position: relative;
-            background-image: linear-gradient(135deg, var(--surface) 60%, var(--accent-dim) 100%);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            margin-top: 20px;
         }
-        h1 { font-family: 'Orbitron'; letter-spacing: 6px; color: var(--accent); text-transform: uppercase; font-size: 1.8rem; }
 
-        /* ── KUNYE BLOCK ── */
-        .kunye-block {
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            background: var(--surface);
+        /* Durum Çubuğu */
+        .status-bar {
+            height: 24px;
+            background-color: #000;
+            color: #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 12px;
+            font-family: sans-serif;
         }
-        .kunye-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .status-bar-icons { display: flex; gap: 4px; align-items: center; }
 
-        /* ── STATS BAR: 3 eşit kare ── */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 1.5rem;
-        }
-        .stat-item {
-            background: var(--surface2);
+        /* Başlık ve Tema Seçici */
+        .header {
             padding: 16px;
-            border-left: 3px solid var(--accent);
-            border-radius: 6px;
-            min-height: 90px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .header-title {
+            color: var(--accent-blue);
+            font-family: var(--font-main);
+            font-weight: bold;
+        }
+        
+        /* Yeniden Düzenlenmiş Küçük Kare Tema Seçici (SARI DAİRE İYİLEŞTİRMESİ) */
+        .theme-selector {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .theme-selector .theme-label {
+            color: var(--accent-blue);
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .color-palette {
+            display: flex;
+            gap: 3px;
+        }
+        .color-box {
+            width: 16px;
+            height: 16px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .color-box.selected { border-color: var(--text-main); box-shadow: 0 0 5px rgba(255,255,255,0.3); }
+
+        /* Kart Stilleri */
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            position: relative;
+        }
+        .card-label {
+            color: #888;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-main-data {
+            color: var(--accent-blue);
+            font-family: var(--font-accent);
+            font-size: 36px;
+            font-weight: 900;
+        }
+        .blue-left-border {
+            position: absolute;
+            left: 0;
+            top: 16px;
+            bottom: 16px;
+            width: 3px;
+            background-color: var(--accent-blue);
+        }
+        .red-left-border {
+            position: absolute;
+            left: 0;
+            top: 16px;
+            bottom: 16px;
+            width: 3px;
+            background-color: var(--accent-red);
+        }
+
+        /* Aktif Görevler */
+        .task-chip {
+            background-color: var(--surface-variant);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 11px;
+            display: inline-flex;
+            gap: 4px;
+            margin-right: 6px;
+        }
+        .task-date { color: #eee; }
+        .task-count { color: #888; }
+
+        /* Kritik Durum */
+        .critical-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-red);
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 6px;
+        }
+        .status-message {
+            color: var(--accent-red);
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        /* Arama */
+        .search-container {
+            padding: 0 16px;
+            margin-bottom: 16px;
+        }
+        .search-input {
+            width: 100%;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: #888;
+            padding: 10px;
+            font-family: var(--font-main);
+            font-size: 12px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Sekme Çubuğu (KIRMIZI DAİRE İYİLEŞTİRMESİ) */
+        .tabs-container {
+            border-top: 1px solid var(--border-color);
+            background-color: #000;
+        }
+        .tabs {
+            display: flex;
+            width: 100%;
+            white-space: nowrap; /* Tek satıra zorla */
+            overflow-x: auto; /* Sığmazsa kaydır (mobil için önlem) */
+        }
+        .tab {
+            flex: 1;
+            padding: 12px 0;
+            color: #888;
+            text-align: center;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            background-image: linear-gradient(135deg, var(--surface2) 70%, var(--accent-dim) 100%);
-            transition: box-shadow 0.2s;
-        }
-        .stat-item:hover { box-shadow: 0 2px 12px var(--accent-dim); }
-        .stat-label { color: var(--text2); font-size: 0.55rem; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
-        .stat-content { font-size: 0.7rem; line-height: 1.4; word-break: break-word; }
-        .stat-content .task-chip {
-            display: inline-block;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 3px 8px; margin: 2px;
-            border-radius: 3px;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .stat-content .task-chip:hover { background: var(--accent-dim); }
-
-        /* ── MODERN TERMINAL SEARCH ── */
-        .terminal-search-wrapper {
-            position: relative;
-            margin-bottom: 1.5rem;
-            display: flex;
             align-items: center;
-            background: var(--bg-grid-lines);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            gap: 4px;
+            min-width: 0; /* flex-shrink için */
         }
-        .terminal-search-wrapper:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-dim);
-            background: var(--bg);
-        }
-        .terminal-prompt {
-            color: var(--accent);
-            padding: 12px 0 12px 14px;
-            font-family: 'Share Tech Mono', monospace;
-            font-weight: bold;
-            font-size: 0.85rem;
-            user-select: none;
-        }
-        .terminal-search-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text1);
-            padding: 12px 14px;
-            font-size: 0.9rem;
-            outline: none;
-            font-family: 'Share Tech Mono', monospace;
-        }
-        .terminal-search-input::placeholder {
-            color: var(--text2);
-            opacity: 0.6;
-        }
-        .search-clear {
-            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-            color: var(--text2); cursor: pointer; font-size: 1rem; display: none;
-            transition: color 0.2s;
-        }
-        .search-clear:hover { color: var(--danger); }
-        .search-clear.visible { display: block; }
-
-        /* ── BUTTONS ── */
-        button {
-            background: transparent; border: none; color: var(--text2);
-            padding: 8px 14px; cursor: pointer; font-size: 0.7rem;
-            text-transform: uppercase; display: flex; align-items: center;
-            gap: 6px; transition: all 0.2s;
-        }
-        button:hover { opacity: 0.8; }
-        
-        /* ── MODERN VIEW CONTROLS (Taşmayı önleyen ve şık yapı) ── */
-        .view-controls-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: stretch;
-        }
-        .view-switcher {
-            display: flex;
-            flex-wrap: wrap;
-            background: var(--surface2);
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            gap: 6px;
-            flex: 2;
-            min-width: 300px;
-        }
-        .view-switcher .view-btn {
-            flex: 1;
-            justify-content: center;
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-weight: 600;
-            color: var(--text2);
-            letter-spacing: 1px;
-            transition: all 0.2s ease;
-        }
-        .view-switcher .view-btn.active {
-            background: var(--accent);
+        .tab-icon { font-size: 14px; }
+        .tab.active {
+            background-color: var(--accent-blue);
             color: #000;
-            box-shadow: 0 2px 10px var(--accent-dim);
             font-weight: bold;
         }
-        
+
+        /* Tarih Gezgini */
         .date-navigator {
             display: flex;
-            background: var(--surface2);
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            align-items: center;
-            flex: 1;
-            min-width: 250px;
-            justify-content: space-between;
-        }
-        .date-navigator button {
-            border-radius: 6px;
-            padding: 10px 16px;
-            background: var(--surface);
-            border: 1px solid transparent;
-        }
-        .date-navigator button:hover:not(#currentRange) {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        .date-display {
-            flex: 1;
-            text-align: center;
-            font-weight: bold;
-            color: var(--text1);
-            pointer-events: none;
             justify-content: center;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
+            align-items: center;
+            gap: 16px;
+            color: #ccc;
+            font-size: 12px;
+            padding: 12px;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+        }
+        .nav-arrow {
+            color: #666;
+            font-weight: bold;
+            cursor: pointer;
         }
 
-        /* ── HABIT INLINE BAR ── */
-        .habit-inline-bar { display: flex; gap: 8px; margin-top: 0.6rem; flex-wrap: wrap; }
-        .habit-inline-btn {
-            background: var(--surface2); border: 1px solid var(--border);
-            border-radius: 6px; padding: 6px 14px; cursor: pointer; transition: all 0.25s;
-            font-size: 0.72rem; color: var(--text2); display: flex; align-items: center;
-            gap: 6px; font-family: 'Share Tech Mono', monospace; text-transform: uppercase;
+        /* Gün Kartları */
+        .day-container {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
         }
-        .habit-inline-btn.active {
-            border-color: var(--accent); color: var(--accent);
-            background: var(--accent-dim); box-shadow: 0 0 10px var(--accent-dim);
-        }
-        .habit-inline-btn:hover { opacity: 0.8; }
-
-        /* ── CARDS ── */
-        .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-        
         .day-card {
-            background: var(--surface); padding: 0; display: flex; cursor: pointer;
-            position: relative; min-height: 140px; border-radius: 6px; overflow: hidden;
-            border-left: 5px solid var(--border); transition: all 0.2s;
-            background-image: linear-gradient(160deg, var(--surface) 75%, var(--accent-dim) 100%);
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            position: relative;
         }
-        .day-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
-        .day-card.recorded { border-left-color: var(--accent); }
-
-        .day-card-left {
-            width: 60px; background: rgba(0, 0, 0, 0.2); border-right: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-            font-weight: bold; color: var(--text2); text-transform: uppercase; letter-spacing: 1px;
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
-        .day-card.recorded .day-card-left { color: var(--accent); }
-
-        .day-card-right { flex: 1; padding: 15px; display: flex; flex-direction: column; position: relative; }
-
-        .status-light {
-            position: absolute; top: 10px; right: 10px;
-            width: 10px; height: 10px; border-radius: 50%; background: var(--border);
+        .day-date-part {
+            display: flex;
+            flex-direction: column;
         }
-        .status-light.active {
-            background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .day-number { color: #888; font-size: 12px; }
+        .day-name { color: #ccc; font-size: 14px; text-transform: uppercase; font-weight: bold; }
+        .day-tags { display: flex; gap: 4px; color: #888; font-size: 11px; }
 
-        .day-stats { display: flex; gap: 8px; margin-top: 8px; font-size: 0.65rem; color: var(--text2); }
-        .day-stat { display: flex; align-items: center; gap: 3px; }
-        .day-header { font-size: 0.65rem; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .day-title { font-size: 0.9rem; color: var(--accent); margin-bottom: 8px; font-weight: bold; }
-        .habit-icons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-        .habit-icon {
-            width: 24px; height: 24px; background: var(--surface2); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; border: 1px solid var(--border);
+        /* Tümünü Sil Butonu (YENİ İŞLEV) */
+        .delete-all-day {
+            color: var(--accent-red);
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
         }
-        .task-progress { margin-top: 10px; font-size: 0.65rem; color: var(--text2); }
-        .progress-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top: 4px; }
-        .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+        .delete-all-day:hover { opacity: 1; }
 
-        /* ── ALERTS ── */
-        .critical-dot { width: 8px; height: 8px; background: var(--danger); border-radius: 50%; display: inline-block; animation: blink 1s infinite; margin-left: 5px; }
-        .backup-alert { color: var(--warning); animation: blink 1.5s infinite; font-size: 0.8rem; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        /* ── MODAL ── */
-        .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.92); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--bg); border: 1px solid var(--accent);
-            width: 100%; max-width: 700px; max-height: 90vh;
-            overflow-y: auto; padding: 1.5rem; border-radius: 6px;
+        /* Gün Notu Alanı (YENİ İYİLEŞTİRMELER) */
+        .day-note-container {
+            margin-top: 12px;
+            position: relative;
         }
-
-        .modal-block {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-            padding: 1.2rem; margin-bottom: 1rem; position: relative; overflow: hidden;
+        .card-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
-        .modal-block::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, var(--accent), transparent); opacity: 0.6;
+        .note-actions {
+            display: flex;
+            gap: 8px;
         }
-        .day-title-input {
-            width: 100%; background: var(--bg); border: 1px solid var(--border);
-            color: var(--accent); padding: 10px; font-size: 0.9rem; margin-bottom: 0.8rem;
-            text-transform: uppercase; font-weight: bold; font-family: 'Share Tech Mono', monospace;
-            border-radius: 4px; outline: none;
+        .note-action-btn {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            opacity: 0.7;
+            transition: opacity 0.2s;
         }
-        .day-title-input:focus { border-color: var(--accent); }
-        textarea {
-            width: 100%; min-height: 130px; background: var(--bg); border: 1px solid var(--border);
-            color: var(--text1); padding: 10px; resize: vertical; border-radius: 4px;
-            font-family: 'Share Tech Mono', monospace; outline: none;
+        .note-action-btn:hover { opacity: 1; }
+
+        .note-textarea {
+            width: 100%;
+            height: 60px; /* Başlangıç yüksekliği */
+            background-color: var(--surface-variant);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px;
+            font-family: var(--font-main);
+            font-size: 12px;
+            border-radius: 4px;
+            resize: none;
+            box-sizing: border-box;
+            transition: height 0.3s ease; /* Genişleme efekti */
         }
-        textarea:focus { border-color: var(--accent); }
-
-        /* ── LIST ROW ── */
-        .list-row {
-            display: flex; align-items: center; gap: 10px; background: var(--surface2);
-            padding: 8px 12px; margin-bottom: 4px; font-size: 0.75rem; border-radius: 5px;
-            border: 1px solid transparent; transition: border-color 0.15s;
-        }
-        .list-row:hover { border-color: var(--border); }
-        .priority-tag { font-size: 0.5rem; padding: 3px 6px; border-radius: 3px; font-weight: bold; }
-
-        /* ── PRIORITY FILTER TABS ── */
-        .pr-filter-tabs { display: flex; gap: 0; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-        .pr-filter-tab {
-            flex: 1; padding: 6px 4px; text-align: center; cursor: pointer;
-            font-size: 0.6rem; background: var(--surface2); color: var(--text2);
-            text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; border: none;
-            font-family: 'Share Tech Mono', monospace;
-        }
-        .pr-filter-tab.active-all { background: var(--surface); color: var(--text1); }
-        .pr-filter-tab.active-1 { background: var(--danger); color: #fff; }
-        .pr-filter-tab.active-2 { background: var(--warning); color: #000; }
-        .pr-filter-tab.active-3 { background: var(--accent); color: #000; }
-
-        .pr-btn { border: 1px solid var(--border); margin-right: 5px; transition: all 0.2s; border-radius: 4px; }
-        .pr-btn.active-1 { background: var(--danger); color: #fff; border-color: var(--danger); }
-        .pr-btn.active-2 { background: var(--warning); color: #000; border-color: var(--warning); }
-        .pr-btn.active-3 { background: var(--accent); color: #000; border-color: var(--accent); }
-
-        /* ── TAGS ── */
-        .tag-chip {
-            background: var(--surface2); color: var(--accent); padding: 4px 8px; font-size: 0.6rem;
-            border-radius: 4px; border: 1px solid var(--border); display: inline-flex; align-items: center;
-            gap: 5px; cursor: pointer; transition: all 0.2s;
-        }
-        .tag-chip:hover { background: var(--accent); color: #000; }
-
-        /* ── FAB ── */
-        .fab {
-            position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px;
-            background: var(--accent); color: #000; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; cursor: pointer; z-index: 100;
-            box-shadow: 0 4px 16px var(--accent-dim); transition: all 0.2s;
-        }
-        .fab:hover { transform: scale(1.1); }
-
-        /* ── HIGHLIGHT ── */
-        .highlight { background: #f1c40f; color: #000; padding: 2px 4px; border-radius: 2px; }
-
-        /* ── FILTER BAR ── */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-        .filter-select {
-            background: var(--surface2); border: 1px solid var(--border);
-            color: var(--text1); padding: 8px 12px; font-size: 0.7rem; border-radius: 4px;
-            font-family: 'Share Tech Mono', monospace;
+        /* Genişleyen Not Alanı (FOKUS İYİLEŞTİRMESİ) */
+        .note-textarea:focus {
+            height: 200px;
+            border-color: var(--accent-blue);
+            outline: none;
         }
 
-        /* ── CHARTS ── */
-        .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 1.5rem; }
-        .chart-block {
-            background: var(--surface); border: 1px solid var(--border);
-            padding: 1.5rem; border-radius: 8px;
-            background-image: linear-gradient(135deg, var(--surface) 80%, var(--accent-dim) 100%);
-        }
-        .chart-title { font-size: 0.7rem; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* ── LINKED NOTES ── */
-        .linked-notes { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-        .linked-note-item {
-            background: var(--surface2); padding: 8px 12px; margin-bottom: 8px; font-size: 0.7rem;
-            border-radius: 4px; cursor: pointer; transition: all 0.2s;
-        }
-        .linked-note-item:hover { background: var(--accent-dim); border-left: 3px solid var(--accent); padding-left: 9px; }
-
-        /* ── COLOR PALETTE ── */
-        .color-palette { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .color-swatch {
-            width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
-            border: 2px solid transparent; transition: all 0.2s;
-        }
-        .color-swatch:hover { transform: scale(1.2); }
-        .color-swatch.selected { border-color: var(--text1); box-shadow: 0 0 8px rgba(255,255,255,0.4); }
-
-        /* ── EXTRA SEKME KISIMLARI ── */
-        .extra-section { margin-bottom: 1.5rem; }
-        .extra-header {
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 1rem; padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .extra-header-title { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; font-weight: bold;}
-        
-        /* TASK POOL BLOCK (Görev Havuzu için izole yeni blok) */
-        .task-pool-block {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 8px; padding: 1.5rem; position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            background-image: linear-gradient(135deg, var(--surface) 60%, var(--surface2) 100%);
+        /* Ekle Butonu */
+        .fab-button {
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent-blue);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            position: absolute;
+            bottom: 60px;
+            right: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* ── GLOBAL SERI TAKIBI (Izgara taşmasını önleyen modern yapı) ── */
-        .streak-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; 
-            margin-bottom: 1.5rem; 
+        /* Alt URL Barı */
+        .phone-footer {
+            height: 40px;
+            background-color: #000;
+            color: #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            border-top: 1px solid #222;
         }
-        .streak-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 8px; padding: 16px; text-align: center;
-            background-image: linear-gradient(135deg, var(--surface) 70%, var(--accent-dim) 100%);
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
-        .streak-card:hover { box-shadow: 0 4px 15px var(--accent-dim); transform: translateY(-2px); }
-        .streak-num { font-family: 'Orbitron'; font-size: 2.2rem; color: var(--accent); line-height: 1; }
-        .streak-lbl { font-size: 0.60rem; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; font-weight: bold; }
+        .url-bar { color: #aaa; font-size: 12px; display: flex; gap: 6px; }
 
-        /* ── ARAMA SONUÇLARI ── */
-        .search-results-block {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; position: relative; overflow: hidden;
+        /* Arşiv Sekmesi İyileştirmesi (YENİ GÖRÜNÜM) */
+        #archived_view {
+            padding: 16px;
+            color: #888;
+            font-size: 12px;
+            line-height: 1.6;
         }
-        .search-results-block::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--warning), transparent);
+        .archive-terminal {
+            background-color: #000;
+            border: 1px solid #111;
+            padding: 16px;
+            font-family: var(--font-main);
+            height: 300px;
+            overflow-y: auto;
         }
-        .search-result-item {
-            background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
-            padding: 10px 14px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; font-size: 0.73rem;
+        .archive-header { color: var(--text-green); margin-bottom: 12px; }
+        .archive-entry {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid #111;
+            padding-bottom: 4px;
         }
-        .search-result-item:hover { border-color: var(--accent); background: var(--accent-dim); }
-        .search-result-date { color: var(--accent); font-size: 0.6rem; margin-bottom: 3px; }
-        .search-result-title { font-weight: bold; color: var(--text1); margin-bottom: 4px; }
-        .search-result-snippet { color: var(--text2); font-size: 0.65rem; line-height: 1.5; }
+        .entry-date { color: #555; }
+        .entry-preview { color: #aaa; flex: 1; }
+        .entry-tags { color: #444; }
 
-        /* ── GÖREV HAVUZU GRUPLARI ── */
-        .pool-group { margin-bottom: 12px; }
-        .pool-group-label {
-            font-size: 0.55rem; text-transform: uppercase; letter-spacing: 2px;
-            margin-bottom: 6px; padding: 4px 10px; border-radius: 4px; display: inline-block; font-weight: bold;
+        /* Aylık Takvim İyileştirmesi (YENİ PRATİK ÖZELLİK: Kritik Gün İşareti) */
+        #monthly_view { padding: 16px; }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
         }
-        .pool-group-label.p1 { background: var(--danger); color: #fff; }
-        .pool-group-label.p2 { background: var(--warning); color: #000; }
-        .pool-group-label.p3 { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+        .cal-day-label { color: #555; font-size: 10px; padding: 4px; }
+        .cal-cell {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ccc;
+            font-size: 12px;
+            position: relative;
+        }
+        .cal-cell.today { border-color: var(--accent-blue); color: var(--accent-blue); font-weight: bold; }
+        /* Kritik görevleri olan günleri vurgula (YENİ İŞLEV) */
+        .cal-cell.has-critical::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 5px;
+            height: 5px;
+            background-color: var(--accent-red);
+            border-radius: 50%;
+        }
+        .cal-cell.other-month { color: #333; }
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 600px) {
-            .stats-bar { grid-template-columns: 1fr; }
-            .terminal-prompt { padding-left: 8px; font-size: 0.75rem; }
-        }
     </style>
 </head>
 <body>
 
-<div class="container">
-
-    <div class="header-block">
-        <div id="themeToggle" style="position:absolute; top:1rem; right:1.5rem; cursor:pointer;"><i class="fa-solid fa-moon"></i></div>
-        <h1><i class="fa-solid fa-terminal"></i> Matrix</h1>
-        <div style="font-size:0.65rem; color:var(--text2); letter-spacing:2px; text-transform:uppercase; margin-bottom:0.6rem;">terminal mod: revize</div>
+<div class="phone-mockup">
+    <div class="status-bar">
+        <div>23:43</div>
+        <div class="status-bar-icons">
+            <span style="font-size: 10px;">Vo LTE</span>
+            <span style="font-size: 10px;">Vo LTE</span>
+            <span style="font-size: 12px; font-weight: bold;">51%</span>
+            <span>🔋</span>
+        </div>
     </div>
 
-    <div class="kunye-block">
-        <div class="kunye-label">// SİSTEM DURUMU</div>
-        <div style="display:flex; gap:10px; margin-bottom:1.5rem; flex-wrap:wrap;">
-            <button id="exportBtn"><i class="fa-solid fa-download"></i> [EXPORT] <span id="backupWarning"></span></button>
-            <button id="importBtn"><i class="fa-solid fa-upload"></i> [IMPORT]</button>
-            <input type="file" id="fileInput" hidden>
-        </div>
-
-        <div style="margin-bottom:1.5rem;">
-            <div class="kunye-label">// RENK TEMASI</div>
-            <div class="color-palette" id="colorPalette">
-                <div class="color-swatch selected" data-color="#2ecc71" style="background:#2ecc71;" title="Yeşil"></div>
-                <div class="color-swatch" data-color="#3498db" style="background:#3498db;" title="Mavi"></div>
-                <div class="color-swatch" data-color="#9b59b6" style="background:#9b59b6;" title="Mor"></div>
-                <div class="color-swatch" data-color="#e67e22" style="background:#e67e22;" title="Turuncu"></div>
-                <div class="color-swatch" data-color="#e74c3c" style="background:#e74c3c;" title="Kırmızı"></div>
-                <div class="color-swatch" data-color="#1abc9c" style="background:#1abc9c;" title="Turkuaz"></div>
-            </div>
-        </div>
-
-        <div class="stats-bar" id="statsBar"></div>
-
-        <div id="globalStreaks"></div>
-
-        <div class="terminal-search-wrapper">
-            <span class="terminal-prompt">root@matrix:~#</span>
-            <input type="text" id="globalSearch" class="terminal-search-input"
-                   placeholder="Sistem veri tabanında ara (örn: grep -r 'görev' /sistem)..." autocomplete="off" spellcheck="false">
-            <span class="search-clear" id="searchClear"><i class="fa-solid fa-xmark"></i></span>
-        </div>
-
-        <div class="view-controls-wrapper">
-            <div class="view-switcher">
-                <button class="view-btn active" data-view="weekly"><i class="fa-solid fa-calendar-week"></i> HAFTALIK</button>
-                <button class="view-btn" data-view="monthly"><i class="fa-solid fa-calendar-days"></i> AYLIK</button>
-                <button class="view-btn" data-view="list"><i class="fa-solid fa-box-archive"></i> ARŞİV</button>
-                <button class="view-btn" data-view="extra"><i class="fa-solid fa-bolt"></i> EKSTRA</button>
-            </div>
-            <div class="date-navigator">
-                <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="currentRange" class="date-display"></button>
-                <button id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+    <div class="header">
+        <div class="header-top">
+            <div class="header-title">MATRIX CORE / TAKİP SYST.</div>
+            <div class="theme-selector">
+                <span class="theme-label">TEMA</span>
+                <div class="color-palette">
+                    <div class="color-box selected" style="background-color: #3498db;"></div>
+                    <div class="color-box" style="background-color: #2ecc71;"></div>
+                    <div class="color-box" style="background-color: #e74c3c;"></div>
+                    <div class="color-box" style="background-color: #f1c40f;"></div>
+                    <div class="color-box" style="background-color: #9b59b6;"></div>
+                    <div class="color-box" style="background-color: #e67e22;"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <main id="mainContent"></main>
+    <div id="main_content_view">
+        
+        <div class="card">
+            <div class="blue-left-border"></div>
+            <div class="card-label">💾 KAYIT SAYISI</div>
+            <div class="card-main-data">3</div>
+        </div>
 
-    <footer>
-        <div id="randomAtomicArea" style="max-width:600px; margin:3rem auto 0; color:var(--text2); font-style:italic; font-size:0.8rem; border-left:2px solid var(--accent); padding-left:15px;"></div>
-    </footer>
+        <div class="card">
+            <div class="blue-left-border"></div>
+            <div class="card-label">📋 AKTİF GÖREVLER</div>
+            <div>
+                <div class="task-chip">
+                    <span class="task-date">2026-04-06</span>
+                    <span class="task-count">(2)</span>
+                </div>
+                <div class="task-chip">
+                    <span class="task-date">2026-04-05</span>
+                    <span class="task-count">(1)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="red-left-border"></div>
+            <div class="card-label">🚨 KRİTİK DURUM <span class="critical-dot"></span></div>
+            <div class="status-message">YÜKSEK ÖNCELİKLİ İŞ VAR</div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Sistem veri tabanında ara...">
+        </div>
+        
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <div class="tab active" data-tab="haftalik">
+                <span class="tab-icon">📅</span>
+                <span>HAFTALIK</span>
+            </div>
+            <div class="tab" data-tab="aylik">
+                <span class="tab-icon">🗓️</span>
+                <span>AYLIK</span>
+            </div>
+            <div class="tab" data-tab="arsiv">
+                <span class="tab-icon">📁</span>
+                <span>ARŞİV</span>
+            </div>
+            <div class="tab" data-tab="ekstra">
+                <span class="tab-icon">⚡</span>
+                <span>EKSTRA</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="date-navigator">
+        <span class="nav-arrow">&lt;</span>
+        <span>19 - 25 NİSAN</span>
+        <span class="nav-arrow">&gt;</span>
+    </div>
+
+    <div class="day-container">
+        <div class="day-card">
+            <div class="delete-all-day" title="Tüm günü sil">🗑️</div>
+
+            <div class="day-header">
+                <div class="day-date-part">
+                    <span class="day-number">19 NİSAN</span>
+                    <span class="day-name">PAZ</span>
+                </div>
+                <div class="day-tags">
+                    <span>#is</span> <span>#spor</span>
+                </div>
+            </div>
+
+            <div>
+                <span class="task-chip"><span style="color:red">!!</span> dd</span>
+                <span class="task-chip"><span style="color:yellow">!</span> 15 syf dergi...</span>
+            </div>
+
+            <div class="day-note-container">
+                <div class="card-label-row">
+                    <div class="card-label" style="margin-bottom:0">// GÜN NOTU</div>
+                    <div class="note-actions">
+                        <button class="note-action-btn" id="copyNoteBtn" title="Tüm metni kopyala">📄</button>
+                        <button class="note-action-btn" id="addTimeBtn" title="Saat ekle">🕒</button>
+                    </div>
+                </div>
+                <textarea class="note-textarea" id="dayNoteTextarea" placeholder="Zihin bulantısı... Not almaya başla..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="fab-button">+</div>
+
+    <div class="phone-footer">
+        <div class="url-bar">
+            <span>🏠</span>
+            <span>github.io/inekler1</span>
+        </div>
+        <div>⋮</div>
+    </div>
 </div>
-
-<div class="modal" id="entryModal">
-    <div class="modal-content">
-
-        <div class="modal-block">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <div id="modalTitle" style="color:var(--accent); font-size:1.2rem; font-weight:bold; font-family:'Orbitron';"></div>
-                <i class="fa-solid fa-times" onclick="closeModal()" style="cursor:pointer; font-size:1.5rem; color:var(--text2);"></i>
-            </div>
-            <input type="text" id="dayTitle" class="day-title-input" placeholder="Gün Başlığı (opsiyonel)">
-            <div class="habit-inline-bar" id="modalHabitBar">
-                <button class="habit-inline-btn" id="hh_zihin" onclick="toggleHabit('zihin')"><i class="fa-solid fa-brain"></i> Z</button>
-                <button class="habit-inline-btn" id="hh_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-running"></i> S</button>
-                <button class="habit-inline-btn" id="hh_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book"></i> O</button>
-            </div>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// GÖREVLER <span id="taskProgress" style="margin-left:10px; color:var(--accent);"></span></div>
-            <div style="display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap;">
-                <button class="pr-btn" data-p="1" onclick="selectPriority(1)">KRİTİK</button>
-                <button class="pr-btn" data-p="2" onclick="selectPriority(2)">ORTA</button>
-                <button class="pr-btn active-3" data-p="3" onclick="selectPriority(3)">DÜŞÜK</button>
-            </div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="taskInput" placeholder="Görev ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px; border-radius:4px; font-family:'Share Tech Mono',monospace; outline:none;">
-                <button onclick="addTask()" style="background:var(--accent); color:#000; padding:8px 15px; border-radius:4px;"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            
-            <div id="modalTasks"></div>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// ZİHİN NOTU</div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="atomicInput" placeholder="Atomic note ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px; border-radius:4px; font-family:'Share Tech Mono',monospace; outline:none;">
-                <button onclick="addAtomic()" style="background:var(--accent); color:#000; padding:8px 15px; border-radius:4px;"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="modalAtomics"></div>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// GÜN NOTU</div>
-            <textarea id="entryText"></textarea>
-        </div>
-
-        <div class="modal-block">
-            <div class="kunye-label">// ETİKETLER</div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <input type="text" id="tagInput" placeholder="#etiket ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px; border-radius:4px; font-family:'Share Tech Mono',monospace; outline:none;">
-                <button onclick="addTag()" style="background:var(--accent); color:#000; padding:8px 15px; border-radius:4px;"><i class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="modalTags"></div>
-            <div id="linkedNotes" class="linked-notes" style="display:none;">
-                <div class="kunye-label">// BAĞLANTILI NOTLAR</div>
-                <div id="linkedNotesList"></div>
-            </div>
-        </div>
-
-        <div style="text-align:right;">
-            <button id="saveBtn" style="background:var(--accent); color:#000; padding:10px 24px; font-weight:bold; border-radius:5px;">
-                <i class="fa-solid fa-save"></i> KAYDET
-            </button>
-        </div>
-    </div>
-</div>
-
-<div class="fab" id="fab"><i class="fa-solid fa-plus"></i></div>
 
 <script>
-const fmt = (d) => d.toISOString().split('T')[0];
+    // Sekme Değiştirme Mantığı
+    const tabs = document.querySelectorAll('.tab');
+    const mainContentView = document.getElementById('main_content_view');
 
-const state = {
-    entries: JSON.parse(localStorage.getItem('matrix_entries') || '{}'),
-    lastBackup: localStorage.getItem('matrix_last_backup'),
-    view: 'weekly',
-    cursor: new Date(),
-    selectedDate: null,
-    temp: { tasks:[], habits:[], atomics:[], tags:[], title:'' },
-    currentPriority: 3,
-    extraPoolFilter: 'all',
-    searchTerm: '',
-    archiveFilter: { tag:'', habit:'', month:'' }
-};
-
-/* ────────────────────────────────────────────
-   STREAK HESAPLAYICI
-──────────────────────────────────────────── */
-const getStreak = (h) => {
-    let s = 0, d = new Date();
-    for (let i = 0; i < 365; i++) {
-        const e = state.entries[fmt(d)];
-        if (e?.habits?.includes(h)) s++;
-        else if (i > 0) break;
-        d.setDate(d.getDate() - 1);
-    }
-    return s;
-};
-
-/* ────────────────────────────────────────────
-   KAYDET / AUTO-SAVE
-──────────────────────────────────────────── */
-const save = () => {
-    localStorage.setItem('matrix_entries', JSON.stringify(state.entries));
-    updateStats();
-    updateStreaks();
-    renderRandomNote();
-};
-
-let autoSaveTimer = null;
-const triggerAutoSave = () => {
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(() => {
-        if (state.selectedDate) {
-            state.entries[state.selectedDate] = {
-                text:    document.getElementById('entryText').value,
-                title:   document.getElementById('dayTitle').value,
-                habits:  state.temp.habits,
-                tasks:   state.temp.tasks,
-                atomics: state.temp.atomics,
-                tags:    state.temp.tags
-            };
-            save();
-        }
-    }, 1000);
-};
-
-/* ────────────────────────────────────────────
-   ARAMA — tam işlevsel
-──────────────────────────────────────────── */
-const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-const highlightText = (text, term) => {
-    if (!term || !text) return text || '';
-    try {
-        const re = new RegExp(`(${escapeRegex(term)})`, 'gi');
-        return String(text).replace(re, '<span class="highlight">$1</span>');
-    } catch(e) { return String(text); }
-};
-
-const performSearch = (term) => {
-    if (!term) return [];
-    const results = [];
-    Object.entries(state.entries).forEach(([d, e]) => {
-        const fields = [
-            e.title || '',
-            e.text || '',
-            ...(e.tasks || []).map(t => t.text || ''),
-            ...(e.atomics || []),
-            ...(e.tags || [])
-        ];
-        const combined = fields.join(' ').toLowerCase();
-        if (combined.includes(term.toLowerCase())) {
-            let snippet = '';
-            if ((e.text || '').toLowerCase().includes(term.toLowerCase())) {
-                const idx = e.text.toLowerCase().indexOf(term.toLowerCase());
-                snippet = e.text.substring(Math.max(0, idx - 30), idx + 80);
-            } else {
-                const matchTask = (e.tasks || []).find(t => (t.text||'').toLowerCase().includes(term.toLowerCase()));
-                if (matchTask) snippet = '[Görev] ' + matchTask.text;
-                else {
-                    const matchAtomic = (e.atomics || []).find(a => a.toLowerCase().includes(term.toLowerCase()));
-                    if (matchAtomic) snippet = '[Zihin] ' + matchAtomic;
-                }
-            }
-            results.push({ date: d, entry: e, snippet });
-        }
-    });
-    return results.sort((a, b) => b.date.localeCompare(a.date));
-};
-
-let searchDebounce = null;
-document.getElementById('globalSearch').addEventListener('input', (ev) => {
-    clearTimeout(searchDebounce);
-    const val = ev.target.value;
-    document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
-    searchDebounce = setTimeout(() => {
-        state.searchTerm = val.trim().toLowerCase();
-        render();
-        if (state.view === 'extra') renderExtraSearchResults();
-    }, 200);
-});
-
-document.getElementById('searchClear').addEventListener('click', () => {
-    document.getElementById('globalSearch').value = '';
-    document.getElementById('searchClear').classList.remove('visible');
-    state.searchTerm = '';
-    render();
-});
-
-/* ────────────────────────────────────────────
-   GLOBAL SERİ GÜNCELLEYİCİ
-──────────────────────────────────────────── */
-const updateStreaks = () => {
-    const streakEl = document.getElementById('globalStreaks');
-    if (!streakEl) return;
-    streakEl.innerHTML = `
-        <div class="streak-grid">
-            <div class="streak-card">
-                <div class="streak-num">${getStreak('zihin')}</div>
-                <div class="streak-lbl"><i class="fa-solid fa-brain"></i> Zihin Serisi</div>
-            </div>
-            <div class="streak-card">
-                <div class="streak-num">${getStreak('spor')}</div>
-                <div class="streak-lbl"><i class="fa-solid fa-running"></i> Spor Serisi</div>
-            </div>
-            <div class="streak-card">
-                <div class="streak-num">${getStreak('okuma')}</div>
-                <div class="streak-lbl"><i class="fa-solid fa-book"></i> Okuma Serisi</div>
-            </div>
-        </div>
-    `;
-};
-
-/* ────────────────────────────────────────────
-   ANA RENDER
-──────────────────────────────────────────── */
-const render = () => {
-    const el = document.getElementById('mainContent');
-    updateStats();
-    updateStreaks();
-
-    if (state.view === 'weekly')       renderWeekly(el);
-    else if (state.view === 'monthly') renderMonthly(el);
-    else if (state.view === 'list')    renderList(el);
-    else if (state.view === 'extra')   renderExtra(el);
-
-    const start = new Date(state.cursor);
-    if (state.view === 'monthly') {
-        start.setDate(1);
-        document.getElementById('currentRange').textContent =
-            start.toLocaleDateString('tr-TR', { year:'numeric', month:'long' });
-    } else {
-        start.setDate(start.getDate() - start.getDay());
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        document.getElementById('currentRange').textContent =
-            `${start.getDate()} - ${end.getDate()} ${start.toLocaleDateString('tr-TR', {month:'short'})}`;
-    }
-};
-
-/* ────────────────────────────────────────────
-   HAFTALIK
-──────────────────────────────────────────── */
-const renderWeekly = (el) => {
-    const start = new Date(state.cursor);
-    start.setDate(start.getDate() - start.getDay());
-    el.innerHTML = '<div class="weekly-grid"></div>';
-    const grid = el.querySelector('.weekly-grid');
-
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        const key = fmt(d);
-        const e = state.entries[key] || {};
-
-        const hasRecords = e.text || (e.habits && e.habits.length) || (e.tasks && e.tasks.length) || (e.atomics && e.atomics.length);
-        const doneTasks  = (e.tasks || []).filter(t => t.done).length;
-        const totalTasks = (e.tasks || []).length;
-        const progress   = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
-        const hasZihin   = e.habits && e.habits.includes('zihin');
-        const taskCount  = totalTasks;
-        const atomicCount= (e.atomics || []).length;
-
-        let habitIcons = '';
-        if (e.habits) {
-            if (e.habits.includes('zihin')) habitIcons += '<div class="habit-icon" title="Zihin"><i class="fa-solid fa-brain"></i></div>';
-            if (e.habits.includes('spor'))  habitIcons += '<div class="habit-icon" title="Spor"><i class="fa-solid fa-running"></i></div>';
-            if (e.habits.includes('okuma')) habitIcons += '<div class="habit-icon" title="Okuma"><i class="fa-solid fa-book"></i></div>';
-        }
-
-        let matchBorder = '';
-        if (state.searchTerm) {
-            const fields = [e.text||'', e.title||'', ...(e.tasks||[]).map(t=>t.text||''), ...(e.atomics||[]), ...(e.tags||[])].join(' ').toLowerCase();
-            if (fields.includes(state.searchTerm)) matchBorder = 'box-shadow: 0 0 0 2px var(--accent);';
-        }
-
-        const dayTitle = e.title ? `<div class="day-title">${highlightText(e.title, state.searchTerm)}</div>` : '';
-
-        grid.innerHTML += `
-            <div class="day-card ${hasRecords ? 'recorded' : ''}" onclick="openEntry('${key}')" style="${matchBorder}">
-                <div class="day-card-left">${d.toLocaleDateString('tr-TR', { weekday:'short' })}</div>
-                <div class="day-card-right">
-                    <div class="status-light ${hasZihin ? 'active' : ''}"></div>
-                    <div class="day-header">${d.toLocaleDateString('tr-TR', { day:'numeric', month:'long' })}</div>
-                    ${dayTitle}
-                    ${habitIcons ? `<div class="habit-icons">${habitIcons}</div>` : ''}
-                    <div class="day-stats">
-                        ${taskCount > 0   ? `<div class="day-stat"><i class="fa-solid fa-tasks"></i> ${taskCount}</div>` : ''}
-                        ${atomicCount > 0 ? `<div class="day-stat"><i class="fa-solid fa-brain"></i> ${atomicCount}</div>` : ''}
-                    </div>
-                    ${totalTasks > 0 ? `
-                        <div class="task-progress">%${progress}
-                            <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
-                        </div>` : ''}
-                </div>
-            </div>`;
-    }
-};
-
-/* ────────────────────────────────────────────
-   AYLIK
-──────────────────────────────────────────── */
-const renderMonthly = (el) => {
-    const y = state.cursor.getFullYear();
-    const m = state.cursor.getMonth();
-    const firstDay = new Date(y, m, 1);
-    const lastDay  = new Date(y, m + 1, 0);
-    const days     = lastDay.getDate();
-    const startDay = firstDay.getDay();
-
-    el.innerHTML = '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px;"></div>';
-    const grid = el.querySelector('div');
-
-    ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'].forEach(day => {
-        grid.innerHTML += `<div style="text-align:center; color:var(--accent); font-size:0.6rem; padding:5px; text-transform:uppercase;">${day}</div>`;
-    });
-    for (let i = 0; i < startDay; i++) grid.innerHTML += '<div></div>';
-
-    for (let i = 1; i <= days; i++) {
-        const d   = new Date(y, m, i);
-        const key = fmt(d);
-        const e   = state.entries[key] || {};
-
-        const hasRecords = e.text || (e.habits && e.habits.length) || (e.tasks && e.tasks.length) || (e.atomics && e.atomics.length);
-        const done  = (e.tasks || []).filter(t => t.done).length;
-        const total = (e.tasks || []).length;
-        const prog  = total > 0 ? Math.round((done / total) * 100) : 0;
-        const hasZihin = e.habits && e.habits.includes('zihin');
-
-        let habitIcons = '';
-        if (e.habits) {
-            if (e.habits.includes('zihin')) habitIcons += '<div class="habit-icon" title="Zihin"><i class="fa-solid fa-brain"></i></div>';
-            if (e.habits.includes('spor'))  habitIcons += '<div class="habit-icon" title="Spor"><i class="fa-solid fa-running"></i></div>';
-            if (e.habits.includes('okuma')) habitIcons += '<div class="habit-icon" title="Okuma"><i class="fa-solid fa-book"></i></div>';
-        }
-
-        let matchBorder = '';
-        if (state.searchTerm) {
-            const fields = [e.text||'', e.title||'', ...(e.tasks||[]).map(t=>t.text||''), ...(e.atomics||[])].join(' ').toLowerCase();
-            if (fields.includes(state.searchTerm)) matchBorder = 'box-shadow: 0 0 0 2px var(--accent);';
-        }
-
-        grid.innerHTML += `
-            <div class="day-card ${hasRecords?'recorded':''}" onclick="openEntry('${key}')" style="min-height:90px; flex-direction: column; padding: 10px; ${matchBorder}">
-                <div class="status-light ${hasZihin?'active':''}"></div>
-                <div class="day-header" style="margin-bottom:0;">${i}</div>
-                ${e.title ? `<div class="day-title" style="font-size:0.7rem; margin-top:5px;">${e.title}</div>` : ''}
-                ${habitIcons ? `<div class="habit-icons" style="margin-top:4px;">${habitIcons}</div>` : ''}
-                ${total > 0 ? `<div class="task-progress">%${prog}<div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div></div>` : ''}
-            </div>`;
-    }
-};
-
-/* ────────────────────────────────────────────
-   ARŞİV
-──────────────────────────────────────────── */
-const renderList = (el) => {
-    let entries = Object.entries(state.entries).sort((a, b) => b[0].localeCompare(a[0]));
-
-    const { tag, habit, month } = state.archiveFilter;
-    if (tag)   entries = entries.filter(([d, e]) => e.tags?.some(t => t.toLowerCase().includes(tag.toLowerCase())));
-    if (habit) entries = entries.filter(([d, e]) => e.habits?.includes(habit));
-    if (month) entries = entries.filter(([d]) => d.startsWith(month));
-
-    if (state.searchTerm) {
-        const term = state.searchTerm;
-        entries = entries.filter(([d, e]) => {
-            const s = [e.text||'', e.title||'', ...(e.tasks||[]).map(t=>t.text||''), ...(e.atomics||[]), ...(e.tags||[]), d].join(' ').toLowerCase();
-            return s.includes(term);
-        });
-    }
-
-    const allTags   = [...new Set(Object.values(state.entries).flatMap(e => e.tags || []))];
-    const allMonths = [...new Set(Object.keys(state.entries).map(d => d.substring(0,7)))].sort().reverse();
-
-    el.innerHTML = `
-        <div class="filter-bar">
-            <select class="filter-select" id="filterTag" onchange="state.archiveFilter.tag=this.value; render();">
-                <option value="">Tüm Etiketler</option>
-                ${allTags.map(t=>`<option value="${t}" ${tag===t?'selected':''}>#${t}</option>`).join('')}
-            </select>
-            <select class="filter-select" id="filterHabit" onchange="state.archiveFilter.habit=this.value; render();">
-                <option value="">Tüm Habitler</option>
-                <option value="zihin" ${habit==='zihin'?'selected':''}>Zihin</option>
-                <option value="spor"  ${habit==='spor' ?'selected':''}>Spor</option>
-                <option value="okuma" ${habit==='okuma'?'selected':''}>Okuma</option>
-            </select>
-            <select class="filter-select" id="filterMonth" onchange="state.archiveFilter.month=this.value; render();">
-                <option value="">Tüm Aylar</option>
-                ${allMonths.map(m=>`<option value="${m}" ${month===m?'selected':''}>${m}</option>`).join('')}
-            </select>
-            <button onclick="state.archiveFilter={tag:'',habit:'',month:''}; render();" style="background:var(--surface2); border:1px solid var(--border); border-radius:4px;">
-                <i class="fa-solid fa-times"></i> Temizle
-            </button>
-        </div>
-        <div class="kunye-label">// ARŞİV (${entries.length} kayıt)</div>
-        ${entries.map(([d, e]) => {
-            const text  = highlightText(e.text||'', state.searchTerm);
-            const title = e.title ? highlightText(e.title, state.searchTerm) : '';
-            return `<div class="list-row" onclick="openEntry('${d}')" style="cursor:pointer; flex-direction:column; align-items:start; padding:12px;">
-                <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
-                    <strong>${d}</strong>
-                    ${title ? `<span style="color:var(--accent);">${title}</span>` : ''}
-                </div>
-                ${text ? `<div style="font-size:0.7rem; color:var(--text2);">${text.substring(0,150)}${text.length>150?'...':''}</div>` : ''}
-                ${e.tags?.length ? `<div style="margin-top:5px;">${e.tags.map(t=>`<span class="tag-chip">#${highlightText(t,state.searchTerm)}</span>`).join('')}</div>` : ''}
-            </div>`;
-        }).join('')}
-    `;
-};
-
-/* ────────────────────────────────────────────
-   EKSTRA SEKMESİ (REVİZE EDİLMİŞ)
-──────────────────────────────────────────── */
-const renderExtra = (el) => {
-    el.innerHTML = `
-        <div class="extra-section task-pool-block">
-            <div class="extra-header">
-                <i class="fa-solid fa-list-check" style="color:var(--accent);"></i>
-                <span class="extra-header-title">Görev Havuzu (Bekleyen)</span>
-            </div>
-            
-            <div class="pr-filter-tabs" style="margin-bottom: 12px; width: fit-content; min-width: 300px;">
-                <button class="pr-filter-tab ${state.extraPoolFilter === 'all' ? 'active-all' : ''}" onclick="setExtraPoolFilter('all')">TÜMÜ</button>
-                <button class="pr-filter-tab ${state.extraPoolFilter === '1' ? 'active-1' : ''}" onclick="setExtraPoolFilter('1')">!! KRİTİK</button>
-                <button class="pr-filter-tab ${state.extraPoolFilter === '2' ? 'active-2' : ''}" onclick="setExtraPoolFilter('2')">! ORTA</button>
-                <button class="pr-filter-tab ${state.extraPoolFilter === '3' ? 'active-3' : ''}" onclick="setExtraPoolFilter('3')">DÜŞÜK</button>
-            </div>
-
-            <div id="pool"></div>
-        </div>
-
-        <div id="extraSearchSection"></div>
-
-        <div class="extra-section">
-            <div class="extra-header">
-                <i class="fa-solid fa-chart-line" style="color:var(--accent);"></i>
-                <span class="extra-header-title">Aktivite Grafikleri</span>
-            </div>
-            <div class="chart-grid">
-                <div class="chart-block">
-                    <div class="chart-title"><i class="fa-solid fa-brain"></i> Zihin Notları (7 Gün)</div>
-                    <canvas id="atomicChart"></canvas>
-                </div>
-                <div class="chart-block">
-                    <div class="chart-title"><i class="fa-solid fa-running"></i> Spor Aktivitesi (30 Gün)</div>
-                    <canvas id="sporChart"></canvas>
-                </div>
-                <div class="chart-block">
-                    <div class="chart-title"><i class="fa-solid fa-book"></i> Okuma Aktivitesi (30 Gün)</div>
-                    <canvas id="okumaChart"></canvas>
+    const views = {
+        haftalik: `
+            <div class="card"><div class="blue-left-border"></div><div class="card-label">💾 KAYIT SAYISI</div><div class="card-main-data">3</div></div>
+            <div class="card"><div class="blue-left-border"></div><div class="card-label">📋 AKTİF GÖREVLER</div><div><div class="task-chip"><span class="task-date">2026-04-06</span><span class="task-count">(2)</span></div></div></div>
+            <div class="search-container"><input type="text" class="search-input" placeholder="Sistem veri tabanında ara..."></div>
+        `,
+        aylik: `
+            <div id="monthly_view">
+                <div class="card-label" style="margin: 0 0 12px 16px;">// AYLIK TAKVİM</div>
+                <div class="calendar-grid">
+                    <div class="cal-day-label">PT</div><div class="cal-day-label">SA</div><div class="cal-day-label">ÇA</div><div class="cal-day-label">PE</div><div class="cal-day-label">CU</div><div class="cal-day-label">CT</div><div class="cal-day-label">PA</div>
+                    <div class="cal-cell other-month">29</div><div class="cal-cell other-month">30</div><div class="cal-cell other-month">31</div><div class="cal-cell">1</div><div class="cal-cell">2</div><div class="cal-cell">3</div><div class="cal-cell">4</div>
+                    <div class="cal-cell today">5</div><div class="cal-cell">6</div><div class="cal-cell">7</div><div class="cal-cell">8</div><div class="cal-cell">9</div><div class="cal-cell">10</div><div class="cal-cell">11</div>
+                    <div class="cal-cell">12</div><div class="cal-cell">13</div><div class="cal-cell">14</div><div class="cal-cell">15</div><div class="cal-cell">16</div><div class="cal-cell">17</div><div class="cal-cell">18</div>
+                    <div class="cal-cell has-critical">19</div><div class="cal-cell">20</div><div class="cal-cell">21</div><div class="cal-cell">22</div><div class="cal-cell">23</div><div class="cal-cell">24</div><div class="cal-cell">25</div>
+                    <div class="cal-cell">26</div><div class="cal-cell">27</div><div class="cal-cell">28</div><div class="cal-cell">29</div><div class="cal-cell">30</div><div class="cal-cell">31</div><div class="cal-cell other-month">1</div>
                 </div>
             </div>
-        </div>
-    `;
+        `,
+        arsiv: `
+            <div id="archived_view">
+                <div class="card-label" style="margin: 0 0 12px 16px;">// VERİ TABANI ARŞİVİ - TERMİNAL</div>
+                <div class="archive-terminal">
+                    <div class="archive-header">root@matrix:/records# ls -la --sort=time</div>
+                    <div class="archive-entry"><span class="entry-date">2026-04-05:</span><span class="entry-preview">dd kritik görev...</span><span class="entry-tags">#is #onemli</span></div>
+                    <div class="archive-entry"><span class="entry-date">2026-04-04:</span><span class="entry-preview">Spor yapıldı...</span><span class="entry-tags">#spor</span></div>
+                    <div class="archive-entry"><span class="entry-date">2026-04-03:</span><span class="entry-preview">Kitap okuma: 20 sayfa...</span><span class="entry-tags">#kitap</span></div>
+                    <div class="archive-entry"><span class="entry-date">...</span><span class="entry-preview">[VERİ BOZULMASI]...</span></div>
+                </div>
+            </div>
+        `,
+        ekstra: `
+            <div class="card-label" style="margin: 16px 0 12px 16px;">// EKSTRA ÖZELLİKLER</div>
+            <div class="card"><div class="card-label">📊 VERİ ANALİZİ</div><div class="status-message" style="color:#aaa">Yükleniyor...</div></div>
+            <div class="card"><div class="card-label">⚙️ SİSTEM AYARLARI</div><div class="status-message" style="color:#aaa">Düzenleme modu kapalı.</div></div>
+        `
+    };
 
-    renderExtraSearchResults();
-
-    setTimeout(() => {
-        initAtomicChart();
-        initSporChart();
-        initOkumaChart();
-    }, 100);
-
-    const pool = el.querySelector('#pool');
-    const groups = { 1: [], 2: [], 3: [] };
-    Object.entries(state.entries).forEach(([d, e]) => {
-        (e.tasks || []).forEach(t => {
-            if (!t.done) {
-                const p = t.priority || 3;
-                groups[p].push({ date: d, text: t.text, priority: p });
-            }
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const tabName = tab.getAttribute('data-tab');
+            mainContentView.innerHTML = views[tabName];
         });
     });
 
-    let allowedPriorities = [1, 2, 3];
-    if (state.extraPoolFilter === '1') allowedPriorities = [1];
-    if (state.extraPoolFilter === '2') allowedPriorities = [2];
-    if (state.extraPoolFilter === '3') allowedPriorities = [3];
-
-    const groupLabels = { 1: ['p1','!! KRİTİK'], 2: ['p2','! ORTA'], 3: ['p3','DÜŞÜK'] };
-    let poolHtml = '';
-    
-    allowedPriorities.forEach(p => {
-        if (groups[p].length === 0) return;
-        const [cls, lbl] = groupLabels[p];
-        poolHtml += `<div class="pool-group">
-            <span class="pool-group-label ${cls}">${lbl} (${groups[p].length})</span>
-            ${groups[p].map(t => `
-                <div class="list-row" onclick="openEntry('${t.date}')" style="cursor:pointer; margin-top:4px;">
-                    <span class="priority-tag" style="background:${p==1?'var(--danger)':p==2?'var(--warning)':'var(--accent)'}; color:${p==2?'#000':'#fff'}">${p==1?'!!':p==2?'!':''}</span>
-                    <span style="flex:1;">${t.text}</span>
-                    <span style="color:var(--text2); font-size:0.6rem;">${t.date}</span>
-                </div>`).join('')}
-        </div>`;
-    });
-    pool.innerHTML = poolHtml || '<div style="color:var(--text2); font-size:0.75rem; padding:10px;">Görüntülenecek görev yok ✓</div>';
-};
-
-window.setExtraPoolFilter = (f) => {
-    state.extraPoolFilter = f;
-    render();
-};
-
-const renderExtraSearchResults = () => {
-    const sec = document.getElementById('extraSearchSection');
-    if (!sec) return;
-    if (!state.searchTerm) { sec.innerHTML = ''; return; }
-
-    const results = performSearch(state.searchTerm);
-    if (results.length === 0) {
-        sec.innerHTML = `<div class="search-results-block">
-            <div class="kunye-label">// ARAMA: "${state.searchTerm}"</div>
-            <div style="color:var(--text2); font-size:0.75rem; padding:10px;">Sonuç bulunamadı.</div>
-        </div>`;
-        return;
-    }
-
-    sec.innerHTML = `
-        <div class="search-results-block">
-            <div class="kunye-label">// ARAMA: "${state.searchTerm}" — ${results.length} sonuç</div>
-            ${results.map(r => `
-                <div class="search-result-item" onclick="openEntry('${r.date}')">
-                    <div class="search-result-date">${r.date}</div>
-                    ${r.entry.title ? `<div class="search-result-title">${highlightText(r.entry.title, state.searchTerm)}</div>` : ''}
-                    <div class="search-result-snippet">${highlightText(r.snippet, state.searchTerm)}</div>
-                    ${r.entry.tags?.length ? `<div style="margin-top:5px;">${r.entry.tags.map(t=>`<span class="tag-chip" style="font-size:0.55rem;">#${t}</span>`).join('')}</div>` : ''}
-                </div>`).join('')}
-        </div>`;
-};
-
-/* ────────────────────────────────────────────
-   MODAL LOGIC
-──────────────────────────────────────────── */
-window.openEntry = (date) => {
-    state.selectedDate = date;
-    const e = state.entries[date] || { text:'', title:'', habits:[], tasks:[], atomics:[], tags:[] };
-    state.temp = {
-        tasks:   [...(e.tasks   || [])],
-        habits:  [...(e.habits  || [])],
-        atomics: [...(e.atomics || [])],
-        tags:    [...(e.tags    || [])],
-        title:   e.title || ''
-    };
-    
-    document.getElementById('modalTitle').textContent = date;
-    document.getElementById('dayTitle').value   = e.title || '';
-    document.getElementById('entryText').value  = e.text  || '';
-    
-    renderModalTemp();
-    updateLinkedNotes();
-    document.getElementById('entryModal').classList.add('active');
-};
-
-window.closeModal = () => {
-    document.getElementById('entryModal').classList.remove('active');
-    render();
-};
-
-document.getElementById('saveBtn').onclick = () => {
-    state.entries[state.selectedDate] = {
-        text:    document.getElementById('entryText').value,
-        title:   document.getElementById('dayTitle').value,
-        habits:  state.temp.habits,
-        tasks:   state.temp.tasks,
-        atomics: state.temp.atomics,
-        tags:    state.temp.tags
-    };
-    save();
-    closeModal();
-};
-
-window.toggleHabit = (h) => {
-    const idx = state.temp.habits.indexOf(h);
-    if (idx > -1) state.temp.habits.splice(idx, 1);
-    else state.temp.habits.push(h);
-    renderModalTemp();
-    triggerAutoSave();
-};
-
-const updateHabitBtns = () => {
-    ['zihin','spor','okuma'].forEach(h => {
-        const btn = document.getElementById(`hh_${h}`);
-        if (!btn) return;
-        btn.className = `habit-inline-btn ${state.temp.habits.includes(h) ? 'active' : ''}`;
-    });
-};
-
-const renderModalTemp = () => {
-    updateHabitBtns();
-
-    let tasks = state.temp.tasks;
-    const sortedTasks = [...tasks].sort((a, b) => (a.priority || 3) - (b.priority || 3));
-
-    document.getElementById('modalTasks').innerHTML = sortedTasks.map(t => {
-        const i = state.temp.tasks.indexOf(t); 
-        return `<div class="list-row">
-            <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done; renderModalTemp(); triggerAutoSave();">
-            <span class="priority-tag" style="background:${t.priority==1?'var(--danger)':t.priority==2?'var(--warning)':'var(--accent)'}; color:${t.priority==2?'#000':'#fff'}">${t.priority==1?'!!':t.priority==2?'!':''}</span>
-            <span style="flex:1; ${t.done?'text-decoration:line-through; opacity:0.5':''};">${t.text}</span>
-            <i class="fa-solid fa-trash" onclick="state.temp.tasks.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="cursor:pointer; color:var(--danger);"></i>
-        </div>`;
-    }).join('');
-
-    document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) =>
-        `<div class="list-row"><span style="flex:1;">${a}</span>
-         <i class="fa-solid fa-trash" onclick="state.temp.atomics.splice(${i},1); renderModalTemp(); triggerAutoSave();" style="margin-left:auto; cursor:pointer; color:var(--danger);"></i>
-        </div>`).join('');
-
-    document.getElementById('modalTags').innerHTML = state.temp.tags.map((t,i) =>
-        `<span class="tag-chip">#${t}
-         <i class="fa-solid fa-times" onclick="state.temp.tags.splice(${i},1); renderModalTemp(); updateLinkedNotes(); triggerAutoSave();" style="cursor:pointer;"></i>
-        </span>`).join('');
-
-    updateTaskProgress();
-    updateLinkedNotes();
-};
-
-const updateTaskProgress = () => {
-    const done  = state.temp.tasks.filter(t => t.done).length;
-    const total = state.temp.tasks.length;
-    const prog  = total > 0 ? Math.round((done / total) * 100) : 0;
-    document.getElementById('taskProgress').textContent = total > 0 ? `(%${prog})` : '';
-};
-
-window.addTask = () => {
-    const inp = document.getElementById('taskInput');
-    if (inp.value.trim()) {
-        state.temp.tasks.push({ text: inp.value.trim(), done: false, priority: state.currentPriority });
-        inp.value = '';
-        renderModalTemp();
-        triggerAutoSave();
-    }
-};
-
-window.addAtomic = () => {
-    const inp = document.getElementById('atomicInput');
-    if (inp.value.trim()) {
-        state.temp.atomics.push(inp.value.trim());
-        inp.value = '';
-        renderModalTemp();
-        triggerAutoSave();
-    }
-};
-
-window.addTag = () => {
-    const inp = document.getElementById('tagInput');
-    if (inp.value.trim()) {
-        const tag = inp.value.trim().replace(/^#/, '');
-        if (!state.temp.tags.includes(tag)) {
-            state.temp.tags.push(tag);
-            inp.value = '';
-            renderModalTemp();
-            updateLinkedNotes();
-            triggerAutoSave();
+    // Not Kopyalama Mantığı
+    const noteTextarea = document.getElementById('dayNoteTextarea');
+    document.getElementById('copyNoteBtn').addEventListener('click', () => {
+        if (noteTextarea.value.trim() === '') {
+            alert('Metin boş, kopyalanacak bir şey yok.');
+            return;
         }
-    }
-};
-
-window.selectPriority = (p) => {
-    state.currentPriority = p;
-    document.querySelectorAll('.pr-btn').forEach(b => {
-        b.classList.remove('active-1','active-2','active-3');
-        if (parseInt(b.dataset.p) === p) b.classList.add(`active-${p}`);
+        noteTextarea.select();
+        navigator.clipboard.writeText(noteTextarea.value)
+            .then(() => alert('Tüm metin kopyalandı!'))
+            .catch(err => alert('Kopyalama başarısız: ' + err));
     });
-};
 
-const updateLinkedNotes = () => {
-    const ct = state.temp.tags;
-    if (!ct.length) { document.getElementById('linkedNotes').style.display = 'none'; return; }
-    const linked = [];
-    Object.entries(state.entries).forEach(([d, e]) => {
-        if (d === state.selectedDate) return;
-        if (e.tags?.some(t => ct.includes(t))) linked.push({ date:d, entry:e, commonTags: e.tags.filter(t => ct.includes(t)) });
+    // Saat Ekleme Mantığı
+    document.getElementById('addTimeBtn').addEventListener('click', () => {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const timeStr = ` [Saat: ${hours}:${minutes}] `;
+        
+        // Metnin sonuna ekle
+        noteTextarea.value += timeStr;
+        // Fokus'u koru
+        noteTextarea.focus();
     });
-    if (linked.length > 0) {
-        document.getElementById('linkedNotes').style.display = 'block';
-        document.getElementById('linkedNotesList').innerHTML = linked
-            .sort((a,b) => b.date.localeCompare(a.date))
-            .map(l => `<div class="linked-note-item" onclick="openEntry('${l.date}')">
-                <strong>${l.date}</strong>${l.entry.title ? ` - ${l.entry.title}` : ''}<br>
-                <span style="font-size:0.6rem; color:var(--text2);">Ortak: ${l.commonTags.map(t=>'#'+t).join(', ')}</span>
-            </div>`).join('');
-    } else {
-        document.getElementById('linkedNotes').style.display = 'none';
-    }
-};
 
-/* ────────────────────────────────────────────
-   STATS
-──────────────────────────────────────────── */
-const updateStats = () => {
-    const all = Object.entries(state.entries);
-    
-    const validCount = all.filter(([d, e]) => {
-        return (e.text && e.text.trim()) || 
-               (e.title && e.title.trim()) || 
-               (e.habits && e.habits.length) || 
-               (e.tasks && e.tasks.length) || 
-               (e.atomics && e.atomics.length) || 
-               (e.tags && e.tags.length);
-    }).length;
-
-    const activeTasks = all.filter(([d,e]) => e.tasks?.some(t => !t.done));
-    const hasCritical = all.some(([d,e]) => e.tasks?.some(t => t.priority==1 && !t.done));
-    const needsBackup = !state.lastBackup || (Date.now() - new Date(state.lastBackup).getTime() > 7*24*60*60*1000);
-
-    document.getElementById('backupWarning').innerHTML = needsBackup ? `<i class="fa-solid fa-triangle-exclamation backup-alert"></i>` : '';
-
-    const activeHtml = activeTasks.length > 0
-        ? activeTasks.slice(0,5).map(([d,e]) => {
-            const n = e.tasks.filter(t => !t.done).length;
-            return `<div class="task-chip" onclick="openEntry('${d}')">${d} (${n})</div>`;
-          }).join('') + (activeTasks.length > 5 ? `<div class="task-chip">+${activeTasks.length-5} daha</div>` : '')
-        : '<span style="color:var(--accent);">TEMİZ ✓</span>';
-
-    document.getElementById('statsBar').innerHTML = `
-        <div class="stat-item">
-            <div class="stat-label"><i class="fa-solid fa-database"></i> KAYIT SAYISI</div>
-            <div class="stat-content" style="font-size:1.6rem; font-family:'Orbitron'; color:var(--accent);">${validCount}</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label"><i class="fa-solid fa-list-check"></i> AKTİF GÖREVLER</div>
-            <div class="stat-content">${activeHtml}</div>
-        </div>
-        <div class="stat-item" style="border-left-color:${hasCritical?'var(--danger)':'var(--accent)'};">
-            <div class="stat-label"><i class="fa-solid fa-shield-halved"></i> KRİTİK DURUM ${hasCritical?'<span class="critical-dot"></span>':''}</div>
-            <div class="stat-content" style="color:${hasCritical?'var(--danger)':'var(--accent)'};">
-                ${hasCritical ? 'YÜKSEK ÖNCELİKLİ İŞ VAR' : 'SİSTEM STABİL'}
-            </div>
-        </div>`;
-};
-
-/* ────────────────────────────────────────────
-   CHARTS
-──────────────────────────────────────────── */
-const chartDefaults = {
-    plugins: { legend: { display: false } },
-    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#777' } },
-              x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#777' } } }
-};
-
-const initAtomicChart = () => {
-    const ctx = document.getElementById('atomicChart'); if (!ctx) return;
-    const sorted = Object.entries(state.entries).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sorted.map(([d]) => d.substring(5)),
-            datasets: [{ data: sorted.map(([,e]) => (e.atomics||[]).length),
-                backgroundColor: 'rgba(46,204,113,0.45)', borderColor: 'var(--accent)', borderWidth: 2, borderRadius: 4 }]
-        },
-        options: { ...chartDefaults }
+    // Tüm Günü Silme Mantığı
+    document.querySelector('.delete-all-day').addEventListener('click', () => {
+        const confirmDelete = confirm('Tüm günü silmek istediğinize emin misiniz? (Görevler, notlar ve etiketler kalıcı olarak silinecek)');
+        if (confirmDelete) {
+            const dayCard = document.querySelector('.day-card');
+            dayCard.innerHTML = '<div style="color:#555; text-align:center; padding: 20px;">[VERİ SİLİNDİ]</div>';
+            setTimeout(() => {
+                dayCard.style.display = 'none';
+            }, 1000);
+        }
     });
-};
 
-const initSporChart = () => {
-    const ctx = document.getElementById('sporChart'); if (!ctx) return;
-    const last30 = []; const d = new Date();
-    for (let i = 0; i < 30; i++) {
-        const key = fmt(new Date(d.getTime() - i * 86400000));
-        last30.unshift(state.entries[key]?.habits?.includes('spor') ? 1 : 0);
-    }
-    new Chart(ctx, {
-        type: 'line',
-        data: { labels: Array.from({length:30},(_,i)=>i+1),
-            datasets: [{ data: last30, borderColor:'#3498db', backgroundColor:'rgba(52,152,219,0.12)', tension:0.4, fill:true, pointRadius:2 }] },
-        options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, max:1, ticks:{stepSize:1,color:'#777'} } } }
-    });
-};
-
-const initOkumaChart = () => {
-    const ctx = document.getElementById('okumaChart'); if (!ctx) return;
-    const last30 = []; const d = new Date();
-    for (let i = 0; i < 30; i++) {
-        const key = fmt(new Date(d.getTime() - i * 86400000));
-        last30.unshift(state.entries[key]?.habits?.includes('okuma') ? 1 : 0);
-    }
-    new Chart(ctx, {
-        type: 'line',
-        data: { labels: Array.from({length:30},(_,i)=>i+1),
-            datasets: [{ data: last30, borderColor:'#e74c3c', backgroundColor:'rgba(231,76,60,0.12)', tension:0.4, fill:true, pointRadius:2 }] },
-        options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, max:1, ticks:{stepSize:1,color:'#777'} } } }
-    });
-};
-
-/* ────────────────────────────────────────────
-   RANDOM NOTE
-──────────────────────────────────────────── */
-const renderRandomNote = () => {
-    const pool = Object.values(state.entries).flatMap(e => e.atomics || []);
-    document.getElementById('randomAtomicArea').textContent =
-        pool.length ? `"${pool[Math.floor(Math.random() * pool.length)]}"` : '';
-};
-
-/* ────────────────────────────────────────────
-   TEMA & RENK
-──────────────────────────────────────────── */
-const saveTheme = (t) => localStorage.setItem('matrix_theme', t);
-const loadTheme = () => {
-    const t = localStorage.getItem('matrix_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-    updateThemeIcon(t);
-};
-const updateThemeIcon = (t) => {
-    document.querySelector('#themeToggle i').className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-};
-
-const accentMap = {
-    '#2ecc71':'rgba(46,204,113,0.1)', '#3498db':'rgba(52,152,219,0.1)',
-    '#9b59b6':'rgba(155,89,182,0.1)', '#e67e22':'rgba(230,126,34,0.1)',
-    '#e74c3c':'rgba(231,76,60,0.1)',  '#1abc9c':'rgba(26,188,156,0.1)'
-};
-const applyAccent = (c) => {
-    document.documentElement.style.setProperty('--accent', c);
-    document.documentElement.style.setProperty('--accent-dim', accentMap[c] || 'rgba(46,204,113,0.1)');
-    localStorage.setItem('matrix_accent', c);
-    document.querySelectorAll('.color-swatch').forEach(s => s.classList.toggle('selected', s.dataset.color === c));
-};
-const loadAccent = () => applyAccent(localStorage.getItem('matrix_accent') || '#2ecc71');
-document.querySelectorAll('.color-swatch').forEach(s => s.addEventListener('click', () => applyAccent(s.dataset.color)));
-
-/* ────────────────────────────────────────────
-   EVENT LISTENERS
-──────────────────────────────────────────── */
-document.getElementById('exportBtn').onclick = () => {
-    const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'matrix_revize.json'; a.click();
-    state.lastBackup = new Date().toISOString();
-    localStorage.setItem('matrix_last_backup', state.lastBackup);
-    updateStats();
-};
-document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange = (ev) => {
-    const r = new FileReader();
-    r.onload = (e) => { state.entries = JSON.parse(e.target.result); save(); render(); };
-    r.readAsText(ev.target.files[0]);
-};
-
-document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => {
-    document.querySelectorAll('.view-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active'); state.view = b.dataset.view; render();
-});
-
-document.getElementById('prevBtn').onclick = () => {
-    if (state.view === 'monthly') state.cursor.setMonth(state.cursor.getMonth() - 1);
-    else state.cursor.setDate(state.cursor.getDate() - 7);
-    render();
-};
-document.getElementById('nextBtn').onclick = () => {
-    if (state.view === 'monthly') state.cursor.setMonth(state.cursor.getMonth() + 1);
-    else state.cursor.setDate(state.cursor.getDate() + 7);
-    render();
-};
-
-document.getElementById('themeToggle').onclick = () => {
-    const cur = document.documentElement.getAttribute('data-theme');
-    const nxt = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', nxt);
-    saveTheme(nxt); updateThemeIcon(nxt);
-};
-
-document.getElementById('fab').onclick = () => openEntry(fmt(new Date()));
-
-document.getElementById('taskInput').addEventListener('keydown',   e => { if(e.key==='Enter') addTask(); });
-document.getElementById('atomicInput').addEventListener('keydown', e => { if(e.key==='Enter') addAtomic(); });
-document.getElementById('tagInput').addEventListener('keydown',    e => { if(e.key==='Enter') addTag(); });
-
-/* ────────────────────────────────────────────
-   BAŞLAT
-──────────────────────────────────────────── */
-loadTheme();
-loadAccent();
-render();
 </script>
+
 </body>
 </html>
