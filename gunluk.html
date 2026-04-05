@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MATRIX - FINAL FIX v47 (Prioritized)</title>
+    <title>MATRIX - FINAL FIX v48 (Blocks & Tags)</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,7 +11,6 @@
             --accent: #2ecc71; 
             --accent-dim: rgba(46, 204, 113, 0.1);
             --danger: #e74c3c;
-            /* Grid Background Colors */
             --bg-grid: #0d0d0d;
             --bg-grid-lines: #161616;
             --bg: var(--bg-grid);
@@ -29,7 +28,6 @@
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Share Tech Mono', monospace; }
         
-        /* Grid Background Pattern */
         body {
             background-color: var(--bg-grid);
             background-image: 
@@ -41,7 +39,6 @@
         
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* Structure update: Separate header blocks */
         .header-block { border: 1px solid var(--border); padding: 1rem 1.5rem; margin-bottom: 0.5rem; background: var(--surface); position: relative; }
         .theme-icon { position: absolute; top: 1rem; right: 1.5rem; cursor: pointer; color: var(--text2); font-size: 1.2rem; }
         
@@ -64,16 +61,13 @@
         button { background: transparent; border: none; color: var(--text2); padding: 8px 14px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
         button.active { background: var(--accent); color: #000; font-weight: bold; }
 
-        /* VIEWS */
         .weekly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
         
-        /* Updated design for weekly card with left green border */
         .day-card { background: var(--surface); border-left: 5px solid var(--accent); padding: 15px; cursor: pointer; position: relative; min-height: 120px; border-radius: 4px; }
         
         .habit-circle { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; border: 1px solid var(--border); border-radius: 50%; }
         .habit-circle.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); border: none; }
 
-        /* Minimal stats at bottom of weekly card */
         .card-stats { position: absolute; bottom: 10px; left: 15px; font-size: 0.6rem; color: var(--text2); display: flex; gap: 10px; }
         .card-stats span { display: flex; align-items: center; gap: 4px; }
 
@@ -82,32 +76,45 @@
         .month-day.other-month { opacity: 0.2; }
         .month-day.has-entry { border-left: 2px solid var(--accent); }
 
-        /* EDITOR & RENDER */
-        /* Toolbar removed from editor modal */
         textarea { width: 100%; min-height: 180px; background: var(--bg); border: 1px solid var(--border); color: var(--text1); padding: 12px; resize: vertical; }
         
         .rendered h1, .rendered h2 { color: var(--accent); margin: 5px 0; }
         .rendered b { color: #fff; }
         .rendered .hl { color: var(--accent); }
 
-        /* MODAL */
+        /* MODAL & BLOCKS */
         .modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--surface); border: 1px solid var(--accent); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 2rem; }
+        /* Modal arkaplanı dış çerçeve için bg rengi, iç bloklar surface rengi */
+        .modal-content { background: var(--bg); border: 1px solid var(--accent); width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-radius: 4px; }
+        
+        /* Yeni Modal Blok Sistemi */
+        .modal-block { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1rem; border-radius: 4px; }
+        .modal-block:last-child { margin-bottom: 0; }
 
-        .habit-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .habit-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .habit-btn { flex: 1; border: 1px solid var(--border); padding: 10px; font-size: 0.65rem; cursor: pointer; text-align: center; color: var(--text2); }
         .habit-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
         .list-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); padding: 6px 10px; margin-bottom: 3px; font-size: 0.8rem; }
         
-        /* Priority tags in task pool and modal */
         .priority-tag { font-size: 0.55rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; font-weight: bold; }
-        .priority-1 { background-color: var(--danger); color: #fff; } /* High */
-        .priority-2 { background-color: #f1c40f; color: #000; } /* Medium */
-        .priority-3 { background-color: var(--accent); color: #000; } /* Low */
+        .priority-1 { background-color: var(--danger); color: #fff; } 
+        .priority-2 { background-color: #f1c40f; color: #000; } 
+        .priority-3 { background-color: var(--accent); color: #000; } 
+
+        /* Görev Öncelik Butonları */
+        .priority-btn-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .pr-btn { flex: 1; padding: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.6rem; text-transform: uppercase; transition: 0.2s; border-radius: 2px; }
+        .pr-btn.active-1 { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .pr-btn.active-2 { background: #f1c40f; color: #000; border-color: #f1c40f; }
+        .pr-btn.active-3 { background: var(--accent); color: #000; border-color: var(--accent); }
         
-        /* Filter buttons in Ekstra view */
+        /* Etiketler */
+        .tag-chip { background: var(--surface2); color: var(--accent); padding: 4px 8px; font-size: 0.65rem; border-radius: 4px; display: inline-flex; align-items: center; border: 1px solid var(--border); }
+        .tag-remove { margin-left: 6px; cursor: pointer; color: var(--text2); }
+        .tag-remove:hover { color: var(--danger); }
+        
         .filter-btn { border: 1px solid var(--border); color: var(--text2); font-size: 0.6rem; padding: 4px 8px; }
         .filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
@@ -161,39 +168,56 @@
 
 <div class="modal" id="entryModal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom: 1.5rem;">00-00-0000</h2>
         
-        <div class="habit-row">
-            <div class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-brain"></i> ZİHİN</div>
-            <div class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-dumbbell"></i> SPOR</div>
-            <div class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book-open"></i> OKUMA</div>
+        <div class="modal-block">
+            <h2 id="modalTitle" style="font-family:'Orbitron'; color:var(--accent); margin-bottom: 1.5rem;">00-00-0000</h2>
+            <div class="habit-row">
+                <div class="habit-btn" id="h_demir" onclick="toggleHabit('demir')"><i class="fa-solid fa-brain"></i> ZİHİN</div>
+                <div class="habit-btn" id="h_spor" onclick="toggleHabit('spor')"><i class="fa-solid fa-dumbbell"></i> SPOR</div>
+                <div class="habit-btn" id="h_okuma" onclick="toggleHabit('okuma')"><i class="fa-solid fa-book-open"></i> OKUMA</div>
+            </div>
         </div>
 
-        <div style="color:var(--text2); font-size:0.6rem; margin-bottom:5px;">// GÖREVLER</div>
-        <div id="modalTasks" style="margin-bottom:10px"></div>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="taskInput" placeholder="Görev ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
-            <select id="taskPrioritySelect" style="background:var(--bg); border:1px solid var(--border); color:var(--accent); padding:8px; font-size:0.7rem;">
-                <option value="3">Düşük</option>
-                <option value="2">Orta</option>
-                <option value="1">Yüksek</option>
-            </select>
-            <button onclick="addTask()" style="border:1px solid var(--accent); color:var(--accent)">EKLE</button>
+        <div class="modal-block">
+            <div style="color:var(--text2); font-size:0.6rem; margin-bottom:5px;">// GÖREVLER</div>
+            <div id="modalTasks" style="margin-bottom:10px"></div>
+            
+            <div style="display:flex; gap:5px; margin-bottom:5px;">
+                <input type="text" id="taskInput" placeholder="Görev ekle..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
+                <button onclick="addTask()" style="border:1px solid var(--accent); color:var(--accent)">EKLE</button>
+            </div>
+            
+            <div class="priority-btn-group">
+                <button class="pr-btn active-3" data-p="3" onclick="selectPriority(3)"><i class="fa-solid fa-arrow-down"></i> Düşük</button>
+                <button class="pr-btn" data-p="2" onclick="selectPriority(2)"><i class="fa-solid fa-minus"></i> Orta</button>
+                <button class="pr-btn" data-p="1" onclick="selectPriority(1)"><i class="fa-solid fa-arrow-up"></i> Yüksek</button>
+            </div>
+
+            <div style="color:var(--text2); font-size:0.6rem; margin-top:15px; margin-bottom:5px;">// ATOMİK NOTLAR</div>
+            <div id="modalAtomics" style="margin-bottom:10px"></div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="atomicInput" placeholder="Atomik not..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
+                <button onclick="addAtomic()" style="border:1px solid #40c4ff; color:#40c4ff">EKLE</button>
+            </div>
         </div>
 
-        <div style="color:var(--text2); font-size:0.6rem; margin-bottom:5px;">// ATOMİK NOTLAR</div>
-        <div id="modalAtomics" style="margin-bottom:10px"></div>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="atomicInput" placeholder="Atomik not..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px;">
-            <button onclick="addAtomic()" style="border:1px solid #40c4ff; color:#40c4ff">EKLE</button>
+        <div class="modal-block">
+            <div style="color:var(--text2); font-size:0.6rem; margin-bottom:5px;">// GÜNLÜK KAYIT</div>
+            <textarea id="entryText"></textarea>
+
+            <div style="color:var(--text2); font-size:0.6rem; margin-top:15px; margin-bottom:5px;">// ETİKETLER</div>
+            <div id="modalTags" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;"></div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="tagInput" placeholder="Örn: proje, fikir, toplantı..." style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text1); padding:8px; font-size:0.7rem;">
+                <button onclick="addTag()" style="border:1px solid #f39c12; color:#f39c12">EKLE</button>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:1.5rem;">
+                <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">KAYDET</button>
+                <button id="closeBtn" style="flex:1; border:1px solid var(--border);">İPTAL</button>
+            </div>
         </div>
 
-        <textarea id="entryText"></textarea>
-
-        <div style="display:flex; gap:10px; margin-top:2rem;">
-            <button id="saveBtn" style="flex:2; background:var(--accent); color:#000; font-weight:bold;">KAYDET</button>
-            <button id="closeBtn" style="flex:1; border:1px solid var(--border);">İPTAL</button>
-        </div>
     </div>
 </div>
 
@@ -201,15 +225,15 @@
 
 <script>
 const state = {
-    entries: JSON.parse(localStorage.getItem('matrix_v47_data') || '{}'),
+    entries: JSON.parse(localStorage.getItem('matrix_v48_data') || '{}'),
     view: 'weekly', cursor: new Date(), selectedDate: null,
-    temp: { tasks: [], habits: [], atomics: [] }, searchQuery: '',
-    currentTaskFilter: 'all'
+    temp: { tasks: [], habits: [], atomics: [], tags: [] }, searchQuery: '',
+    currentTaskFilter: 'all',
+    currentPrioritySelection: 3 // Default priority low
 };
 
-const save = () => localStorage.setItem('matrix_v47_data', JSON.stringify(state.entries));
+const save = () => localStorage.setItem('matrix_v48_data', JSON.stringify(state.entries));
 const fmt = (d) => d.toISOString().split('T')[0];
-
 const getPriorityLabel = (p) => ['Yüksek', 'Orta', 'Düşük'][p-1];
 
 /* VIEWS */
@@ -294,7 +318,7 @@ const renderExtra = (el) => {
             <div class="stat-item"><div class="stat-label">GENEL HABITS</div>Spor: ${countHabit('spor', all)} | Okuma: ${countHabit('okuma', all)}</div>
             <div class="stat-item"><div class="stat-label">GÖREV ÖNCELİKLERİ</div>Hi: ${priorityCounts[1] || 0} | Med: ${priorityCounts[2] || 0} | Low: ${priorityCounts[3] || 0}</div>
         </div>
-        <div class="kunye-label" style="margin-top:20px">// ÖNCELİKLİ GÖREV HAVUZU (SIRALANMIŞ / FİLTRELİ)</div>
+        <div class="kunye-label" style="margin-top:20px">// ÖNCELİKLİ GÖREV HAVUZU</div>
         <div class="filter-row" style="display:flex; gap:5px; margin-bottom:15px;">
             <button class="filter-btn ${state.currentTaskFilter === 'all' ? 'active' : ''}" onclick="setTaskFilter('all')">TÜMÜ</button>
             <button class="filter-btn ${state.currentTaskFilter === '1' ? 'active' : ''}" onclick="setTaskFilter('1')">YÜKSEK</button>
@@ -307,7 +331,7 @@ const renderExtra = (el) => {
     
     const allSortedTasks = all.flatMap(([d, e]) => (e.tasks || []).map(t => ({...t, date: d})))
                              .filter(t => state.currentTaskFilter === 'all' || t.priority == state.currentTaskFilter)
-                             .sort((a, b) => (a.priority || 3) - (b.priority || 3) || a.date.localeCompare(b.date)); // Priority first, then date
+                             .sort((a, b) => (a.priority || 3) - (b.priority || 3) || a.date.localeCompare(b.date)); 
 
     allSortedTasks.forEach(t => {
         pool.innerHTML += `<div class="list-row" style="opacity:${t.done?0.4:1}">
@@ -319,8 +343,8 @@ const renderExtra = (el) => {
 /* LOGIC */
 window.openEntry = (date) => {
     state.selectedDate = date;
-    const e = state.entries[date] || { text:'', habits:[], tasks:[], atomics:[] };
-    state.temp = { tasks: [...(e.tasks || [])], habits: [...(e.habits || [])], atomics: [...(e.atomics || [])] };
+    const e = state.entries[date] || { text:'', habits:[], tasks:[], atomics:[], tags: [] };
+    state.temp = { tasks: [...(e.tasks || [])], habits: [...(e.habits || [])], atomics: [...(e.atomics || [])], tags: [...(e.tags || [])] };
     document.getElementById('modalTitle').textContent = date;
     document.getElementById('entryText').value = e.text || '';
     renderModalTemp();
@@ -329,36 +353,53 @@ window.openEntry = (date) => {
 
 const renderModalTemp = () => {
     ['demir','spor','okuma'].forEach(h => document.getElementById(`h_${h}`).classList.toggle('active', state.temp.habits.includes(h)));
+    
     document.getElementById('modalTasks').innerHTML = state.temp.tasks.map((t,i) => `<div class="list-row">
-        <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done">
+        <input type="checkbox" ${t.done?'checked':''} onchange="state.temp.tasks[${i}].done=!state.temp.tasks[${i}].done; updateStats();">
         <span class="priority-tag priority-${t.priority || 3}">[${getPriorityLabel(t.priority || 3)}]</span>
-        <span style="flex:1">${t.text}</span>
+        <span style="flex:1; ${t.done?'text-decoration:line-through; opacity:0.5':''}">${t.text}</span>
     </div>`).join('');
+    
     document.getElementById('modalAtomics').innerHTML = state.temp.atomics.map((a,i) => `<div class="list-row" style="border-left:2px solid #40c4ff"><span>${a}</span></div>`).join('');
+    
+    document.getElementById('modalTags').innerHTML = state.temp.tags.map((tag, i) => `<span class="tag-chip">#${tag} <i class="fa-solid fa-times tag-remove" onclick="removeTag(${i})"></i></span>`).join('');
+};
+
+window.selectPriority = (p) => {
+    state.currentPrioritySelection = p;
+    document.querySelectorAll('.pr-btn').forEach(btn => {
+        btn.className = 'pr-btn'; 
+        if (parseInt(btn.dataset.p) === p) btn.classList.add(`active-${p}`);
+    });
 };
 
 window.addTask = () => {
     const i = document.getElementById('taskInput');
-    const p = document.getElementById('taskPrioritySelect').value;
     if(i.value){
-        state.temp.tasks.push({text:i.value, done:false, priority: parseInt(p)});
+        state.temp.tasks.push({text:i.value, done:false, priority: state.currentPrioritySelection});
         i.value='';
-        document.getElementById('taskPrioritySelect').value = '3'; // Reset to low
         renderModalTemp();
     }
 };
+
 window.addAtomic = () => { const i = document.getElementById('atomicInput'); if(i.value){state.temp.atomics.push(i.value); i.value=''; renderModalTemp();} };
 window.toggleHabit = (h) => { const idx = state.temp.habits.indexOf(h); if(idx>-1) state.temp.habits.splice(idx,1); else state.temp.habits.push(h); renderModalTemp(); };
 
-// Wrap function removed from JavaScript
-
-window.setTaskFilter = (f) => {
-    state.currentTaskFilter = f;
-    render();
+window.addTag = () => {
+    const i = document.getElementById('tagInput');
+    const val = i.value.trim().replace(/^#/, ''); // baştaki hashtag'i engelle
+    if(val){
+        if(!state.temp.tags.includes(val)) state.temp.tags.push(val);
+        i.value='';
+        renderModalTemp();
+    }
 };
+window.removeTag = (idx) => { state.temp.tags.splice(idx, 1); renderModalTemp(); };
+
+window.setTaskFilter = (f) => { state.currentTaskFilter = f; render(); };
 
 document.getElementById('saveBtn').onclick = () => {
-    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics };
+    state.entries[state.selectedDate] = { text: document.getElementById('entryText').value, habits: state.temp.habits, tasks: state.temp.tasks, atomics: state.temp.atomics, tags: state.temp.tags };
     save(); document.getElementById('entryModal').classList.remove('active'); render();
 };
 
@@ -381,7 +422,7 @@ document.querySelectorAll('.view-btn').forEach(b => b.onclick = () => { document
 document.getElementById('prevBtn').onclick = () => { if(state.view==='monthly') state.cursor.setMonth(state.cursor.getMonth()-1); else state.cursor.setDate(state.cursor.getDate()-7); render(); };
 document.getElementById('nextBtn').onclick = () => { if(state.view==='monthly') state.cursor.setMonth(state.cursor.getMonth()+1); else state.cursor.setDate(state.cursor.getDate()+7); render(); };
 document.getElementById('themeToggle').onclick = () => { const t = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', t); document.getElementById('themeToggle').innerHTML = t==='dark'?'<i class="fa-solid fa-moon"></i>':'<i class="fa-solid fa-sun"></i>'; };
-document.getElementById('exportBtn').onclick = () => { const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v47.json'; a.click(); };
+document.getElementById('exportBtn').onclick = () => { const b = new Blob([JSON.stringify(state.entries)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='matrix_v48.json'; a.click(); };
 document.getElementById('importBtn').onclick = () => document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange = (e) => { const r = new FileReader(); r.onload=(ev)=>{state.entries=JSON.parse(ev.target.result); render();}; r.readAsText(e.target.files[0]); };
 document.getElementById('closeBtn').onclick = () => document.getElementById('entryModal').classList.remove('active');
