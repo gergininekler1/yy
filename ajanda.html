@@ -1,779 +1,1127 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light" data-lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ajanda</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface2: #f0f0f0;
+    --border: #e0e0e0;
+    --text: #111111;
+    --text2: #666666;
+    --text3: #999999;
+    --accent: #111111;
+    --accent-soft: #f0f0f0;
+    --high: #ff3b30;
+    --high-bg: #fff0ef;
+    --mid: #ff9500;
+    --mid-bg: #fff8ed;
+    --low: #34c759;
+    --low-bg: #edfff2;
+    --today: #111111;
+    --today-text: #ffffff;
+    --modal-bg: rgba(0,0,0,0.4);
+    --shadow: 0 2px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0e0e0e;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --text: #f0f0f0;
+    --text2: #aaaaaa;
+    --text3: #666666;
+    --accent: #f0f0f0;
+    --accent-soft: #2a2a2a;
+    --high: #ff453a;
+    --high-bg: #2a1010;
+    --mid: #ff9f0a;
+    --mid-bg: #2a1f00;
+    --low: #30d158;
+    --low-bg: #0a2a12;
+    --today: #f0f0f0;
+    --today-text: #111111;
+    --modal-bg: rgba(0,0,0,0.7);
+    --shadow: 0 2px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
 
-:root {
-  --bg: #f5f4f0;
-  --surface: #ffffff;
-  --surface2: #f0efe9;
-  --surface3: #eae8e1;
-  --border: #e2e0d8;
-  --border2: #ccc9bf;
-  --text: #1a1916;
-  --text-muted: #8c8a82;
-  --text-light: #b8b6ae;
-  --accent: #2d2a24;
-  --accent2: #c9553a;
-  --line: #ece9e2;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
-  --radius: 12px;
-  --font-display: 'DM Serif Display', serif;
-  --font-body: 'DM Sans', sans-serif;
-  --p-critical: #dc2626;
-  --p-critical-bg: #fef2f2;
-  --p-critical-border: #fecaca;
-  --p-high: #ea580c;
-  --p-high-bg: #fff7ed;
-  --p-high-border: #fed7aa;
-  --p-medium: #ca8a04;
-  --p-medium-bg: #fefce8;
-  --p-medium-border: #fde68a;
-  --p-low: #16a34a;
-  --p-low-bg: #f0fdf4;
-  --p-low-border: #bbf7d0;
-}
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .topbar-right { display: flex; align-items: center; gap: 6px; }
+  .week-nav { display: flex; align-items: center; gap: 6px; }
+  .week-nav button {
+    background: none; border: none; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 16px;
+    transition: background 0.15s;
+  }
+  .week-nav button:hover { background: var(--surface2); }
+  .week-label {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+  .week-label:hover { background: var(--surface2); }
+  .today-btn {
+    font-size: 12px; font-weight: 500;
+    background: var(--accent-soft); border: none; cursor: pointer;
+    color: var(--text); padding: 5px 10px; border-radius: 20px;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .today-btn:hover { background: var(--border); }
+  .icon-btn {
+    background: none; border: none; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 18px;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .icon-btn:hover { background: var(--surface2); color: var(--text); }
+  .icon-btn .badge {
+    position: absolute; top: 4px; right: 4px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--high);
+  }
 
-body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+  /* ── HIGH PRIORITY BANNER ── */
+  #high-banner {
+    margin: 12px 16px 0;
+    background: var(--high-bg);
+    border: 1px solid var(--high);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    display: none; align-items: flex-start; gap: 10px;
+  }
+  #high-banner.show { display: flex; }
+  #high-banner .banner-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  #high-banner .banner-content { flex: 1; }
+  #high-banner .banner-title { font-size: 12px; font-weight: 600; color: var(--high); margin-bottom: 4px; }
+  #high-banner .banner-list { list-style: none; }
+  #high-banner .banner-list li {
+    font-size: 12px; color: var(--text); padding: 2px 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  #high-banner .banner-list li::before { content: "⚡"; font-size: 10px; }
 
-.icon { display: inline-flex; align-items: center; justify-content: center; }
-.icon svg { width: 16px; height: 16px; stroke-width: 1.8; }
-.icon-sm svg { width: 13px; height: 13px; }
-.icon-lg svg { width: 20px; height: 20px; }
+  /* ── WEEK GRID ── */
+  .week-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 16px 80px;
+  }
+  .day-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.15s;
+    min-height: 130px;
+    display: flex; flex-direction: column;
+  }
+  .day-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .day-card.today { border-color: var(--today); border-width: 2px; }
+  .day-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-name-num { display: flex; align-items: baseline; gap: 5px; }
+  .day-name { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .day-num {
+    font-size: 18px; font-weight: 700;
+    color: var(--text);
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+  .today .day-num { background: var(--today); color: var(--today-text); }
+  .day-indicators { display: flex; gap: 3px; align-items: center; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-high { background: var(--high); }
+  .dot-mid { background: var(--mid); }
+  .dot-low { background: var(--low); }
+  .dot-note { background: var(--text3); }
+  .day-body { padding: 8px 10px; flex: 1; overflow: hidden; }
+  .day-preview-item {
+    font-size: 11px; color: var(--text2);
+    padding: 2px 0; display: flex; align-items: center; gap: 5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .day-preview-item .pi-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .day-preview-more { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .day-empty { font-size: 11px; color: var(--text3); font-style: italic; padding: 2px 0; }
 
-/* ── HEADER ── */
-.app-header {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(245,244,240,0.96);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 20px;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  backdrop-filter: blur(12px);
-}
-.header-left { display: flex; align-items: center; gap: 12px; }
-.app-logo { font-family: var(--font-display); font-size: 21px; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.logo-icon { color: var(--accent2); }
-.header-date { font-size: 11px; color: var(--text-muted); letter-spacing: 0.4px; text-transform: uppercase; border-left: 1px solid var(--border2); padding-left: 12px; }
-.header-right { display: flex; align-items: center; gap: 8px; }
-.header-nav { display: flex; gap: 3px; background: var(--surface2); padding: 3px; border-radius: 10px; border: 1px solid var(--border); }
-.nav-btn { padding: 6px 14px; border: none; background: transparent; border-radius: 7px; font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
-.nav-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-.nav-btn:hover:not(.active) { color: var(--text); }
-.icon-btn { width: 34px; height: 34px; border: 1px solid var(--border2); background: var(--surface); border-radius: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s; }
-.icon-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  /* ── MODAL ── */
+  .overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--modal-bg);
+    display: none; align-items: flex-end;
+    animation: fadeIn 0.2s;
+  }
+  .overlay.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%; max-height: 92vh;
+    display: flex; flex-direction: column;
+    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
+    box-shadow: var(--shadow-lg);
+  }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 10px auto 0;
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-date { font-size: 17px; font-weight: 700; }
+  .modal-close {
+    background: var(--surface2); border: none; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--text2);
+  }
+  .modal-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    padding: 0 18px; gap: 0;
+  }
+  .modal-tab {
+    background: none; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    color: var(--text3); padding: 10px 14px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .modal-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .modal-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
 
-/* ── CRITICAL BANNER ── */
-.critical-banner { margin: 12px 16px 0; background: var(--p-critical-bg); border: 1px solid var(--p-critical-border); border-radius: var(--radius); overflow: hidden; animation: fadeIn 0.3s ease; }
-.critical-banner-header { padding: 10px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; border-bottom: 1px solid var(--p-critical-border); }
-.critical-banner-header .cb-label { font-size: 11px; font-weight: 600; color: var(--p-critical); letter-spacing: 0.8px; text-transform: uppercase; flex: 1; }
-.cb-count { background: var(--p-critical); color: white; border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
-.critical-tasks-list { padding: 6px; display: flex; flex-direction: column; gap: 2px; max-height: 180px; overflow-y: auto; }
-.ct-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; transition: background 0.15s; }
-.ct-item:hover { background: rgba(220,38,38,0.07); }
-.ct-check { width: 16px; height: 16px; border: 1.5px solid var(--p-critical); border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-.ct-check.done { background: var(--p-critical); border-color: var(--p-critical); color: white; }
-.ct-title { font-size: 13px; font-weight: 500; color: var(--p-critical); flex: 1; }
-.ct-title.done { text-decoration: line-through; opacity: 0.5; }
-.ct-date { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
-.critical-banner.collapsed .critical-tasks-list { display: none; }
+  /* ── NOTES TAB ── */
+  .note-area {
+    width: 100%;
+    min-height: 180px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface2);
+    resize: vertical;
+    outline: none;
+    line-height: 1.7;
+    transition: border-color 0.15s;
+  }
+  .note-area:focus { border-color: var(--accent); }
+  .note-save-btn {
+    margin-top: 10px; width: 100%;
+    background: var(--accent); color: var(--today-text);
+    border: none; border-radius: var(--radius-sm);
+    padding: 11px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .note-save-btn:hover { opacity: 0.85; }
 
-/* ── WEEK NAV ── */
-.week-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 10px; }
-.week-label { font-family: var(--font-display); font-size: 18px; }
-.week-sub { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
-.week-controls { display: flex; gap: 6px; align-items: center; }
-.arrow-btn { width: 30px; height: 30px; border: 1px solid var(--border2); background: var(--surface); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s; }
-.arrow-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-.today-btn { padding: 5px 12px; border: 1px solid var(--border2); background: var(--surface); border-radius: 8px; cursor: pointer; font-family: var(--font-body); font-size: 11px; font-weight: 500; color: var(--text-muted); transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
-.today-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  /* ── TASKS TAB ── */
+  .task-input-row {
+    display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .task-input {
+    flex: 1; min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: var(--text);
+    background: var(--surface2); outline: none;
+    transition: border-color 0.15s;
+  }
+  .task-input:focus { border-color: var(--accent); }
+  .prio-select {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 9px 8px; background: var(--surface2);
+    font-family: 'DM Sans', sans-serif; font-size: 12px;
+    color: var(--text); outline: none; cursor: pointer;
+  }
+  .recur-select {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 9px 8px; background: var(--surface2);
+    font-family: 'DM Sans', sans-serif; font-size: 12px;
+    color: var(--text); outline: none; cursor: pointer;
+  }
+  .add-task-btn {
+    background: var(--accent); color: var(--today-text);
+    border: none; border-radius: var(--radius-sm);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 16px; font-weight: 700;
+    transition: opacity 0.15s;
+  }
+  .add-task-btn:hover { opacity: 0.8; }
+  .task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .task-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 12px;
+    transition: opacity 0.2s;
+  }
+  .task-item.done { opacity: 0.45; }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border); cursor: pointer;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+    background: none;
+  }
+  .task-item.done .task-check { background: var(--low); border-color: var(--low); }
+  .task-check::after { content: "✓"; font-size: 10px; color: white; display: none; }
+  .task-item.done .task-check::after { display: block; }
+  .task-text {
+    flex: 1; font-size: 13px; color: var(--text);
+    word-break: break-word;
+  }
+  .task-item.done .task-text { text-decoration: line-through; color: var(--text3); }
+  .task-prio-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 20px; flex-shrink: 0;
+  }
+  .prio-high { background: var(--high-bg); color: var(--high); }
+  .prio-mid { background: var(--mid-bg); color: var(--mid); }
+  .prio-low { background: var(--low-bg); color: var(--low); }
+  .task-recur { font-size: 10px; color: var(--text3); flex-shrink: 0; }
+  .task-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); font-size: 15px; padding: 0 2px;
+    transition: color 0.15s;
+  }
+  .task-del:hover { color: var(--high); }
 
-/* ── VIEWS ── */
-.view { display: none; animation: fadeIn 0.25s ease; }
-.view.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  /* ── MINI CALENDAR ── */
+  .mini-cal {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--modal-bg);
+    display: none; align-items: center; justify-content: center;
+  }
+  .mini-cal.open { display: flex; }
+  .mini-cal-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 320px;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.2s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .mini-cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .mini-cal-title { font-size: 15px; font-weight: 700; }
+  .mini-cal-nav { display: flex; gap: 4px; }
+  .mini-cal-nav button {
+    background: none; border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 14px;
+    transition: background 0.15s;
+  }
+  .mini-cal-nav button:hover { background: var(--surface2); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow {
+    text-align: center; font-size: 10px; font-weight: 600;
+    color: var(--text3); padding: 4px 0;
+    text-transform: uppercase;
+  }
+  .cal-day {
+    text-align: center; font-size: 12px;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text);
+    transition: background 0.12s;
+  }
+  .cal-day:hover { background: var(--surface2); }
+  .cal-day.today { background: var(--today); color: var(--today-text); font-weight: 700; }
+  .cal-day.in-week { background: var(--accent-soft); font-weight: 600; }
+  .cal-day.other-month { color: var(--text3); }
+  .cal-day.has-data::after {
+    content: ""; display: block;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--high); margin: 1px auto 0;
+  }
+  .mini-cal-close-btn {
+    margin-top: 14px; width: 100%;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    color: var(--text); cursor: pointer;
+  }
 
-/* ── WEEK GRID ── */
-.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; padding: 0 14px 20px; }
-.day-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; min-height: 310px; transition: all 0.2s; cursor: pointer; }
-.day-card:hover { box-shadow: var(--shadow-lg); border-color: var(--border2); transform: translateY(-1px); }
-.day-card.today { border-color: var(--accent); border-width: 1.5px; }
-.day-header { padding: 9px 10px 7px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
-.day-header-left { display: flex; flex-direction: column; gap: 2px; }
-.day-name { font-size: 9px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); }
-.day-card.today .day-name { color: var(--accent2); }
-.day-num { font-family: var(--font-display); font-size: 20px; line-height: 1; }
-.day-today-circle { width: 28px; height: 28px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 15px; }
-.day-task-dots { display: flex; gap: 2px; flex-wrap: wrap; max-width: 26px; }
-.task-dot { width: 6px; height: 6px; border-radius: 50%; }
-.task-dot.critical { background: var(--p-critical); }
-.task-dot.high { background: var(--p-high); }
-.task-dot.medium { background: var(--p-medium); }
-.task-dot.low { background: var(--p-low); }
-.day-body { flex: 1; position: relative; overflow: hidden; }
-.day-body::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(to bottom, transparent, transparent 22px, var(--line) 22px, var(--line) 23px); pointer-events: none; }
-.day-tasks-mini { padding: 5px 8px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 3px; }
-.day-task-mini { display: flex; align-items: center; gap: 5px; }
-.task-mini-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.task-mini-text { font-size: 10px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
-.task-mini-text.done { text-decoration: line-through; color: var(--text-light); }
-.day-note-mini { padding: 4px 8px 6px; font-size: 10px; line-height: 23px; color: var(--text-muted); position: relative; z-index: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-.day-footer { padding: 5px 9px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.day-footer-stats { display: flex; gap: 8px; }
-.stat-chip { font-size: 9px; color: var(--text-light); display: flex; align-items: center; gap: 3px; }
+  /* ── IMPORT/EXPORT PANEL ── */
+  .io-panel {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--modal-bg);
+    display: none; align-items: flex-end;
+  }
+  .io-panel.open { display: flex; }
+  .io-box {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
+  }
+  .io-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .io-btn {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 13px 16px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface2); cursor: pointer;
+    margin-bottom: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--text);
+    transition: background 0.15s;
+  }
+  .io-btn:hover { background: var(--border); }
+  .io-btn .io-icon { font-size: 20px; width: 28px; text-align: center; }
+  .io-btn-label { display: flex; flex-direction: column; align-items: flex-start; }
+  .io-btn-label strong { font-weight: 600; }
+  .io-btn-label span { font-size: 11px; color: var(--text3); }
+  .io-close { margin-top: 6px; }
 
-/* ── MONTH VIEW ── */
-.month-container { padding: 0 14px 24px; }
-.month-header-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 4px 14px; }
-.month-title { font-family: var(--font-display); font-size: 20px; }
-.month-arrows { display: flex; gap: 6px; }
-.month-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px; }
-.month-day-name { text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); padding: 8px 0; }
-.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.month-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 9px; cursor: pointer; transition: all 0.15s; font-size: 13px; color: var(--text); border: 1px solid transparent; gap: 2px; }
-.month-cell:hover { background: var(--surface2); border-color: var(--border); }
-.month-cell.today { background: var(--accent); color: white; font-weight: 500; }
-.month-cell.other-month { color: var(--text-light); }
-.month-cell-dots { display: flex; gap: 2px; }
-.month-dot { width: 4px; height: 4px; border-radius: 50%; }
-.month-cell.today .month-dot { background: rgba(255,255,255,0.6) !important; }
+  /* ── FAB ── */
+  .fab {
+    position: fixed; bottom: 24px; right: 20px; z-index: 150;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--accent); color: var(--today-text);
+    border: none; cursor: pointer; font-size: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .fab:hover { transform: scale(1.08); }
 
-/* ── MODAL ── */
-.modal-overlay { position: fixed; inset: 0; background: rgba(26,25,22,0.55); z-index: 200; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
-.modal-overlay.open { display: flex; animation: overlayIn 0.2s ease; }
-@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
-.modal { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-width: 680px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
-.modal-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.modal-date { font-family: var(--font-display); font-size: 20px; }
-.modal-date-sub { font-size: 11px; color: var(--text-muted); display: block; }
-.modal-close { width: 28px; height: 28px; border: 1px solid var(--border); background: var(--surface2); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s; }
-.modal-close:hover { background: var(--accent); color: white; border-color: var(--accent); }
-.modal-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.modal-tab { flex: 1; padding: 10px; border: none; background: transparent; font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface2); }
-.modal-tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
-.tab-badge { background: var(--surface3); color: var(--text-muted); border-radius: 20px; padding: 1px 6px; font-size: 10px; }
-.tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; min-height: 0; }
-.tab-content.active { display: flex; }
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 8px; margin-top: 14px;
+  }
+  .section-label:first-child { margin-top: 0; }
 
-/* Note Tab */
-.modal-textarea-wrap { position: relative; flex: 1; overflow-y: auto; }
-.modal-textarea-wrap::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(to bottom, transparent, transparent 31px, var(--line) 31px, var(--line) 32px); pointer-events: none; }
-.modal-textarea { width: 100%; min-height: 260px; padding: 10px 18px; border: none; outline: none; resize: none; font-family: var(--font-body); font-size: 14px; line-height: 32px; color: var(--text); background: transparent; position: relative; z-index: 1; }
+  /* ── SEPARATOR ── */
+  .sep { height: 1px; background: var(--border); margin: 12px 0; }
 
-/* Task Tab */
-.task-tab-inner { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
-.add-task-row { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.task-input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: var(--font-body); font-size: 13px; color: var(--text); background: var(--surface2); outline: none; transition: border-color 0.15s; }
-.task-input:focus { border-color: var(--border2); background: var(--surface); }
-.priority-select { border: 1px solid var(--border); border-radius: 8px; padding: 8px 8px; font-family: var(--font-body); font-size: 12px; color: var(--text); background: var(--surface2); outline: none; cursor: pointer; }
-.add-task-btn { width: 34px; height: 34px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
-.add-task-btn:hover { background: #3d3930; }
-.tasks-list { flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; min-height: 0; }
-.task-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; border: 1px solid transparent; transition: all 0.15s; }
-.task-item:hover { background: var(--surface2); border-color: var(--border); }
-.task-item.critical { border-left: 3px solid var(--p-critical); }
-.task-item.high     { border-left: 3px solid var(--p-high); }
-.task-item.medium   { border-left: 3px solid var(--p-medium); }
-.task-item.low      { border-left: 3px solid var(--p-low); }
-.task-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--border2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
-.task-item.critical .task-checkbox { border-color: var(--p-critical); }
-.task-item.high     .task-checkbox { border-color: var(--p-high); }
-.task-item.medium   .task-checkbox { border-color: var(--p-medium); }
-.task-item.low      .task-checkbox { border-color: var(--p-low); }
-.task-checkbox.checked { background: var(--accent); border-color: var(--accent); color: white; }
-.task-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
-.task-text.done { text-decoration: line-through; color: var(--text-light); }
-.priority-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
-.priority-badge.critical { background: var(--p-critical-bg); color: var(--p-critical); border: 1px solid var(--p-critical-border); }
-.priority-badge.high     { background: var(--p-high-bg);     color: var(--p-high);     border: 1px solid var(--p-high-border); }
-.priority-badge.medium   { background: var(--p-medium-bg);   color: var(--p-medium);   border: 1px solid var(--p-medium-border); }
-.priority-badge.low      { background: var(--p-low-bg);      color: var(--p-low);      border: 1px solid var(--p-low-border); }
-.task-del { width: 22px; height: 22px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-light); border-radius: 5px; transition: all 0.15s; opacity: 0; }
-.task-item:hover .task-del { opacity: 1; }
-.task-del:hover { background: #fef2f2; color: var(--p-critical); }
-.no-tasks { text-align: center; padding: 32px 20px; color: var(--text-light); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  /* ── UTILITY ── */
+  .hidden { display: none !important; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
 
-/* Modal footer */
-.modal-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.footer-left { display: flex; gap: 10px; align-items: center; }
-.char-count { font-size: 11px; color: var(--text-light); }
-.save-indicator { font-size: 11px; color: #16a34a; opacity: 0; transition: opacity 0.3s; display: flex; align-items: center; gap: 4px; }
-.save-indicator.show { opacity: 1; }
-.save-btn { padding: 7px 18px; background: var(--accent); color: white; border: none; border-radius: 8px; font-family: var(--font-body); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
-.save-btn:hover { background: #3d3930; transform: translateY(-1px); }
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* ── EXPORT/IMPORT PANEL ── */
-.panel-overlay { position: fixed; inset: 0; background: rgba(26,25,22,0.45); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-.panel-overlay.open { display: flex; animation: overlayIn 0.2s ease; }
-.panel { background: var(--surface); border-radius: 18px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); animation: scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1); overflow: hidden; }
-@keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.panel-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.panel-title { font-family: var(--font-display); font-size: 18px; display: flex; align-items: center; gap: 8px; }
-.panel-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-.p-label { font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); padding: 4px 0 0; }
-.p-btn { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.15s; text-align: left; }
-.p-btn:hover { background: var(--surface3); border-color: var(--border2); }
-.p-btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
-.p-btn.primary:hover { background: #3d3930; }
-.p-btn .p-btn-body { display: flex; flex-direction: column; gap: 1px; }
-.p-btn .p-desc { font-size: 11px; font-weight: 400; color: var(--text-muted); }
-.p-btn.primary .p-desc { color: rgba(255,255,255,0.55); }
-.p-btn.warn { border-color: var(--p-high-border); color: var(--p-high); }
-.p-btn.warn:hover { background: var(--p-high-bg); }
-hr.p-div { border: none; border-top: 1px solid var(--border); }
-.p-stats { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.p-stat { display: flex; flex-direction: column; gap: 2px; }
-.p-stat-val { font-family: var(--font-display); font-size: 22px; }
-.p-stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
-/* ── TOAST ── */
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--accent); color: white; padding: 10px 18px; border-radius: 20px; font-size: 12px; font-weight: 500; z-index: 400; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.success { background: #16a34a; }
-.toast.error { background: var(--p-critical); }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 860px) { .header-date { display: none; } .week-grid { gap: 4px; padding: 0 8px 16px; } .day-card { min-height: 220px; } }
-@media (max-width: 560px) { .week-grid { grid-template-columns: 1fr; } .day-card { min-height: 80px; flex-direction: row; } .day-header { flex-direction: column; align-items: flex-start; width: 58px; border-bottom: none; border-right: 1px solid var(--line); flex-shrink: 0; } }
+  @media (min-width: 600px) {
+    .week-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .modal { max-width: 480px; margin: auto; border-radius: var(--radius); }
+    .overlay { align-items: center; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ══ HEADER ══ -->
-<header class="app-header">
-  <div class="header-left">
-    <div class="app-logo">
-      <span class="logo-icon icon icon-lg"><i data-lucide="notebook-pen"></i></span>
-      Ajanda
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="week-nav">
+      <button onclick="shiftWeek(-1)" title="Önceki hafta">‹</button>
+      <span class="week-label" onclick="openCal()" id="week-label">—</span>
+      <button onclick="shiftWeek(1)" title="Sonraki hafta">›</button>
     </div>
-    <div class="header-date" id="headerDate"></div>
+    <button class="today-btn" onclick="goToday()" id="today-btn-label">Bugün</button>
   </div>
-  <div class="header-right">
-    <div class="header-nav">
-      <button class="nav-btn active" id="navWeekly" onclick="switchView('weekly')">
-        <span class="icon icon-sm"><i data-lucide="layout-grid"></i></span> Haftalık
-      </button>
-      <button class="nav-btn" id="navMonthly" onclick="switchView('monthly')">
-        <span class="icon icon-sm"><i data-lucide="calendar-days"></i></span> Aylık
-      </button>
-    </div>
-    <button class="icon-btn" onclick="openPanel()" title="Veri Yönetimi">
-      <span class="icon"><i data-lucide="database"></i></span>
-    </button>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema">🌙</button>
+    <button class="icon-btn" onclick="toggleLang()" id="lang-btn" title="Dil">TR</button>
+    <button class="icon-btn" onclick="openCal()" title="Takvim">📅</button>
+    <button class="icon-btn" id="io-open-btn" onclick="openIO()" title="İçe/Dışa Aktar">⬆︎</button>
   </div>
 </header>
 
-<!-- ══ WEEKLY VIEW ══ -->
-<div class="view active" id="weeklyView">
-  <!-- Critical Banner -->
-  <div id="criticalBanner" class="critical-banner" style="display:none">
-    <div class="critical-banner-header" onclick="toggleBanner()">
-      <span class="icon icon-sm" style="color:var(--p-critical)"><i data-lucide="alert-circle"></i></span>
-      <span class="cb-label">Kritik Görevler</span>
-      <span class="cb-count" id="cbCount">0</span>
-      <span class="icon icon-sm" style="color:var(--p-critical)" id="cbChevron"><i data-lucide="chevron-down"></i></span>
-    </div>
-    <div class="critical-tasks-list" id="criticalList"></div>
-  </div>
-
-  <div class="week-nav">
-    <div>
-      <span class="week-label" id="weekLabel"></span>
-      <span class="week-sub" id="weekSub"></span>
-    </div>
-    <div class="week-controls">
-      <button class="today-btn" onclick="goToday()">
-        <span class="icon icon-sm"><i data-lucide="locate"></i></span> Bugün
-      </button>
-      <button class="arrow-btn" onclick="changeWeek(-1)"><span class="icon icon-sm"><i data-lucide="chevron-left"></i></span></button>
-      <button class="arrow-btn" onclick="changeWeek(1)"><span class="icon icon-sm"><i data-lucide="chevron-right"></i></span></button>
-    </div>
-  </div>
-  <div class="week-grid" id="weekGrid"></div>
-</div>
-
-<!-- ══ MONTHLY VIEW ══ -->
-<div class="view" id="monthlyView">
-  <div class="month-container">
-    <div class="month-header-row">
-      <span class="month-title" id="monthTitle"></span>
-      <div class="month-arrows">
-        <button class="arrow-btn" onclick="changeMonth(-1)"><span class="icon icon-sm"><i data-lucide="chevron-left"></i></span></button>
-        <button class="arrow-btn" onclick="changeMonth(1)"><span class="icon icon-sm"><i data-lucide="chevron-right"></i></span></button>
-      </div>
-    </div>
-    <div class="month-grid-header" id="monthDayNames"></div>
-    <div class="month-grid" id="monthGrid"></div>
+<!-- HIGH PRIORITY BANNER -->
+<div id="high-banner">
+  <div class="banner-icon">⚡</div>
+  <div class="banner-content">
+    <div class="banner-title" id="banner-title">YÜKSEK ÖNCELİKLİ GÖREVLER</div>
+    <ul class="banner-list" id="banner-list"></ul>
   </div>
 </div>
 
-<!-- ══ DAY MODAL ══ -->
-<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
-  <div class="modal">
+<!-- WEEK GRID -->
+<div class="week-grid" id="week-grid"></div>
+
+<!-- DAY MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div>
-        <span class="modal-date" id="modalDate"></span>
-        <span class="modal-date-sub" id="modalDateSub"></span>
-      </div>
-      <button class="modal-close" onclick="closeModal()"><span class="icon icon-sm"><i data-lucide="x"></i></span></button>
+      <span class="modal-date" id="modal-date"></span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-tabs">
-      <button class="modal-tab active" id="tabNoteBtn" onclick="switchModalTab('note',this)">
-        <span class="icon icon-sm"><i data-lucide="file-text"></i></span> Notlar
+      <button class="modal-tab active" data-tab="notes" onclick="switchTab('notes')">
+        <span>📝</span> <span id="tab-notes-label">Notlar</span>
       </button>
-      <button class="modal-tab" id="tabTaskBtn" onclick="switchModalTab('tasks',this)">
-        <span class="icon icon-sm"><i data-lucide="check-square"></i></span> Görevler
-        <span class="tab-badge" id="taskBadge" style="display:none"></span>
+      <button class="modal-tab" data-tab="tasks" onclick="switchTab('tasks')">
+        <span>✅</span> <span id="tab-tasks-label">Görevler</span>
       </button>
     </div>
-    <!-- Note -->
-    <div class="tab-content active" id="noteTab">
-      <div class="modal-textarea-wrap">
-        <textarea class="modal-textarea" id="modalTextarea" placeholder="Bugün için düşüncelerinizi, planlarınızı buraya yazın…" oninput="onTextInput()"></textarea>
+    <div class="modal-body">
+      <!-- NOTES -->
+      <div id="tab-notes">
+        <textarea class="note-area" id="note-area" placeholder="Bu gün için notlarını yaz…"></textarea>
+        <button class="note-save-btn" onclick="saveNote()" id="save-note-label">Kaydet</button>
       </div>
-    </div>
-    <!-- Tasks -->
-    <div class="tab-content" id="tasksTab">
-      <div class="task-tab-inner">
-        <div class="add-task-row">
-          <span class="icon" style="color:var(--text-muted)"><i data-lucide="plus-circle"></i></span>
-          <input type="text" class="task-input" id="taskInput" placeholder="Yeni görev ekle…" onkeydown="if(event.key==='Enter')addTask()">
-          <select class="priority-select" id="prioritySelect">
-            <option value="low">🟢 Düşük</option>
-            <option value="medium" selected>🟡 Orta</option>
-            <option value="high">🟠 Yüksek</option>
-            <option value="critical">🔴 Kritik</option>
+      <!-- TASKS -->
+      <div id="tab-tasks" class="hidden">
+        <div class="task-input-row">
+          <input class="task-input" id="task-input" placeholder="Yeni görev…" onkeydown="if(event.key==='Enter')addTask()">
+          <select class="prio-select" id="prio-select">
+            <option value="high">⚡ Yüksek</option>
+            <option value="mid" selected>🔸 Orta</option>
+            <option value="low">✅ Düşük</option>
           </select>
-          <button class="add-task-btn" onclick="addTask()"><span class="icon icon-sm"><i data-lucide="plus"></i></span></button>
+          <select class="recur-select" id="recur-select">
+            <option value="">— Tekrar yok</option>
+            <option value="daily">Her gün</option>
+            <option value="weekly">Her hafta</option>
+            <option value="weekdays">Hafta içi</option>
+            <option value="mon">Her Pzt</option>
+            <option value="tue">Her Sal</option>
+            <option value="wed">Her Çar</option>
+            <option value="thu">Her Per</option>
+            <option value="fri">Her Cum</option>
+            <option value="sat">Her Cmt</option>
+            <option value="sun">Her Paz</option>
+          </select>
+          <button class="add-task-btn" onclick="addTask()">+</button>
         </div>
-        <div class="tasks-list" id="tasksList"></div>
+
+        <!-- Mid tasks section -->
+        <div id="mid-tasks-section">
+          <div class="section-label" id="mid-section-label">Orta & Düşük Öncelik</div>
+          <ul class="task-list" id="mid-task-list"></ul>
+        </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <div class="footer-left">
-        <span class="char-count" id="charCount"></span>
-        <span class="save-indicator" id="saveIndicator"><span class="icon icon-sm"><i data-lucide="check"></i></span> Kaydedildi</span>
-      </div>
-      <button class="save-btn" onclick="saveNote()"><span class="icon icon-sm"><i data-lucide="save"></i></span> Kaydet</button>
     </div>
   </div>
 </div>
 
-<!-- ══ DATA PANEL ══ -->
-<div class="panel-overlay" id="panelOverlay" onclick="if(event.target===this)closePanel()">
-  <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title"><span class="icon"><i data-lucide="hard-drive"></i></span> Veri Yönetimi</div>
-      <button class="modal-close" onclick="closePanel()"><span class="icon icon-sm"><i data-lucide="x"></i></span></button>
+<!-- MINI CALENDAR -->
+<div class="mini-cal" id="mini-cal" onclick="miniCalOverlayClick(event)">
+  <div class="mini-cal-box">
+    <div class="mini-cal-header">
+      <span class="mini-cal-title" id="mini-cal-title"></span>
+      <div class="mini-cal-nav">
+        <button onclick="shiftCal(-1)">‹</button>
+        <button onclick="shiftCal(1)">›</button>
+      </div>
     </div>
-    <div class="panel-body">
-      <div class="p-stats" id="dataStats"></div>
-      <hr class="p-div">
-      <div class="p-label">Dışa Aktar</div>
-      <button class="p-btn primary" onclick="exportData()">
-        <span class="icon"><i data-lucide="download"></i></span>
-        <div class="p-btn-body"><span>JSON olarak İndir</span><span class="p-desc">Tüm not ve görevleri yedekle</span></div>
-      </button>
-      <hr class="p-div">
-      <div class="p-label">İçe Aktar</div>
-      <button class="p-btn" onclick="document.getElementById('importMerge').click()">
-        <span class="icon"><i data-lucide="upload"></i></span>
-        <div class="p-btn-body"><span>Birleştirerek Yükle</span><span class="p-desc">Mevcut veriler korunur</span></div>
-      </button>
-      <button class="p-btn warn" onclick="document.getElementById('importReplace').click()">
-        <span class="icon"><i data-lucide="refresh-cw"></i></span>
-        <div class="p-btn-body"><span>Üzerine Yaz</span><span class="p-desc">Mevcut tüm veriler silinir!</span></div>
-      </button>
-      <input type="file" id="importMerge"   accept=".json" style="display:none" onchange="importData(this,false)">
-      <input type="file" id="importReplace" accept=".json" style="display:none" onchange="importData(this,true)">
-    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <button class="mini-cal-close-btn" onclick="closeCal()" id="cal-close-label">Kapat</button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- IMPORT/EXPORT -->
+<div class="io-panel" id="io-panel" onclick="ioPanelClick(event)">
+  <div class="io-box">
+    <div class="io-title" id="io-title">Veri Yönetimi</div>
+    <button class="io-btn" onclick="exportData()">
+      <span class="io-icon">📤</span>
+      <div class="io-btn-label"><strong id="exp-label">Dışa Aktar</strong><span id="exp-sub">JSON dosyası olarak indir</span></div>
+    </button>
+    <button class="io-btn" onclick="document.getElementById('import-file').click()">
+      <span class="io-icon">📥</span>
+      <div class="io-btn-label"><strong id="imp-label">İçe Aktar</strong><span id="imp-sub">JSON dosyasından yükle</span></div>
+    </button>
+    <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+    <button class="io-btn io-close" onclick="closeIO()">
+      <span class="io-icon">✕</span>
+      <div class="io-btn-label"><strong id="close-io-label">Kapat</strong><span></span></div>
+    </button>
+  </div>
+</div>
 
 <script>
-// ══ CONSTANTS ══
-const TR_DAYS      = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-const TR_DAYS_FULL = ['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
-const TR_MONTHS    = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-const P_LABELS     = { critical:'Kritik', high:'Yüksek', medium:'Orta', low:'Düşük' };
-const P_ORDER      = { critical:0, high:1, medium:2, low:3 };
+// ── STATE ──
+let currentWeekStart = null; // Monday of displayed week
+let selectedDateKey = null;
+let activeTab = 'notes';
+let calViewDate = new Date();
 
-// ══ STATE ══
-let weekOffset       = 0;
-let monthDate        = new Date();
-let modalDate        = null;
-let saveTO           = null;
-let bannerCollapsed  = false;
-let activeTab        = 'note';
-const TODAY          = new Date(); TODAY.setHours(0,0,0,0);
+// DATA: { "YYYY-MM-DD": { note: "", tasks: [{id,text,prio,done,recur}] } }
+let DATA = {};
 
-// ══ STORAGE ══
-function dk(d) { return `${d.getFullYear()}_${String(d.getMonth()+1).padStart(2,'0')}_${String(d.getDate()).padStart(2,'0')}`; }
-function getNote(d)      { return localStorage.getItem('note_'+dk(d)) || ''; }
-function setNote(d,t)    { t.trim() ? localStorage.setItem('note_'+dk(d),t) : localStorage.removeItem('note_'+dk(d)); }
-function getTasks(d)     { try { return JSON.parse(localStorage.getItem('tasks_'+dk(d))||'[]'); } catch { return []; } }
-function setTasks(d,arr) { arr.length ? localStorage.setItem('tasks_'+dk(d),JSON.stringify(arr)) : localStorage.removeItem('tasks_'+dk(d)); }
-function sameDay(a,b)    { return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
-function esc(s)          { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// RECURRING tasks store: [{id,text,prio,recur,createdKey}]
+let RECURRING = [];
 
-// ══ HEADER ══
-function updateHeader() {
-  const dow = TODAY.getDay();
-  document.getElementById('headerDate').textContent =
-    `${TR_DAYS_FULL[dow===0?6:dow-1]}, ${TODAY.getDate()} ${TR_MONTHS[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
+const MONTHS_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+const DAYS_EN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const DOW_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+const DOW_EN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const FULL_DAYS_TR = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
+const FULL_DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+let lang = 'tr';
+let theme = 'light';
+
+// ── UTILS ──
+function dateKey(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function parseKey(k) {
+  const [y,m,d] = k.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+function todayKey() { return dateKey(new Date()); }
+function getMondayOf(d) {
+  const copy = new Date(d);
+  const day = copy.getDay(); // 0=Sun
+  const diff = (day === 0) ? -6 : 1 - day;
+  copy.setDate(copy.getDate() + diff);
+  return copy;
+}
+function addDays(d, n) {
+  const copy = new Date(d);
+  copy.setDate(copy.getDate() + n);
+  return copy;
+}
+function uid() { return Math.random().toString(36).slice(2,10); }
+
+// Day-of-week index (0=Mon … 6=Sun)
+function dowIndex(d) {
+  const day = d.getDay(); // 0=Sun
+  return day === 0 ? 6 : day - 1;
 }
 
-// ══ CRITICAL BANNER ══
-function gatherCriticals() {
-  const out = [];
-  for (let i=-30; i<=60; i++) {
-    const d = new Date(TODAY); d.setDate(d.getDate()+i);
-    getTasks(d).forEach(t => { if (t.priority==='critical' && !t.done) out.push({...t,_d:new Date(d)}); });
+// ── PERSIST ──
+function save() {
+  localStorage.setItem('ajanda_data', JSON.stringify(DATA));
+  localStorage.setItem('ajanda_recur', JSON.stringify(RECURRING));
+  localStorage.setItem('ajanda_lang', lang);
+  localStorage.setItem('ajanda_theme', theme);
+}
+function load() {
+  try { DATA = JSON.parse(localStorage.getItem('ajanda_data') || '{}'); } catch(e){ DATA={}; }
+  try { RECURRING = JSON.parse(localStorage.getItem('ajanda_recur') || '[]'); } catch(e){ RECURRING=[]; }
+  lang = localStorage.getItem('ajanda_lang') || 'tr';
+  theme = localStorage.getItem('ajanda_theme') || 'light';
+}
+
+// ── RECURRING INJECTION ──
+function recurringMatchesDay(r, d) {
+  const dow = dowIndex(d); // 0=Mon..6=Sun
+  if (r.recur === 'daily') return true;
+  if (r.recur === 'weekly') {
+    const orig = parseKey(r.createdKey);
+    return dowIndex(orig) === dow;
   }
-  return out;
+  if (r.recur === 'weekdays') return dow <= 4;
+  const map = {mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6};
+  if (map[r.recur] !== undefined) return map[r.recur] === dow;
+  return false;
 }
 
-function renderCriticalBanner() {
-  const crits  = gatherCriticals();
-  const banner = document.getElementById('criticalBanner');
-  const list   = document.getElementById('criticalList');
-  document.getElementById('cbCount').textContent = crits.length;
-  if (!crits.length) { banner.style.display='none'; return; }
-  banner.style.display = 'block';
-  list.innerHTML = crits.slice(0,8).map(t => {
-    const isT   = sameDay(t._d, TODAY);
-    const label = isT ? 'Bugün' : `${t._d.getDate()} ${TR_MONTHS[t._d.getMonth()]}`;
-    return `<div class="ct-item">
-      <div class="ct-check${t.done?' done':''}" onclick="toggleCrit('${dk(t._d)}','${t.id}',this)">
-        ${t.done?'<span class="icon icon-sm"><i data-lucide="check"></i></span>':''}
-      </div>
-      <span class="ct-title${t.done?' done':''}">${esc(t.title)}</span>
-      <span class="ct-date">${label}</span>
-    </div>`;
-  }).join('');
-  lucide.createIcons();
+function getTasksForDay(key) {
+  const d = parseKey(key);
+  const own = (DATA[key]?.tasks || []);
+  const injected = RECURRING
+    .filter(r => recurringMatchesDay(r, d))
+    .filter(r => !own.find(t => t.recurId === r.id))
+    .map(r => ({
+      id: uid(), text: r.text, prio: r.prio,
+      done: false, recur: r.recur, recurId: r.id, _virtual: true
+    }));
+  return [...own, ...injected];
 }
 
-function toggleCrit(dkStr, id) {
-  const [y,m,day] = dkStr.split('_').map(Number);
-  const d = new Date(y,m-1,day);
-  const tasks = getTasks(d);
-  const t = tasks.find(x=>x.id===id);
-  if (t) { t.done=!t.done; setTasks(d,tasks); }
-  renderCriticalBanner(); renderWeek();
+// ── THEME / LANG ──
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  theme = theme === 'light' ? 'dark' : 'light';
+  applyTheme(); save();
+}
+function applyLang() {
+  document.documentElement.setAttribute('data-lang', lang);
+  document.getElementById('lang-btn').textContent = lang === 'tr' ? 'EN' : 'TR';
+  // update static labels
+  const t = lang === 'tr';
+  document.getElementById('today-btn-label').textContent = t ? 'Bugün' : 'Today';
+  document.getElementById('tab-notes-label').textContent = t ? 'Notlar' : 'Notes';
+  document.getElementById('tab-tasks-label').textContent = t ? 'Görevler' : 'Tasks';
+  document.getElementById('save-note-label').textContent = t ? 'Kaydet' : 'Save';
+  document.getElementById('note-area').placeholder = t ? 'Bu gün için notlarını yaz…' : 'Write your notes for today…';
+  document.getElementById('task-input').placeholder = t ? 'Yeni görev…' : 'New task…';
+  document.getElementById('io-title').textContent = t ? 'Veri Yönetimi' : 'Data Management';
+  document.getElementById('exp-label').textContent = t ? 'Dışa Aktar' : 'Export';
+  document.getElementById('exp-sub').textContent = t ? 'JSON dosyası olarak indir' : 'Download as JSON file';
+  document.getElementById('imp-label').textContent = t ? 'İçe Aktar' : 'Import';
+  document.getElementById('imp-sub').textContent = t ? 'JSON dosyasından yükle' : 'Load from JSON file';
+  document.getElementById('close-io-label').textContent = t ? 'Kapat' : 'Close';
+  document.getElementById('cal-close-label').textContent = t ? 'Kapat' : 'Close';
+  document.getElementById('mid-section-label').textContent = t ? 'Orta & Düşük Öncelik' : 'Mid & Low Priority';
+  document.getElementById('banner-title').textContent = t ? 'YÜKSEK ÖNCELİKLİ GÖREVLER' : 'HIGH PRIORITY TASKS';
+  // prio options
+  const ps = document.getElementById('prio-select');
+  ps.options[0].text = t ? '⚡ Yüksek' : '⚡ High';
+  ps.options[1].text = t ? '🔸 Orta' : '🔸 Mid';
+  ps.options[2].text = t ? '✅ Düşük' : '✅ Low';
+  // recur options
+  const rs = document.getElementById('recur-select');
+  rs.options[0].text = t ? '— Tekrar yok' : '— No repeat';
+  rs.options[1].text = t ? 'Her gün' : 'Every day';
+  rs.options[2].text = t ? 'Her hafta' : 'Every week';
+  rs.options[3].text = t ? 'Hafta içi' : 'Weekdays';
+  rs.options[4].text = t ? 'Her Pzt' : 'Every Mon';
+  rs.options[5].text = t ? 'Her Sal' : 'Every Tue';
+  rs.options[6].text = t ? 'Her Çar' : 'Every Wed';
+  rs.options[7].text = t ? 'Her Per' : 'Every Thu';
+  rs.options[8].text = t ? 'Her Cum' : 'Every Fri';
+  rs.options[9].text = t ? 'Her Cmt' : 'Every Sat';
+  rs.options[10].text = t ? 'Her Paz' : 'Every Sun';
+  renderWeek(); renderBanner(); if(document.getElementById('mini-cal').classList.contains('open')) renderCal();
+}
+function toggleLang() {
+  lang = lang === 'tr' ? 'en' : 'tr';
+  applyLang(); save();
 }
 
-function toggleBanner() {
-  bannerCollapsed = !bannerCollapsed;
-  document.getElementById('criticalBanner').classList.toggle('collapsed',bannerCollapsed);
-  document.getElementById('cbChevron').innerHTML =
-    bannerCollapsed ? '<i data-lucide="chevron-right"></i>' : '<i data-lucide="chevron-down"></i>';
-  lucide.createIcons();
+// ── WEEK ──
+function shiftWeek(n) {
+  currentWeekStart = addDays(currentWeekStart, n * 7);
+  renderWeek();
 }
-
-// ══ WEEKLY ══
-function weekStart(off) {
-  const d=new Date(TODAY), dow=d.getDay();
-  d.setDate(d.getDate()+(dow===0?-6:1-dow)+off*7); d.setHours(0,0,0,0); return d;
+function goToday() {
+  currentWeekStart = getMondayOf(new Date());
+  renderWeek();
 }
-
 function renderWeek() {
-  const s=weekStart(weekOffset), e=new Date(s); e.setDate(e.getDate()+6);
-  const fmt=d=>`${d.getDate()} ${TR_MONTHS[d.getMonth()]}`;
-  document.getElementById('weekLabel').textContent = `${TR_MONTHS[s.getMonth()]} ${s.getFullYear()}`;
-  document.getElementById('weekSub').textContent   = `${fmt(s)} – ${fmt(e)}`;
-  const grid = document.getElementById('weekGrid'); grid.innerHTML='';
+  const t = lang === 'tr';
+  const months = t ? MONTHS_TR : MONTHS_EN;
+  const days = t ? DAYS_TR : DAYS_EN;
+  // Week label
+  const end = addDays(currentWeekStart, 6);
+  const startM = months[currentWeekStart.getMonth()];
+  const endM = months[end.getMonth()];
+  let label;
+  if (currentWeekStart.getMonth() === end.getMonth()) {
+    label = `${startM} ${currentWeekStart.getFullYear()}`;
+  } else {
+    label = `${startM} – ${endM} ${end.getFullYear()}`;
+  }
+  // Week number
+  const wn = getWeekNumber(currentWeekStart);
+  document.getElementById('week-label').textContent = `${label}  ·  W${wn}`;
 
-  for (let i=0;i<7;i++) {
-    const d=new Date(s); d.setDate(d.getDate()+i);
-    const isT   = sameDay(d,TODAY);
-    const note  = getNote(d);
-    const tasks = getTasks(d);
-    const done  = tasks.filter(t=>t.done).length;
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+  const tk = todayKey();
 
-    const dotHtml = ['critical','high','medium','low']
-      .filter(p=>tasks.some(t=>t.priority===p))
-      .map(p=>`<div class="task-dot ${p}"></div>`).join('');
-
-    const sorted = [...tasks].sort((a,b)=>P_ORDER[a.priority]-P_ORDER[b.priority]);
-    const miniHtml = sorted.slice(0,4).map(t=>
-      `<div class="day-task-mini">
-        <div class="task-mini-dot ${t.priority}"></div>
-        <span class="task-mini-text${t.done?' done':''}">${esc(t.title)}</span>
-      </div>`).join('');
-
-    const numHtml = isT
-      ? `<div class="day-today-circle">${d.getDate()}</div>`
-      : `<div class="day-num">${d.getDate()}</div>`;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const k = dateKey(d);
+    const isToday = k === tk;
+    const tasks = getTasksForDay(k);
+    const note = DATA[k]?.note || '';
 
     const card = document.createElement('div');
-    card.className = 'day-card'+(isT?' today':'');
-    card.onclick   = ()=>openModal(d);
+    card.className = 'day-card' + (isToday ? ' today' : '');
+    card.onclick = () => openModal(k);
+
+    // indicators
+    const highCount = tasks.filter(t => t.prio === 'high' && !t.done).length;
+    const midCount = tasks.filter(t => t.prio === 'mid' && !t.done).length;
+    const lowCount = tasks.filter(t => t.prio === 'low' && !t.done).length;
+    const hasNote = note.trim().length > 0;
+
+    let indHTML = '';
+    if (highCount) indHTML += `<div class="dot dot-high" title="${highCount} yüksek"></div>`;
+    if (midCount) indHTML += `<div class="dot dot-mid"></div>`;
+    if (lowCount) indHTML += `<div class="dot dot-low"></div>`;
+    if (hasNote) indHTML += `<div class="dot dot-note"></div>`;
+
+    // Preview items
+    let previewHTML = '';
+    const allItems = [
+      ...tasks.filter(t=>!t.done).slice(0,3).map(t => ({type:'task', text:t.text, prio:t.prio})),
+    ];
+    if (allItems.length === 0 && !hasNote) {
+      previewHTML = `<div class="day-empty">—</div>`;
+    } else {
+      if (hasNote && allItems.length < 3) {
+        allItems.push({type:'note', text: note.trim().split('\n')[0].slice(0,40)});
+      }
+      allItems.slice(0,3).forEach(item => {
+        const color = item.type==='note' ? 'var(--text3)' : item.prio==='high' ? 'var(--high)' : item.prio==='mid' ? 'var(--mid)' : 'var(--low)';
+        previewHTML += `<div class="day-preview-item"><div class="pi-dot" style="background:${color}"></div><span>${escHtml(item.text)}</span></div>`;
+      });
+      const total = tasks.filter(t=>!t.done).length + (hasNote?1:0);
+      if (total > 3) previewHTML += `<div class="day-preview-more">+${total-3} daha</div>`;
+    }
+
     card.innerHTML = `
       <div class="day-header">
-        <div class="day-header-left">
-          <div class="day-name">${TR_DAYS[i]}</div>${numHtml}
+        <div class="day-name-num">
+          <span class="day-name">${days[i]}</span>
+          <span class="day-num">${d.getDate()}</span>
         </div>
-        <div class="day-task-dots">${dotHtml}</div>
+        <div class="day-indicators">${indHTML}</div>
       </div>
-      <div class="day-body">
-        ${miniHtml?`<div class="day-tasks-mini">${miniHtml}</div>`:''}
-        ${note?`<div class="day-note-mini">${esc(note.slice(0,100))}</div>`:''}
-        ${!miniHtml&&!note?`<div style="padding:6px 8px;font-size:10px;color:var(--text-light);font-style:italic;position:relative;z-index:1">Boş gün…</div>`:''}
-      </div>
-      <div class="day-footer">
-        <div class="day-footer-stats">
-          ${tasks.length?`<span class="stat-chip"><span class="icon icon-sm" style="color:var(--text-light)"><i data-lucide="check-square"></i></span>${done}/${tasks.length}</span>`:''}
-          ${note?`<span class="stat-chip"><span class="icon icon-sm" style="color:var(--text-light)"><i data-lucide="file-text"></i></span></span>`:''}
-        </div>
-        <span class="icon icon-sm" style="color:var(--text-light)"><i data-lucide="arrow-up-right"></i></span>
-      </div>`;
+      <div class="day-body">${previewHTML}</div>
+    `;
     grid.appendChild(card);
   }
-  lucide.createIcons();
-  renderCriticalBanner();
+  renderBanner();
 }
 
-function changeWeek(d) { weekOffset+=d; renderWeek(); }
-function goToday()     { weekOffset=0; renderWeek(); }
-
-// ══ MONTHLY ══
-function renderMonth() {
-  const y=monthDate.getFullYear(), m=monthDate.getMonth();
-  document.getElementById('monthTitle').textContent = `${TR_MONTHS[m]} ${y}`;
-  document.getElementById('monthDayNames').innerHTML = TR_DAYS.map(n=>`<div class="month-day-name">${n}</div>`).join('');
-  const grid=document.getElementById('monthGrid'); grid.innerHTML='';
-  const first=new Date(y,m,1), last=new Date(y,m+1,0);
-  let sdow=first.getDay(); if(sdow===0)sdow=7; const off=sdow-1;
-  for(let i=off-1;i>=0;i--) addMCell(grid,new Date(y,m,-i),true);
-  for(let d=1;d<=last.getDate();d++) addMCell(grid,new Date(y,m,d),false);
-  const total=off+last.getDate(), rem=total%7===0?0:7-(total%7);
-  for(let i=1;i<=rem;i++) addMCell(grid,new Date(y,m+1,i),true);
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
 }
 
-function addMCell(grid,d,other) {
-  const isT=sameDay(d,TODAY), tasks=getTasks(d), note=getNote(d);
-  const dots=['critical','high','medium','low']
-    .filter(p=>tasks.some(t=>t.priority===p)).slice(0,3)
-    .map(p=>`<div class="month-dot" style="background:var(--p-${p})"></div>`).join('');
-  const cell=document.createElement('div');
-  cell.className='month-cell'+(isT?' today':'')+(other?' other-month':'');
-  cell.innerHTML=`<span>${d.getDate()}</span>${dots?`<div class="month-cell-dots">${dots}</div>`:(note?`<div class="month-cell-dots"><div class="month-dot" style="background:var(--border2)"></div></div>`:'')}`;
-  cell.onclick=()=>openModal(new Date(d));
-  grid.appendChild(cell);
-}
-
-function changeMonth(d) {
-  monthDate=new Date(monthDate.getFullYear(),monthDate.getMonth()+d,1); renderMonth();
-}
-
-// ══ MODAL ══
-function openModal(d) {
-  modalDate=new Date(d);
-  const dow=d.getDay();
-  document.getElementById('modalDate').textContent    = `${d.getDate()} ${TR_MONTHS[d.getMonth()]}`;
-  document.getElementById('modalDateSub').textContent = `${TR_DAYS_FULL[dow===0?6:dow-1]}, ${d.getFullYear()}`;
-  document.getElementById('modalTextarea').value      = getNote(d);
-  updateCharCount();
-  document.getElementById('saveIndicator').classList.remove('show');
-  renderTasksList();
-  document.getElementById('modalOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-  lucide.createIcons();
-  if (activeTab==='note') setTimeout(()=>document.getElementById('modalTextarea').focus(),300);
-}
-
-function closeModal() {
-  saveCurrentNote(true);
-  document.getElementById('modalOverlay').classList.remove('open');
-  document.body.style.overflow='';
-  modalDate=null;
-  renderWeek();
-  if (document.getElementById('monthlyView').classList.contains('active')) renderMonth();
-}
-
-function handleOverlayClick(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
-
-function switchModalTab(tab,btn) {
-  activeTab=tab;
-  document.querySelectorAll('.modal-tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById(tab==='note'?'noteTab':'tasksTab').classList.add('active');
-  if (tab==='note') setTimeout(()=>document.getElementById('modalTextarea').focus(),100);
-}
-
-function saveCurrentNote(silent=false) {
-  if (!modalDate) return;
-  setNote(modalDate,document.getElementById('modalTextarea').value);
-  if (!silent) {
-    const i=document.getElementById('saveIndicator');
-    i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),2000);
-    showToast('Kaydedildi','success');
+// ── BANNER ──
+function renderBanner() {
+  const banner = document.getElementById('high-banner');
+  const list = document.getElementById('banner-list');
+  const t = lang === 'tr';
+  // collect all undone high-priority tasks for current week
+  let highs = [];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const k = dateKey(d);
+    const tasks = getTasksForDay(k);
+    tasks.filter(t => t.prio === 'high' && !t.done).forEach(task => {
+      const dayName = (lang==='tr' ? DAYS_TR : DAYS_EN)[i];
+      highs.push({text: task.text, day: dayName});
+    });
   }
+  if (highs.length === 0) { banner.classList.remove('show'); return; }
+  banner.classList.add('show');
+  list.innerHTML = highs.slice(0,5).map(h => `<li>${h.day}: ${escHtml(h.text)}</li>`).join('');
 }
-function saveNote() { saveCurrentNote(false); }
 
-function onTextInput() {
-  updateCharCount();
-  clearTimeout(saveTO);
-  saveTO=setTimeout(()=>{
-    if(!modalDate) return;
-    setNote(modalDate,document.getElementById('modalTextarea').value);
-    const i=document.getElementById('saveIndicator');
-    i.classList.add('show'); setTimeout(()=>i.classList.remove('show'),1500);
-  },800);
+// ── MODAL ──
+function openModal(key) {
+  selectedDateKey = key;
+  const d = parseKey(key);
+  const t = lang === 'tr';
+  const months = t ? MONTHS_TR : MONTHS_EN;
+  const fullDays = t ? FULL_DAYS_TR : FULL_DAYS_EN;
+  const dow = dowIndex(d);
+  document.getElementById('modal-date').textContent = `${fullDays[dow]}, ${d.getDate()} ${months[d.getMonth()]}`;
+  document.getElementById('note-area').value = DATA[key]?.note || '';
+  switchTab('notes');
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function updateCharCount() {
-  document.getElementById('charCount').textContent = document.getElementById('modalTextarea').value.length+' karakter';
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  renderWeek();
+}
+function overlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tab-notes').classList.toggle('hidden', tab !== 'notes');
+  document.getElementById('tab-tasks').classList.toggle('hidden', tab !== 'tasks');
+  if (tab === 'tasks') renderTasks();
+}
+
+// ── NOTES ──
+function saveNote() {
+  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+  DATA[selectedDateKey].note = document.getElementById('note-area').value;
+  save(); renderWeek();
+  // brief feedback
+  const btn = document.getElementById('save-note-label');
+  const orig = btn.textContent;
+  btn.textContent = '✓';
+  setTimeout(() => btn.textContent = orig, 800);
 }
 
 // ── TASKS ──
-function renderTasksList() {
-  if (!modalDate) return;
-  const tasks=getTasks(modalDate), el=document.getElementById('tasksList'), badge=document.getElementById('taskBadge');
-  const pending=tasks.filter(t=>!t.done).length;
-  badge.style.display=tasks.length?'inline':'none';
-  badge.textContent=pending||tasks.length;
+function renderTasks() {
+  const tasks = getTasksForDay(selectedDateKey);
+  const highList = document.getElementById('high-banner'); // not used here
+  const midList = document.getElementById('mid-task-list');
+  const midSection = document.getElementById('mid-tasks-section');
+  const t = lang === 'tr';
 
-  if (!tasks.length) {
-    el.innerHTML=`<div class="no-tasks"><span class="icon icon-lg" style="color:var(--border2)"><i data-lucide="clipboard-list"></i></span>Henüz görev yok.<br>Yukarıdan ekleyebilirsin.</div>`;
-    lucide.createIcons(); return;
+  // Separate high from mid/low
+  const highTasks = tasks.filter(t => t.prio === 'high');
+  const otherTasks = tasks.filter(t => t.prio !== 'high');
+
+  // Insert high tasks ABOVE mid section
+  let highContainer = document.getElementById('high-task-inline');
+  if (!highContainer) {
+    highContainer = document.createElement('div');
+    highContainer.id = 'high-task-inline';
+    midSection.parentNode.insertBefore(highContainer, midSection);
   }
-  const sorted=[...tasks].sort((a,b)=>{ if(a.done!==b.done) return a.done?1:-1; return P_ORDER[a.priority]-P_ORDER[b.priority]; });
-  el.innerHTML=sorted.map(t=>`
-    <div class="task-item ${t.priority}">
-      <div class="task-checkbox${t.done?' checked':''}" onclick="toggleTask('${t.id}')">
-        ${t.done?`<span class="icon icon-sm"><i data-lucide="check"></i></span>`:''}
-      </div>
-      <span class="task-text${t.done?' done':''}">${esc(t.title)}</span>
-      <span class="priority-badge ${t.priority}">${P_LABELS[t.priority]}</span>
-      <button class="task-del" onclick="deleteTask('${t.id}')"><span class="icon icon-sm"><i data-lucide="trash-2"></i></span></button>
-    </div>`).join('');
-  lucide.createIcons();
+
+  if (highTasks.length > 0) {
+    highContainer.innerHTML = `
+      <div class="section-label" style="color:var(--high)">⚡ ${t?'Yüksek Öncelik':'High Priority'}</div>
+      <ul class="task-list" id="high-task-list">${highTasks.map(task => taskHTML(task)).join('')}</ul>
+      <div class="sep"></div>
+    `;
+  } else {
+    highContainer.innerHTML = '';
+  }
+
+  midList.innerHTML = otherTasks.map(task => taskHTML(task)).join('');
+  midSection.style.display = otherTasks.length > 0 ? '' : 'none';
+}
+
+function taskHTML(task) {
+  const t = lang === 'tr';
+  const prioLabel = task.prio === 'high' ? (t?'Yüksek':'High') : task.prio === 'mid' ? (t?'Orta':'Mid') : (t?'Düşük':'Low');
+  const prioClass = 'prio-' + task.prio;
+  let recurIcon = '';
+  if (task.recur) recurIcon = `<span class="task-recur">🔁</span>`;
+  const isVirtual = task._virtual;
+  return `
+    <li class="task-item${task.done?' done':''}" id="ti-${task.id}">
+      <div class="task-check" onclick="toggleTask('${task.id}',${isVirtual})"></div>
+      <span class="task-text">${escHtml(task.text)}</span>
+      <span class="task-prio-badge ${prioClass}">${prioLabel}</span>
+      ${recurIcon}
+      ${!isVirtual ? `<button class="task-del" onclick="deleteTask('${task.id}')">✕</button>` : ''}
+    </li>
+  `;
 }
 
 function addTask() {
-  const inp=document.getElementById('taskInput'), title=inp.value.trim();
-  if (!title||!modalDate) return;
-  const tasks=getTasks(modalDate);
-  tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5), title, priority:document.getElementById('prioritySelect').value, done:false, created:Date.now()});
-  setTasks(modalDate,tasks); inp.value=''; inp.focus(); renderTasksList(); renderCriticalBanner();
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const prio = document.getElementById('prio-select').value;
+  const recur = document.getElementById('recur-select').value;
+
+  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+
+  const task = { id: uid(), text, prio, done: false, recur: recur || '' };
+
+  // If recurring, also store in RECURRING
+  if (recur) {
+    RECURRING.push({ id: task.id, text, prio, recur, createdKey: selectedDateKey });
+  }
+
+  DATA[selectedDateKey].tasks.push(task);
+  input.value = '';
+  document.getElementById('recur-select').value = '';
+  save(); renderTasks(); renderWeek(); renderBanner();
 }
 
-function toggleTask(id) {
-  if (!modalDate) return;
-  const tasks=getTasks(modalDate), t=tasks.find(x=>x.id===id);
-  if (t) { t.done=!t.done; setTasks(modalDate,tasks); }
-  renderTasksList(); renderCriticalBanner();
+function toggleTask(id, isVirtual) {
+  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+  if (isVirtual) {
+    // Materialize it
+    const tasks = getTasksForDay(selectedDateKey);
+    const vTask = tasks.find(t => t.id === id);
+    if (vTask) {
+      const newTask = { id: uid(), text: vTask.text, prio: vTask.prio, done: true, recur: vTask.recur, recurId: vTask.recurId };
+      DATA[selectedDateKey].tasks.push(newTask);
+    }
+  } else {
+    const task = DATA[selectedDateKey].tasks.find(t => t.id === id);
+    if (task) task.done = !task.done;
+  }
+  save(); renderTasks(); renderBanner();
 }
 
 function deleteTask(id) {
-  if (!modalDate) return;
-  setTasks(modalDate,getTasks(modalDate).filter(x=>x.id!==id));
-  renderTasksList(); renderCriticalBanner();
+  if (!DATA[selectedDateKey]) return;
+  DATA[selectedDateKey].tasks = DATA[selectedDateKey].tasks.filter(t => t.id !== id);
+  // Also remove from recurring
+  RECURRING = RECURRING.filter(r => r.id !== id);
+  save(); renderTasks(); renderWeek(); renderBanner();
 }
 
-// ══ EXPORT / IMPORT ══
-function collectData() {
-  const data={version:2,exported:new Date().toISOString(),notes:{},tasks:{}};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k.startsWith('note_'))  data.notes[k.slice(5)] =localStorage.getItem(k);
-    if(k.startsWith('tasks_')) data.tasks[k.slice(6)] =JSON.parse(localStorage.getItem(k));
+// ── MINI CALENDAR ──
+let calViewYear, calViewMonth;
+function openCal() {
+  const now = new Date();
+  calViewYear = now.getFullYear();
+  calViewMonth = now.getMonth();
+  renderCal();
+  document.getElementById('mini-cal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCal() {
+  document.getElementById('mini-cal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function miniCalOverlayClick(e) {
+  if (e.target === document.getElementById('mini-cal')) closeCal();
+}
+function shiftCal(n) {
+  calViewMonth += n;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderCal();
+}
+function renderCal() {
+  const t = lang === 'tr';
+  const months = t ? MONTHS_TR : MONTHS_EN;
+  const dows = t ? DOW_TR : DOW_EN;
+  document.getElementById('mini-cal-title').textContent = `${months[calViewMonth]} ${calViewYear}`;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Day of week headers (Mon first)
+  dows.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstOfMonth = new Date(calViewYear, calViewMonth, 1);
+  const firstDow = dowIndex(firstOfMonth); // 0=Mon
+
+  // Blanks
+  for (let i = 0; i < firstDow; i++) {
+    const el = document.createElement('div');
+    grid.appendChild(el);
   }
-  return data;
+
+  const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  const tk = todayKey();
+
+  // Week start/end for highlighting
+  const weekEnd = addDays(currentWeekStart, 6);
+  const weekStartKey = dateKey(currentWeekStart);
+  const weekEndKey = dateKey(weekEnd);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(calViewYear, calViewMonth, day);
+    const k = dateKey(d);
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (k === tk) el.classList.add('today');
+    else if (k >= weekStartKey && k <= weekEndKey) el.classList.add('in-week');
+    const tasks = getTasksForDay(k);
+    const hasData = tasks.length > 0 || (DATA[k]?.note || '').trim().length > 0;
+    if (hasData) el.classList.add('has-data');
+    el.textContent = day;
+    el.onclick = () => { currentWeekStart = getMondayOf(d); closeCal(); renderWeek(); };
+    grid.appendChild(el);
+  }
 }
 
-function openPanel() {
-  renderDataStats();
-  document.getElementById('panelOverlay').classList.add('open');
-  lucide.createIcons();
-}
-function closePanel() { document.getElementById('panelOverlay').classList.remove('open'); }
-
-function renderDataStats() {
-  const d=collectData();
-  const nKeys=Object.keys(d.notes), tKeys=Object.keys(d.tasks);
-  const total=tKeys.reduce((s,k)=>s+d.tasks[k].length,0);
-  const done=tKeys.reduce((s,k)=>s+d.tasks[k].filter(t=>t.done).length,0);
-  document.getElementById('dataStats').innerHTML=`
-    <div class="p-stat"><div class="p-stat-val">${nKeys.length}</div><div class="p-stat-lbl">Günlük Not</div></div>
-    <div class="p-stat"><div class="p-stat-val">${total}</div><div class="p-stat-lbl">Toplam Görev</div></div>
-    <div class="p-stat"><div class="p-stat-val">${done}</div><div class="p-stat-lbl">Tamamlanan</div></div>
-    <div class="p-stat"><div class="p-stat-val">${total-done}</div><div class="p-stat-lbl">Bekleyen</div></div>`;
-}
+// ── IMPORT / EXPORT ──
+function openIO() { document.getElementById('io-panel').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeIO() { document.getElementById('io-panel').classList.remove('open'); document.body.style.overflow=''; }
+function ioPanelClick(e) { if(e.target===document.getElementById('io-panel')) closeIO(); }
 
 function exportData() {
-  const blob=new Blob([JSON.stringify(collectData(),null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob), a=document.createElement('a');
-  a.href=url; a.download=`ajanda_${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); URL.revokeObjectURL(url);
-  showToast('Yedek indirildi ↓','success'); closePanel();
+  const payload = { data: DATA, recurring: RECURRING, lang, theme };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ajanda-backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  closeIO();
 }
-
-function importData(input,replace) {
-  const file=input.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
+function importData(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
     try {
-      const data=JSON.parse(e.target.result);
-      if(!data.notes&&!data.tasks) throw new Error();
-      if(replace) {
-        for(let i=localStorage.length-1;i>=0;i--){
-          const k=localStorage.key(i);
-          if(k.startsWith('note_')||k.startsWith('tasks_')) localStorage.removeItem(k);
-        }
-      }
-      let n=0,t=0;
-      Object.entries(data.notes||{}).forEach(([k,v])=>{localStorage.setItem('note_'+k,v);n++;});
-      Object.entries(data.tasks||{}).forEach(([k,v])=>{localStorage.setItem('tasks_'+k,JSON.stringify(v));t++;});
-      showToast(`${n} not, ${t} gün görevi yüklendi ✓`,'success');
-      renderWeek(); renderMonth(); renderDataStats(); closePanel();
-    } catch { showToast('Dosya okunamadı!','error'); }
-    input.value='';
+      const parsed = JSON.parse(ev.target.result);
+      if (parsed.data) DATA = parsed.data;
+      if (parsed.recurring) RECURRING = parsed.recurring;
+      if (parsed.lang) lang = parsed.lang;
+      if (parsed.theme) theme = parsed.theme;
+      save(); applyTheme(); applyLang(); renderWeek();
+      closeIO();
+    } catch(err) { alert('Geçersiz dosya!'); }
   };
   reader.readAsText(file);
+  e.target.value = '';
 }
 
-// ══ VIEW SWITCH ══
-function switchView(view) {
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(view==='weekly'?'weeklyView':'monthlyView').classList.add('active');
-  document.getElementById(view==='weekly'?'navWeekly':'navMonthly').classList.add('active');
-  if (view==='monthly') renderMonth();
+// ── HELPERS ──
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ══ TOAST ══
-function showToast(msg,type='') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(type?' '+type:''); t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+// ── INIT ──
+function init() {
+  load();
+  currentWeekStart = getMondayOf(new Date());
+  applyTheme();
+  applyLang();
+  renderWeek();
+
+  // Auto-save note on blur
+  document.getElementById('note-area').addEventListener('blur', () => {
+    if (selectedDateKey) {
+      if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+      DATA[selectedDateKey].note = document.getElementById('note-area').value;
+      save();
+    }
+  });
 }
-
-// ══ KEYBOARD ══
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){
-    if(document.getElementById('panelOverlay').classList.contains('open')) closePanel();
-    else closeModal();
-  }
-});
-
-// ══ INIT ══
-updateHeader(); renderWeek(); lucide.createIcons();
+init();
 </script>
 </body>
 </html>
