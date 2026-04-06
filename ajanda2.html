@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light" data-lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ajanda</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface2: #f0f0f0;
+    --border: #e0e0e0;
+    --text: #111111;
+    --text2: #666666;
+    --text3: #999999;
+    --accent: #111111;
+    --accent-soft: #f0f0f0;
+    --high: #ff3b30;
+    --high-bg: #fff0ef;
+    --mid: #ff9500;
+    --mid-bg: #fff8ed;
+    --low: #34c759;
+    --low-bg: #edfff2;
+    --today: #111111;
+    --today-text: #ffffff;
+    --modal-bg: rgba(0,0,0,0.4);
+    --shadow: 0 2px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0e0e0e;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --text: #f0f0f0;
+    --text2: #aaaaaa;
+    --text3: #666666;
+    --accent: #f0f0f0;
+    --accent-soft: #2a2a2a;
+    --high: #ff453a;
+    --high-bg: #2a1010;
+    --mid: #ff9f0a;
+    --mid-bg: #2a1f00;
+    --low: #30d158;
+    --low-bg: #0a2a12;
+    --today: #f0f0f0;
+    --today-text: #111111;
+    --modal-bg: rgba(0,0,0,0.7);
+    --shadow: 0 2px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .topbar-right { display: flex; align-items: center; gap: 6px; }
+  .week-nav { display: flex; align-items: center; gap: 6px; }
+  .week-nav button {
+    background: none; border: none; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 16px;
+    transition: background 0.15s;
+  }
+  .week-nav button:hover { background: var(--surface2); }
+  .week-label {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+  .week-label:hover { background: var(--surface2); }
+  .today-btn {
+    font-size: 12px; font-weight: 500;
+    background: var(--accent-soft); border: none; cursor: pointer;
+    color: var(--text); padding: 5px 10px; border-radius: 20px;
+    font-family: 'Instrument Sans', sans-serif;
+    transition: background 0.15s;
+  }
+  .today-btn:hover { background: var(--border); }
+  .icon-btn {
+    background: none; border: none; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 18px;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .icon-btn:hover { background: var(--surface2); color: var(--text); }
+  .icon-btn .badge {
+    position: absolute; top: 4px; right: 4px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--high);
+  }
+
+  /* ── HIGH PRIORITY BANNER ── */
+  #high-banner {
+    margin: 12px 16px 0;
+    background: var(--high-bg);
+    border: 1px solid var(--high);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    display: none; align-items: flex-start; gap: 10px;
+  }
+  #high-banner.show { display: flex; }
+  #high-banner .banner-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  #high-banner .banner-content { flex: 1; }
+  #high-banner .banner-title { font-size: 12px; font-weight: 600; color: var(--high); margin-bottom: 4px; }
+  #high-banner .banner-list { list-style: none; }
+  #high-banner .banner-list li {
+    font-size: 12px; color: var(--text); padding: 2px 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  #high-banner .banner-list li::before { content: "›"; font-size: 11px; color: var(--high); font-weight: 700; }
+
+  /* ── WEEK GRID ── */
+  .week-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 16px 24px;
+  }
+  .day-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.15s;
+    min-height: 130px;
+    display: flex; flex-direction: column;
+  }
+  .day-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .day-card.today { border-color: var(--today); border-width: 2px; }
+  .day-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-name-num { display: flex; align-items: baseline; gap: 5px; }
+  .day-name { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .day-num {
+    font-size: 18px; font-weight: 700;
+    color: var(--text);
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+  .today .day-num { background: var(--today); color: var(--today-text); }
+  .day-indicators { display: flex; gap: 3px; align-items: center; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-high { background: var(--high); }
+  .dot-mid { background: var(--mid); }
+  .dot-low { background: var(--low); }
+  .dot-note { background: var(--text3); }
+  
+  .day-body {
+    padding: 0 10px; flex: 1; overflow: hidden;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 21px,
+      var(--border) 21px,
+      var(--border) 22px
+    );
+    background-position: 0 8px;
+    min-height: 90px;
+  }
+  .day-body-inner { padding: 8px 0 6px; }
+  .day-preview-item {
+    font-size: 11px; color: var(--text2);
+    line-height: 22px; height: 22px;
+    display: flex; align-items: center; gap: 5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .day-preview-item .pi-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .day-preview-more { font-size: 10px; color: var(--text3); line-height: 22px; height: 22px; display:flex; align-items:center; }
+  .day-empty { font-size: 11px; color: var(--text3); font-style: italic; line-height: 22px; height: 22px; display:flex; align-items:center; }
+
+  /* ── MODAL ── */
+  .overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--modal-bg);
+    display: none; align-items: flex-end;
+    animation: fadeIn 0.2s;
+  }
+  .overlay.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%; max-height: 92vh;
+    display: flex; flex-direction: column;
+    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
+    box-shadow: var(--shadow-lg);
+  }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 10px auto 0;
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-date { font-size: 17px; font-weight: 700; }
+  .modal-close {
+    background: var(--surface2); border: none; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--text2);
+  }
+  .modal-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    padding: 0 18px; gap: 0;
+  }
+  .modal-tab {
+    background: none; border: none; cursor: pointer;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    color: var(--text3); padding: 10px 14px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .modal-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .modal-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+
+  /* ── NOTES TAB ── */
+  .note-wrapper {
+    position: relative;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .note-wrapper:focus-within { border-color: var(--accent); }
+  .note-lines {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 27px,
+      var(--border) 27px,
+      var(--border) 28px
+    );
+    background-position: 0 12px;
+  }
+  .note-tools {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 4px;
+    z-index: 5;
+  }
+  .note-tool-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .note-tool-btn:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+  .note-area {
+    width: 100%;
+    min-height: 240px;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: transparent;
+    resize: vertical;
+    outline: none;
+    line-height: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .note-save-btn {
+    margin-top: 10px; width: 100%;
+    background: var(--accent); color: var(--today-text);
+    border: none; border-radius: var(--radius-sm);
+    padding: 11px; font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .note-save-btn:hover { opacity: 0.85; }
+
+  /* ── TASKS TAB ── */
+  .task-input-row {
+    display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .task-input {
+    flex: 1; min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px; color: var(--text);
+    background: var(--surface2); outline: none;
+    transition: border-color 0.15s;
+  }
+  .task-input:focus { border-color: var(--accent); }
+  .prio-select {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 9px 8px; background: var(--surface2);
+    font-family: 'Instrument Sans', sans-serif; font-size: 12px;
+    color: var(--text); outline: none; cursor: pointer;
+  }
+  .recur-select {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 9px 8px; background: var(--surface2);
+    font-family: 'Instrument Sans', sans-serif; font-size: 12px;
+    color: var(--text); outline: none; cursor: pointer;
+  }
+  .add-task-btn {
+    background: var(--accent); color: var(--today-text);
+    border: none; border-radius: var(--radius-sm);
+    padding: 9px 14px; cursor: pointer;
+    font-size: 16px; font-weight: 700;
+    transition: opacity 0.15s;
+  }
+  .add-task-btn:hover { opacity: 0.8; }
+  .task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .task-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 12px;
+    transition: opacity 0.2s;
+  }
+  .task-item.done { opacity: 0.45; }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border); cursor: pointer;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+    background: none;
+  }
+  .task-item.done .task-check { background: var(--low); border-color: var(--low); }
+  .task-check::after { content: "✓"; font-size: 10px; color: white; display: none; }
+  .task-item.done .task-check::after { display: block; }
+  .task-text {
+    flex: 1; font-size: 13px; color: var(--text);
+    word-break: break-word;
+  }
+  .task-item.done .task-text { text-decoration: line-through; color: var(--text3); }
+  .task-prio-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 20px; flex-shrink: 0;
+  }
+  .prio-high { background: var(--high-bg); color: var(--high); }
+  .prio-mid { background: var(--mid-bg); color: var(--mid); }
+  .prio-low { background: var(--low-bg); color: var(--low); }
+  .task-recur { font-size: 10px; color: var(--text3); flex-shrink: 0; }
+  .task-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); font-size: 15px; padding: 0 2px;
+    transition: color 0.15s;
+  }
+  .task-del:hover { color: var(--high); }
+
+  /* ── MINI CALENDAR ── */
+  .mini-cal {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--modal-bg);
+    display: none; align-items: center; justify-content: center;
+  }
+  .mini-cal.open { display: flex; }
+  .mini-cal-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 320px;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.2s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .mini-cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .mini-cal-title { font-size: 15px; font-weight: 700; }
+  .mini-cal-nav { display: flex; gap: 4px; }
+  .mini-cal-nav button {
+    background: none; border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 14px;
+    transition: background 0.15s;
+  }
+  .mini-cal-nav button:hover { background: var(--surface2); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow {
+    text-align: center; font-size: 10px; font-weight: 600;
+    color: var(--text3); padding: 4px 0;
+    text-transform: uppercase;
+  }
+  .cal-day {
+    text-align: center; font-size: 12px;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text);
+    transition: background 0.12s;
+  }
+  .cal-day:hover { background: var(--surface2); }
+  .cal-day.today { background: var(--today); color: var(--today-text); font-weight: 700; }
+  .cal-day.in-week { background: var(--accent-soft); font-weight: 600; }
+  .cal-day.other-month { color: var(--text3); }
+  .cal-day.has-data::after {
+    content: ""; display: block;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--high); margin: 1px auto 0;
+  }
+  .mini-cal-close-btn {
+    margin-top: 14px; width: 100%;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px;
+    font-family: 'Instrument Sans', sans-serif; font-size: 13px;
+    color: var(--text); cursor: pointer;
+  }
+
+  /* ── IMPORT/EXPORT PANEL ── */
+  .io-panel {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--modal-bg);
+    display: none; align-items: flex-end;
+  }
+  .io-panel.open { display: flex; }
+  .io-box {
+    background: var(--surface);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
+  }
+  .io-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .io-btn {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 13px 16px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface2); cursor: pointer;
+    margin-bottom: 10px; font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; color: var(--text);
+    transition: background 0.15s;
+  }
+  .io-btn:hover { background: var(--border); }
+  .io-btn .io-icon { font-size: 20px; width: 28px; text-align: center; display:flex; align-items:center; justify-content:center; }
+  .io-btn-label { display: flex; flex-direction: column; align-items: flex-start; }
+  .io-btn-label strong { font-weight: 600; }
+  .io-btn-label span { font-size: 11px; color: var(--text3); }
+  .io-close { margin-top: 6px; }
+
+  /* ── WEEK STATS CARD ── */
+  .week-stats-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 130px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .week-stats-card.perfect {
+    border-color: var(--low);
+    background: var(--low-bg);
+  }
+  .stats-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .week-stats-card.perfect .stats-header { border-bottom-color: var(--low); }
+  .stats-title { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .week-stats-card.perfect .stats-title { color: var(--low); }
+  .stats-body {
+    flex: 1; padding: 10px 10px 8px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 21px,
+      var(--border) 21px,
+      var(--border) 22px
+    );
+    background-position: 0 8px;
+    min-height: 90px;
+  }
+  .week-stats-card.perfect .stats-body {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 21px,
+      rgba(52,199,89,0.2) 21px,
+      rgba(52,199,89,0.2) 22px
+    );
+  }
+  .stats-pct {
+    font-size: 28px; font-weight: 700; line-height: 1;
+    color: var(--text);
+    font-family: 'Instrument Serif', serif;
+  }
+  .week-stats-card.perfect .stats-pct { color: var(--low); }
+  .stats-sub {
+    font-size: 10px; color: var(--text3); margin-top: 2px;
+  }
+  .week-stats-card.perfect .stats-sub { color: var(--low); opacity: 0.85; }
+  .stats-bar-wrap {
+    margin-top: 8px;
+    background: var(--surface2);
+    border-radius: 4px; height: 5px; overflow: hidden;
+  }
+  .stats-bar {
+    height: 100%; border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .week-stats-card.perfect .stats-bar { background: var(--low); }
+  .stats-perfect-msg {
+    font-size: 11px; font-weight: 600; color: var(--low);
+    display: none; margin-top: 4px;
+  }
+  .week-stats-card.perfect .stats-perfect-msg { display: block; }
+  .stats-empty { font-size: 11px; color: var(--text3); font-style: italic; }
+
+  /* ── FAB ── */
+  .fab {
+    position: fixed; bottom: 24px; right: 20px; z-index: 150;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--accent); color: var(--today-text);
+    border: none; cursor: pointer; font-size: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .fab:hover { transform: scale(1.08); }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10px; font-weight: 700; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 8px; margin-top: 14px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* ── SEPARATOR ── */
+  .sep { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* ── UTILITY ── */
+  .hidden { display: none !important; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (min-width: 600px) {
+    .week-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .modal { max-width: 480px; margin: auto; border-radius: var(--radius); }
+    .overlay { align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="week-nav">
+      <button onclick="shiftWeek(-1)" title="Önceki hafta">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="week-label" onclick="openCal()" id="week-label">—</span>
+      <button onclick="shiftWeek(1)" title="Sonraki hafta">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <button class="today-btn" onclick="goToday()" id="today-btn-label">Bugün</button>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="Tema">
+      <svg id="theme-icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg id="theme-icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" style="display:none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="icon-btn" onclick="toggleLang()" id="lang-btn" title="Dil" style="font-size:11px;font-weight:700;letter-spacing:0.3px;">TR</button>
+    <button class="icon-btn" onclick="openIO()" id="top-io-btn" title="Veri Yönetimi">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="1.8"/><path d="M21 12c0 1.66-4.03 3-9 3S3 13.66 3 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="icon-btn" onclick="openCal()" title="Takvim">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<div id="high-banner">
+  <div class="banner-icon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="var(--high)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="banner-content">
+    <div class="banner-title" id="banner-title">YÜKSEK ÖNCELİKLİ GÖREVLER</div>
+    <ul class="banner-list" id="banner-list"></ul>
+  </div>
+</div>
+
+<div class="week-grid" id="week-grid"></div>
+
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-date" id="modal-date"></span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="notes" onclick="switchTab('notes')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span id="tab-notes-label">Notlar</span>
+      </button>
+      <button class="modal-tab" data-tab="tasks" onclick="switchTab('tasks')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="9,11 12,14 22,4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="tab-tasks-label">Görevler</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="tab-notes">
+        <div class="note-wrapper">
+          <div class="note-lines"></div>
+          <div class="note-tools">
+            <button class="note-tool-btn" id="time-btn" onclick="insertTime()" title="Zaman Ekle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <button class="note-tool-btn" id="copy-btn" onclick="copyNote()" title="Kopyala">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
+          <textarea class="note-area" id="note-area" placeholder="Bu gün için notlarını yaz…"></textarea>
+        </div>
+        <button class="note-save-btn" onclick="saveNote()" id="save-note-label">Kaydet</button>
+      </div>
+      <div id="tab-tasks" class="hidden">
+        <div class="task-input-row">
+          <input class="task-input" id="task-input" placeholder="Yeni görev…" onkeydown="if(event.key==='Enter')addTask()">
+          <select class="prio-select" id="prio-select">
+            <option value="high">⚡ Yüksek</option>
+            <option value="mid" selected>🔸 Orta</option>
+            <option value="low">✅ Düşük</option>
+          </select>
+          <select class="recur-select" id="recur-select">
+            <option value="">— Tekrar yok</option>
+            <option value="daily">Her gün</option>
+            <option value="weekly">Her hafta</option>
+            <option value="weekdays">Hafta içi</option>
+            <option value="mon">Her Pzt</option>
+            <option value="tue">Her Sal</option>
+            <option value="wed">Her Çar</option>
+            <option value="thu">Her Per</option>
+            <option value="fri">Her Cum</option>
+            <option value="sat">Her Cmt</option>
+            <option value="sun">Her Paz</option>
+          </select>
+          <button class="add-task-btn" onclick="addTask()">+</button>
+        </div>
+
+        <div id="mid-tasks-section">
+          <div class="section-label" id="mid-section-label">Orta & Düşük Öncelik</div>
+          <ul class="task-list" id="mid-task-list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mini-cal" id="mini-cal" onclick="miniCalOverlayClick(event)">
+  <div class="mini-cal-box">
+    <div class="mini-cal-header">
+      <span class="mini-cal-title" id="mini-cal-title"></span>
+      <div class="mini-cal-nav">
+        <button onclick="shiftCal(-1)">‹</button>
+        <button onclick="shiftCal(1)">›</button>
+      </div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <button class="mini-cal-close-btn" onclick="closeCal()" id="cal-close-label">Kapat</button>
+  </div>
+</div>
+
+<div class="io-panel" id="io-panel" onclick="ioPanelClick(event)">
+  <div class="io-box">
+    <div class="io-title" id="io-title">Veri Yönetimi</div>
+    <button class="io-btn" onclick="exportData()">
+      <span class="io-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      <div class="io-btn-label"><strong id="exp-label">Dışa Aktar</strong><span id="exp-sub">JSON dosyası olarak indir</span></div>
+    </button>
+    <button class="io-btn" onclick="document.getElementById('import-file').click()">
+      <span class="io-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17,8 12,3 7,8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      <div class="io-btn-label"><strong id="imp-label">İçe Aktar</strong><span id="imp-sub">JSON dosyasından yükle</span></div>
+    </button>
+    <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+    <button class="io-btn io-close" onclick="closeIO()">
+      <span class="io-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      <div class="io-btn-label"><strong id="close-io-label">Kapat</strong><span></span></div>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let currentWeekStart = null; // Monday of displayed week
+let selectedDateKey = null;
+let activeTab = 'notes';
+let calViewDate = new Date();
+
+// DATA: { "YYYY-MM-DD": { note: "", tasks: [{id,text,prio,done,recur}] } }
+let DATA = {};
+
+// RECURRING tasks store: [{id,text,prio,recur,createdKey}]
+let RECURRING = [];
+
+const MONTHS_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+const DAYS_EN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const DOW_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+const DOW_EN = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const FULL_DAYS_TR = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
+const FULL_DAYS_EN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+let lang = 'tr';
+let theme = 'light';
+
+// ── UTILS ──
+function dateKey(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function parseKey(k) {
+  const [y,m,d] = k.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+function todayKey() { return dateKey(new Date()); }
+function getMondayOf(d) {
+  const copy = new Date(d);
+  const day = copy.getDay(); // 0=Sun
+  const diff = (day === 0) ? -6 : 1 - day;
+  copy.setDate(copy.getDate() + diff);
+  return copy;
+}
+function addDays(d, n) {
+  const copy = new Date(d);
+  copy.setDate(copy.getDate() + n);
+  return copy;
+}
+function uid() { return Math.random().toString(36).slice(2,10); }
+
+// Day-of-week index (0=Mon … 6=Sun)
+function dowIndex(d) {
+  const day = d.getDay(); // 0=Sun
+  return day === 0 ? 6 : day - 1;
+}
+
+// ── PERSIST ──
+function save() {
+  localStorage.setItem('ajanda_data', JSON.stringify(DATA));
+  localStorage.setItem('ajanda_recur', JSON.stringify(RECURRING));
+  localStorage.setItem('ajanda_lang', lang);
+  localStorage.setItem('ajanda_theme', theme);
+}
+function load() {
+  try { DATA = JSON.parse(localStorage.getItem('ajanda_data') || '{}'); } catch(e){ DATA={}; }
+  try { RECURRING = JSON.parse(localStorage.getItem('ajanda_recur') || '[]'); } catch(e){ RECURRING=[]; }
+  lang = localStorage.getItem('ajanda_lang') || 'tr';
+  theme = localStorage.getItem('ajanda_theme') || 'light';
+}
+
+// ── RECURRING INJECTION ──
+function recurringMatchesDay(r, d) {
+  const dow = dowIndex(d); // 0=Mon..6=Sun
+  if (r.recur === 'daily') return true;
+  if (r.recur === 'weekly') {
+    const orig = parseKey(r.createdKey);
+    return dowIndex(orig) === dow;
+  }
+  if (r.recur === 'weekdays') return dow <= 4;
+  const map = {mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6};
+  if (map[r.recur] !== undefined) return map[r.recur] === dow;
+  return false;
+}
+
+function getTasksForDay(key) {
+  const d = parseKey(key);
+  const own = (DATA[key]?.tasks || []);
+  const injected = RECURRING
+    .filter(r => recurringMatchesDay(r, d))
+    .filter(r => !own.find(t => t.recurId === r.id))
+    .map(r => ({
+      id: uid(), text: r.text, prio: r.prio,
+      done: false, recur: r.recur, recurId: r.id, _virtual: true
+    }));
+  return [...own, ...injected];
+}
+
+// ── THEME / LANG ──
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', theme);
+  const moonEl = document.getElementById('theme-icon-moon');
+  const sunEl = document.getElementById('theme-icon-sun');
+  if (moonEl && sunEl) {
+    moonEl.style.display = theme === 'dark' ? 'none' : '';
+    sunEl.style.display = theme === 'dark' ? '' : 'none';
+  }
+}
+function toggleTheme() {
+  theme = theme === 'light' ? 'dark' : 'light';
+  applyTheme(); save();
+}
+function applyLang() {
+  document.documentElement.setAttribute('data-lang', lang);
+  document.getElementById('lang-btn').textContent = lang === 'tr' ? 'EN' : 'TR';
+  const t = lang === 'tr';
+  
+  // update titles
+  const topIo = document.getElementById('top-io-btn');
+  if(topIo) topIo.title = t ? 'Veri Yönetimi' : 'Data Management';
+  const timeBtn = document.getElementById('time-btn');
+  if(timeBtn) timeBtn.title = t ? 'Zaman Ekle' : 'Insert Time';
+  const copyBtn = document.getElementById('copy-btn');
+  if(copyBtn) copyBtn.title = t ? 'Kopyala' : 'Copy';
+
+  // update static labels
+  document.getElementById('today-btn-label').textContent = t ? 'Bugün' : 'Today';
+  document.getElementById('tab-notes-label').textContent = t ? 'Notlar' : 'Notes';
+  document.getElementById('tab-tasks-label').textContent = t ? 'Görevler' : 'Tasks';
+  document.getElementById('save-note-label').textContent = t ? 'Kaydet' : 'Save';
+  document.getElementById('note-area').placeholder = t ? 'Bu gün için notlarını yaz…' : 'Write your notes for today…';
+  document.getElementById('task-input').placeholder = t ? 'Yeni görev…' : 'New task…';
+  document.getElementById('io-title').textContent = t ? 'Veri Yönetimi' : 'Data Management';
+  document.getElementById('exp-label').textContent = t ? 'Dışa Aktar' : 'Export';
+  document.getElementById('exp-sub').textContent = t ? 'JSON dosyası olarak indir' : 'Download as JSON file';
+  document.getElementById('imp-label').textContent = t ? 'İçe Aktar' : 'Import';
+  document.getElementById('imp-sub').textContent = t ? 'JSON dosyasından yükle' : 'Load from JSON file';
+  document.getElementById('close-io-label').textContent = t ? 'Kapat' : 'Close';
+  document.getElementById('cal-close-label').textContent = t ? 'Kapat' : 'Close';
+  document.getElementById('mid-section-label').textContent = t ? 'Orta & Düşük Öncelik' : 'Mid & Low Priority';
+  document.getElementById('banner-title').textContent = t ? 'YÜKSEK ÖNCELİKLİ GÖREVLER' : 'HIGH PRIORITY TASKS';
+
+  // prio options
+  const ps = document.getElementById('prio-select');
+  ps.options[0].text = t ? '⚡ Yüksek' : '⚡ High';
+  ps.options[1].text = t ? '🔸 Orta' : '🔸 Mid';
+  ps.options[2].text = t ? '✅ Düşük' : '✅ Low';
+  
+  // recur options
+  const rs = document.getElementById('recur-select');
+  rs.options[0].text = t ? '— Tekrar yok' : '— No repeat';
+  rs.options[1].text = t ? 'Her gün' : 'Every day';
+  rs.options[2].text = t ? 'Her hafta' : 'Every week';
+  rs.options[3].text = t ? 'Hafta içi' : 'Weekdays';
+  rs.options[4].text = t ? 'Her Pzt' : 'Every Mon';
+  rs.options[5].text = t ? 'Her Sal' : 'Every Tue';
+  rs.options[6].text = t ? 'Her Çar' : 'Every Wed';
+  rs.options[7].text = t ? 'Her Per' : 'Every Thu';
+  rs.options[8].text = t ? 'Her Cum' : 'Every Fri';
+  rs.options[9].text = t ? 'Her Cmt' : 'Every Sat';
+  rs.options[10].text = t ? 'Her Paz' : 'Every Sun';
+  
+  renderWeek(); renderBanner(); if(document.getElementById('mini-cal').classList.contains('open')) renderCal();
+}
+function toggleLang() {
+  lang = lang === 'tr' ? 'en' : 'tr';
+  applyLang(); save();
+}
+
+// ── WEEK ──
+function shiftWeek(n) {
+  currentWeekStart = addDays(currentWeekStart, n * 7);
+  renderWeek();
+}
+function goToday() {
+  currentWeekStart = getMondayOf(new Date());
+  renderWeek();
+}
+function renderWeek() {
+  const t = lang === 'tr';
+  const months = t ? MONTHS_TR : MONTHS_EN;
+  const days = t ? DAYS_TR : DAYS_EN;
+  // Week label
+  const end = addDays(currentWeekStart, 6);
+  const startM = months[currentWeekStart.getMonth()];
+  const endM = months[end.getMonth()];
+  let label;
+  if (currentWeekStart.getMonth() === end.getMonth()) {
+    label = `${startM} ${currentWeekStart.getFullYear()}`;
+  } else {
+    label = `${startM} – ${endM} ${end.getFullYear()}`;
+  }
+  // Week number
+  const wn = getWeekNumber(currentWeekStart);
+  document.getElementById('week-label').textContent = `${label}  ·  W${wn}`;
+
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+  const tk = todayKey();
+
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const k = dateKey(d);
+    const isToday = k === tk;
+    const tasks = getTasksForDay(k);
+    const note = DATA[k]?.note || '';
+
+    const card = document.createElement('div');
+    card.className = 'day-card' + (isToday ? ' today' : '');
+    card.onclick = () => openModal(k);
+
+    // indicators
+    const highCount = tasks.filter(t => t.prio === 'high' && !t.done).length;
+    const midCount = tasks.filter(t => t.prio === 'mid' && !t.done).length;
+    const lowCount = tasks.filter(t => t.prio === 'low' && !t.done).length;
+    const hasNote = note.trim().length > 0;
+
+    let indHTML = '';
+    if (highCount) indHTML += `<div class="dot dot-high" title="${highCount} yüksek"></div>`;
+    if (midCount) indHTML += `<div class="dot dot-mid"></div>`;
+    if (lowCount) indHTML += `<div class="dot dot-low"></div>`;
+    if (hasNote) indHTML += `<div class="dot dot-note"></div>`;
+
+    // Preview items
+    let previewHTML = '';
+    const allItems = [
+      ...tasks.filter(t=>!t.done).slice(0,3).map(t => ({type:'task', text:t.text, prio:t.prio})),
+    ];
+    if (allItems.length === 0 && !hasNote) {
+      previewHTML = `<div class="day-empty">—</div>`;
+    } else {
+      if (hasNote && allItems.length < 3) {
+        allItems.push({type:'note', text: note.trim().split('\n')[0].slice(0,40)});
+      }
+      allItems.slice(0,3).forEach(item => {
+        const color = item.type==='note' ? 'var(--text3)' : item.prio==='high' ? 'var(--high)' : item.prio==='mid' ? 'var(--mid)' : 'var(--low)';
+        previewHTML += `<div class="day-preview-item"><div class="pi-dot" style="background:${color}"></div><span>${escHtml(item.text)}</span></div>`;
+      });
+      const total = tasks.filter(t=>!t.done).length + (hasNote?1:0);
+      if (total > 3) previewHTML += `<div class="day-preview-more">+${total-3} daha</div>`;
+    }
+
+    card.innerHTML = `
+      <div class="day-header">
+        <div class="day-name-num">
+          <span class="day-name">${days[i]}</span>
+          <span class="day-num">${d.getDate()}</span>
+        </div>
+        <div class="day-indicators">${indHTML}</div>
+      </div>
+      <div class="day-body"><div class="day-body-inner">${previewHTML}</div></div>
+    `;
+    grid.appendChild(card);
+  }
+
+  // ── 8th slot: weekly stats card ──
+  const statsCard = document.createElement('div');
+  let totalTasks = 0, doneTasks = 0;
+  for (let i = 0; i < 7; i++) {
+    const k = dateKey(addDays(currentWeekStart, i));
+    const tasks = getTasksForDay(k);
+    totalTasks += tasks.length;
+    doneTasks += tasks.filter(t => t.done).length;
+  }
+  const pct = totalTasks === 0 ? null : Math.round((doneTasks / totalTasks) * 100);
+  const isPerfect = pct === 100;
+  const t2 = lang === 'tr';
+  statsCard.className = 'week-stats-card' + (isPerfect ? ' perfect' : '');
+
+  let statsBodyContent = '';
+  if (pct === null) {
+    statsBodyContent = `<div class="stats-empty">${t2 ? 'Henüz görev yok' : 'No tasks yet'}</div>`;
+  } else {
+    const subLabel = t2
+      ? `${doneTasks} / ${totalTasks} görev tamamlandı`
+      : `${doneTasks} / ${totalTasks} tasks done`;
+    const perfectMsgs = t2
+      ? ['Mükemmelsin! 🎉', 'Haftayı fethettim!', 'Her şey tamam!']
+      : ['Perfect week! 🎉', 'Crushed it!', 'All done!'];
+    const perfectMsg = perfectMsgs[Math.floor(new Date().getDay() % perfectMsgs.length)];
+    statsBodyContent = `
+      <div>
+        <div class="stats-pct">${pct}%</div>
+        <div class="stats-sub">${subLabel}</div>
+      </div>
+      <div>
+        <div class="stats-bar-wrap"><div class="stats-bar" style="width:${pct}%"></div></div>
+        <div class="stats-perfect-msg">${perfectMsg}</div>
+      </div>
+    `;
+  }
+
+  statsCard.innerHTML = `
+    <div class="stats-header">
+      <span class="stats-title">${t2 ? 'Hafta özeti' : 'Week summary'}</span>
+      ${isPerfect ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="var(--low)" stroke="var(--low)" stroke-width="1.5"/></svg>` : ''}
+    </div>
+    <div class="stats-body">${statsBodyContent}</div>
+  `;
+  grid.appendChild(statsCard);
+
+  renderBanner();
+}
+
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+// ── BANNER ──
+function renderBanner() {
+  const banner = document.getElementById('high-banner');
+  const list = document.getElementById('banner-list');
+  const t = lang === 'tr';
+  let highs = [];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(currentWeekStart, i);
+    const k = dateKey(d);
+    const tasks = getTasksForDay(k);
+    tasks.filter(t => t.prio === 'high' && !t.done).forEach(task => {
+      const dayName = (lang==='tr' ? DAYS_TR : DAYS_EN)[i];
+      highs.push({text: task.text, day: dayName});
+    });
+  }
+  if (highs.length === 0) { banner.classList.remove('show'); return; }
+  banner.classList.add('show');
+  list.innerHTML = highs.slice(0,5).map(h => `<li>${h.day}: ${escHtml(h.text)}</li>`).join('');
+}
+
+// ── MODAL ──
+function openModal(key) {
+  selectedDateKey = key;
+  const d = parseKey(key);
+  const t = lang === 'tr';
+  const months = t ? MONTHS_TR : MONTHS_EN;
+  const fullDays = t ? FULL_DAYS_TR : FULL_DAYS_EN;
+  const dow = dowIndex(d);
+  document.getElementById('modal-date').textContent = `${fullDays[dow]}, ${d.getDate()} ${months[d.getMonth()]}`;
+  document.getElementById('note-area').value = DATA[key]?.note || '';
+  switchTab('notes');
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  renderWeek();
+}
+function overlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tab-notes').classList.toggle('hidden', tab !== 'notes');
+  document.getElementById('tab-tasks').classList.toggle('hidden', tab !== 'tasks');
+  if (tab === 'tasks') renderTasks();
+}
+
+// ── NOTES ──
+function saveNote() {
+  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+  DATA[selectedDateKey].note = document.getElementById('note-area').value;
+  save(); renderWeek();
+  const btn = document.getElementById('save-note-label');
+  const orig = btn.textContent;
+  btn.textContent = '✓';
+  setTimeout(() => btn.textContent = orig, 800);
+}
+
+function insertTime() {
+  const textarea = document.getElementById('note-area');
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const timeStr = `[${hh}:${mm}] - `;
+  
+  const startPos = textarea.selectionStart;
+  const endPos = textarea.selectionEnd;
+  
+  textarea.value = textarea.value.substring(0, startPos) + timeStr + textarea.value.substring(endPos);
+  textarea.selectionStart = textarea.selectionEnd = startPos + timeStr.length;
+  textarea.focus();
+  
+  if (selectedDateKey) {
+    if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+    DATA[selectedDateKey].note = textarea.value;
+    save();
+  }
+}
+
+function copyNote() {
+  const textarea = document.getElementById('note-area');
+  if (!textarea.value) return;
+  navigator.clipboard.writeText(textarea.value).then(() => {
+    const btn = document.getElementById('copy-btn');
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--low)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    setTimeout(() => { btn.innerHTML = origHtml; }, 1200);
+  });
+}
+
+// ── TASKS ──
+function renderTasks() {
+  const tasks = getTasksForDay(selectedDateKey);
+  const midList = document.getElementById('mid-task-list');
+  const midSection = document.getElementById('mid-tasks-section');
+  const t = lang === 'tr';
+
+  const highTasks = tasks.filter(t => t.prio === 'high');
+  const otherTasks = tasks.filter(t => t.prio !== 'high');
+
+  let highContainer = document.getElementById('high-task-inline');
+  if (!highContainer) {
+    highContainer = document.createElement('div');
+    highContainer.id = 'high-task-inline';
+    midSection.parentNode.insertBefore(highContainer, midSection);
+  }
+
+  if (highTasks.length > 0) {
+    highContainer.innerHTML = `
+      <div class="section-label" style="color:var(--high)">⚡ ${t?'Yüksek Öncelik':'High Priority'}</div>
+      <ul class="task-list" id="high-task-list">${highTasks.map(task => taskHTML(task)).join('')}</ul>
+      <div class="sep"></div>
+    `;
+  } else {
+    highContainer.innerHTML = '';
+  }
+
+  midList.innerHTML = otherTasks.map(task => taskHTML(task)).join('');
+  midSection.style.display = otherTasks.length > 0 ? '' : 'none';
+}
+
+function taskHTML(task) {
+  const t = lang === 'tr';
+  const prioLabel = task.prio === 'high' ? (t?'Yüksek':'High') : task.prio === 'mid' ? (t?'Orta':'Mid') : (t?'Düşük':'Low');
+  const prioClass = 'prio-' + task.prio;
+  let recurIcon = '';
+  if (task.recur) recurIcon = `<span class="task-recur">🔁</span>`;
+  const isVirtual = task._virtual;
+  return `
+    <li class="task-item${task.done?' done':''}" id="ti-${task.id}">
+      <div class="task-check" onclick="toggleTask('${task.id}',${isVirtual})"></div>
+      <span class="task-text">${escHtml(task.text)}</span>
+      <span class="task-prio-badge ${prioClass}">${prioLabel}</span>
+      ${recurIcon}
+      ${!isVirtual ? `<button class="task-del" onclick="deleteTask('${task.id}')">✕</button>` : ''}
+    </li>
+  `;
+}
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const prio = document.getElementById('prio-select').value;
+  const recur = document.getElementById('recur-select').value;
+
+  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+
+  const task = { id: uid(), text, prio, done: false, recur: recur || '' };
+
+  if (recur) {
+    RECURRING.push({ id: task.id, text, prio, recur, createdKey: selectedDateKey });
+  }
+
+  DATA[selectedDateKey].tasks.push(task);
+  input.value = '';
+  document.getElementById('recur-select').value = '';
+  save(); renderTasks(); renderWeek(); renderBanner();
+}
+
+function toggleTask(id, isVirtual) {
+  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+  if (isVirtual) {
+    const tasks = getTasksForDay(selectedDateKey);
+    const vTask = tasks.find(t => t.id === id);
+    if (vTask) {
+      const newTask = { id: uid(), text: vTask.text, prio: vTask.prio, done: true, recur: vTask.recur, recurId: vTask.recurId };
+      DATA[selectedDateKey].tasks.push(newTask);
+    }
+  } else {
+    const task = DATA[selectedDateKey].tasks.find(t => t.id === id);
+    if (task) task.done = !task.done;
+  }
+  save(); renderTasks(); renderBanner();
+}
+
+function deleteTask(id) {
+  if (!DATA[selectedDateKey]) return;
+  DATA[selectedDateKey].tasks = DATA[selectedDateKey].tasks.filter(t => t.id !== id);
+  RECURRING = RECURRING.filter(r => r.id !== id);
+  save(); renderTasks(); renderWeek(); renderBanner();
+}
+
+// ── MINI CALENDAR ──
+let calViewYear, calViewMonth;
+function openCal() {
+  const now = new Date();
+  calViewYear = now.getFullYear();
+  calViewMonth = now.getMonth();
+  renderCal();
+  document.getElementById('mini-cal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCal() {
+  document.getElementById('mini-cal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function miniCalOverlayClick(e) {
+  if (e.target === document.getElementById('mini-cal')) closeCal();
+}
+function shiftCal(n) {
+  calViewMonth += n;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderCal();
+}
+function renderCal() {
+  const t = lang === 'tr';
+  const months = t ? MONTHS_TR : MONTHS_EN;
+  const dows = t ? DOW_TR : DOW_EN;
+  document.getElementById('mini-cal-title').textContent = `${months[calViewMonth]} ${calViewYear}`;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  dows.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstOfMonth = new Date(calViewYear, calViewMonth, 1);
+  const firstDow = dowIndex(firstOfMonth);
+
+  for (let i = 0; i < firstDow; i++) {
+    const el = document.createElement('div');
+    grid.appendChild(el);
+  }
+
+  const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  const tk = todayKey();
+
+  const weekEnd = addDays(currentWeekStart, 6);
+  const weekStartKey = dateKey(currentWeekStart);
+  const weekEndKey = dateKey(weekEnd);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(calViewYear, calViewMonth, day);
+    const k = dateKey(d);
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    if (k === tk) el.classList.add('today');
+    else if (k >= weekStartKey && k <= weekEndKey) el.classList.add('in-week');
+    const tasks = getTasksForDay(k);
+    const hasData = tasks.length > 0 || (DATA[k]?.note || '').trim().length > 0;
+    if (hasData) el.classList.add('has-data');
+    el.textContent = day;
+    el.onclick = () => { currentWeekStart = getMondayOf(d); closeCal(); renderWeek(); };
+    grid.appendChild(el);
+  }
+}
+
+// ── IMPORT / EXPORT ──
+function openIO() { document.getElementById('io-panel').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeIO() { document.getElementById('io-panel').classList.remove('open'); document.body.style.overflow=''; }
+function ioPanelClick(e) { if(e.target===document.getElementById('io-panel')) closeIO(); }
+
+function exportData() {
+  const payload = { data: DATA, recurring: RECURRING, lang, theme };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ajanda-backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  closeIO();
+}
+function importData(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (parsed.data) DATA = parsed.data;
+      if (parsed.recurring) RECURRING = parsed.recurring;
+      if (parsed.lang) lang = parsed.lang;
+      if (parsed.theme) theme = parsed.theme;
+      save(); applyTheme(); applyLang(); renderWeek();
+      closeIO();
+    } catch(err) { alert('Geçersiz dosya!'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── HELPERS ──
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──
+function init() {
+  load();
+  currentWeekStart = getMondayOf(new Date());
+  applyTheme();
+  applyLang();
+  renderWeek();
+
+  document.getElementById('note-area').addEventListener('blur', () => {
+    if (selectedDateKey) {
+      if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[]};
+      DATA[selectedDateKey].note = document.getElementById('note-area').value;
+      save();
+    }
+  });
+}
+init();
+</script>
+</body>
+</html>
