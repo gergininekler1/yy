@@ -492,7 +492,7 @@
   .hidden { display: none !important; }
 
   /* ── SEARCH RESULT ITEM HOVER ── */
-  .search-item { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+  .search-item { padding: 12px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
   .search-item:hover { background: var(--surface2); }
   .search-item:last-child { border-bottom: none; }
 
@@ -518,9 +518,6 @@
     <button class="today-btn" onclick="goToday()">Bugün</button>
   </div>
   <div class="topbar-right">
-    <button class="icon-btn" onclick="openSearch()" title="Hızlı Arama">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
-    </button>
     <button class="icon-btn" onclick="toggleTheme()" title="Tema">
       <svg id="theme-icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <svg id="theme-icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" style="display:none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -534,6 +531,14 @@
   </div>
 </header>
 
+<div class="search-bar-container" style="padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border);">
+  <div style="display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="Not veya görev ara..." onkeyup="doSearch()" style="width:100%; border:none; outline:none; padding: 10px 0; font-family:inherit; font-size:14px; background:transparent; color:var(--text);">
+  </div>
+  <div id="search-results" style="max-height: 250px; overflow-y: auto;"></div>
+</div>
+
 <div id="high-banner">
   <div class="banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div class="banner-content">
@@ -543,16 +548,6 @@
 </div>
 
 <div class="week-grid" id="week-grid"></div>
-
-<div class="overlay" id="search-overlay" onclick="searchOverlayClick(event)">
-  <div class="modal" id="search-modal" style="height: 70vh;">
-    <div class="modal-header" style="padding: 16px 20px;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="search-input" placeholder="Not veya görev ara..." onkeyup="doSearch()" style="width:100%; border:none; outline:none; font-family:inherit; font-size:16px; background:transparent; color:var(--text);">
-    </div>
-    <div class="modal-body" id="search-results" style="padding:0;"></div>
-  </div>
-</div>
 
 <div class="overlay" id="stats-overlay" onclick="statsOverlayClick(event)">
   <div class="modal" id="stats-modal">
@@ -618,8 +613,7 @@
             <option value="fri">Her Cum</option>
             <option value="sat">Her Cmt</option>
             <option value="sun">Her Paz</option>
-            <option value="month-1">Her ayın 1'i</option>
-            <option value="month-15">Her ayın 15'i</option>
+            <option value="monthly">Her ay (Aynı gün)</option>
             <option value="month-last">Ayın son günü</option>
           </select>
           <button class="add-task-btn" onclick="addTask()">+</button>
@@ -716,8 +710,13 @@ function recurringMatchesDay(r, d) {
   if (r.recur === 'daily') return true;
   if (r.recur === 'weekly') { const orig = parseKey(r.createdKey); return dowIndex(orig) === dow; }
   if (r.recur === 'weekdays') return dow <= 4;
-  if (r.recur === 'month-1') return d.getDate() === 1;
-  if (r.recur === 'month-15') return d.getDate() === 15;
+  
+  // REVIZE: Aylık tekrar kontrolü
+  if (r.recur === 'monthly') { 
+    const orig = parseKey(r.createdKey); 
+    return d.getDate() === orig.getDate(); 
+  }
+  
   if (r.recur === 'month-last') {
     const nextDay = new Date(d);
     nextDay.setDate(d.getDate() + 1);
@@ -750,14 +749,11 @@ function applyTheme() {
 function toggleTheme() { theme = theme === 'light' ? 'dark' : 'light'; applyTheme(); save(); }
 
 // ── SEARCH ──
-function openSearch() {
-  document.getElementById('search-overlay').classList.add('open');
+// REVIZE: Inline arama çubuğu için fonksiyonlar güncellendi.
+function closeSearch() { 
   document.getElementById('search-input').value = '';
   document.getElementById('search-results').innerHTML = '';
-  setTimeout(() => document.getElementById('search-input').focus(), 100);
 }
-function closeSearch() { document.getElementById('search-overlay').classList.remove('open'); }
-function searchOverlayClick(e) { if(e.target.id==='search-overlay') closeSearch(); }
 function doSearch() {
   const q = document.getElementById('search-input').value.toLowerCase();
   const resEl = document.getElementById('search-results');
