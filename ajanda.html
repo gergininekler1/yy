@@ -136,7 +136,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    padding: 12px 16px 80px;
+    padding: 12px 16px 68px;
   }
   .day-card {
     background: var(--surface);
@@ -171,15 +171,29 @@
   .dot-mid { background: var(--mid); }
   .dot-low { background: var(--low); }
   .dot-note { background: var(--text3); }
-  .day-body { padding: 8px 10px; flex: 1; overflow: hidden; }
+  /* Lined notebook body for day cards */
+  .day-body {
+    padding: 0 10px; flex: 1; overflow: hidden;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 21px,
+      var(--border) 21px,
+      var(--border) 22px
+    );
+    background-position: 0 8px;
+    min-height: 90px;
+  }
+  .day-body-inner { padding: 8px 0 6px; }
   .day-preview-item {
     font-size: 11px; color: var(--text2);
-    padding: 2px 0; display: flex; align-items: center; gap: 5px;
+    line-height: 22px; height: 22px;
+    display: flex; align-items: center; gap: 5px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .day-preview-item .pi-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-  .day-preview-more { font-size: 10px; color: var(--text3); margin-top: 2px; }
-  .day-empty { font-size: 11px; color: var(--text3); font-style: italic; padding: 2px 0; }
+  .day-preview-more { font-size: 10px; color: var(--text3); line-height: 22px; height: 22px; display:flex; align-items:center; }
+  .day-empty { font-size: 11px; color: var(--text3); font-style: italic; line-height: 22px; height: 22px; display:flex; align-items:center; }
 
   /* ── MODAL ── */
   .overlay {
@@ -449,21 +463,93 @@
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    height: 52px;
+    height: 44px;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
   }
   .data-mgmt-btn {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 6px;
     background: none; border: none; cursor: pointer;
     font-family: 'Instrument Sans', sans-serif;
-    font-size: 12px; font-weight: 500;
-    color: var(--text3); padding: 8px 20px;
+    font-size: 11px; font-weight: 500;
+    color: var(--text3); padding: 6px 16px;
     border-radius: 20px;
     transition: background 0.15s, color 0.15s;
   }
   .data-mgmt-btn:hover { background: var(--surface2); color: var(--text); }
   .data-mgmt-btn svg { flex-shrink: 0; }
+
+  /* ── WEEK STATS CARD ── */
+  .week-stats-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 130px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .week-stats-card.perfect {
+    border-color: var(--low);
+    background: var(--low-bg);
+  }
+  .stats-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .week-stats-card.perfect .stats-header { border-bottom-color: var(--low); }
+  .stats-title { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .week-stats-card.perfect .stats-title { color: var(--low); }
+  .stats-body {
+    flex: 1; padding: 10px 10px 8px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 21px,
+      var(--border) 21px,
+      var(--border) 22px
+    );
+    background-position: 0 8px;
+    min-height: 90px;
+  }
+  .week-stats-card.perfect .stats-body {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 21px,
+      rgba(52,199,89,0.2) 21px,
+      rgba(52,199,89,0.2) 22px
+    );
+  }
+  .stats-pct {
+    font-size: 28px; font-weight: 700; line-height: 1;
+    color: var(--text);
+    font-family: 'Instrument Serif', serif;
+  }
+  .week-stats-card.perfect .stats-pct { color: var(--low); }
+  .stats-sub {
+    font-size: 10px; color: var(--text3); margin-top: 2px;
+  }
+  .week-stats-card.perfect .stats-sub { color: var(--low); opacity: 0.85; }
+  .stats-bar-wrap {
+    margin-top: 8px;
+    background: var(--surface2);
+    border-radius: 4px; height: 5px; overflow: hidden;
+  }
+  .stats-bar {
+    height: 100%; border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .week-stats-card.perfect .stats-bar { background: var(--low); }
+  .stats-perfect-msg {
+    font-size: 11px; font-weight: 600; color: var(--low);
+    display: none; margin-top: 4px;
+  }
+  .week-stats-card.perfect .stats-perfect-msg { display: block; }
+  .stats-empty { font-size: 11px; color: var(--text3); font-style: italic; }
 
   /* ── FAB ── */
   .fab {
@@ -748,7 +834,12 @@ function getTasksForDay(key) {
 // ── THEME / LANG ──
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', theme);
-  document.getElementById('theme-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  const moonEl = document.getElementById('theme-icon-moon');
+  const sunEl = document.getElementById('theme-icon-sun');
+  if (moonEl && sunEl) {
+    moonEl.style.display = theme === 'dark' ? 'none' : '';
+    sunEl.style.display = theme === 'dark' ? '' : 'none';
+  }
 }
 function toggleTheme() {
   theme = theme === 'light' ? 'dark' : 'light';
@@ -774,6 +865,7 @@ function applyLang() {
   document.getElementById('cal-close-label').textContent = t ? 'Kapat' : 'Close';
   document.getElementById('mid-section-label').textContent = t ? 'Orta & Düşük Öncelik' : 'Mid & Low Priority';
   document.getElementById('banner-title').textContent = t ? 'YÜKSEK ÖNCELİKLİ GÖREVLER' : 'HIGH PRIORITY TASKS';
+  document.getElementById('data-mgmt-label').textContent = t ? 'Veri Yönetimi' : 'Data Management';
   // prio options
   const ps = document.getElementById('prio-select');
   ps.options[0].text = t ? '⚡ Yüksek' : '⚡ High';
@@ -880,10 +972,57 @@ function renderWeek() {
         </div>
         <div class="day-indicators">${indHTML}</div>
       </div>
-      <div class="day-body">${previewHTML}</div>
+      <div class="day-body"><div class="day-body-inner">${previewHTML}</div></div>
     `;
     grid.appendChild(card);
   }
+
+  // ── 8th slot: weekly stats card ──
+  const statsCard = document.createElement('div');
+  let totalTasks = 0, doneTasks = 0;
+  for (let i = 0; i < 7; i++) {
+    const k = dateKey(addDays(currentWeekStart, i));
+    const tasks = getTasksForDay(k);
+    totalTasks += tasks.length;
+    doneTasks += tasks.filter(t => t.done).length;
+  }
+  const pct = totalTasks === 0 ? null : Math.round((doneTasks / totalTasks) * 100);
+  const isPerfect = pct === 100;
+  const t2 = lang === 'tr';
+  statsCard.className = 'week-stats-card' + (isPerfect ? ' perfect' : '');
+
+  let statsBodyContent = '';
+  if (pct === null) {
+    statsBodyContent = `<div class="stats-empty">${t2 ? 'Henüz görev yok' : 'No tasks yet'}</div>`;
+  } else {
+    const subLabel = t2
+      ? `${doneTasks} / ${totalTasks} görev tamamlandı`
+      : `${doneTasks} / ${totalTasks} tasks done`;
+    const perfectMsgs = t2
+      ? ['Mükemmelsin! 🎉', 'Haftayı fethettim!', 'Her şey tamam!']
+      : ['Perfect week! 🎉', 'Crushed it!', 'All done!'];
+    const perfectMsg = perfectMsgs[Math.floor(new Date().getDay() % perfectMsgs.length)];
+    statsBodyContent = `
+      <div>
+        <div class="stats-pct">${pct}%</div>
+        <div class="stats-sub">${subLabel}</div>
+      </div>
+      <div>
+        <div class="stats-bar-wrap"><div class="stats-bar" style="width:${pct}%"></div></div>
+        <div class="stats-perfect-msg">${perfectMsg}</div>
+      </div>
+    `;
+  }
+
+  statsCard.innerHTML = `
+    <div class="stats-header">
+      <span class="stats-title">${t2 ? 'Hafta özeti' : 'Week summary'}</span>
+      ${isPerfect ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="var(--low)" stroke="var(--low)" stroke-width="1.5"/></svg>` : ''}
+    </div>
+    <div class="stats-body">${statsBodyContent}</div>
+  `;
+  grid.appendChild(statsCard);
+
   renderBanner();
 }
 
