@@ -1,194 +1,421 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Öykü Mimarı v5.0 | Mobil Pro</title>
-    <style>
-        :root {
-            --bg: #000000;
-            --card: #121212;
-            --accent: #E50914;
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
-            --nav-bg: #1a1a1a;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro-Ajanda 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f5f5; --surface: #ffffff; --surface2: #f0f0f0; --border: #e0e0e0;
+    --text: #111111; --text2: #666666; --text3: #999999; --accent: #111111;
+    --accent-soft: #f0f0f0; --high: #ff3b30; --high-bg: #fff0ef; --mid: #ff9500;
+    --mid-bg: #fff8ed; --low: #34c759; --low-bg: #edfff2; --today: #111111;
+    --today-text: #ffffff; --modal-bg: rgba(0,0,0,0.4); --shadow: 0 2px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.14); --radius: 14px; --radius-sm: 8px;
+  }
+  [data-theme="dark"] {
+    --bg: #0e0e0e; --surface: #1a1a1a; --surface2: #242424; --border: #2e2e2e;
+    --text: #f0f0f0; --text2: #aaaaaa; --text3: #666666; --accent: #f0f0f0;
+    --accent-soft: #2a2a2a; --high: #ff453a; --high-bg: #2a1010; --mid: #ff9f0a;
+    --mid-bg: #2a1f00; --low: #30d158; --low-bg: #0a2a12; --today: #f0f0f0;
+    --today-text: #111111; --modal-bg: rgba(0,0,0,0.7); --shadow: 0 2px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 80px; /* Nav bar için boşluk */
-        }
+  /* TOP BAR */
+  .topbar { position: sticky; top: 0; z-index: 100; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; height: 56px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); }
+  .topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .week-nav { display: flex; align-items: center; gap: 6px; }
+  .week-nav button { background: none; border: none; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); transition: background 0.15s; }
+  .week-nav button:hover { background: var(--surface2); }
+  .week-label { font-size: 15px; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); }
+  .today-btn { font-size: 12px; font-weight: 500; background: var(--accent-soft); border: none; cursor: pointer; color: var(--text); padding: 5px 12px; border-radius: 20px; }
+  .icon-btn { background: none; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); }
 
-        /* ÜST HEADER */
-        .header {
-            padding: 15px;
-            background: var(--nav-bg);
-            border-bottom: 1px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+  /* TABS */
+  .main-tabs-container { display: flex; gap: 8px; padding: 12px 20px 0; border-bottom: 1px solid var(--border); background: var(--surface); overflow-x: auto; scrollbar-width: none; }
+  .main-tab { background: none; border: none; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text3); padding: 10px 14px; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .main-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .main-tab-pane { display: none; }
+  .main-tab-pane.active { display: block; animation: fadeIn 0.2s; }
 
-        .header h1 { font-size: 1.2rem; color: var(--accent); margin: 0; letter-spacing: 1px; }
+  /* GRID & CARDS */
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; padding: 16px; }
+  .day-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); min-height: 140px; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.1s; }
+  .day-card.today { border-color: var(--today); border-width: 2px; }
+  .day-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .day-num { font-size: 18px; font-weight: 700; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .today .day-num { background: var(--today); color: var(--today-text); }
+  .day-body { padding: 8px 12px; flex: 1; background-image: repeating-linear-gradient(to bottom, transparent, transparent 23px, var(--border) 23px, var(--border) 24px); background-position: 0 6px; }
 
-        /* ANA İÇERİK ALANLARI */
-        .tab-content { display: none; padding: 15px; animation: fadeIn 0.3s; }
-        .tab-content.active { display: block; }
+  /* MEDIA GRID (RAF/DVD) */
+  .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 16px; }
+  .media-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+  .media-img { width: 100%; height: 220px; object-fit: cover; background: var(--surface2); }
+  .media-content { padding: 12px; flex: 1; }
+  .media-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .media-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
 
-        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+  /* EDITOR */
+  .rte-toolbar { display: flex; gap: 4px; background: var(--surface2); padding: 8px; border-radius: 8px 8px 0 0; border: 1px solid var(--border); flex-wrap: wrap; }
+  .rte-btn { padding: 4px 8px; font-size: 12px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; }
+  .rte-editor { min-height: 500px; background: var(--surface); border: 1px solid var(--border); border-top: none; padding: 20px; outline: none; line-height: 1.8; font-size: 15px; }
 
-        /* KART TASARIMI */
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #222;
-        }
+  /* BANNERS */
+  .banners-row { display: none; gap: 10px; padding: 12px 16px 0; }
+  .banner-box { flex: 1; background: var(--surface); border-radius: 50px; padding: 8px 16px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); }
 
-        h2 { font-size: 1rem; margin-top: 0; color: var(--accent); text-transform: uppercase; }
+  /* MODAL */
+  .overlay { position: fixed; inset: 0; z-index: 200; background: var(--modal-bg); display: none; align-items: flex-end; justify-content: center; }
+  .overlay.open { display: flex; }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-        /* GİRİŞ ALANLARI */
-        input, textarea, select {
-            width: 100%;
-            background: #222;
-            border: 1px solid #333;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
+  /* FORMS */
+  .task-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .task-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: inherit; outline: none; }
+  .add-task-btn { padding: 10px 16px; background: var(--accent); color: var(--today-text); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
-        .writing-area { height: 350px; line-height: 1.6; font-family: serif; }
+  /* MISC */
+  .hidden { display: none !important; }
+  .sep { height: 1px; background: var(--border); margin: 15px 0; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; letter-spacing: 0.5px; }
+  .note-area { width: 100%; min-height: 150px; border: none; outline: none; background: transparent; font-family: inherit; font-size: 14px; line-height: 28px; resize: none; }
+  .note-wrapper { border: 1px solid var(--border); border-radius: 12px; padding: 12px; position: relative; background: var(--surface); }
 
-        /* DRAMATİK YAPI SEÇİCİ */
-        .stage-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: #333;
-        }
-
-        /* MOBİL ALT NAVİGASYON */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: var(--nav-bg);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid #333;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.7rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .nav-item.active { color: var(--accent); }
-        .nav-item i { font-size: 1.4rem; margin-bottom: 4px; }
-
-        .btn-action {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-            width: 100%;
-        }
-    </style>
+  @media (min-width: 600px) { .modal { border-radius: 20px; margin-bottom: 20px; } .overlay { align-items: center; } }
+</style>
 </head>
 <body>
 
-<div class="header">
-    <h1>ÖYKÜ MİMARI PRO</h1>
-    <span id="globalWordCount" style="font-size: 0.8rem; color: var(--text-dim);">0 Kelime</span>
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="week-nav">
+      <button onclick="shiftWeek(-1)">❮</button>
+      <span class="week-label" onclick="openCal()" id="week-label">—</span>
+      <button onclick="shiftWeek(1)">❯</button>
+    </div>
+    <button class="today-btn" onclick="goToday()">Bugün</button>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="toggleTheme()" title="Tema">🌓</button>
+    <button class="icon-btn" onclick="openIO()" title="Veri">💾</button>
+  </div>
+</header>
+
+<div class="main-tabs-container">
+  <button class="main-tab active" data-main-tab="week" onclick="switchMainTab('week')">Haftalık</button>
+  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">Raf (Kitaplık)</button>
+  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">DVD Arşivi</button>
+  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">Kurallar</button>
 </div>
 
-<div id="dna" class="tab-content active">
-    <div class="card">
-        <h2>🏗️ Proje Temeli</h2>
-        <label>Öykü Adı</label>
-        <input type="text" id="mainTitle" placeholder="Örn: Görünmez Şehir" oninput="saveData()">
-        
-        <label>Logline (Tek Cümlelik Özet)</label>
-        <textarea id="logline" placeholder="Kim, neyi, neden istiyor?" oninput="saveData()"></textarea>
-        
-        <label>Ana Tema</label>
-        <input type="text" id="theme" placeholder="Örn: Bağışlama ve Zaman" oninput="saveData()">
+<div id="pane-week" class="main-tab-pane active">
+  <div class="banners-row" id="banners-row">
+    <div id="high-banner" class="banner-box" style="border-color: var(--high);">
+      <span style="color: var(--high);">⚡</span>
+      <div id="banner-list" style="font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></div>
     </div>
+    <div id="sports-banner" class="banner-box" style="border-color: var(--low);">
+      <span style="color: var(--low);">🏃</span>
+      <div id="sports-banner-text" style="font-size: 12px; font-weight: 600;"></div>
+    </div>
+  </div>
 
-    <div class="card">
-        <h2>👥 Karakter Arkları</h2>
-        <div id="charList"></div>
-        <button class="btn-action" style="background:#333;" onclick="addChar()">+ Karakter Ekle</button>
+  <div class="week-grid" id="week-grid"></div>
+
+  <div style="padding: 0 16px 30px;">
+    <div class="section-label">Haftalık Odak & Notlar</div>
+    <div class="note-wrapper">
+      <textarea id="weekly-note" class="note-area" placeholder="Haftanın ana hedefleri..." onblur="saveWeeklyNote()"></textarea>
     </div>
+  </div>
 </div>
 
-<div id="structure" class="tab-content">
-    <div class="card">
-        <h2>⏳ Dramatik Akış Notları</h2>
-        <p style="font-size: 0.8rem; color: var(--text-dim);">Öykünün iskeletini burada planla.</p>
-        
-        <label>1. SERİM (Giriş/Normal Düzen)</label>
-        <textarea id="plan_serim" oninput="saveData()"></textarea>
-
-        <label>2. DÜĞÜM (Tetikleyici Olay)</label>
-        <textarea id="plan_dugum" oninput="saveData()"></textarea>
-
-        <label>3. GELİŞME (Çatışma/Engeller)</label>
-        <textarea id="plan_gelisme" oninput="saveData()"></textarea>
-
-        <label>4. DORUK (Climax)</label>
-        <textarea id="plan_doruk" oninput="saveData()"></textarea>
-
-        <label>5. ÇÖZÜM (Final)</label>
-        <textarea id="plan_cozum" oninput="saveData()"></textarea>
+<div id="pane-library" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="task-input-row" style="background:var(--surface); padding:15px; border-radius:12px; border:1px solid var(--border); flex-wrap:wrap;">
+      <input class="task-input" id="lib-title" placeholder="Kitap Adı" style="flex:1 1 100%;">
+      <input class="task-input" id="lib-desc" placeholder="Yazar / Notlar" style="flex:1 1 100%;">
+      <input class="task-input" id="lib-img" placeholder="Kapak Görsel URL">
+      <select class="task-input" id="lib-rating" style="flex:0;">
+        <option value="5">⭐⭐⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="3" selected>⭐⭐⭐</option><option value="2">⭐⭐</option><option value="1">⭐</option>
+      </select>
+      <button class="add-task-btn" onclick="addGlobalBook()">Kitaplığa Ekle</button>
     </div>
+  </div>
+  <div class="media-grid" id="global-books-grid"></div>
 </div>
 
-<div id="write" class="tab-content">
-    <div class="card">
-        <select id="chapterStage" onchange="syncData()">
-            <option value="Serim">Bölüm Aşaması: SERİM</option>
-            <option value="Düğüm">Bölüm Aşaması: DÜĞÜM</option>
-            <option value="Gelişme">Bölüm Aşaması: GELİŞME</option>
-            <option value="Doruk">Bölüm Aşaması: DORUK</option>
-            <option value="Çözüm">Bölüm Aşaması: ÇÖZÜM</option>
+<div id="pane-dvds" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="task-input-row" style="background:var(--surface); padding:15px; border-radius:12px; border:1px solid var(--border);">
+      <input class="task-input" id="dvd-title" placeholder="Film/Dizi Adı">
+      <input class="task-input" id="dvd-img" placeholder="Poster URL">
+      <button class="add-task-btn" onclick="addGlobalMovie()">Ekle</button>
+    </div>
+  </div>
+  <div class="media-grid" id="global-movies-grid"></div>
+</div>
+
+<div id="pane-rules" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="rte-toolbar">
+      <button class="rte-btn" onclick="document.execCommand('bold')">B</button>
+      <button class="rte-btn" onclick="document.execCommand('italic')">I</button>
+      <button class="rte-btn" onclick="document.execCommand('insertUnorderedList')">• Liste</button>
+      <button class="rte-btn" onclick="document.execCommand('formatBlock', false, 'H3')">Başlık</button>
+    </div>
+    <div id="rules-editor" class="rte-editor" contenteditable="true" onblur="saveRules()" placeholder="Yaşam prensiplerini buraya yaz..."></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div style="height:4px; width:40px; background:var(--border); margin:10px auto; border-radius:2px;"></div>
+    <div style="padding:10px 20px; display:flex; justify-content:space-between; align-items:center;">
+      <h2 id="modal-date" style="font-size:18px;"></h2>
+      <button onclick="closeModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text3);">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="section-label">Günün Notu</div>
+      <div class="note-wrapper" style="margin-bottom:20px;">
+        <textarea id="note-area" class="note-area" placeholder="Neler oldu?"></textarea>
+      </div>
+
+      <div class="section-label">Görevler</div>
+      <div class="task-input-row">
+        <input class="task-input" id="task-input" placeholder="Yeni görev..." onkeydown="if(event.key==='Enter')addTask()">
+        <select class="task-input" id="prio-select" style="flex:0; padding:5px;">
+          <option value="high">Yüksek</option>
+          <option value="mid" selected>Orta</option>
+          <option value="low">Düşük</option>
         </select>
-        
-        <input type="text" id="chapterTitle" placeholder="Bölüm Başlığı..." oninput="syncData()">
-        
-        <div style="margin-top:15px; border-top: 1px solid #333; padding-top:10px;">
-            <p style="font-size: 0.75rem; color: orange;">💡 BU BÖLÜMÜN PLANI:</p>
-            <div id="currentStagePlan" style="font-size: 0.85rem; color: #ccc; font-style: italic;">Henüz plan yazılmadı.</div>
-        </div>
+        <button class="add-task-btn" onclick="addTask()">+</button>
+      </div>
+      <ul id="task-list" style="list-style:none; display:grid; gap:8px;"></ul>
 
-        <textarea id="editorBody" class="writing-area" placeholder="Buraya yaz..." oninput="syncData()"></textarea>
+      <div class="sep"></div>
+      
+      <div class="section-label">Kitap İlerlemesi</div>
+      <div class="task-input-row">
+        <input class="task-input" id="book-name" placeholder="Kitap Adı">
+        <input class="task-input" type="number" id="book-current" placeholder="Sayfa" style="max-width:70px;">
+        <input class="task-input" type="number" id="book-total" placeholder="Top." style="max-width:70px;">
+        <button class="add-task-btn" onclick="addBook()">Ekle</button>
+      </div>
     </div>
-    <button class="btn-action" onclick="downloadProject()">📩 Tüm Dosyayı İndir</button>
+  </div>
 </div>
 
-<nav class="bottom-nav">
-    <div class="nav-item active" onclick
+<div class="overlay" id="io-panel" onclick="if(event.target===this) closeIO()">
+  <div class="modal" style="max-width:350px; padding:20px; border-radius:20px;">
+    <h3 style="margin-bottom:15px;">Veri Yönetimi</h3>
+    <button class="add-task-btn" style="width:100%; margin-bottom:10px;" onclick="exportData()">Dışa Aktar (JSON)</button>
+    <button class="add-task-btn" style="width:100%; background:var(--surface2); color:var(--text);" onclick="document.getElementById('import-file').click()">İçe Aktar</button>
+    <input type="file" id="import-file" class="hidden" onchange="importData(event)">
+  </div>
+</div>
+
+<script>
+let DATA = {}, RECURRING = [], theme = 'light';
+let GLOBAL_BOOKS = [], GLOBAL_MOVIES = [], GLOBAL_RULES = "", WEEKLY_NOTES = {};
+let currentWeekStart = null, selectedDateKey = null;
+
+const MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const DAYS = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+
+// UTILS
+const dKey = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parseK = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+const getMon = d => { const c = new Date(d); const day = c.getDay(); c.setDate(c.getDate() + (day === 0 ? -6 : 1 - day)); return c; };
+const uid = () => Math.random().toString(36).slice(2,10);
+
+// PERSISTENCE
+function save() {
+  localStorage.setItem('ajanda_master', JSON.stringify({
+    DATA, RECURRING, theme, GLOBAL_BOOKS, GLOBAL_MOVIES, GLOBAL_RULES, WEEKLY_NOTES
+  }));
+}
+function load() {
+  const master = JSON.parse(localStorage.getItem('ajanda_master') || '{}');
+  DATA = master.DATA || {};
+  RECURRING = master.RECURRING || [];
+  theme = master.theme || 'light';
+  GLOBAL_BOOKS = master.GLOBAL_BOOKS || [];
+  GLOBAL_MOVIES = master.GLOBAL_MOVIES || [];
+  GLOBAL_RULES = master.GLOBAL_RULES || "";
+  WEEKLY_NOTES = master.WEEKLY_NOTES || {};
+}
+
+// MAIN TABS
+function switchMainTab(t) {
+  document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.mainTab === t));
+  document.querySelectorAll('.main-tab-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + t));
+  if(t === 'library') renderGlobalBooks();
+  if(t === 'dvds') renderGlobalMovies();
+  if(t === 'rules') document.getElementById('rules-editor').innerHTML = GLOBAL_RULES;
+}
+
+// WEEK LOGIC
+function renderWeek() {
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+  const weekKey = dKey(currentWeekStart);
+  document.getElementById('week-label').textContent = `${currentWeekStart.getDate()} ${MONTHS[currentWeekStart.getMonth()]} ${currentWeekStart.getFullYear()}`;
+  document.getElementById('weekly-note').value = WEEKLY_NOTES[weekKey] || "";
+
+  let highTasks = [];
+  let sportDays = 0;
+
+  for(let i=0; i<7; i++) {
+    const d = new Date(currentWeekStart);
+    d.setDate(d.getDate() + i);
+    const k = dKey(d);
+    const dayData = DATA[k] || {tasks:[], sports:[]};
+
+    if(dayData.tasks) dayData.tasks.filter(t => t.prio === 'high' && !t.done).forEach(t => highTasks.push(t.text));
+    if(dayData.sports && dayData.sports.length > 0) sportDays++;
+
+    const card = document.createElement('div');
+    card.className = `day-card ${k === dKey(new Date()) ? 'today' : ''}`;
+    card.onclick = () => openModal(k);
+    card.innerHTML = `
+      <div class="day-header">
+        <span style="font-size:11px; font-weight:700; color:var(--text3);">${DAYS[i]}</span>
+        <div class="day-num">${d.getDate()}</div>
+      </div>
+      <div class="day-body">
+        ${(dayData.tasks || []).slice(0,3).map(t => `<div style="font-size:12px; margin-bottom:4px; color:${t.done?'var(--text3)':'inherit'}; ${t.done?'text-decoration:line-through':''}">• ${t.text}</div>`).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+
+  // Banners
+  const row = document.getElementById('banners-row');
+  const hb = document.getElementById('high-banner');
+  const sb = document.getElementById('sports-banner');
+  
+  if(highTasks.length > 0) {
+    hb.classList.remove('hidden');
+    document.getElementById('banner-list').textContent = highTasks.join(' • ');
+  } else hb.classList.add('hidden');
+
+  if(sportDays > 0) {
+    sb.classList.remove('hidden');
+    document.getElementById('sports-banner-text').textContent = `Bu hafta ${sportDays} gün hareket ettin!`;
+  } else sb.classList.add('hidden');
+
+  row.style.display = (highTasks.length || sportDays) ? 'flex' : 'none';
+}
+
+function shiftWeek(n) { currentWeekStart.setDate(currentWeekStart.getDate() + (n*7)); renderWeek(); }
+function goToday() { currentWeekStart = getMon(new Date()); renderWeek(); }
+
+// MODAL LOGIC
+function openModal(k) {
+  selectedDateKey = k;
+  const d = parseK(k);
+  document.getElementById('modal-date').textContent = `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('note-area').value = DATA[k]?.note || "";
+  renderTasks();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() {
+  if(selectedDateKey) {
+    if(!DATA[selectedDateKey]) DATA[selectedDateKey] = {};
+    DATA[selectedDateKey].note = document.getElementById('note-area').value;
+    save();
+  }
+  document.getElementById('overlay').classList.remove('open');
+  renderWeek();
+}
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = (DATA[selectedDateKey]?.tasks || []).map(t => `
+    <li style="display:flex; align-items:center; gap:10px; background:var(--surface2); padding:8px; border-radius:8px;">
+      <input type="checkbox" ${t.done?'checked':''} onclick="toggleTask('${t.id}')">
+      <span style="flex:1; font-size:13px; ${t.done?'text-decoration:line-through; color:var(--text3)':''}">${t.text}</span>
+      <button onclick="deleteTask('${t.id}')" style="background:none; border:none; cursor:pointer;">✕</button>
+    </li>
+  `).join('');
+}
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  if(!input.value) return;
+  if(!DATA[selectedDateKey]) DATA[selectedDateKey] = {tasks:[]};
+  if(!DATA[selectedDateKey].tasks) DATA[selectedDateKey].tasks = [];
+  DATA[selectedDateKey].tasks.push({ id:uid(), text: input.value, prio: document.getElementById('prio-select').value, done:false });
+  input.value = ''; save(); renderTasks();
+}
+function toggleTask(id) {
+  const t = DATA[selectedDateKey].tasks.find(x => x.id === id);
+  if(t) t.done = !t.done;
+  save(); renderTasks();
+}
+function deleteTask(id) {
+  DATA[selectedDateKey].tasks = DATA[selectedDateKey].tasks.filter(x => x.id !== id);
+  save(); renderTasks();
+}
+
+// GLOBAL FEATURES
+function renderGlobalBooks() {
+  const g = document.getElementById('global-books-grid');
+  g.innerHTML = GLOBAL_BOOKS.map(b => `
+    <div class="media-card">
+      <img src="${b.img || 'https://via.placeholder.com/150'}" class="media-img">
+      <div class="media-content">
+        <div class="media-title">${b.title}</div>
+        <div class="media-desc">${b.desc}</div>
+        <div style="margin-top:8px; color:var(--mid); font-size:12px;">${'⭐'.repeat(b.rating)}</div>
+        <button onclick="deleteGlobalBook('${b.id}')" style="margin-top:10px; border:none; background:none; color:var(--high); cursor:pointer; font-size:11px;">Kaldır</button>
+      </div>
+    </div>
+  `).join('');
+}
+function addGlobalBook() {
+  const title = document.getElementById('lib-title').value;
+  if(!title) return;
+  GLOBAL_BOOKS.push({
+    id: uid(), title, 
+    desc: document.getElementById('lib-desc').value,
+    img: document.getElementById('lib-img').value,
+    rating: document.getElementById('lib-rating').value
+  });
+  save(); renderGlobalBooks();
+}
+function deleteGlobalBook(id) { GLOBAL_BOOKS = GLOBAL_BOOKS.filter(x => x.id !== id); save(); renderGlobalBooks(); }
+
+function saveRules() { GLOBAL_RULES = document.getElementById('rules-editor').innerHTML; save(); }
+function saveWeeklyNote() { WEEKLY_NOTES[dKey(currentWeekStart)] = document.getElementById('weekly-note').value; save(); }
+
+// THEME & IO
+function toggleTheme() { theme = theme === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', theme); save(); }
+function openIO() { document.getElementById('io-panel').classList.add('open'); }
+function closeIO() { document.getElementById('io-panel').classList.remove('open'); }
+function exportData() {
+  const blob = new Blob([localStorage.getItem('ajanda_master')], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'ajanda_yedek.json'; a.click();
+}
+function importData(e) {
+  const reader = new FileReader();
+  reader.onload = ev => { localStorage.setItem('ajanda_master', ev.target.result); location.reload(); };
+  reader.readAsText(e.target.files[0]);
+}
+
+// INIT
+load();
+document.documentElement.setAttribute('data-theme', theme);
+currentWeekStart = getMon(new Date());
+renderWeek();
+</script>
+</body>
+</html>
