@@ -105,7 +105,7 @@
   }
   .icon-btn:hover { background: var(--surface2); color: var(--text); }
 
-  /* ── MAIN TABS (NEW) ── */
+  /* ── MAIN TABS ── */
   .main-tabs-container {
     display: flex;
     gap: 8px;
@@ -127,7 +127,7 @@
   .main-tab-pane { display: none; }
   .main-tab-pane.active { display: block; animation: fadeIn 0.2s; }
 
-  /* ── CARDS (LIBRARY & DVDS) ── */
+  /* ── CARDS (RAF & DVDS) ── */
   .media-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -151,7 +151,7 @@
   .media-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
   .media-rating { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
 
-  /* ── RICH TEXT EDITOR (RULES) ── */
+  /* ── RICH TEXT EDITOR (KURAL) ── */
   .rte-toolbar {
     display: flex; gap: 6px; background: var(--surface2);
     padding: 8px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
@@ -167,12 +167,18 @@
   .rte-editor {
     min-height: 400px; background: var(--surface); color: var(--text);
     border: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-    padding: 16px; font-size: 15px; line-height: 1.6; outline: none;
+    padding: 16px; font-size: 15px; outline: none;
     overflow-y: auto;
+    
+    /* Defter Çizgisi Görüntüsü */
+    line-height: 28px;
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, var(--border) 27px, var(--border) 28px);
+    background-attachment: local;
+    background-position: 0 12px;
   }
-  .rte-editor h3 { margin-bottom: 10px; margin-top: 16px; color: var(--text); }
+  .rte-editor h3 { margin-bottom: 10px; margin-top: 16px; color: var(--text); line-height: 28px; }
   .rte-editor h3:first-child { margin-top: 0; }
-  .rte-editor ul { padding-left: 20px; margin-bottom: 10px; }
+  .rte-editor ul { padding-left: 20px; margin-bottom: 10px; line-height: 28px; }
 
   /* ── BANNERS ROW ── */
   .banners-row { display: none; gap: 8px; padding: 14px 16px 0; flex-wrap: wrap; }
@@ -288,7 +294,7 @@
   .task-del { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 15px; padding: 0 2px; transition: color 0.15s; }
   .task-del:hover { color: var(--high); }
 
-  /* ── MINI CALENDAR & IO & STATS ── (Sıkıştırılmış halde korunmuştur) */
+  /* ── MINI CALENDAR & IO & STATS ── */
   .mini-cal { position: fixed; inset: 0; z-index: 300; background: var(--modal-bg); display: none; align-items: center; justify-content: center; }
   .mini-cal.open { display: flex; }
   .mini-cal-box { background: var(--surface); border-radius: var(--radius); padding: 20px; width: 320px; box-shadow: var(--shadow-lg); animation: scaleIn 0.2s cubic-bezier(.4,0,.2,1); }
@@ -399,9 +405,9 @@
 
 <div class="main-tabs-container">
   <button class="main-tab active" data-main-tab="week" onclick="switchMainTab('week')">Haftalık Görünüm</button>
-  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">Kitaplık</button>
-  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">DVD'ler</button>
-  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">Kurallar</button>
+  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">Raf</button>
+  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">Dvd</button>
+  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">Kural</button>
 </div>
 
 <div id="pane-week" class="main-tab-pane active">
@@ -717,10 +723,48 @@ function switchMainTab(tabId) {
   if(tabId === 'rules') document.getElementById('rules-editor').innerHTML = GLOBAL_RULES;
 }
 
-// ── KİTAPLIK VE DVDLER FONKSİYONLARI ──
+// ── RAF VE DVDLER FONKSİYONLARI ──
 function renderGlobalBooks() {
   const grid = document.getElementById('global-books-grid');
-  grid.innerHTML = GLOBAL_BOOKS.map(b => `
+  let html = '';
+
+  // 1. Günlük olarak eklenen kitapları dinamik çek
+  const activeBooks = {};
+  Object.keys(DATA).sort().forEach(key => {
+    if(DATA[key].books) {
+      DATA[key].books.forEach(b => {
+        if (!activeBooks[b.name] || b.current > activeBooks[b.name].current) {
+          activeBooks[b.name] = b;
+        }
+      });
+    }
+  });
+
+  // Önce günlük okumaları (farklı stilde) ekle
+  Object.values(activeBooks).forEach(b => {
+    const pct = Math.min(100, Math.round((b.current / b.total) * 100));
+    html += `
+      <div class="media-card" style="border-color: var(--accent); background: var(--surface2);">
+        <div style="height: 120px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text); padding: 16px; text-align: center;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.5;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <div style="font-size: 11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Günlük İlerleme</div>
+        </div>
+        <div class="media-content">
+          <div class="media-title">${escHtml(b.name)}</div>
+          <div class="media-desc" style="margin-bottom:14px;">Sayfa: ${b.current} / ${b.total}</div>
+          <div class="media-footer" style="flex-direction:column; align-items:stretch;">
+            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; font-weight:600;"><span>%${pct}</span></div>
+            <div class="stats-bar-wrap" style="height:4px; background:var(--border); width:100%; margin:0;">
+              <div class="stats-bar" style="width:${pct}%; background:var(--accent);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // 2. Global (Sabit) Kitapları ekle
+  html += GLOBAL_BOOKS.map(b => `
     <div class="media-card">
       ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
       <div class="media-content">
@@ -733,7 +777,10 @@ function renderGlobalBooks() {
       </div>
     </div>
   `).join('');
+
+  grid.innerHTML = html;
 }
+
 function addGlobalBook() {
   const title = document.getElementById('lib-title').value.trim();
   const desc = document.getElementById('lib-desc').value.trim();
