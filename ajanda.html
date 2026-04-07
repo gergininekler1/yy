@@ -2,18 +2,17 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Dijital Ajanda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobil Ajanda</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --sidebar-color: #ffffff;
+            --bg-color: #f1f5f9;
             --accent-color: #6366f1;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --card-bg: #ffffff;
-            --border-color: #e2e8f0;
+            --safe-area-bottom: 70px;
         }
 
         * {
@@ -21,228 +20,243 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
+            padding-bottom: var(--safe-area-bottom); /* Navigasyon için boşluk */
         }
 
-        /* Sidebar Tasarımı */
-        aside {
-            width: 260px;
-            background-color: var(--sidebar-color);
-            border-right: 1px solid var(--border-color);
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            color: var(--accent-color);
-        }
-
-        nav ul {
-            list-style: none;
-        }
-
-        nav li {
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--text-muted);
-        }
-
-        nav li:hover, nav li.active {
-            background-color: #f1f5f9;
-            color: var(--accent-color);
-        }
-
-        /* Ana İçerik Alanı */
-        main {
-            flex: 1;
-            padding: 2.5rem;
-            overflow-y: auto;
-        }
-
+        /* Üst Bilgi Alanı */
         header {
+            background: var(--card-bg);
+            padding: 20px;
+            padding-top: 40px;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
         }
 
         .date-display h1 {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 600;
         }
 
         .date-display p {
+            font-size: 0.85rem;
             color: var(--text-muted);
         }
 
-        /* Grid Düzeni */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+        .add-btn-circle {
+            background: var(--accent-color);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
         }
 
+        /* İçerik Konteyneri */
+        main {
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 20px 0 12px 4px;
+            color: var(--text-main);
+        }
+
+        /* Kart Yapısı */
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .card h3 {
-            margin-bottom: 1.2rem;
-            font-size: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         /* Görev Listesi */
         .task-item {
             display: flex;
             align-items: center;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .task-item:last-child {
-            border-bottom: none;
-        }
+        .task-item:last-child { border-bottom: none; }
 
         input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             margin-right: 12px;
             accent-color: var(--accent-color);
-            cursor: pointer;
         }
 
         .task-text {
             flex: 1;
+            font-size: 0.95rem;
         }
 
         .tag {
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-            background: #e0e7ff;
-            color: #4338ca;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: var(--text-muted);
         }
 
-        /* Notlar ve Takvim */
+        /* Notlar Alanı */
         textarea {
             width: 100%;
-            height: 150px;
+            height: 120px;
             border: none;
             resize: none;
             outline: none;
-            font-size: 0.95rem;
-            color: var(--text-main);
-            line-height: 1.6;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            background: transparent;
         }
 
-        .calendar-mini {
-            text-align: center;
+        /* Mobil Alt Menü (Bottom Nav) */
+        nav.bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #e2e8f0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.65rem;
             color: var(--text-muted);
-            padding: 1rem;
-            border: 1px dashed var(--border-color);
-            border-radius: 12px;
+            text-decoration: none;
         }
 
-        button.add-btn {
+        .nav-item.active {
+            color: var(--accent-color);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        /* Basit bir takvim önizlemesi */
+        .mini-cal {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .cal-day {
+            flex: 1;
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .cal-day.today {
             background: var(--accent-color);
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
 
-    <aside>
-        <div class="logo">Plan.io</div>
-        <nav>
-            <ul>
-                <li class="active">Günlük Plan</li>
-                <li>Haftalık Görünüm</li>
-                <li>Projeler</li>
-                <li>Arşiv</li>
-                <li>Ayarlar</li>
-            </ul>
-        </nav>
-    </aside>
+    <header>
+        <div class="header-top">
+            <div class="date-display">
+                <p id="today-name">Salı</p>
+                <h1 id="current-date">7 Nisan 2026</h1>
+            </div>
+            <button class="add-btn-circle">+</button>
+        </div>
+    </header>
 
     <main>
-        <header>
-            <div class="date-display">
-                <h1 id="current-date">7 Nisan 2026</h1>
-                <p>Bugün için harika bir gün!</p>
+        <div class="card">
+            <div class="mini-cal">
+                <div class="cal-day"><small>Pzt</small><div>6</div></div>
+                <div class="cal-day today"><small>Sal</small><div>7</div></div>
+                <div class="cal-day"><small>Çar</small><div>8</div></div>
+                <div class="cal-day"><small>Per</small><div>9</div></div>
+                <div class="cal-day"><small>Cum</small><div>10</div></div>
             </div>
-            <button class="add-btn">+ Yeni Görev</button>
-        </header>
+        </div>
 
-        <div class="dashboard-grid">
-            <section class="card">
-                <h3>Bugünkü Görevler <span>(3)</span></h3>
-                <div class="task-list">
-                    <div class="task-item">
-                        <input type="checkbox">
-                        <span class="task-text">Proje taslağını gözden geçir</span>
-                        <span class="tag">İş</span>
-                    </div>
-                    <div class="task-item">
-                        <input type="checkbox" checked>
-                        <span class="task-text" style="text-decoration: line-through; color: #94a3b8;">Sabah yürüyüşü</span>
-                        <span class="tag" style="background:#dcfce7; color:#166534;">Sağlık</span>
-                    </div>
-                    <div class="task-item">
-                        <input type="checkbox">
-                        <span class="task-text">Market alışverişi listesi hazırla</span>
-                        <span class="tag" style="background:#fef3c7; color:#92400e;">Kişisel</span>
-                    </div>
-                </div>
-            </section>
-
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                <section class="card">
-                    <h3>Hızlı Notlar</h3>
-                    <textarea placeholder="Buraya yazmaya başla..."></textarea>
-                </section>
-
-                <section class="card">
-                    <h3>Nisan 2026</h3>
-                    <div class="calendar-mini">
-                        <p>Küçük Takvim Görünümü</p>
-                        <small>Gelecek etkinlik: Tasarım Toplantısı (Yarın)</small>
-                    </div>
-                </section>
+        <h2 class="section-title">Bugünkü Görevler</h2>
+        <div class="card">
+            <div class="task-item">
+                <input type="checkbox">
+                <span class="task-text">E-postaları yanıtla</span>
+                <span class="tag">İş</span>
             </div>
+            <div class="task-item">
+                <input type="checkbox" checked>
+                <span class="task-text" style="text-decoration: line-through; color: gray;">Egzersiz yap</span>
+                <span class="tag">Kişisel</span>
+            </div>
+            <div class="task-item">
+                <input type="checkbox">
+                <span class="task-text">Kitap oku (20 sayfa)</span>
+                <span class="tag">Gelişim</span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Hızlı Notlar</h2>
+        <div class="card">
+            <textarea placeholder="Fikirlerini buraya not et..."></textarea>
         </div>
     </main>
 
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">📅</span>
+            <span>Günüm</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Analiz</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📁</span>
+            <span>Dosyalar</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Ayarlar</span>
+        </a>
+    </nav>
+
     <script>
-        // Basit tarih güncelleme
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const today  = new Date();
-        document.getElementById('current-date').innerText = today.toLocaleDateString('tr-TR', options);
+        // Otomatik Tarih Güncelleme
+        const today = new Date();
+        const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+        const dayOptions = { weekday: 'long' };
+        
+        document.getElementById('current-date').innerText = today.toLocaleDateString('tr-TR', dateOptions);
+        document.getElementById('today-name').innerText = today.toLocaleDateString('tr-TR', dayOptions);
     </script>
 </body>
 </html>
