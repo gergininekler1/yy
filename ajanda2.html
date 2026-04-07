@@ -550,7 +550,8 @@
 </div>
 
 <div id="sports-banner" style="display:none; margin: 16px 16px 0; padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border-left: 4px solid var(--low); box-shadow: 0 4px 20px rgba(0,0,0,0.04); align-items:center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--text);">
-  <span style="font-size:18px;">💪</span> <span id="sports-banner-text"></span>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="color:var(--low); flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span id="sports-banner-text"></span>
 </div>
 
 <div class="week-grid" id="week-grid"></div>
@@ -646,6 +647,7 @@
       </div>
 
       <div id="tab-raf" class="hidden">
+        <div id="active-books-container"></div>
         <div class="section-label">Kitaplar</div>
         <div class="task-input-row">
           <input class="task-input" id="book-name" placeholder="Kitap Adı" style="flex:2;">
@@ -784,7 +786,6 @@ function getTasksForDay(key) {
   const injected = RECURRING
     .filter(r => recurringMatchesDay(r, d))
     .filter(r => !own.find(t => t.recurId === r.id))
-    // HATA ÇÖZÜMÜ: v- öneki ile sanal id sabitledik, böylece tıklandığında kolayca bulunabilir.
     .map(r => ({ id: 'v-' + r.id, text: r.text, prio: r.prio, done: false, recur: r.recur, recurId: r.id, _virtual: true }));
   return [...own, ...injected];
 }
@@ -886,8 +887,10 @@ function renderWeek() {
     const tasks = getTasksForDay(k);
     const note = DATA[k]?.note || '';
     
-    // Spor ve Raf verilerini topla
-    if (DATA[k] && DATA[k].sports && DATA[k].sports.length > 0) daysActive++;
+    const hasSports = DATA[k] && DATA[k].sports && DATA[k].sports.length > 0;
+    const hasRaf = DATA[k] && ((DATA[k].books && DATA[k].books.length > 0) || (DATA[k].movies && DATA[k].movies.length > 0));
+
+    if (hasSports) daysActive++;
     if (DATA[k] && DATA[k].books) {
       DATA[k].books.forEach(b => {
         if (!booksMap[b.name] || b.current > booksMap[b.name].current) {
@@ -902,6 +905,10 @@ function renderWeek() {
     const hasNote = note.trim().length > 0;
 
     let indHTML = '';
+    
+    if (hasRaf) indHTML += `<div style="color:var(--text3); margin-right:2px; display:flex; align-items:center;" title="Raf (Kitap/Film)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>`;
+    if (hasSports) indHTML += `<div style="color:var(--text3); margin-right:4px; display:flex; align-items:center;" title="Spor/Hareket"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+
     if (highCount) indHTML += `<div class="dot dot-high" title="${highCount} yüksek"></div>`;
     if (midCount) indHTML += `<div class="dot dot-mid"></div>`;
     if (lowCount) indHTML += `<div class="dot dot-low"></div>`;
@@ -1139,7 +1146,6 @@ function renderTasks() {
 function taskHTML(task) {
   const prioLabel = task.prio === 'high' ? 'Yüksek' : task.prio === 'mid' ? 'Orta' : 'Düşük';
   const prioClass = 'prio-' + task.prio;
-  // HATA ÇÖZÜMÜ: task._virtual değerini kesinleştirerek fonksiyona gönderiyoruz.
   return `
     <li class="task-item${task.done?' done':''}" id="ti-${task.id}">
       <div class="task-check" onclick="toggleTask('${task.id}', ${task._virtual === true})"></div>
@@ -1184,6 +1190,46 @@ function renderRaf() {
   const books = d.books || [];
   const movies = d.movies || [];
   
+  // Devam Eden Kitaplar Listesini Oluştur
+  let activeBooksHTML = '';
+  const activeBooks = {};
+  
+  Object.keys(DATA).sort().forEach(key => {
+    if(DATA[key].books) {
+      DATA[key].books.forEach(b => {
+        if (!activeBooks[b.name] || b.current > activeBooks[b.name].current) {
+          activeBooks[b.name] = { ...b, lastDate: key };
+        }
+      });
+    }
+  });
+
+  let hasActive = false;
+  let activeList = '';
+  Object.values(activeBooks).forEach(b => {
+    if (b.current < b.total) {
+      const alreadyToday = books.find(tb => tb.name === b.name);
+      if (!alreadyToday) {
+        hasActive = true;
+        const safeName = escHtml(b.name).replace(/'/g, "\\'");
+        activeList += `
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; background:var(--surface2); padding:8px 10px; border-radius:var(--radius-sm); border: 1px solid var(--border);">
+              <div style="flex:1; font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                <strong>${escHtml(b.name)}</strong> <span style="color:var(--text3)">(${b.current}/${b.total})</span>
+              </div>
+              <input type="number" id="quick-book-${b.id}" placeholder="Yeni Sayfa" style="width:75px; border:1px solid var(--border); border-radius:4px; padding:6px 4px; font-size:11px; outline:none; background:var(--surface);">
+              <button onclick="updateActiveBook('${safeName}', '${b.id}', ${b.total})" style="background:var(--accent); color:var(--today-text); border:none; border-radius:4px; padding:6px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:opacity 0.15s;">Güncelle</button>
+          </div>`;
+      }
+    }
+  });
+
+  if (hasActive) {
+    activeBooksHTML = `<div class="section-label" style="margin-top:0;">Okumaya Devam Et</div>${activeList}<div class="sep"></div>`;
+  }
+  document.getElementById('active-books-container').innerHTML = activeBooksHTML;
+
+  // Standart Liste
   document.getElementById('book-list').innerHTML = books.map(b => `
     <li class="task-item">
       <span class="task-text">${escHtml(b.name)} <span style="color:var(--text3);font-size:11px;font-weight:600;">(${b.current}/${b.total})</span></span>
@@ -1196,6 +1242,17 @@ function renderRaf() {
       <button class="task-del" onclick="deleteMovie('${m.id}')">✕</button>
     </li>`).join('');
 }
+
+function updateActiveBook(name, id, total) {
+  const input = document.getElementById('quick-book-' + id);
+  if (!input) return;
+  const current = parseInt(input.value);
+  if (isNaN(current) || current <= 0) return;
+  ensureData();
+  DATA[selectedDateKey].books.push({ id: uid(), name, current, total });
+  save(); renderRaf(); renderWeek();
+}
+
 function addBook() {
   const name = document.getElementById('book-name').value.trim();
   const current = parseInt(document.getElementById('book-current').value);
