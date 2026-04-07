@@ -1,1516 +1,246 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="light">
+<html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ajanda</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #f5f5f5;
-    --surface: #ffffff;
-    --surface2: #f0f0f0;
-    --border: #e0e0e0;
-    --text: #111111;
-    --text2: #666666;
-    --text3: #999999;
-    --accent: #111111;
-    --accent-soft: #f0f0f0;
-    --high: #ff3b30;
-    --high-bg: #fff0ef;
-    --mid: #ff9500;
-    --mid-bg: #fff8ed;
-    --low: #34c759;
-    --low-bg: #edfff2;
-    --today: #111111;
-    --today-text: #ffffff;
-    --modal-bg: rgba(0,0,0,0.4);
-    --shadow: 0 2px 16px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
-    --radius: 14px;
-    --radius-sm: 8px;
-    --shelf-color: #dcdcdc; /* Raf için temel renk */
-  }
-  [data-theme="dark"] {
-    --bg: #0e0e0e;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: #2e2e2e;
-    --text: #f0f0f0;
-    --text2: #aaaaaa;
-    --text3: #666666;
-    --accent: #f0f0f0;
-    --accent-soft: #2a2a2a;
-    --high: #ff453a;
-    --high-bg: #2a1010;
-    --mid: #ff9f0a;
-    --mid-bg: #2a1f00;
-    --low: #30d158;
-    --low-bg: #0a2a12;
-    --today: #f0f0f0;
-    --today-text: #111111;
-    --modal-bg: rgba(0,0,0,0.7);
-    --shadow: 0 2px 16px rgba(0,0,0,0.4);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
-    --shelf-color: #333333;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Instrument Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    transition: background 0.3s, color 0.3s;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Arayüz Güncellemesi</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --accent-color: #000000;
+            --hover-bg: #f5f5f5;
+        }
 
-  /* --- YANIP SÖNEN UYARI İKONU EFEKTİ --- */
-  @keyframes blinkWarning {
-    0% { opacity: 1; }
-    50% { opacity: 0.2; }
-    100% { opacity: 1; }
-  }
-  .blink-icon {
-    display: inline-block;
-    animation: blinkWarning 1.2s infinite;
-  }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-  /* ── TOP BAR ── */
-  .topbar {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 20px;
-    height: 56px;
-    display: flex; align-items: center; gap: 12px;
-    box-shadow: var(--shadow);
-  }
-  .topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-  .topbar-right { display: flex; align-items: center; gap: 6px; }
-  .week-nav { display: flex; align-items: center; gap: 6px; }
-  .week-nav button {
-    background: none; border: none; cursor: pointer;
-    width: 30px; height: 30px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text2); font-size: 16px;
-    transition: background 0.15s;
-  }
-  .week-nav button:hover { background: var(--surface2); }
-  .week-label {
-    font-size: 15px; font-weight: 600; color: var(--text);
-    cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm);
-    transition: background 0.15s;
-  }
-  .week-label:hover { background: var(--surface2); }
-  .today-btn {
-    font-size: 12px; font-weight: 500;
-    background: var(--accent-soft); border: none; cursor: pointer;
-    color: var(--text); padding: 5px 10px; border-radius: 20px;
-    font-family: 'Instrument Sans', sans-serif;
-    transition: background 0.15s;
-  }
-  .today-btn:hover { background: var(--border); }
-  .icon-btn {
-    background: none; border: none; cursor: pointer;
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text2); font-size: 18px;
-    transition: background 0.15s, color 0.15s;
-  }
-  .icon-btn:hover { background: var(--surface2); color: var(--text); }
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
 
-  /* ── MAIN TABS ── */
-  .main-tabs-container {
-    display: flex;
-    gap: 8px;
-    padding: 12px 20px 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    overflow-x: auto;
-  }
-  .main-tabs-container::-webkit-scrollbar { display: none; }
-  .main-tab {
-    background: none; border: none; cursor: pointer; flex-shrink: 0;
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 14px; font-weight: 600;
-    color: var(--text3); padding: 10px 14px;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .main-tab.active { color: var(--text); border-bottom-color: var(--accent); }
-  .main-tab-pane { display: none; }
-  .main-tab-pane.active { display: block; animation: fadeIn 0.2s; }
+        /* Raf Bölümü */
+        .shelf-section {
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-  /* ── CARDS (RAF & DVDS) ── */
-  .media-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    padding: 16px;
-  }
+        .shelf-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-  /* ── YENİ RAF GÖRÜNÜMÜ EFEKTİ ── */
-  .shelf-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Yan yana 2 kitap */
-    gap: 32px 16px; /* Alt alta boşluk arttırıldı, raf efekti için */
-    padding: 24px 16px;
-  }
-  .shelf-item-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  /* Raf çizgisini simüle eden alt kenarlık */
-  .shelf-item-wrapper::after {
-    content: "";
-    position: absolute;
-    bottom: -12px;
-    left: -8px;
-    right: -8px;
-    height: 10px;
-    background: var(--shelf-color);
-    border-radius: 4px;
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
-    z-index: 0;
-  }
-  .media-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); overflow: hidden;
-    box-shadow: var(--shadow); transition: transform 0.15s;
-    display: flex; flex-direction: column;
-    position: relative;
-    z-index: 1; /* Rafın üstünde dursun */
-    height: 100%;
-  }
-  .media-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-  
-  .media-img {
-    width: 100%; height: 200px; object-fit: cover;
-    background: var(--surface2);
-  }
-  .media-content { padding: 12px; flex: 1; display: flex; flex-direction: column; }
-  .media-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
-  .media-desc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; flex: 1; }
-  .media-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
-  .media-rating { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
-  
-  .edit-btn {
-    font-size: 10px; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 4px; padding: 4px 8px; cursor: pointer; color: var(--text);
-    font-weight: 600;
-  }
-  .edit-btn:hover { background: var(--border); }
+        /* Minimal Buton Tasarımı */
+        .btn-minimal {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
 
-  /* ── RICH TEXT EDITOR (KURAL) ── */
-  .rte-toolbar {
-    display: flex; gap: 6px; background: var(--surface2);
-    padding: 8px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    border: 1px solid var(--border); border-bottom: none;
-    flex-wrap: wrap;
-  }
-  .rte-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); border-radius: 4px; padding: 6px 10px;
-    font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s;
-  }
-  .rte-btn:hover { background: var(--border); }
-  .rte-editor {
-    min-height: 400px; background: var(--surface); color: var(--text);
-    border: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-    padding: 16px; font-size: 15px; outline: none;
-    overflow-y: auto;
-    
-    line-height: 28px;
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, var(--border) 27px, var(--border) 28px);
-    background-attachment: local;
-    background-position: 0 12px;
-  }
-  .rte-editor h3 { margin-bottom: 10px; margin-top: 16px; color: var(--text); line-height: 28px; }
-  .rte-editor h3:first-child { margin-top: 0; }
-  .rte-editor ul { padding-left: 20px; margin-bottom: 10px; line-height: 28px; }
+        .btn-minimal:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
 
-  /* ── BANNERS ROW ── */
-  .banners-row { display: none; gap: 8px; padding: 14px 16px 0; flex-wrap: wrap; }
-  #high-banner {
-    flex: 1; min-width: 0; background: var(--surface);
-    border: 1px solid rgba(255,59,48,0.25); border-radius: 50px;
-    padding: 10px 16px; display: none; align-items: center; gap: 10px;
-    box-shadow: 0 2px 12px rgba(255,59,48,0.08); transition: box-shadow 0.2s;
-  }
-  #high-banner.show { display: flex; }
-  #high-banner .banner-icon { font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 24px;}
-  #high-banner .banner-content { flex: 1; min-width: 0; }
-  #high-banner .banner-title { font-size: 10px; font-weight: 700; color: var(--high); margin-bottom: 2px; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.8; }
-  #high-banner .banner-list { list-style: none; }
-  #high-banner .banner-list li {
-    font-size: 12px; font-weight: 500; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    display: flex; align-items: center; gap: 5px;
-  }
-  #high-banner .banner-list li::before { content: ""; display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--high); flex-shrink: 0; }
-  #high-banner .banner-count { font-size: 10px; color: var(--high); font-weight: 700; background: var(--high-bg); border-radius: 20px; padding: 2px 7px; flex-shrink: 0; white-space: nowrap; }
+        .btn-minimal.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
 
-  #sports-banner {
-    flex: 1; min-width: 0; background: var(--surface);
-    border: 1px solid rgba(52,199,89,0.25); border-radius: 50px;
-    padding: 10px 16px; display: none; align-items: center; gap: 10px;
-    box-shadow: 0 2px 12px rgba(52,199,89,0.08); transition: box-shadow 0.2s;
-  }
+        /* Kurallar Bölümü */
+        .rules-section {
+            width: 100%;
+        }
 
-  /* ── WEEK GRID ── */
-  .week-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 16px 24px; }
-  .day-card {
-    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
-    overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
-    min-height: 130px; display: flex; flex-direction: column;
-  }
-  .day-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-  .day-card.today { border-color: var(--today); border-width: 2px; }
-  .day-card.drag-over { border-color: var(--accent); background: var(--surface2); }
-  
-  .day-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 6px; border-bottom: 1px solid var(--border); }
-  .day-name-num { display: flex; align-items: baseline; gap: 5px; }
-  .day-name { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
-  .day-num { font-size: 18px; font-weight: 700; color: var(--text); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-  .today .day-num { background: var(--today); color: var(--today-text); }
-  .day-indicators { display: flex; gap: 3px; align-items: center; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; }
-  .dot-high { background: var(--high); }
-  .dot-mid { background: var(--mid); }
-  .dot-low { background: var(--low); }
-  .dot-note { background: var(--text3); }
-  
-  .day-body {
-    padding: 0 10px; flex: 1; overflow: hidden;
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--border) 21px, var(--border) 22px);
-    background-position: 0 8px; min-height: 90px;
-  }
-  .day-body-inner { padding: 8px 0 6px; }
-  .day-preview-item { font-size: 11px; color: var(--text2); line-height: 22px; height: 22px; display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 4px; transition: background 0.15s; }
-  .day-preview-item[draggable="true"] { cursor: grab; }
-  .day-preview-item[draggable="true"]:active { cursor: grabbing; background: var(--surface2); }
-  .day-preview-item .pi-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-  .day-preview-more { font-size: 10px; color: var(--text3); line-height: 22px; height: 22px; display:flex; align-items:center; }
-  .day-empty { font-size: 11px; color: var(--text3); font-style: italic; line-height: 22px; height: 22px; display:flex; align-items:center; }
+        .rules-header {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background: #fafafa;
+        }
 
-  /* ── MODALS ── */
-  .overlay { position: fixed; inset: 0; z-index: 200; background: var(--modal-bg); display: none; align-items: flex-end; animation: fadeIn 0.2s; }
-  .overlay.open { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; width: 100%; max-height: 92vh; display: flex; flex-direction: column; animation: slideUp 0.25s cubic-bezier(.4,0,.2,1); box-shadow: var(--shadow-lg); }
-  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; }
-  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; border-bottom: 1px solid var(--border); }
-  .modal-date { font-size: 17px; font-weight: 700; }
-  .modal-close { background: var(--surface2); border: none; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); }
-  .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 18px; gap: 0; overflow-x: auto; }
-  .modal-tabs::-webkit-scrollbar { display: none; }
-  .modal-tab { background: none; border: none; cursor: pointer; flex-shrink: 0; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text3); padding: 10px 14px; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 5px; }
-  .modal-tab.active { color: var(--text); border-bottom-color: var(--accent); }
-  .modal-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+        .rules-input-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-  /* ── NOTES & TASKS TAB ── */
-  .note-wrapper { position: relative; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
-  .note-wrapper:focus-within { border-color: var(--accent); }
-  .note-lines { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, var(--border) 27px, var(--border) 28px); background-position: 0 12px; }
-  .note-tools { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 5; }
-  .note-tool-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); cursor: pointer; border-radius: var(--radius-sm); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-  .note-tool-btn:hover { background: var(--surface2); color: var(--text); }
-  .note-area { width: 100%; min-height: 240px; border: none; border-radius: var(--radius-sm); padding: 12px 14px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: var(--text); background: transparent; resize: vertical; outline: none; line-height: 28px; position: relative; z-index: 1; }
-  .note-save-btn { margin-top: 10px; width: 100%; background: var(--accent); color: var(--today-text); border: none; border-radius: var(--radius-sm); padding: 11px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
-  .note-save-btn:hover { opacity: 0.85; }
+        #newRuleText {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            outline: none;
+            font-size: 0.9rem;
+        }
 
-  .task-input-row { display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-start; flex-wrap: wrap; }
-  .task-input { flex: 1; min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-family: 'Instrument Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--surface2); outline: none; transition: border-color 0.15s; }
-  .task-input:focus { border-color: var(--accent); }
-  .prio-select, .recur-select { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 8px; background: var(--surface2); font-family: 'Instrument Sans', sans-serif; font-size: 12px; color: var(--text); outline: none; cursor: pointer; }
-  .add-task-btn { background: var(--accent); color: var(--today-text); border: none; border-radius: var(--radius-sm); padding: 9px 14px; cursor: pointer; font-size: 16px; font-weight: 700; transition: opacity 0.15s; }
-  .add-task-btn:hover { opacity: 0.8; }
-  .task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-  .task-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; transition: opacity 0.2s; }
-  .task-item.done { opacity: 0.45; }
-  .task-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s, background 0.15s; background: none; }
-  .task-item.done .task-check { background: var(--low); border-color: var(--low); }
-  .task-check::after { content: "✓"; font-size: 10px; color: white; display: none; }
-  .task-item.done .task-check::after { display: block; }
-  .task-text { flex: 1; font-size: 13px; color: var(--text); word-break: break-word; }
-  .task-item.done .task-text { text-decoration: line-through; color: var(--text3); }
-  .task-prio-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
-  .prio-high { background: var(--high-bg); color: var(--high); }
-  .prio-mid { background: var(--mid-bg); color: var(--mid); }
-  .prio-low { background: var(--low-bg); color: var(--low); }
-  .task-recur { font-size: 10px; color: var(--text3); flex-shrink: 0; }
-  .task-del { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 15px; padding: 0 2px; transition: color 0.15s; }
-  .task-del:hover { color: var(--high); }
+        /* Kurallar Listesi */
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-  /* ── MINI CALENDAR & IO & STATS ── */
-  .mini-cal { position: fixed; inset: 0; z-index: 300; background: var(--modal-bg); display: none; align-items: center; justify-content: center; }
-  .mini-cal.open { display: flex; }
-  .mini-cal-box { background: var(--surface); border-radius: var(--radius); padding: 20px; width: 320px; box-shadow: var(--shadow-lg); animation: scaleIn 0.2s cubic-bezier(.4,0,.2,1); }
-  @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .mini-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .mini-cal-title { font-size: 15px; font-weight: 700; }
-  .mini-cal-nav { display: flex; gap: 4px; }
-  .mini-cal-nav button { background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 14px; transition: background 0.15s; }
-  .mini-cal-nav button:hover { background: var(--surface2); }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .cal-dow { text-align: center; font-size: 10px; font-weight: 600; color: var(--text3); padding: 4px 0; text-transform: uppercase; }
-  .cal-day { text-align: center; font-size: 12px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: background 0.12s; }
-  .cal-day:hover { background: var(--surface2); }
-  .cal-day.today { background: var(--today); color: var(--today-text); font-weight: 700; }
-  .cal-day.in-week { background: var(--accent-soft); font-weight: 600; }
-  .cal-day.other-month { color: var(--text3); }
-  .cal-day.has-data::after { content: ""; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--high); margin: 1px auto 0; }
-  .mini-cal-close-btn { margin-top: 14px; width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px; font-family: 'Instrument Sans', sans-serif; font-size: 13px; color: var(--text); cursor: pointer; }
+        .rule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.3s ease;
+        }
 
-  .io-panel { position: fixed; inset: 0; z-index: 300; background: var(--modal-bg); display: none; align-items: flex-end; }
-  .io-panel.open { display: flex; }
-  .io-box { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 24px 20px 36px; width: 100%; box-shadow: var(--shadow-lg); animation: slideUp 0.25s cubic-bezier(.4,0,.2,1); }
-  .io-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-  .io-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); cursor: pointer; margin-bottom: 10px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: var(--text); transition: background 0.15s; }
-  .io-btn:hover { background: var(--border); }
-  .io-btn .io-icon { font-size: 20px; width: 28px; text-align: center; display:flex; align-items:center; justify-content:center; }
-  .io-btn-label { display: flex; flex-direction: column; align-items: flex-start; }
-  .io-btn-label strong { font-weight: 600; }
-  .io-btn-label span { font-size: 11px; color: var(--text3); }
-  .io-close { margin-top: 6px; }
+        .rule-content {
+            display: flex;
+            flex-direction: column;
+        }
 
-  .week-stats-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; min-height: 130px; display: flex; flex-direction: column; position: relative; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s; }
-  .week-stats-card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
-  .week-stats-card.perfect { border-color: var(--low); background: var(--low-bg); }
-  .stats-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 6px; border-bottom: 1px solid var(--border); }
-  .week-stats-card.perfect .stats-header { border-bottom-color: var(--low); }
-  .stats-title { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
-  .week-stats-card.perfect .stats-title { color: var(--low); }
-  .stats-body { flex: 1; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--border) 21px, var(--border) 22px); background-position: 0 8px; min-height: 90px; }
-  .week-stats-card.perfect .stats-body { background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, rgba(52,199,89,0.2) 21px, rgba(52,199,89,0.2) 22px); }
-  .stats-pct { font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); font-family: 'Instrument Serif', serif; }
-  .week-stats-card.perfect .stats-pct { color: var(--low); }
-  .stats-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
-  .week-stats-card.perfect .stats-sub { color: var(--low); opacity: 0.85; }
-  .stats-bar-wrap { margin-top: 8px; background: var(--surface2); border-radius: 4px; height: 5px; overflow: hidden; }
-  .stats-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.4s cubic-bezier(.4,0,.2,1); }
-  .week-stats-card.perfect .stats-bar { background: var(--low); }
-  .stats-perfect-msg { font-size: 11px; font-weight: 600; color: var(--low); display: none; margin-top: 4px; }
-  .week-stats-card.perfect .stats-perfect-msg { display: block; }
-  .stats-empty { font-size: 11px; color: var(--text3); font-style: italic; }
+        .rule-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 4px;
+        }
 
-  .day-task-status { display: flex; gap: 3px; align-items: center; padding: 0 10px 7px; flex-wrap: wrap; }
-  .ts-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .ts-dot-done { background: var(--low); position: relative; }
-  .ts-dot-active { background: transparent; border: 1.5px solid var(--text3); }
+        .rule-text {
+            font-size: 1rem;
+        }
 
-  .section-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; margin-top: 14px; }
-  .section-label:first-child { margin-top: 0; }
-  .sep { height: 1px; background: var(--border); margin: 12px 0; }
-  .hidden { display: none !important; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  .search-item { padding: 12px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
-  .search-item:hover { background: var(--surface2); }
-  .search-item:last-child { border-bottom: none; }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  @media (min-width: 600px) {
-    .week-grid { grid-template-columns: 1fr 1fr 1fr; }
-    .modal { max-width: 480px; margin: auto; border-radius: var(--radius); }
-    .overlay { align-items: center; }
-  }
-</style>
+        /* İkonlar için Genel Stil */
+        svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="topbar-left">
-    <div class="week-nav">
-      <button onclick="shiftWeek(-1)" title="Önceki hafta"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <span class="week-label" onclick="openCal()" id="week-label">—</span>
-      <button onclick="shiftWeek(1)" title="Sonraki hafta"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    </div>
-    <button class="today-btn" onclick="goToday()">Bugün</button>
-  </div>
-  <div class="topbar-right">
-    <button class="icon-btn" onclick="toggleTheme()" title="Tema">
-      <svg id="theme-icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <svg id="theme-icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" style="display:none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </button>
-    <button class="icon-btn" onclick="openIO()" title="Veri Yönetimi">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" stroke-width="1.8"/><path d="M21 12c0 1.66-4.03 3-9 3S3 13.66 3 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </button>
-    <button class="icon-btn" onclick="openCal()" title="Takvim">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-</header>
-
-<div class="search-bar-container" style="padding: 12px 20px 0; background: var(--surface);">
-  <div style="display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="search-input" placeholder="Not veya görev ara..." onkeyup="doSearch()" style="width:100%; border:none; outline:none; padding: 10px 0; font-family:inherit; font-size:14px; background:transparent; color:var(--text);">
-  </div>
-  <div id="search-results" style="max-height: 250px; overflow-y: auto;"></div>
-</div>
-
-<div class="main-tabs-container">
-  <button class="main-tab active" data-main-tab="week" onclick="switchMainTab('week')">📅 Haftalık</button>
-  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">📚 Raf</button>
-  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">🎬 Dvd</button>
-  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">⚖️ Kural</button>
-</div>
-
-<div id="pane-week" class="main-tab-pane active">
-  <div class="banners-row" id="banners-row">
-    <div id="high-banner">
-      <div class="banner-icon blink-icon">⚠️</div>
-      <div class="banner-content">
-        <div class="banner-title">Yüksek Öncelik</div>
-        <ul class="banner-list" id="banner-list"></ul>
-      </div>
-      <span class="banner-count" id="banner-count"></span>
+<div class="container">
+    <div class="shelf-section">
+        <div class="shelf-title">
+            <svg viewBox="0 0 24 24"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"/></svg>
+            Ürün Rafı
+        </div>
+        <button id="editBtn" class="btn-minimal" onclick="toggleEditMode()">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>Görsel Düzenle</span>
+        </button>
     </div>
 
-    <div id="sports-banner">
-      <div style="color:var(--low); flex-shrink:0; display:flex; align-items:center;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div style="flex:1; min-width:0;">
-        <div style="font-size:10px; font-weight:700; color:var(--low); opacity:0.8; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:2px;">Hareket</div>
-        <div id="sports-banner-text" style="font-size:12px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="week-grid" id="week-grid"></div>
-
-  <div id="books-banner" style="display:none; margin: 0 16px 24px; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
-    <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
-    <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
-  </div>
-
-  <div style="padding: 0 16px 24px;">
-    <div class="section-label" style="margin-top:0;">Haftanın Genel Notu</div>
-    <div class="note-wrapper">
-      <div class="note-lines"></div>
-      <textarea class="note-area" id="weekly-note" placeholder="Bu haftaya dair genel değerlendirmeler, özel notlar ve ana fikirler..." onblur="saveWeeklyNote()"></textarea>
-    </div>
-  </div>
-</div>
-
-<div id="pane-library" class="main-tab-pane">
-  <div style="padding: 16px;">
-    <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
-      <input class="task-input" id="lib-title" placeholder="Kitap Adı" style="flex:100%;">
-      <input class="task-input" id="lib-desc" placeholder="Kısa Açıklama..." style="flex:100%;">
-      <input class="task-input" id="lib-img" placeholder="Görsel URL (İsteğe bağlı)" style="flex:2;">
-      <select class="prio-select" id="lib-rating" style="flex:1;">
-        <option value="1">1 Yıldız</option>
-        <option value="2">2 Yıldız</option>
-        <option value="3" selected>3 Yıldız</option>
-        <option value="4">4 Yıldız</option>
-        <option value="5">5 Yıldız</option>
-      </select>
-      <button class="add-task-btn" onclick="addGlobalBook()">Ekle</button>
-    </div>
-  </div>
-  <div class="shelf-grid" id="global-books-grid"></div>
-</div>
-
-<div id="pane-dvds" class="main-tab-pane">
-  <div style="padding: 16px;">
-    <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
-      <input class="task-input" id="dvd-title" placeholder="Film/Dizi Adı" style="flex:100%;">
-      <input class="task-input" id="dvd-img" placeholder="Görsel URL (İsteğe bağlı)" style="flex:2;">
-      <select class="prio-select" id="dvd-rating" style="flex:1;">
-        <option value="1">1 Yıldız</option>
-        <option value="2">2 Yıldız</option>
-        <option value="3" selected>3 Yıldız</option>
-        <option value="4">4 Yıldız</option>
-        <option value="5">5 Yıldız</option>
-      </select>
-      <button class="add-task-btn" onclick="addGlobalMovie()">Ekle</button>
-    </div>
-  </div>
-  <div class="media-grid" id="global-movies-grid"></div>
-</div>
-
-<div id="pane-rules" class="main-tab-pane">
-  <div style="padding: 16px;">
-    <div class="rte-toolbar">
-      <button class="rte-btn" onclick="document.execCommand('formatBlock', false, 'H3')">Başlık (H3)</button>
-      <button class="rte-btn" onclick="document.execCommand('bold')"><b>Kalın</b></button>
-      <button class="rte-btn" onclick="document.execCommand('italic')"><i>Eğik</i></button>
-      <button class="rte-btn" onclick="document.execCommand('insertUnorderedList')">Madde İmi</button>
-      <button class="rte-btn" onclick="document.execCommand('insertOrderedList')">Numaralı</button>
-      <button class="rte-btn" onclick="document.execCommand('indent')">Girinti Artır ➡</button>
-      <button class="rte-btn" onclick="document.execCommand('outdent')">Girinti Azalt ⬅</button>
-    </div>
-    <div class="rte-editor" id="rules-editor" contenteditable="true" onblur="saveRules()" placeholder="Hayat kurallarını, öğretileri ve çıkarımlarını buraya yaz..."></div>
-  </div>
-</div>
-
-<div class="overlay" id="stats-overlay" onclick="statsOverlayClick(event)">
-  <div class="modal" id="stats-modal">
-    <div class="modal-header">
-      <span class="modal-date">Haftalık Üretkenlik</span>
-      <button class="modal-close" onclick="closeStats()">✕</button>
-    </div>
-    <div class="modal-body" id="stats-body" style="display:flex; align-items:flex-end; gap:8px; height: 180px; padding-top: 30px;">
-      </div>
-  </div>
-</div>
-
-<div class="overlay" id="overlay" onclick="overlayClick(event)">
-  <div class="modal" id="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-date" id="modal-date"></span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-tabs">
-      <button class="modal-tab active" data-tab="notes" onclick="switchTab('notes')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span>Notlar</span>
-      </button>
-      <button class="modal-tab" data-tab="tasks" onclick="switchTab('tasks')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="9,11 12,14 22,4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>Görevler</span>
-      </button>
-      <button class="modal-tab" data-tab="ekstra" onclick="switchTab('ekstra')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span>Ekstra</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div id="tab-notes">
-        <div class="note-wrapper">
-          <div class="note-lines"></div>
-          <div class="note-tools">
-            <button class="note-tool-btn" onclick="insertTime()" title="Zaman Ekle">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <div class="rules-section">
+        <div class="rules-header">
+            <div class="rules-input-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <input type="text" id="newRuleText" placeholder="Yeni notunuzu buraya yazın...">
+            </div>
+            <button class="btn-minimal" onclick="addRule()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Kural Ekle
             </button>
-            <button class="note-tool-btn" id="copy-btn" onclick="copyNote()" title="Kopyala">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/></svg>
-            </button>
-          </div>
-          <textarea class="note-area" id="note-area" placeholder="Bu gün için notlarını yaz…"></textarea>
-        </div>
-        <button class="note-save-btn" onclick="saveNote()" id="save-note-label">Kaydet</button>
-      </div>
-
-      <div id="tab-tasks" class="hidden">
-        <div class="task-input-row">
-          <input class="task-input" id="task-input" placeholder="Yeni görev…" onkeydown="if(event.key==='Enter')addTask()">
-          <select class="prio-select" id="prio-select">
-            <option value="high">⚠️ Yüksek</option>
-            <option value="mid" selected>🔸 Orta</option>
-            <option value="low">✅ Düşük</option>
-          </select>
-          <select class="recur-select" id="recur-select">
-            <option value="">— Tekrar yok</option>
-            <option value="daily">Her gün</option>
-            <option value="weekly">Her hafta</option>
-            <option value="weekdays">Hafta içi</option>
-            <option value="mon">Her Pzt</option>
-            <option value="tue">Her Sal</option>
-            <option value="wed">Her Çar</option>
-            <option value="thu">Her Per</option>
-            <option value="fri">Her Cum</option>
-            <option value="sat">Her Cmt</option>
-            <option value="sun">Her Paz</option>
-            <option value="monthly">Her ay (Aynı gün)</option>
-            <option value="month-last">Ayın son günü</option>
-          </select>
-          <button class="add-task-btn" onclick="addTask()">+</button>
         </div>
 
-        <div id="mid-tasks-section">
-          <div class="section-label">Orta & Düşük Öncelik</div>
-          <ul class="task-list" id="mid-task-list"></ul>
-        </div>
-      </div>
-
-      <div id="tab-ekstra" class="hidden">
-        <div id="active-books-container"></div>
-        <div class="section-label">Kitaplar (Günlük İlerleme)</div>
-        <div class="task-input-row">
-          <input class="task-input" id="book-name" placeholder="Kitap Adı" style="flex:2;">
-          <input class="task-input" type="number" id="book-current" placeholder="Şu an" style="flex:1; min-width:50px;">
-          <input class="task-input" type="number" id="book-total" placeholder="Toplam" style="flex:1; min-width:50px;">
-          <button class="add-task-btn" onclick="addBook()">+</button>
-        </div>
-        <ul class="task-list" id="book-list"></ul>
-        <div class="sep"></div>
-        <div class="section-label">Filmler (Günlük Seyir)</div>
-        <div class="task-input-row">
-          <input class="task-input" id="movie-name" placeholder="Film Adı">
-          <select class="prio-select" id="movie-rating">
-            <option value="1">⭐</option>
-            <option value="2">⭐⭐</option>
-            <option value="3" selected>⭐⭐⭐</option>
-            <option value="4">⭐⭐⭐⭐</option>
-            <option value="5">⭐⭐⭐⭐⭐</option>
-          </select>
-          <button class="add-task-btn" onclick="addMovie()">+</button>
-        </div>
-        <ul class="task-list" id="movie-list"></ul>
-        <div class="sep"></div>
-        <div class="section-label">Spor / Hareket</div>
-        <div class="task-input-row">
-          <input class="task-input" id="sport-name" placeholder="Örn: Kol, Göğüs, Omuz, Koşu..." onkeydown="if(event.key==='Enter')addSport()">
-          <button class="add-task-btn" onclick="addSport()">+</button>
-        </div>
-        <ul class="task-list" id="sport-list"></ul>
-      </div>
-
+        <div id="rulesList" class="rules-list">
+            </div>
     </div>
-  </div>
-</div>
-
-<div class="mini-cal" id="mini-cal" onclick="miniCalOverlayClick(event)">
-  <div class="mini-cal-box">
-    <div class="mini-cal-header">
-      <span class="mini-cal-title" id="mini-cal-title"></span>
-      <div class="mini-cal-nav">
-        <button onclick="shiftCal(-1)">‹</button>
-        <button onclick="shiftCal(1)">›</button>
-      </div>
-    </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <button class="mini-cal-close-btn" onclick="closeCal()">Kapat</button>
-  </div>
-</div>
-
-<div class="io-panel" id="io-panel" onclick="ioPanelClick(event)">
-  <div class="io-box">
-    <div class="io-title">Veri Yönetimi</div>
-    <button class="io-btn" onclick="exportData()">
-      <span class="io-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-      <div class="io-btn-label"><strong>Dışa Aktar</strong><span>JSON dosyası olarak indir</span></div>
-    </button>
-    <button class="io-btn" onclick="document.getElementById('import-file').click()">
-      <span class="io-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17,8 12,3 7,8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-      <div class="io-btn-label"><strong>İçe Aktar</strong><span>JSON dosyasından yükle</span></div>
-    </button>
-    <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
-    <button class="io-btn io-close" onclick="closeIO()">
-      <span class="io-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-      <div class="io-btn-label"><strong>Kapat</strong><span></span></div>
-    </button>
-  </div>
 </div>
 
 <script>
-// ── STATE ──
-let currentWeekStart = null;
-let selectedDateKey = null;
-let activeTab = 'notes';
-let calViewYear, calViewMonth;
+    let ruleCount = 0;
+    let isEditMode = false;
 
-let DATA = {};
-let RECURRING = [];
-let theme = 'light';
-
-// YENİ EKLENEN VERİ YAPILARI
-let GLOBAL_BOOKS = [];
-let GLOBAL_MOVIES = [];
-let GLOBAL_RULES = "";
-let WEEKLY_NOTES = {};
-
-const MONTHS_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
-const DAYS_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
-const FULL_DAYS_TR = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
-
-// ── UTILS ──
-function dateKey(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function parseKey(k) { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); }
-function todayKey() { return dateKey(new Date()); }
-function getMondayOf(d) {
-  const copy = new Date(d);
-  const day = copy.getDay();
-  const diff = (day === 0) ? -6 : 1 - day;
-  copy.setDate(copy.getDate() + diff);
-  return copy;
-}
-function addDays(d, n) { const copy = new Date(d); copy.setDate(copy.getDate() + n); return copy; }
-function uid() { return Math.random().toString(36).slice(2,10); }
-function dowIndex(d) { const day = d.getDay(); return day === 0 ? 6 : day - 1; }
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ── PERSIST ──
-function save() {
-  localStorage.setItem('ajanda_data', JSON.stringify(DATA));
-  localStorage.setItem('ajanda_recur', JSON.stringify(RECURRING));
-  localStorage.setItem('ajanda_theme', theme);
-  
-  localStorage.setItem('ajanda_g_books', JSON.stringify(GLOBAL_BOOKS));
-  localStorage.setItem('ajanda_g_movies', JSON.stringify(GLOBAL_MOVIES));
-  localStorage.setItem('ajanda_g_rules', GLOBAL_RULES);
-  localStorage.setItem('ajanda_w_notes', JSON.stringify(WEEKLY_NOTES));
-}
-function load() {
-  try { DATA = JSON.parse(localStorage.getItem('ajanda_data') || '{}'); } catch(e){ DATA={}; }
-  try { RECURRING = JSON.parse(localStorage.getItem('ajanda_recur') || '[]'); } catch(e){ RECURRING=[]; }
-  theme = localStorage.getItem('ajanda_theme') || 'light';
-
-  try { GLOBAL_BOOKS = JSON.parse(localStorage.getItem('ajanda_g_books') || '[]'); } catch(e){ GLOBAL_BOOKS=[]; }
-  try { GLOBAL_MOVIES = JSON.parse(localStorage.getItem('ajanda_g_movies') || '[]'); } catch(e){ GLOBAL_MOVIES=[]; }
-  GLOBAL_RULES = localStorage.getItem('ajanda_g_rules') || '';
-  try { WEEKLY_NOTES = JSON.parse(localStorage.getItem('ajanda_w_notes') || '{}'); } catch(e){ WEEKLY_NOTES={}; }
-}
-
-// ── ANA SEKMELER (YENİ) ──
-function switchMainTab(tabId) {
-  document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.mainTab === tabId));
-  document.querySelectorAll('.main-tab-pane').forEach(p => p.classList.remove('active'));
-  document.getElementById('pane-' + tabId).classList.add('active');
-  
-  if(tabId === 'library') renderGlobalBooks();
-  if(tabId === 'dvds') renderGlobalMovies();
-  if(tabId === 'rules') document.getElementById('rules-editor').innerHTML = GLOBAL_RULES;
-}
-
-// ── RAF VE DVDLER FONKSİYONLARI ──
-function renderGlobalBooks() {
-  const grid = document.getElementById('global-books-grid');
-  let html = '';
-
-  const activeBooks = {};
-  Object.keys(DATA).sort().forEach(key => {
-    if(DATA[key].books) {
-      DATA[key].books.forEach(b => {
-        if (!activeBooks[b.name] || b.current > activeBooks[b.name].current) {
-          activeBooks[b.name] = b;
-        }
-      });
-    }
-  });
-
-  // Günlük İlerleme Kitapları - Düzenleme Altyapısı Eklendi
-  Object.values(activeBooks).forEach(b => {
-    const pct = Math.min(100, Math.round((b.current / b.total) * 100));
-    // Geçici görsel ekleme mantığı: isimdeki ilk harfi veya sisteme kaydedilecek özel bir URL'i gösterebiliriz.
-    // Şimdilik kitap rafı efekti içine oturması için Wrapper'a alındı.
-    html += `
-      <div class="shelf-item-wrapper">
-        <div class="media-card" style="border-color: var(--accent); background: var(--surface2);">
-          <div style="height: 140px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text); padding: 16px; text-align: center; position:relative;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.5;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-            <div style="font-size: 11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Günlük İlerleme</div>
-          </div>
-          <div class="media-content">
-            <div class="media-title">${escHtml(b.name)}</div>
-            <div class="media-desc" style="margin-bottom:14px;">Sayfa: ${b.current} / ${b.total}</div>
-            <div class="media-footer">
-              <div style="width:100%;">
-                <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; font-weight:600;"><span>%${pct}</span></div>
-                <div class="stats-bar-wrap" style="height:4px; background:var(--border); width:100%; margin:0;">
-                  <div class="stats-bar" style="width:${pct}%; background:var(--accent);"></div>
-                </div>
-              </div>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:12px;">
-                <button class="edit-btn" onclick="alert('Görsel/Bilgi Düzenleme menüsü yakında entegre edilecek!')">Görsel / Düzenle</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-
-  // Global Sabit Kitaplar
-  html += GLOBAL_BOOKS.map(b => `
-    <div class="shelf-item-wrapper">
-      <div class="media-card">
-        ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
-        <div class="media-content">
-          <div class="media-title">${escHtml(b.title)}</div>
-          <div class="media-desc">${escHtml(b.desc)}</div>
-          <div class="media-footer">
-            <div class="media-rating">${'⭐'.repeat(b.rating)}</div>
-            <button class="task-del" onclick="deleteGlobalBook('${b.id}')">✕</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `).join('');
-
-  grid.innerHTML = html;
-}
-
-function addGlobalBook() {
-  const title = document.getElementById('lib-title').value.trim();
-  const desc = document.getElementById('lib-desc').value.trim();
-  const img = document.getElementById('lib-img').value.trim();
-  const rating = parseInt(document.getElementById('lib-rating').value);
-  if (!title) return;
-  GLOBAL_BOOKS.push({ id: uid(), title, desc, img, rating });
-  document.getElementById('lib-title').value = '';
-  document.getElementById('lib-desc').value = '';
-  document.getElementById('lib-img').value = '';
-  save(); renderGlobalBooks();
-}
-function deleteGlobalBook(id) {
-  GLOBAL_BOOKS = GLOBAL_BOOKS.filter(b => b.id !== id);
-  save(); renderGlobalBooks();
-}
-
-function renderGlobalMovies() {
-  const grid = document.getElementById('global-movies-grid');
-  grid.innerHTML = GLOBAL_MOVIES.map(m => `
-    <div class="media-card">
-      ${m.img ? `<img src="${escHtml(m.img)}" class="media-img" alt="${escHtml(m.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
-      <div class="media-content">
-        <div class="media-title">${escHtml(m.title)}</div>
-        <div class="media-footer">
-          <div class="media-rating">${'⭐'.repeat(m.rating)}</div>
-          <button class="task-del" onclick="deleteGlobalMovie('${m.id}')">✕</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-function addGlobalMovie() {
-  const title = document.getElementById('dvd-title').value.trim();
-  const img = document.getElementById('dvd-img').value.trim();
-  const rating = parseInt(document.getElementById('dvd-rating').value);
-  if (!title) return;
-  GLOBAL_MOVIES.push({ id: uid(), title, img, rating });
-  document.getElementById('dvd-title').value = '';
-  document.getElementById('dvd-img').value = '';
-  save(); renderGlobalMovies();
-}
-function deleteGlobalMovie(id) {
-  GLOBAL_MOVIES = GLOBAL_MOVIES.filter(m => m.id !== id);
-  save(); renderGlobalMovies();
-}
-
-function saveRules() {
-  GLOBAL_RULES = document.getElementById('rules-editor').innerHTML;
-  save();
-}
-
-function renderWeeklyNote() {
-  const wKey = dateKey(currentWeekStart);
-  document.getElementById('weekly-note').value = WEEKLY_NOTES[wKey] || '';
-}
-function saveWeeklyNote() {
-  const wKey = dateKey(currentWeekStart);
-  WEEKLY_NOTES[wKey] = document.getElementById('weekly-note').value;
-  save();
-}
-
-function recurringMatchesDay(r, d) {
-  const dow = dowIndex(d);
-  if (r.recur === 'daily') return true;
-  if (r.recur === 'weekly') { const orig = parseKey(r.createdKey); return dowIndex(orig) === dow; }
-  if (r.recur === 'weekdays') return dow <= 4;
-  if (r.recur === 'monthly') { const orig = parseKey(r.createdKey); return d.getDate() === orig.getDate(); }
-  if (r.recur === 'month-last') {
-    const nextDay = new Date(d);
-    nextDay.setDate(d.getDate() + 1);
-    return nextDay.getDate() === 1;
-  }
-  const map = {mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6};
-  if (map[r.recur] !== undefined) return map[r.recur] === dow;
-  return false;
-}
-function getTasksForDay(key) {
-  const d = parseKey(key);
-  const own = (DATA[key]?.tasks || []);
-  const injected = RECURRING
-    .filter(r => recurringMatchesDay(r, d))
-    .filter(r => !own.find(t => t.recurId === r.id))
-    .map(r => ({ id: 'v-' + r.id, text: r.text, prio: r.prio, done: false, recur: r.recur, recurId: r.id, _virtual: true }));
-  return [...own, ...injected];
-}
-
-function applyTheme() {
-  document.documentElement.setAttribute('data-theme', theme);
-  const moonEl = document.getElementById('theme-icon-moon');
-  const sunEl = document.getElementById('theme-icon-sun');
-  if (moonEl && sunEl) {
-    moonEl.style.display = theme === 'dark' ? 'none' : '';
-    sunEl.style.display = theme === 'dark' ? '' : 'none';
-  }
-}
-function toggleTheme() { theme = theme === 'light' ? 'dark' : 'light'; applyTheme(); save(); }
-
-function closeSearch() { 
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-results').innerHTML = '';
-}
-function doSearch() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const resEl = document.getElementById('search-results');
-  if(q.length < 2) { resEl.innerHTML = ''; return; }
-  let html = '';
-  Object.keys(DATA).forEach(k => {
-    const d = DATA[k];
-    let matched = false;
-    let matchText = '';
-    if (d.note && d.note.toLowerCase().includes(q)) { matched = true; matchText = 'Not: ' + d.note.substring(0,60)+'...'; }
-    if (d.tasks) d.tasks.forEach(t => { if (t.text.toLowerCase().includes(q)) { matched = true; matchText = 'Görev: ' + t.text; } });
-    if (matched) {
-      const parts = k.split('-');
-      const dateStr = `${parts[2]} ${MONTHS_TR[parseInt(parts[1])-1]} ${parts[0]}`;
-      html += `<div class="search-item" onclick="closeSearch(); openModal('${k}')">
-        <div style="font-size:11px; color:var(--text3); font-weight:700; margin-bottom:4px;">${dateStr}</div>
-        <div style="font-size:13px; color:var(--text);">${escHtml(matchText)}</div>
-      </div>`;
-    }
-  });
-  resEl.innerHTML = html || '<div style="padding:16px 20px; color:var(--text3); font-size:14px;">Sonuç bulunamadı.</div>';
-}
-
-function dragStart(e, dateKey, taskId) {
-  e.dataTransfer.setData('dateKey', dateKey);
-  e.dataTransfer.setData('taskId', taskId);
-  e.stopPropagation();
-}
-function allowDropTask(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
-function dragLeaveTask(e) { e.currentTarget.classList.remove('drag-over'); }
-function dropTask(e, toKey) {
-  e.preventDefault();
-  e.currentTarget.classList.remove('drag-over');
-  const fromKey = e.dataTransfer.getData('dateKey');
-  const taskId = e.dataTransfer.getData('taskId');
-  if (fromKey && taskId && fromKey !== toKey) {
-    const idx = DATA[fromKey].tasks.findIndex(t => t.id === taskId);
-    if (idx > -1) {
-      const task = DATA[fromKey].tasks.splice(idx, 1)[0];
-      if(!DATA[toKey]) DATA[toKey] = {note:'', tasks:[], books:[], movies:[], sports:[]};
-      if(!DATA[toKey].tasks) DATA[toKey].tasks = [];
-      DATA[toKey].tasks.push(task);
-      save(); renderWeek(); renderBanner();
-    }
-  }
-}
-
-function shiftWeek(n) { currentWeekStart = addDays(currentWeekStart, n * 7); renderWeek(); }
-function goToday() { currentWeekStart = getMondayOf(new Date()); renderWeek(); }
-function getWeekNumber(d) {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-}
-function renderWeek() {
-  const end = addDays(currentWeekStart, 6);
-  const startM = MONTHS_TR[currentWeekStart.getMonth()];
-  const endM = MONTHS_TR[end.getMonth()];
-  let label = currentWeekStart.getMonth() === end.getMonth() 
-    ? `${startM} ${currentWeekStart.getFullYear()}` 
-    : `${startM} – ${endM} ${end.getFullYear()}`;
-  document.getElementById('week-label').textContent = `${label}  ·  W${getWeekNumber(currentWeekStart)}`;
-
-  const grid = document.getElementById('week-grid');
-  grid.innerHTML = '';
-  const tk = todayKey();
-
-  let daysActive = 0;
-  let booksMap = {};
-
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(currentWeekStart, i);
-    const k = dateKey(d);
-    const isToday = k === tk;
-    const tasks = getTasksForDay(k);
-    const note = DATA[k]?.note || '';
-    
-    const hasSports = DATA[k] && DATA[k].sports && DATA[k].sports.length > 0;
-    const hasRaf = DATA[k] && ((DATA[k].books && DATA[k].books.length > 0) || (DATA[k].movies && DATA[k].movies.length > 0));
-
-    if (hasSports) daysActive++;
-    if (DATA[k] && DATA[k].books) {
-      DATA[k].books.forEach(b => {
-        if (!booksMap[b.name] || b.current > booksMap[b.name].current) {
-          booksMap[b.name] = b;
-        }
-      });
-    }
-
-    const highCount = tasks.filter(t => t.prio === 'high' && !t.done).length;
-    const midCount = tasks.filter(t => t.prio === 'mid' && !t.done).length;
-    const lowCount = tasks.filter(t => t.prio === 'low' && !t.done).length;
-    const hasNote = note.trim().length > 0;
-
-    let indHTML = '';
-    if (hasRaf) indHTML += `<div style="color:var(--text3); margin-right:2px; display:flex; align-items:center;" title="Raf (Kitap/Film)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>`;
-    if (hasSports) indHTML += `<div style="color:var(--text3); margin-right:4px; display:flex; align-items:center;" title="Spor/Hareket"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
-    if (highCount) indHTML += `<div class="dot dot-high" title="${highCount} yüksek"></div>`;
-    if (midCount) indHTML += `<div class="dot dot-mid"></div>`;
-    if (lowCount) indHTML += `<div class="dot dot-low"></div>`;
-    if (hasNote) indHTML += `<div class="dot dot-note"></div>`;
-
-    let previewHTML = '';
-    const allItems = [...tasks.filter(t=>!t.done).slice(0,3).map(t => ({type:'task', id:t.id, text:t.text, prio:t.prio, isVirtual: t._virtual}))];
-    
-    if (allItems.length === 0 && !hasNote) {
-      previewHTML = `<div class="day-empty">—</div>`;
-    } else {
-      if (hasNote && allItems.length < 3) allItems.push({type:'note', text: note.trim().split('\n')[0].slice(0,40)});
-      allItems.slice(0,3).forEach(item => {
-        const color = item.type==='note' ? 'var(--text3)' : item.prio==='high' ? 'var(--high)' : item.prio==='mid' ? 'var(--mid)' : 'var(--low)';
-        if (item.type === 'task' && !item.isVirtual) {
-          previewHTML += `<div class="day-preview-item" draggable="true" ondragstart="dragStart(event, '${k}', '${item.id}')" onclick="openModal('${k}'); event.stopPropagation();"><div class="pi-dot" style="background:${color}"></div><span>${escHtml(item.text)}</span></div>`;
+    // Görsel Düzenle Butonunu Aktif Hale Getiren Fonksiyon
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const btn = document.getElementById('editBtn');
+        const span = btn.querySelector('span');
+        
+        if (isEditMode) {
+            btn.classList.add('active');
+            span.innerText = "Düzenleme Aktif";
+            console.log("Görsel düzenleme modu açıldı.");
+            // Burada görsel üzerine overlay veya çerçeve ekleme mantığı çalışabilir
         } else {
-          previewHTML += `<div class="day-preview-item" onclick="openModal('${k}'); event.stopPropagation();"><div class="pi-dot" style="background:${color}"></div><span>${escHtml(item.text)}</span></div>`;
+            btn.classList.remove('active');
+            span.innerText = "Görsel Düzenle";
+            console.log("Görsel düzenleme modu kapatıldı.");
         }
-      });
-      const total = tasks.filter(t=>!t.done).length + (hasNote?1:0);
-      if (total > 3) previewHTML += `<div class="day-preview-more">+${total-3} daha</div>`;
     }
 
-    const allTasks = getTasksForDay(k);
-    let taskDotsHTML = '';
-    if (allTasks.length > 0) {
-      const maxDots = Math.min(allTasks.length, 7);
-      allTasks.slice(0, maxDots).forEach(t => {
-        taskDotsHTML += `<div class="ts-dot ${t.done ? 'ts-dot-done' : 'ts-dot-active'}" title="${t.done ? 'Tamamlandı' : 'Aktif'}: ${escHtml(t.text)}"></div>`;
-      });
-      if (allTasks.length > 7) taskDotsHTML += `<span style="font-size:9px;color:var(--text3);margin-left:1px;">+${allTasks.length-7}</span>`;
-    }
-
-    const card = document.createElement('div');
-    card.className = 'day-card' + (isToday ? ' today' : '');
-    card.onclick = () => openModal(k);
-    card.setAttribute('ondragover', 'allowDropTask(event)');
-    card.setAttribute('ondragleave', 'dragLeaveTask(event)');
-    card.setAttribute('ondrop', `dropTask(event, '${k}')`);
-
-    card.innerHTML = `
-      <div class="day-header">
-        <div class="day-name-num"><span class="day-name">${DAYS_TR[i]}</span><span class="day-num">${d.getDate()}</span></div>
-        <div class="day-indicators">${indHTML}</div>
-      </div>
-      <div class="day-body"><div class="day-body-inner">${previewHTML}</div></div>
-      ${taskDotsHTML ? `<div class="day-task-status">${taskDotsHTML}</div>` : ''}
-    `;
-    grid.appendChild(card);
-  }
-
-  const statsCard = document.createElement('div');
-  let totalTasks = 0, doneTasks = 0;
-  for (let i = 0; i < 7; i++) {
-    const k = dateKey(addDays(currentWeekStart, i));
-    const tasks = getTasksForDay(k);
-    totalTasks += tasks.length;
-    doneTasks += tasks.filter(t => t.done).length;
-  }
-  const pct = totalTasks === 0 ? null : Math.round((doneTasks / totalTasks) * 100);
-  const isPerfect = pct === 100;
-  statsCard.className = 'week-stats-card' + (isPerfect ? ' perfect' : '');
-  statsCard.onclick = openStats;
-
-  let statsBodyContent = pct === null 
-    ? `<div class="stats-empty">Henüz görev yok</div>`
-    : `<div><div class="stats-pct">${pct}%</div><div class="stats-sub">${doneTasks} / ${totalTasks} görev tamamlandı</div></div>
-       <div><div class="stats-bar-wrap"><div class="stats-bar" style="width:${pct}%"></div></div><div class="stats-perfect-msg">Mükemmelsin! 🎉</div></div>`;
-
-  statsCard.innerHTML = `
-    <div class="stats-header">
-      <span class="stats-title">Hafta özeti</span>
-      ${isPerfect ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="var(--low)" stroke="var(--low)" stroke-width="1.5"/></svg>` : ''}
-    </div>
-    <div class="stats-body">${statsBodyContent}</div>
-  `;
-  grid.appendChild(statsCard);
-
-  const sportsBanner = document.getElementById('sports-banner');
-  if (daysActive > 0) {
-    sportsBanner.style.display = 'flex';
-    document.getElementById('sports-banner-text').innerHTML = `Bu hafta <b>${daysActive} gün</b> hareket ettin!`;
-  } else {
-    sportsBanner.style.display = 'none';
-  }
-
-  const booksBanner = document.getElementById('books-banner');
-  const booksList = document.getElementById('books-banner-list');
-  const bookKeys = Object.keys(booksMap);
-  if (bookKeys.length > 0) {
-    booksBanner.style.display = 'block';
-    booksList.innerHTML = bookKeys.map(name => {
-      const b = booksMap[name];
-      const bookPct = Math.min(100, Math.round((b.current / b.total) * 100));
-      return `
-        <div>
-          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
-            <span style="font-weight:600; color:var(--text);">${escHtml(name)}</span>
-            <span style="color:var(--text2);">${b.current} / ${b.total} (%${bookPct})</span>
-          </div>
-          <div class="stats-bar-wrap" style="height:6px; background:var(--surface2);">
-            <div class="stats-bar" style="width:${bookPct}%; background:var(--accent);"></div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  } else {
-    booksBanner.style.display = 'none';
-  }
-
-  renderBanner();
-  renderWeeklyNote();
-}
-
-function renderBanner() {
-  const banner = document.getElementById('high-banner');
-  const list = document.getElementById('banner-list');
-  const countEl = document.getElementById('banner-count');
-  let highs = [];
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(currentWeekStart, i);
-    const k = dateKey(d);
-    getTasksForDay(k).filter(t => t.prio === 'high' && !t.done).forEach(task => highs.push({text: task.text, day: DAYS_TR[i]}));
-  }
-  if (highs.length === 0) {
-    banner.classList.remove('show');
-  } else {
-    banner.classList.add('show');
-    const first = highs[0];
-    list.innerHTML = `<li>${first.day}: ${escHtml(first.text)}</li>`;
-    countEl.textContent = highs.length > 1 ? `+${highs.length - 1}` : '';
-    countEl.style.display = highs.length > 1 ? '' : 'none';
-  }
-  const row = document.getElementById('banners-row');
-  row.style.display = (banner.classList.contains('show') || document.getElementById('sports-banner').style.display === 'flex') ? 'flex' : 'none';
-}
-
-function openStats() {
-  document.getElementById('stats-overlay').classList.add('open');
-  const body = document.getElementById('stats-body');
-  body.innerHTML = '';
-  for(let i=0; i<7; i++) {
-    const d = addDays(currentWeekStart, i);
-    const tasks = getTasksForDay(dateKey(d));
-    const total = tasks.length;
-    const done = tasks.filter(t=>t.done).length;
-    const pct = total === 0 ? 0 : Math.round((done/total)*100);
-    const h = Math.max(pct, 5); 
-    body.innerHTML += `
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px;">
-        <div style="font-size:11px; color:var(--text3); font-weight:700;">${pct}%</div>
-        <div style="width:100%; height:100px; background:var(--surface2); border-radius:4px; position:relative; overflow:hidden;">
-          <div style="position:absolute; bottom:0; left:0; width:100%; height:${h}%; background:var(--accent); border-radius:4px; transition:height 0.4s cubic-bezier(.4,0,.2,1);"></div>
-        </div>
-        <div style="font-size:11px; font-weight:600; color:var(--text2);">${DAYS_TR[i]}</div>
-      </div>
-    `;
-  }
-}
-function closeStats() { document.getElementById('stats-overlay').classList.remove('open'); }
-function statsOverlayClick(e) { if(e.target.id==='stats-overlay') closeStats(); }
-
-function ensureData() {
-  if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[], books:[], movies:[], sports:[]};
-  if (!DATA[selectedDateKey].tasks) DATA[selectedDateKey].tasks = [];
-  if (!DATA[selectedDateKey].books) DATA[selectedDateKey].books = [];
-  if (!DATA[selectedDateKey].movies) DATA[selectedDateKey].movies = [];
-  if (!DATA[selectedDateKey].sports) DATA[selectedDateKey].sports = [];
-}
-function openModal(key) {
-  selectedDateKey = key;
-  ensureData();
-  const d = parseKey(key);
-  document.getElementById('modal-date').textContent = `${FULL_DAYS_TR[dowIndex(d)]}, ${d.getDate()} ${MONTHS_TR[d.getMonth()]}`;
-  document.getElementById('note-area').value = DATA[key]?.note || '';
-  switchTab('notes');
-  document.getElementById('overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal() { document.getElementById('overlay').classList.remove('open'); document.body.style.overflow = ''; renderWeek(); }
-function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
-
-function switchTab(tab) {
-  activeTab = tab;
-  document.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  document.getElementById('tab-notes').classList.toggle('hidden', tab !== 'notes');
-  document.getElementById('tab-tasks').classList.toggle('hidden', tab !== 'tasks');
-  document.getElementById('tab-ekstra').classList.toggle('hidden', tab !== 'ekstra');
-  if (tab === 'tasks') renderTasks();
-  if (tab === 'ekstra') { renderRaf(); renderSports(); }
-}
-function saveNote() {
-  ensureData();
-  DATA[selectedDateKey].note = document.getElementById('note-area').value;
-  save(); renderWeek();
-  const btn = document.getElementById('save-note-label');
-  const orig = btn.textContent;
-  btn.textContent = '✓';
-  setTimeout(() => btn.textContent = orig, 800);
-}
-function insertTime() {
-  const textarea = document.getElementById('note-area');
-  const now = new Date();
-  const timeStr = `[${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}] - `;
-  const startPos = textarea.selectionStart;
-  textarea.value = textarea.value.substring(0, startPos) + timeStr + textarea.value.substring(textarea.selectionEnd);
-  textarea.selectionStart = textarea.selectionEnd = startPos + timeStr.length;
-  textarea.focus();
-  if (selectedDateKey) { ensureData(); DATA[selectedDateKey].note = textarea.value; save(); }
-}
-function copyNote() {
-  const textarea = document.getElementById('note-area');
-  if (!textarea.value) return;
-  navigator.clipboard.writeText(textarea.value).then(() => {
-    const btn = document.getElementById('copy-btn');
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="var(--low)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    setTimeout(() => btn.innerHTML = orig, 1200);
-  });
-}
-
-function renderTasks() {
-  const tasks = getTasksForDay(selectedDateKey);
-  const midList = document.getElementById('mid-task-list');
-  const midSection = document.getElementById('mid-tasks-section');
-  const highTasks = tasks.filter(t => t.prio === 'high');
-  const otherTasks = tasks.filter(t => t.prio !== 'high');
-
-  let highContainer = document.getElementById('high-task-inline');
-  if (!highContainer) {
-    highContainer = document.createElement('div');
-    highContainer.id = 'high-task-inline';
-    midSection.parentNode.insertBefore(highContainer, midSection);
-  }
-  if (highTasks.length > 0) {
-    highContainer.innerHTML = `<div class="section-label" style="color:var(--high)"><span class="blink-icon">⚠️</span> Yüksek Öncelik</div><ul class="task-list">${highTasks.map(task => taskHTML(task)).join('')}</ul><div class="sep"></div>`;
-  } else { highContainer.innerHTML = ''; }
-  midList.innerHTML = otherTasks.map(task => taskHTML(task)).join('');
-  midSection.style.display = otherTasks.length > 0 ? '' : 'none';
-}
-function taskHTML(task) {
-  const prioLabel = task.prio === 'high' ? 'Yüksek' : task.prio === 'mid' ? 'Orta' : 'Düşük';
-  const prioClass = 'prio-' + task.prio;
-  return `
-    <li class="task-item${task.done?' done':''}" id="ti-${task.id}">
-      <div class="task-check" onclick="toggleTask('${task.id}', ${task._virtual === true})"></div>
-      <span class="task-text">${escHtml(task.text)}</span>
-      <span class="task-prio-badge ${prioClass}">${prioLabel}</span>
-      ${task.recur ? `<span class="task-recur">🔁</span>` : ''}
-      ${!task._virtual ? `<button class="task-del" onclick="deleteTask('${task.id}')">✕</button>` : ''}
-    </li>`;
-}
-function addTask() {
-  const input = document.getElementById('task-input');
-  const text = input.value.trim();
-  if (!text) return;
-  ensureData();
-  const task = { id: uid(), text, prio: document.getElementById('prio-select').value, done: false, recur: document.getElementById('recur-select').value || '' };
-  if (task.recur) RECURRING.push({ id: task.id, text, prio: task.prio, recur: task.recur, createdKey: selectedDateKey });
-  DATA[selectedDateKey].tasks.push(task);
-  input.value = ''; document.getElementById('recur-select').value = '';
-  save(); renderTasks(); renderWeek(); renderBanner();
-}
-function toggleTask(id, isVirtual) {
-  ensureData();
-  if (isVirtual) {
-    const vTask = getTasksForDay(selectedDateKey).find(t => t.id === id);
-    if (vTask) DATA[selectedDateKey].tasks.push({ id: uid(), text: vTask.text, prio: vTask.prio, done: true, recur: vTask.recur, recurId: vTask.recurId });
-  } else {
-    const task = DATA[selectedDateKey].tasks.find(t => t.id === id);
-    if (task) task.done = !task.done;
-  }
-  save(); renderTasks(); renderBanner();
-}
-function deleteTask(id) {
-  if (!DATA[selectedDateKey]) return;
-  DATA[selectedDateKey].tasks = DATA[selectedDateKey].tasks.filter(t => t.id !== id);
-  RECURRING = RECURRING.filter(r => r.id !== id);
-  save(); renderTasks(); renderWeek(); renderBanner();
-}
-
-function renderRaf() {
-  const d = DATA[selectedDateKey] || {};
-  const books = d.books || [];
-  const movies = d.movies || [];
-  
-  let activeBooksHTML = '';
-  const activeBooks = {};
-  
-  Object.keys(DATA).sort().forEach(key => {
-    if(DATA[key].books) {
-      DATA[key].books.forEach(b => {
-        if (!activeBooks[b.name] || b.current > activeBooks[b.name].current) {
-          activeBooks[b.name] = { ...b, lastDate: key };
+    // Yeni Kural Ekleme Fonksiyonu
+    function addRule() {
+        const input = document.getElementById('newRuleText');
+        const list = document.getElementById('rulesList');
+        
+        if (input.value.trim() === "") {
+            alert("Lütfen bir not yazın.");
+            return;
         }
-      });
+
+        ruleCount++;
+        
+        const ruleDiv = document.createElement('div');
+        ruleDiv.className = 'rule-item';
+        
+        ruleDiv.innerHTML = `
+            <div class="rule-content">
+                <span class="rule-title">KURAL ${ruleCount}</span>
+                <span class="rule-text">${input.value}</span>
+            </div>
+            <button class="btn-minimal" onclick="this.parentElement.remove()" style="border:none; padding:5px;">
+                <svg viewBox="0 0 24 24" style="width:14px; height:14px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        `;
+
+        list.appendChild(ruleDiv);
+        input.value = ""; // Girişi temizle
+        input.focus();
     }
-  });
 
-  let hasActive = false;
-  let activeList = '';
-  Object.values(activeBooks).forEach(b => {
-    if (b.current < b.total) {
-      const alreadyToday = books.find(tb => tb.name === b.name);
-      if (!alreadyToday) {
-        hasActive = true;
-        const safeName = escHtml(b.name).replace(/'/g, "\\'");
-        activeList += `
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; background:var(--surface2); padding:8px 10px; border-radius:var(--radius-sm); border: 1px solid var(--border);">
-              <div style="flex:1; font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                <strong>${escHtml(b.name)}</strong> <span style="color:var(--text3)">(${b.current}/${b.total})</span>
-              </div>
-              <input type="number" id="quick-book-${b.id}" placeholder="Yeni Sayfa" style="width:75px; border:1px solid var(--border); border-radius:4px; padding:6px 4px; font-size:11px; outline:none; background:var(--surface);">
-              <button onclick="updateActiveBook('${safeName}', '${b.id}', ${b.total})" style="background:var(--accent); color:var(--today-text); border:none; border-radius:4px; padding:6px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:opacity 0.15s;">Güncelle</button>
-          </div>`;
-      }
-    }
-  });
-
-  if (hasActive) activeBooksHTML = `<div class="section-label" style="margin-top:0;">Okumaya Devam Et</div>${activeList}<div class="sep"></div>`;
-  document.getElementById('active-books-container').innerHTML = activeBooksHTML;
-
-  document.getElementById('book-list').innerHTML = books.map(b => `
-    <li class="task-item">
-      <span class="task-text">${escHtml(b.name)} <span style="color:var(--text3);font-size:11px;font-weight:600;">(${b.current}/${b.total})</span></span>
-      <button class="task-del" onclick="deleteBook('${b.id}')">✕</button>
-    </li>`).join('');
-    
-  document.getElementById('movie-list').innerHTML = movies.map(m => `
-    <li class="task-item">
-      <span class="task-text">${escHtml(m.name)} <span style="color:var(--mid);font-size:11px;margin-left:4px;">${'⭐'.repeat(m.rating)}</span></span>
-      <button class="task-del" onclick="deleteMovie('${m.id}')">✕</button>
-    </li>`).join('');
-}
-
-function updateActiveBook(name, id, total) {
-  const input = document.getElementById('quick-book-' + id);
-  if (!input) return;
-  const current = parseInt(input.value);
-  if (isNaN(current) || current <= 0) return;
-  ensureData();
-  DATA[selectedDateKey].books.push({ id: uid(), name, current, total });
-  save(); renderRaf(); renderWeek();
-}
-
-function addBook() {
-  const name = document.getElementById('book-name').value.trim();
-  const current = parseInt(document.getElementById('book-current').value);
-  const total = parseInt(document.getElementById('book-total').value);
-  if (!name || isNaN(current) || isNaN(total)) return;
-  ensureData();
-  DATA[selectedDateKey].books.push({ id: uid(), name, current, total });
-  document.getElementById('book-name').value = '';
-  document.getElementById('book-current').value = '';
-  document.getElementById('book-total').value = '';
-  save(); renderRaf(); renderWeek();
-}
-function deleteBook(id) { if(!DATA[selectedDateKey]) return; DATA[selectedDateKey].books = DATA[selectedDateKey].books.filter(b => b.id !== id); save(); renderRaf(); renderWeek(); }
-function addMovie() {
-  const name = document.getElementById('movie-name').value.trim();
-  const rating = parseInt(document.getElementById('movie-rating').value);
-  if (!name) return;
-  ensureData();
-  DATA[selectedDateKey].movies.push({ id: uid(), name, rating });
-  document.getElementById('movie-name').value = '';
-  document.getElementById('movie-rating').value = '3';
-  save(); renderRaf();
-}
-function deleteMovie(id) { if(!DATA[selectedDateKey]) return; DATA[selectedDateKey].movies = DATA[selectedDateKey].movies.filter(m => m.id !== id); save(); renderRaf(); }
-function renderSports() {
-  const d = DATA[selectedDateKey] || {};
-  const sports = d.sports || [];
-  document.getElementById('sport-list').innerHTML = sports.map(s => `
-    <li class="task-item"><span class="task-text">${escHtml(s.name)}</span><button class="task-del" onclick="deleteSport('${s.id}')">✕</button></li>`).join('');
-}
-function addSport() {
-  const name = document.getElementById('sport-name').value.trim();
-  if (!name) return;
-  ensureData();
-  DATA[selectedDateKey].sports.push({ id: uid(), name });
-  document.getElementById('sport-name').value = '';
-  save(); renderSports(); renderWeek();
-}
-function deleteSport(id) { if(!DATA[selectedDateKey]) return; DATA[selectedDateKey].sports = DATA[selectedDateKey].sports.filter(s => s.id !== id); save(); renderSports(); renderWeek(); }
-
-function openCal() {
-  const now = new Date(); calViewYear = now.getFullYear(); calViewMonth = now.getMonth();
-  renderCal(); document.getElementById('mini-cal').classList.add('open'); document.body.style.overflow = 'hidden';
-}
-function closeCal() { document.getElementById('mini-cal').classList.remove('open'); document.body.style.overflow = ''; }
-function miniCalOverlayClick(e) { if (e.target === document.getElementById('mini-cal')) closeCal(); }
-function shiftCal(n) { calViewMonth += n; if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; } if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; } renderCal(); }
-function renderCal() {
-  document.getElementById('mini-cal-title').textContent = `${MONTHS_TR[calViewMonth]} ${calViewYear}`;
-  const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
-  DAYS_TR.forEach(d => { const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el); });
-  const firstDow = dowIndex(new Date(calViewYear, calViewMonth, 1));
-  for (let i = 0; i < firstDow; i++) grid.appendChild(document.createElement('div'));
-  
-  const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
-  const tk = todayKey();
-  const weekStartKey = dateKey(currentWeekStart);
-  const weekEndKey = dateKey(addDays(currentWeekStart, 6));
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const d = new Date(calViewYear, calViewMonth, day);
-    const k = dateKey(d);
-    const el = document.createElement('div'); el.className = 'cal-day';
-    if (k === tk) el.classList.add('today');
-    else if (k >= weekStartKey && k <= weekEndKey) el.classList.add('in-week');
-    if (getTasksForDay(k).length > 0 || (DATA[k]?.note || '').trim().length > 0) el.classList.add('has-data');
-    el.textContent = day;
-    el.onclick = () => { currentWeekStart = getMondayOf(d); closeCal(); switchMainTab('week'); renderWeek(); };
-    grid.appendChild(el);
-  }
-}
-
-function openIO() { document.getElementById('io-panel').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeIO() { document.getElementById('io-panel').classList.remove('open'); document.body.style.overflow=''; }
-function ioPanelClick(e) { if(e.target===document.getElementById('io-panel')) closeIO(); }
-function exportData() {
-  const blob = new Blob([JSON.stringify({ 
-    data: DATA, 
-    recurring: RECURRING, 
-    theme,
-    g_books: GLOBAL_BOOKS,
-    g_movies: GLOBAL_MOVIES,
-    g_rules: GLOBAL_RULES,
-    w_notes: WEEKLY_NOTES
-  }, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'ajanda-backup.json'; a.click();
-  URL.revokeObjectURL(url); closeIO();
-}
-function importData(e) {
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const parsed = JSON.parse(ev.target.result);
-      if (parsed.data) DATA = parsed.data;
-      if (parsed.recurring) RECURRING = parsed.recurring;
-      if (parsed.theme) theme = parsed.theme;
-      if (parsed.g_books) GLOBAL_BOOKS = parsed.g_books;
-      if (parsed.g_movies) GLOBAL_MOVIES = parsed.g_movies;
-      if (parsed.g_rules) GLOBAL_RULES = parsed.g_rules;
-      if (parsed.w_notes) WEEKLY_NOTES = parsed.w_notes;
-      save(); applyTheme(); renderWeek(); closeIO();
-    } catch(err) { alert('Geçersiz dosya!'); }
-  };
-  reader.readAsText(file); e.target.value = '';
-}
-
-// ── INIT ──
-function init() {
-  load();
-  currentWeekStart = getMondayOf(new Date());
-  applyTheme();
-  renderWeek();
-  
-  // Editör blur event'leri
-  document.getElementById('note-area').addEventListener('blur', () => {
-    if (selectedDateKey) {
-      ensureData();
-      DATA[selectedDateKey].note = document.getElementById('note-area').value;
-      save();
-    }
-  });
-}
-init();
+    // Enter tuşu ile kural ekleme desteği
+    document.getElementById('newRuleText').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            addRule();
+        }
+    });
 </script>
+
 </body>
 </html>
