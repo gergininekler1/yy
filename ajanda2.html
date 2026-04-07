@@ -105,59 +105,118 @@
   }
   .icon-btn:hover { background: var(--surface2); color: var(--text); }
 
-  /* ── HIGH PRIORITY BANNER (SADELEŞTİRİLMİŞ) ── */
-  #high-banner {
-    margin: 16px 16px 0;
+  /* ── MAIN TABS (NEW) ── */
+  .main-tabs-container {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px 0;
+    border-bottom: 1px solid var(--border);
     background: var(--surface);
-    border-left: 4px solid var(--high);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    display: none; align-items: flex-start; gap: 14px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    overflow-x: auto;
+  }
+  .main-tabs-container::-webkit-scrollbar { display: none; }
+  .main-tab {
+    background: none; border: none; cursor: pointer; flex-shrink: 0;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--text3); padding: 10px 14px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .main-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .main-tab-pane { display: none; }
+  .main-tab-pane.active { display: block; animation: fadeIn 0.2s; }
+
+  /* ── CARDS (LIBRARY & DVDS) ── */
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+  .media-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); overflow: hidden;
+    box-shadow: var(--shadow); transition: transform 0.15s;
+    display: flex; flex-direction: column;
+  }
+  .media-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .media-img {
+    width: 100%; height: 240px; object-fit: cover;
+    background: var(--surface2);
+  }
+  .media-content { padding: 12px; flex: 1; display: flex; flex-direction: column; }
+  .media-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+  .media-desc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; flex: 1; }
+  .media-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+  .media-rating { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
+
+  /* ── RICH TEXT EDITOR (RULES) ── */
+  .rte-toolbar {
+    display: flex; gap: 6px; background: var(--surface2);
+    padding: 8px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    border: 1px solid var(--border); border-bottom: none;
+    flex-wrap: wrap;
+  }
+  .rte-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); border-radius: 4px; padding: 6px 10px;
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s;
+  }
+  .rte-btn:hover { background: var(--border); }
+  .rte-editor {
+    min-height: 400px; background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    padding: 16px; font-size: 15px; line-height: 1.6; outline: none;
+    overflow-y: auto;
+  }
+  .rte-editor h3 { margin-bottom: 10px; margin-top: 16px; color: var(--text); }
+  .rte-editor h3:first-child { margin-top: 0; }
+  .rte-editor ul { padding-left: 20px; margin-bottom: 10px; }
+
+  /* ── BANNERS ROW ── */
+  .banners-row { display: none; gap: 8px; padding: 14px 16px 0; flex-wrap: wrap; }
+  #high-banner {
+    flex: 1; min-width: 0; background: var(--surface);
+    border: 1px solid rgba(255,59,48,0.25); border-radius: 50px;
+    padding: 10px 16px; display: none; align-items: center; gap: 10px;
+    box-shadow: 0 2px 12px rgba(255,59,48,0.08); transition: box-shadow 0.2s;
   }
   #high-banner.show { display: flex; }
-  #high-banner .banner-icon { color: var(--high); margin-top: 2px; }
-  #high-banner .banner-content { flex: 1; }
-  #high-banner .banner-title { font-size: 11px; font-weight: 700; color: var(--text3); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+  #high-banner .banner-icon { color: var(--high); flex-shrink: 0; display: flex; align-items: center; }
+  #high-banner .banner-content { flex: 1; min-width: 0; }
+  #high-banner .banner-title { font-size: 10px; font-weight: 700; color: var(--high); margin-bottom: 2px; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.8; }
   #high-banner .banner-list { list-style: none; }
-  #high-banner .banner-list li { font-size: 13px; font-weight: 500; color: var(--text); padding: 4px 0; display: flex; align-items: center; }
-  #high-banner .banner-list li::before { content: "—"; color: var(--high); font-weight: 700; margin-right: 8px; opacity: 0.5; }
+  #high-banner .banner-list li {
+    font-size: 12px; font-weight: 500; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: flex; align-items: center; gap: 5px;
+  }
+  #high-banner .banner-list li::before { content: ""; display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--high); flex-shrink: 0; }
+  #high-banner .banner-count { font-size: 10px; color: var(--high); font-weight: 700; background: var(--high-bg); border-radius: 20px; padding: 2px 7px; flex-shrink: 0; white-space: nowrap; }
+
+  #sports-banner {
+    flex: 1; min-width: 0; background: var(--surface);
+    border: 1px solid rgba(52,199,89,0.25); border-radius: 50px;
+    padding: 10px 16px; display: none; align-items: center; gap: 10px;
+    box-shadow: 0 2px 12px rgba(52,199,89,0.08); transition: box-shadow 0.2s;
+  }
 
   /* ── WEEK GRID ── */
-  .week-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 16px 16px 24px;
-  }
+  .week-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 16px 24px; }
   .day-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    cursor: pointer;
-    transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
-    min-height: 130px;
-    display: flex; flex-direction: column;
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+    min-height: 130px; display: flex; flex-direction: column;
   }
   .day-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
   .day-card.today { border-color: var(--today); border-width: 2px; }
   .day-card.drag-over { border-color: var(--accent); background: var(--surface2); }
   
-  .day-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 10px 6px;
-    border-bottom: 1px solid var(--border);
-  }
+  .day-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 6px; border-bottom: 1px solid var(--border); }
   .day-name-num { display: flex; align-items: baseline; gap: 5px; }
   .day-name { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
-  .day-num {
-    font-size: 18px; font-weight: 700;
-    color: var(--text);
-    width: 28px; height: 28px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%;
-  }
+  .day-num { font-size: 18px; font-weight: 700; color: var(--text); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
   .today .day-num { background: var(--today); color: var(--today-text); }
   .day-indicators { display: flex; gap: 3px; align-items: center; }
   .dot { width: 6px; height: 6px; border-radius: 50%; }
@@ -168,25 +227,11 @@
   
   .day-body {
     padding: 0 10px; flex: 1; overflow: hidden;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 21px,
-      var(--border) 21px,
-      var(--border) 22px
-    );
-    background-position: 0 8px;
-    min-height: 90px;
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--border) 21px, var(--border) 22px);
+    background-position: 0 8px; min-height: 90px;
   }
   .day-body-inner { padding: 8px 0 6px; }
-  .day-preview-item {
-    font-size: 11px; color: var(--text2);
-    line-height: 22px; height: 22px;
-    display: flex; align-items: center; gap: 5px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    border-radius: 4px;
-    transition: background 0.15s;
-  }
+  .day-preview-item { font-size: 11px; color: var(--text2); line-height: 22px; height: 22px; display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 4px; transition: background 0.15s; }
   .day-preview-item[draggable="true"] { cursor: grab; }
   .day-preview-item[draggable="true"]:active { cursor: grabbing; background: var(--surface2); }
   .day-preview-item .pi-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -194,172 +239,42 @@
   .day-empty { font-size: 11px; color: var(--text3); font-style: italic; line-height: 22px; height: 22px; display:flex; align-items:center; }
 
   /* ── MODALS ── */
-  .overlay {
-    position: fixed; inset: 0; z-index: 200;
-    background: var(--modal-bg);
-    display: none; align-items: flex-end;
-    animation: fadeIn 0.2s;
-  }
+  .overlay { position: fixed; inset: 0; z-index: 200; background: var(--modal-bg); display: none; align-items: flex-end; animation: fadeIn 0.2s; }
   .overlay.open { display: flex; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .modal {
-    background: var(--surface);
-    border-radius: var(--radius) var(--radius) 0 0;
-    width: 100%; max-height: 92vh;
-    display: flex; flex-direction: column;
-    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
-    box-shadow: var(--shadow-lg);
-  }
+  .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; width: 100%; max-height: 92vh; display: flex; flex-direction: column; animation: slideUp 0.25s cubic-bezier(.4,0,.2,1); box-shadow: var(--shadow-lg); }
   @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .modal-handle {
-    width: 36px; height: 4px; background: var(--border);
-    border-radius: 2px; margin: 10px auto 0;
-  }
-  .modal-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px 10px;
-    border-bottom: 1px solid var(--border);
-  }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; border-bottom: 1px solid var(--border); }
   .modal-date { font-size: 17px; font-weight: 700; }
-  .modal-close {
-    background: var(--surface2); border: none; cursor: pointer;
-    width: 30px; height: 30px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: var(--text2);
-  }
-  .modal-tabs {
-    display: flex; border-bottom: 1px solid var(--border);
-    padding: 0 18px; gap: 0;
-    overflow-x: auto;
-  }
+  .modal-close { background: var(--surface2); border: none; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); }
+  .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 18px; gap: 0; overflow-x: auto; }
   .modal-tabs::-webkit-scrollbar { display: none; }
-  .modal-tab {
-    background: none; border: none; cursor: pointer; flex-shrink: 0;
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 13px; font-weight: 500;
-    color: var(--text3); padding: 10px 14px;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-    display: flex; align-items: center; gap: 5px;
-  }
+  .modal-tab { background: none; border: none; cursor: pointer; flex-shrink: 0; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text3); padding: 10px 14px; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 5px; }
   .modal-tab.active { color: var(--text); border-bottom-color: var(--accent); }
   .modal-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
 
-  /* ── NOTES TAB ── */
-  .note-wrapper {
-    position: relative;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
+  /* ── NOTES & TASKS TAB ── */
+  .note-wrapper { position: relative; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
   .note-wrapper:focus-within { border-color: var(--accent); }
-  .note-lines {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 27px,
-      var(--border) 27px,
-      var(--border) 28px
-    );
-    background-position: 0 12px;
-  }
-  .note-tools {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    display: flex;
-    gap: 4px;
-    z-index: 5;
-  }
-  .note-tool-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
+  .note-lines { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, var(--border) 27px, var(--border) 28px); background-position: 0 12px; }
+  .note-tools { position: absolute; top: 6px; right: 6px; display: flex; gap: 4px; z-index: 5; }
+  .note-tool-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text2); cursor: pointer; border-radius: var(--radius-sm); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   .note-tool-btn:hover { background: var(--surface2); color: var(--text); }
-  .note-area {
-    width: 100%;
-    min-height: 240px;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: transparent;
-    resize: vertical;
-    outline: none;
-    line-height: 28px;
-    position: relative;
-    z-index: 1;
-  }
-  .note-save-btn {
-    margin-top: 10px; width: 100%;
-    background: var(--accent); color: var(--today-text);
-    border: none; border-radius: var(--radius-sm);
-    padding: 11px; font-family: 'Instrument Sans', sans-serif;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    transition: opacity 0.15s;
-  }
+  .note-area { width: 100%; min-height: 240px; border: none; border-radius: var(--radius-sm); padding: 12px 14px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: var(--text); background: transparent; resize: vertical; outline: none; line-height: 28px; position: relative; z-index: 1; }
+  .note-save-btn { margin-top: 10px; width: 100%; background: var(--accent); color: var(--today-text); border: none; border-radius: var(--radius-sm); padding: 11px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
   .note-save-btn:hover { opacity: 0.85; }
 
-  /* ── TASKS TAB ── */
-  .task-input-row {
-    display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-start;
-    flex-wrap: wrap;
-  }
-  .task-input {
-    flex: 1; min-width: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 9px 12px;
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 13px; color: var(--text);
-    background: var(--surface2); outline: none;
-    transition: border-color 0.15s;
-  }
+  .task-input-row { display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .task-input { flex: 1; min-width: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-family: 'Instrument Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--surface2); outline: none; transition: border-color 0.15s; }
   .task-input:focus { border-color: var(--accent); }
-  .prio-select, .recur-select {
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 9px 8px; background: var(--surface2);
-    font-family: 'Instrument Sans', sans-serif; font-size: 12px;
-    color: var(--text); outline: none; cursor: pointer;
-  }
-  .add-task-btn {
-    background: var(--accent); color: var(--today-text);
-    border: none; border-radius: var(--radius-sm);
-    padding: 9px 14px; cursor: pointer;
-    font-size: 16px; font-weight: 700;
-    transition: opacity 0.15s;
-  }
+  .prio-select, .recur-select { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 8px; background: var(--surface2); font-family: 'Instrument Sans', sans-serif; font-size: 12px; color: var(--text); outline: none; cursor: pointer; }
+  .add-task-btn { background: var(--accent); color: var(--today-text); border: none; border-radius: var(--radius-sm); padding: 9px 14px; cursor: pointer; font-size: 16px; font-weight: 700; transition: opacity 0.15s; }
   .add-task-btn:hover { opacity: 0.8; }
   .task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-  .task-item {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 9px 12px;
-    transition: opacity 0.2s;
-  }
+  .task-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; transition: opacity 0.2s; }
   .task-item.done { opacity: 0.45; }
-  .task-check {
-    width: 18px; height: 18px; border-radius: 50%;
-    border: 2px solid var(--border); cursor: pointer;
-    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    transition: border-color 0.15s, background 0.15s;
-    background: none;
-  }
+  .task-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s, background 0.15s; background: none; }
   .task-item.done .task-check { background: var(--low); border-color: var(--low); }
   .task-check::after { content: "✓"; font-size: 10px; color: white; display: none; }
   .task-item.done .task-check::after { display: block; }
@@ -370,82 +285,34 @@
   .prio-mid { background: var(--mid-bg); color: var(--mid); }
   .prio-low { background: var(--low-bg); color: var(--low); }
   .task-recur { font-size: 10px; color: var(--text3); flex-shrink: 0; }
-  .task-del {
-    background: none; border: none; cursor: pointer;
-    color: var(--text3); font-size: 15px; padding: 0 2px;
-    transition: color 0.15s;
-  }
+  .task-del { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 15px; padding: 0 2px; transition: color 0.15s; }
   .task-del:hover { color: var(--high); }
 
-  /* ── MINI CALENDAR ── */
-  .mini-cal {
-    position: fixed; inset: 0; z-index: 300;
-    background: var(--modal-bg);
-    display: none; align-items: center; justify-content: center;
-  }
+  /* ── MINI CALENDAR & IO & STATS ── (Sıkıştırılmış halde korunmuştur) */
+  .mini-cal { position: fixed; inset: 0; z-index: 300; background: var(--modal-bg); display: none; align-items: center; justify-content: center; }
   .mini-cal.open { display: flex; }
-  .mini-cal-box {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 20px;
-    width: 320px;
-    box-shadow: var(--shadow-lg);
-    animation: scaleIn 0.2s cubic-bezier(.4,0,.2,1);
-  }
+  .mini-cal-box { background: var(--surface); border-radius: var(--radius); padding: 20px; width: 320px; box-shadow: var(--shadow-lg); animation: scaleIn 0.2s cubic-bezier(.4,0,.2,1); }
   @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .mini-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .mini-cal-title { font-size: 15px; font-weight: 700; }
   .mini-cal-nav { display: flex; gap: 4px; }
-  .mini-cal-nav button {
-    background: none; border: none; cursor: pointer;
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text2); font-size: 14px; transition: background 0.15s;
-  }
+  .mini-cal-nav button { background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 14px; transition: background 0.15s; }
   .mini-cal-nav button:hover { background: var(--surface2); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
   .cal-dow { text-align: center; font-size: 10px; font-weight: 600; color: var(--text3); padding: 4px 0; text-transform: uppercase; }
-  .cal-day {
-    text-align: center; font-size: 12px; width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: background 0.12s;
-  }
+  .cal-day { text-align: center; font-size: 12px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: background 0.12s; }
   .cal-day:hover { background: var(--surface2); }
   .cal-day.today { background: var(--today); color: var(--today-text); font-weight: 700; }
   .cal-day.in-week { background: var(--accent-soft); font-weight: 600; }
   .cal-day.other-month { color: var(--text3); }
-  .cal-day.has-data::after {
-    content: ""; display: block; width: 4px; height: 4px; border-radius: 50%;
-    background: var(--high); margin: 1px auto 0;
-  }
-  .mini-cal-close-btn {
-    margin-top: 14px; width: 100%;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 9px;
-    font-family: 'Instrument Sans', sans-serif; font-size: 13px; color: var(--text); cursor: pointer;
-  }
+  .cal-day.has-data::after { content: ""; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--high); margin: 1px auto 0; }
+  .mini-cal-close-btn { margin-top: 14px; width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px; font-family: 'Instrument Sans', sans-serif; font-size: 13px; color: var(--text); cursor: pointer; }
 
-  /* ── IMPORT/EXPORT PANEL ── */
-  .io-panel {
-    position: fixed; inset: 0; z-index: 300;
-    background: var(--modal-bg);
-    display: none; align-items: flex-end;
-  }
+  .io-panel { position: fixed; inset: 0; z-index: 300; background: var(--modal-bg); display: none; align-items: flex-end; }
   .io-panel.open { display: flex; }
-  .io-box {
-    background: var(--surface);
-    border-radius: var(--radius) var(--radius) 0 0;
-    padding: 24px 20px 36px;
-    width: 100%; box-shadow: var(--shadow-lg);
-    animation: slideUp 0.25s cubic-bezier(.4,0,.2,1);
-  }
+  .io-box { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 24px 20px 36px; width: 100%; box-shadow: var(--shadow-lg); animation: slideUp 0.25s cubic-bezier(.4,0,.2,1); }
   .io-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-  .io-btn {
-    display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 16px;
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    background: var(--surface2); cursor: pointer; margin-bottom: 10px;
-    font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: var(--text);
-    transition: background 0.15s;
-  }
+  .io-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); cursor: pointer; margin-bottom: 10px; font-family: 'Instrument Sans', sans-serif; font-size: 14px; color: var(--text); transition: background 0.15s; }
   .io-btn:hover { background: var(--border); }
   .io-btn .io-icon { font-size: 20px; width: 28px; text-align: center; display:flex; align-items:center; justify-content:center; }
   .io-btn-label { display: flex; flex-direction: column; align-items: flex-start; }
@@ -453,29 +320,15 @@
   .io-btn-label span { font-size: 11px; color: var(--text3); }
   .io-close { margin-top: 6px; }
 
-  /* ── WEEK STATS CARD ── */
-  .week-stats-card {
-    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
-    overflow: hidden; min-height: 130px; display: flex; flex-direction: column;
-    position: relative; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s;
-  }
+  .week-stats-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; min-height: 130px; display: flex; flex-direction: column; position: relative; cursor: pointer; transition: transform 0.15s, box-shadow 0.2s; }
   .week-stats-card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
   .week-stats-card.perfect { border-color: var(--low); background: var(--low-bg); }
-  .stats-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 10px 6px; border-bottom: 1px solid var(--border);
-  }
+  .stats-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 6px; border-bottom: 1px solid var(--border); }
   .week-stats-card.perfect .stats-header { border-bottom-color: var(--low); }
   .stats-title { font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
   .week-stats-card.perfect .stats-title { color: var(--low); }
-  .stats-body {
-    flex: 1; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between;
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--border) 21px, var(--border) 22px);
-    background-position: 0 8px; min-height: 90px;
-  }
-  .week-stats-card.perfect .stats-body {
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, rgba(52,199,89,0.2) 21px, rgba(52,199,89,0.2) 22px);
-  }
+  .stats-body { flex: 1; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, var(--border) 21px, var(--border) 22px); background-position: 0 8px; min-height: 90px; }
+  .week-stats-card.perfect .stats-body { background-image: repeating-linear-gradient(to bottom, transparent, transparent 21px, rgba(52,199,89,0.2) 21px, rgba(52,199,89,0.2) 22px); }
   .stats-pct { font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); font-family: 'Instrument Serif', serif; }
   .week-stats-card.perfect .stats-pct { color: var(--low); }
   .stats-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
@@ -487,13 +340,16 @@
   .week-stats-card.perfect .stats-perfect-msg { display: block; }
   .stats-empty { font-size: 11px; color: var(--text3); font-style: italic; }
 
-  /* ── SECTION LABEL & SEPARATOR ── */
+  .day-task-status { display: flex; gap: 3px; align-items: center; padding: 0 10px 7px; flex-wrap: wrap; }
+  .ts-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .ts-dot-done { background: var(--low); position: relative; }
+  .ts-dot-active { background: transparent; border: 1.5px solid var(--text3); }
+
   .section-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; margin-top: 14px; }
   .section-label:first-child { margin-top: 0; }
   .sep { height: 1px; background: var(--border); margin: 12px 0; }
   .hidden { display: none !important; }
 
-  /* ── SEARCH RESULT ITEM HOVER ── */
   .search-item { padding: 12px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
   .search-item:hover { background: var(--surface2); }
   .search-item:last-child { border-bottom: none; }
@@ -533,7 +389,7 @@
   </div>
 </header>
 
-<div class="search-bar-container" style="padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border);">
+<div class="search-bar-container" style="padding: 12px 20px 0; background: var(--surface);">
   <div style="display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px;">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input type="text" id="search-input" placeholder="Not veya görev ara..." onkeyup="doSearch()" style="width:100%; border:none; outline:none; padding: 10px 0; font-family:inherit; font-size:14px; background:transparent; color:var(--text);">
@@ -541,24 +397,101 @@
   <div id="search-results" style="max-height: 250px; overflow-y: auto;"></div>
 </div>
 
-<div id="high-banner">
-  <div class="banner-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  <div class="banner-content">
-    <div class="banner-title">Yüksek Öncelikli Görevler</div>
-    <ul class="banner-list" id="banner-list"></ul>
+<div class="main-tabs-container">
+  <button class="main-tab active" data-main-tab="week" onclick="switchMainTab('week')">Haftalık Görünüm</button>
+  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">Kitaplık</button>
+  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">DVD'ler</button>
+  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">Kurallar</button>
+</div>
+
+<div id="pane-week" class="main-tab-pane active">
+  <div class="banners-row" id="banners-row">
+    <div id="high-banner">
+      <div class="banner-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="banner-content">
+        <div class="banner-title">Yüksek Öncelik</div>
+        <ul class="banner-list" id="banner-list"></ul>
+      </div>
+      <span class="banner-count" id="banner-count"></span>
+    </div>
+
+    <div id="sports-banner">
+      <div style="color:var(--low); flex-shrink:0; display:flex; align-items:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:10px; font-weight:700; color:var(--low); opacity:0.8; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:2px;">Hareket</div>
+        <div id="sports-banner-text" style="font-size:12px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-grid" id="week-grid"></div>
+
+  <div id="books-banner" style="display:none; margin: 0 16px 24px; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
+    <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
+    <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+
+  <div style="padding: 0 16px 24px;">
+    <div class="section-label" style="margin-top:0;">Haftanın Genel Notu</div>
+    <div class="note-wrapper">
+      <div class="note-lines"></div>
+      <textarea class="note-area" id="weekly-note" placeholder="Bu haftaya dair genel değerlendirmeler, özel notlar ve ana fikirler..." onblur="saveWeeklyNote()"></textarea>
+    </div>
   </div>
 </div>
 
-<div id="sports-banner" style="display:none; margin: 16px 16px 0; padding: 12px 16px; background: var(--surface); border-radius: var(--radius-sm); border-left: 4px solid var(--low); box-shadow: 0 4px 20px rgba(0,0,0,0.04); align-items:center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--text);">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="color:var(--low); flex-shrink:0;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  <span id="sports-banner-text"></span>
+<div id="pane-library" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+      <input class="task-input" id="lib-title" placeholder="Kitap Adı" style="flex:100%;">
+      <input class="task-input" id="lib-desc" placeholder="Kısa Açıklama..." style="flex:100%;">
+      <input class="task-input" id="lib-img" placeholder="Görsel URL (İsteğe bağlı)" style="flex:2;">
+      <select class="prio-select" id="lib-rating" style="flex:1;">
+        <option value="1">1 Yıldız</option>
+        <option value="2">2 Yıldız</option>
+        <option value="3" selected>3 Yıldız</option>
+        <option value="4">4 Yıldız</option>
+        <option value="5">5 Yıldız</option>
+      </select>
+      <button class="add-task-btn" onclick="addGlobalBook()">Ekle</button>
+    </div>
+  </div>
+  <div class="media-grid" id="global-books-grid"></div>
 </div>
 
-<div class="week-grid" id="week-grid"></div>
+<div id="pane-dvds" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+      <input class="task-input" id="dvd-title" placeholder="Film/Dizi Adı" style="flex:100%;">
+      <input class="task-input" id="dvd-img" placeholder="Görsel URL (İsteğe bağlı)" style="flex:2;">
+      <select class="prio-select" id="dvd-rating" style="flex:1;">
+        <option value="1">1 Yıldız</option>
+        <option value="2">2 Yıldız</option>
+        <option value="3" selected>3 Yıldız</option>
+        <option value="4">4 Yıldız</option>
+        <option value="5">5 Yıldız</option>
+      </select>
+      <button class="add-task-btn" onclick="addGlobalMovie()">Ekle</button>
+    </div>
+  </div>
+  <div class="media-grid" id="global-movies-grid"></div>
+</div>
 
-<div id="books-banner" style="display:none; margin: 0 16px 24px; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
-  <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
-  <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+<div id="pane-rules" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="rte-toolbar">
+      <button class="rte-btn" onclick="document.execCommand('formatBlock', false, 'H3')">Başlık (H3)</button>
+      <button class="rte-btn" onclick="document.execCommand('bold')"><b>Kalın</b></button>
+      <button class="rte-btn" onclick="document.execCommand('italic')"><i>Eğik</i></button>
+      <button class="rte-btn" onclick="document.execCommand('insertUnorderedList')">Madde İmi</button>
+      <button class="rte-btn" onclick="document.execCommand('insertOrderedList')">Numaralı</button>
+      <button class="rte-btn" onclick="document.execCommand('indent')">Girinti Artır ➡</button>
+      <button class="rte-btn" onclick="document.execCommand('outdent')">Girinti Azalt ⬅</button>
+    </div>
+    <div class="rte-editor" id="rules-editor" contenteditable="true" onblur="saveRules()" placeholder="Hayat kurallarını, öğretileri ve çıkarımlarını buraya yaz..."></div>
+  </div>
 </div>
 
 <div class="overlay" id="stats-overlay" onclick="statsOverlayClick(event)">
@@ -588,13 +521,9 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="9,11 12,14 22,4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>Görevler</span>
       </button>
-      <button class="modal-tab" data-tab="raf" onclick="switchTab('raf')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span>Raf</span>
-      </button>
-      <button class="modal-tab" data-tab="sports" onclick="switchTab('sports')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>Spor</span>
+      <button class="modal-tab" data-tab="ekstra" onclick="switchTab('ekstra')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Ekstra</span>
       </button>
     </div>
     <div class="modal-body">
@@ -646,9 +575,9 @@
         </div>
       </div>
 
-      <div id="tab-raf" class="hidden">
+      <div id="tab-ekstra" class="hidden">
         <div id="active-books-container"></div>
-        <div class="section-label">Kitaplar</div>
+        <div class="section-label">Kitaplar (Günlük İlerleme)</div>
         <div class="task-input-row">
           <input class="task-input" id="book-name" placeholder="Kitap Adı" style="flex:2;">
           <input class="task-input" type="number" id="book-current" placeholder="Şu an" style="flex:1; min-width:50px;">
@@ -657,7 +586,7 @@
         </div>
         <ul class="task-list" id="book-list"></ul>
         <div class="sep"></div>
-        <div class="section-label">Filmler</div>
+        <div class="section-label">Filmler (Günlük Seyir)</div>
         <div class="task-input-row">
           <input class="task-input" id="movie-name" placeholder="Film Adı">
           <select class="prio-select" id="movie-rating">
@@ -670,9 +599,7 @@
           <button class="add-task-btn" onclick="addMovie()">+</button>
         </div>
         <ul class="task-list" id="movie-list"></ul>
-      </div>
-
-      <div id="tab-sports" class="hidden">
+        <div class="sep"></div>
         <div class="section-label">Spor / Hareket</div>
         <div class="task-input-row">
           <input class="task-input" id="sport-name" placeholder="Örn: Kol, Göğüs, Omuz, Koşu..." onkeydown="if(event.key==='Enter')addSport()">
@@ -729,6 +656,12 @@ let DATA = {};
 let RECURRING = [];
 let theme = 'light';
 
+// YENİ EKLENEN VERİ YAPILARI
+let GLOBAL_BOOKS = [];
+let GLOBAL_MOVIES = [];
+let GLOBAL_RULES = "";
+let WEEKLY_NOTES = {};
+
 const MONTHS_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const DAYS_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 const FULL_DAYS_TR = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
@@ -754,12 +687,117 @@ function save() {
   localStorage.setItem('ajanda_data', JSON.stringify(DATA));
   localStorage.setItem('ajanda_recur', JSON.stringify(RECURRING));
   localStorage.setItem('ajanda_theme', theme);
+  
+  // Yeni verilerin kaydedilmesi
+  localStorage.setItem('ajanda_g_books', JSON.stringify(GLOBAL_BOOKS));
+  localStorage.setItem('ajanda_g_movies', JSON.stringify(GLOBAL_MOVIES));
+  localStorage.setItem('ajanda_g_rules', GLOBAL_RULES);
+  localStorage.setItem('ajanda_w_notes', JSON.stringify(WEEKLY_NOTES));
 }
 function load() {
   try { DATA = JSON.parse(localStorage.getItem('ajanda_data') || '{}'); } catch(e){ DATA={}; }
   try { RECURRING = JSON.parse(localStorage.getItem('ajanda_recur') || '[]'); } catch(e){ RECURRING=[]; }
   theme = localStorage.getItem('ajanda_theme') || 'light';
+
+  // Yeni verilerin yüklenmesi
+  try { GLOBAL_BOOKS = JSON.parse(localStorage.getItem('ajanda_g_books') || '[]'); } catch(e){ GLOBAL_BOOKS=[]; }
+  try { GLOBAL_MOVIES = JSON.parse(localStorage.getItem('ajanda_g_movies') || '[]'); } catch(e){ GLOBAL_MOVIES=[]; }
+  GLOBAL_RULES = localStorage.getItem('ajanda_g_rules') || '';
+  try { WEEKLY_NOTES = JSON.parse(localStorage.getItem('ajanda_w_notes') || '{}'); } catch(e){ WEEKLY_NOTES={}; }
 }
+
+// ── ANA SEKMELER (YENİ) ──
+function switchMainTab(tabId) {
+  document.querySelectorAll('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.mainTab === tabId));
+  document.querySelectorAll('.main-tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('pane-' + tabId).classList.add('active');
+  
+  if(tabId === 'library') renderGlobalBooks();
+  if(tabId === 'dvds') renderGlobalMovies();
+  if(tabId === 'rules') document.getElementById('rules-editor').innerHTML = GLOBAL_RULES;
+}
+
+// ── KİTAPLIK VE DVDLER FONKSİYONLARI ──
+function renderGlobalBooks() {
+  const grid = document.getElementById('global-books-grid');
+  grid.innerHTML = GLOBAL_BOOKS.map(b => `
+    <div class="media-card">
+      ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
+      <div class="media-content">
+        <div class="media-title">${escHtml(b.title)}</div>
+        <div class="media-desc">${escHtml(b.desc)}</div>
+        <div class="media-footer">
+          <div class="media-rating">${'⭐'.repeat(b.rating)}</div>
+          <button class="task-del" onclick="deleteGlobalBook('${b.id}')">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function addGlobalBook() {
+  const title = document.getElementById('lib-title').value.trim();
+  const desc = document.getElementById('lib-desc').value.trim();
+  const img = document.getElementById('lib-img').value.trim();
+  const rating = parseInt(document.getElementById('lib-rating').value);
+  if (!title) return;
+  GLOBAL_BOOKS.push({ id: uid(), title, desc, img, rating });
+  document.getElementById('lib-title').value = '';
+  document.getElementById('lib-desc').value = '';
+  document.getElementById('lib-img').value = '';
+  save(); renderGlobalBooks();
+}
+function deleteGlobalBook(id) {
+  GLOBAL_BOOKS = GLOBAL_BOOKS.filter(b => b.id !== id);
+  save(); renderGlobalBooks();
+}
+
+function renderGlobalMovies() {
+  const grid = document.getElementById('global-movies-grid');
+  grid.innerHTML = GLOBAL_MOVIES.map(m => `
+    <div class="media-card">
+      ${m.img ? `<img src="${escHtml(m.img)}" class="media-img" alt="${escHtml(m.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
+      <div class="media-content">
+        <div class="media-title">${escHtml(m.title)}</div>
+        <div class="media-footer">
+          <div class="media-rating">${'⭐'.repeat(m.rating)}</div>
+          <button class="task-del" onclick="deleteGlobalMovie('${m.id}')">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function addGlobalMovie() {
+  const title = document.getElementById('dvd-title').value.trim();
+  const img = document.getElementById('dvd-img').value.trim();
+  const rating = parseInt(document.getElementById('dvd-rating').value);
+  if (!title) return;
+  GLOBAL_MOVIES.push({ id: uid(), title, img, rating });
+  document.getElementById('dvd-title').value = '';
+  document.getElementById('dvd-img').value = '';
+  save(); renderGlobalMovies();
+}
+function deleteGlobalMovie(id) {
+  GLOBAL_MOVIES = GLOBAL_MOVIES.filter(m => m.id !== id);
+  save(); renderGlobalMovies();
+}
+
+// ── KURALLAR (ZENGİN METİN) ──
+function saveRules() {
+  GLOBAL_RULES = document.getElementById('rules-editor').innerHTML;
+  save();
+}
+
+// ── HAFTALIK NOT ──
+function renderWeeklyNote() {
+  const wKey = dateKey(currentWeekStart);
+  document.getElementById('weekly-note').value = WEEKLY_NOTES[wKey] || '';
+}
+function saveWeeklyNote() {
+  const wKey = dateKey(currentWeekStart);
+  WEEKLY_NOTES[wKey] = document.getElementById('weekly-note').value;
+  save();
+}
+
 
 // ── RECURRING ──
 function recurringMatchesDay(r, d) {
@@ -767,10 +805,7 @@ function recurringMatchesDay(r, d) {
   if (r.recur === 'daily') return true;
   if (r.recur === 'weekly') { const orig = parseKey(r.createdKey); return dowIndex(orig) === dow; }
   if (r.recur === 'weekdays') return dow <= 4;
-  if (r.recur === 'monthly') { 
-    const orig = parseKey(r.createdKey); 
-    return d.getDate() === orig.getDate(); 
-  }
+  if (r.recur === 'monthly') { const orig = parseKey(r.createdKey); return d.getDate() === orig.getDate(); }
   if (r.recur === 'month-last') {
     const nextDay = new Date(d);
     nextDay.setDate(d.getDate() + 1);
@@ -905,10 +940,8 @@ function renderWeek() {
     const hasNote = note.trim().length > 0;
 
     let indHTML = '';
-    
     if (hasRaf) indHTML += `<div style="color:var(--text3); margin-right:2px; display:flex; align-items:center;" title="Raf (Kitap/Film)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>`;
     if (hasSports) indHTML += `<div style="color:var(--text3); margin-right:4px; display:flex; align-items:center;" title="Spor/Hareket"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
-
     if (highCount) indHTML += `<div class="dot dot-high" title="${highCount} yüksek"></div>`;
     if (midCount) indHTML += `<div class="dot dot-mid"></div>`;
     if (lowCount) indHTML += `<div class="dot dot-low"></div>`;
@@ -933,6 +966,16 @@ function renderWeek() {
       if (total > 3) previewHTML += `<div class="day-preview-more">+${total-3} daha</div>`;
     }
 
+    const allTasks = getTasksForDay(k);
+    let taskDotsHTML = '';
+    if (allTasks.length > 0) {
+      const maxDots = Math.min(allTasks.length, 7);
+      allTasks.slice(0, maxDots).forEach(t => {
+        taskDotsHTML += `<div class="ts-dot ${t.done ? 'ts-dot-done' : 'ts-dot-active'}" title="${t.done ? 'Tamamlandı' : 'Aktif'}: ${escHtml(t.text)}"></div>`;
+      });
+      if (allTasks.length > 7) taskDotsHTML += `<span style="font-size:9px;color:var(--text3);margin-left:1px;">+${allTasks.length-7}</span>`;
+    }
+
     const card = document.createElement('div');
     card.className = 'day-card' + (isToday ? ' today' : '');
     card.onclick = () => openModal(k);
@@ -946,11 +989,11 @@ function renderWeek() {
         <div class="day-indicators">${indHTML}</div>
       </div>
       <div class="day-body"><div class="day-body-inner">${previewHTML}</div></div>
+      ${taskDotsHTML ? `<div class="day-task-status">${taskDotsHTML}</div>` : ''}
     `;
     grid.appendChild(card);
   }
 
-  // Stats Card
   const statsCard = document.createElement('div');
   let totalTasks = 0, doneTasks = 0;
   for (let i = 0; i < 7; i++) {
@@ -978,7 +1021,6 @@ function renderWeek() {
   `;
   grid.appendChild(statsCard);
 
-  // Spor Banner
   const sportsBanner = document.getElementById('sports-banner');
   if (daysActive > 0) {
     sportsBanner.style.display = 'flex';
@@ -987,7 +1029,6 @@ function renderWeek() {
     sportsBanner.style.display = 'none';
   }
 
-  // Kitap Banner
   const booksBanner = document.getElementById('books-banner');
   const booksList = document.getElementById('books-banner-list');
   const bookKeys = Object.keys(booksMap);
@@ -1013,24 +1054,32 @@ function renderWeek() {
   }
 
   renderBanner();
+  renderWeeklyNote();
 }
 
-// ── BANNER ──
 function renderBanner() {
   const banner = document.getElementById('high-banner');
   const list = document.getElementById('banner-list');
+  const countEl = document.getElementById('banner-count');
   let highs = [];
   for (let i = 0; i < 7; i++) {
     const d = addDays(currentWeekStart, i);
     const k = dateKey(d);
     getTasksForDay(k).filter(t => t.prio === 'high' && !t.done).forEach(task => highs.push({text: task.text, day: DAYS_TR[i]}));
   }
-  if (highs.length === 0) { banner.classList.remove('show'); return; }
-  banner.classList.add('show');
-  list.innerHTML = highs.slice(0,5).map(h => `<li>${h.day}: ${escHtml(h.text)}</li>`).join('');
+  if (highs.length === 0) {
+    banner.classList.remove('show');
+  } else {
+    banner.classList.add('show');
+    const first = highs[0];
+    list.innerHTML = `<li>${first.day}: ${escHtml(first.text)}</li>`;
+    countEl.textContent = highs.length > 1 ? `+${highs.length - 1}` : '';
+    countEl.style.display = highs.length > 1 ? '' : 'none';
+  }
+  const row = document.getElementById('banners-row');
+  row.style.display = (banner.classList.contains('show') || document.getElementById('sports-banner').style.display === 'flex') ? 'flex' : 'none';
 }
 
-// ── DETAILED STATS ──
 function openStats() {
   document.getElementById('stats-overlay').classList.add('open');
   const body = document.getElementById('stats-body');
@@ -1056,7 +1105,6 @@ function openStats() {
 function closeStats() { document.getElementById('stats-overlay').classList.remove('open'); }
 function statsOverlayClick(e) { if(e.target.id==='stats-overlay') closeStats(); }
 
-// ── MODAL ──
 function ensureData() {
   if (!DATA[selectedDateKey]) DATA[selectedDateKey] = {note:'', tasks:[], books:[], movies:[], sports:[]};
   if (!DATA[selectedDateKey].tasks) DATA[selectedDateKey].tasks = [];
@@ -1077,17 +1125,14 @@ function openModal(key) {
 function closeModal() { document.getElementById('overlay').classList.remove('open'); document.body.style.overflow = ''; renderWeek(); }
 function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
-// ── TABS & NOTES ──
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('tab-notes').classList.toggle('hidden', tab !== 'notes');
   document.getElementById('tab-tasks').classList.toggle('hidden', tab !== 'tasks');
-  document.getElementById('tab-raf').classList.toggle('hidden', tab !== 'raf');
-  document.getElementById('tab-sports').classList.toggle('hidden', tab !== 'sports');
+  document.getElementById('tab-ekstra').classList.toggle('hidden', tab !== 'ekstra');
   if (tab === 'tasks') renderTasks();
-  if (tab === 'raf') renderRaf();
-  if (tab === 'sports') renderSports();
+  if (tab === 'ekstra') { renderRaf(); renderSports(); }
 }
 function saveNote() {
   ensureData();
@@ -1106,11 +1151,7 @@ function insertTime() {
   textarea.value = textarea.value.substring(0, startPos) + timeStr + textarea.value.substring(textarea.selectionEnd);
   textarea.selectionStart = textarea.selectionEnd = startPos + timeStr.length;
   textarea.focus();
-  if (selectedDateKey) {
-    ensureData();
-    DATA[selectedDateKey].note = textarea.value;
-    save();
-  }
+  if (selectedDateKey) { ensureData(); DATA[selectedDateKey].note = textarea.value; save(); }
 }
 function copyNote() {
   const textarea = document.getElementById('note-area');
@@ -1123,7 +1164,6 @@ function copyNote() {
   });
 }
 
-// ── TASKS ──
 function renderTasks() {
   const tasks = getTasksForDay(selectedDateKey);
   const midList = document.getElementById('mid-task-list');
@@ -1184,13 +1224,11 @@ function deleteTask(id) {
   save(); renderTasks(); renderWeek(); renderBanner();
 }
 
-// ── RAF (KİTAP & FİLM) ──
 function renderRaf() {
   const d = DATA[selectedDateKey] || {};
   const books = d.books || [];
   const movies = d.movies || [];
   
-  // Devam Eden Kitaplar Listesini Oluştur
   let activeBooksHTML = '';
   const activeBooks = {};
   
@@ -1224,12 +1262,9 @@ function renderRaf() {
     }
   });
 
-  if (hasActive) {
-    activeBooksHTML = `<div class="section-label" style="margin-top:0;">Okumaya Devam Et</div>${activeList}<div class="sep"></div>`;
-  }
+  if (hasActive) activeBooksHTML = `<div class="section-label" style="margin-top:0;">Okumaya Devam Et</div>${activeList}<div class="sep"></div>`;
   document.getElementById('active-books-container').innerHTML = activeBooksHTML;
 
-  // Standart Liste
   document.getElementById('book-list').innerHTML = books.map(b => `
     <li class="task-item">
       <span class="task-text">${escHtml(b.name)} <span style="color:var(--text3);font-size:11px;font-weight:600;">(${b.current}/${b.total})</span></span>
@@ -1265,11 +1300,7 @@ function addBook() {
   document.getElementById('book-total').value = '';
   save(); renderRaf(); renderWeek();
 }
-function deleteBook(id) {
-  if(!DATA[selectedDateKey]) return;
-  DATA[selectedDateKey].books = DATA[selectedDateKey].books.filter(b => b.id !== id);
-  save(); renderRaf(); renderWeek();
-}
+function deleteBook(id) { if(!DATA[selectedDateKey]) return; DATA[selectedDateKey].books = DATA[selectedDateKey].books.filter(b => b.id !== id); save(); renderRaf(); renderWeek(); }
 function addMovie() {
   const name = document.getElementById('movie-name').value.trim();
   const rating = parseInt(document.getElementById('movie-rating').value);
@@ -1280,21 +1311,12 @@ function addMovie() {
   document.getElementById('movie-rating').value = '3';
   save(); renderRaf();
 }
-function deleteMovie(id) {
-  if(!DATA[selectedDateKey]) return;
-  DATA[selectedDateKey].movies = DATA[selectedDateKey].movies.filter(m => m.id !== id);
-  save(); renderRaf();
-}
-
-// ── SPOR ──
+function deleteMovie(id) { if(!DATA[selectedDateKey]) return; DATA[selectedDateKey].movies = DATA[selectedDateKey].movies.filter(m => m.id !== id); save(); renderRaf(); }
 function renderSports() {
   const d = DATA[selectedDateKey] || {};
   const sports = d.sports || [];
   document.getElementById('sport-list').innerHTML = sports.map(s => `
-    <li class="task-item">
-      <span class="task-text">${escHtml(s.name)}</span>
-      <button class="task-del" onclick="deleteSport('${s.id}')">✕</button>
-    </li>`).join('');
+    <li class="task-item"><span class="task-text">${escHtml(s.name)}</span><button class="task-del" onclick="deleteSport('${s.id}')">✕</button></li>`).join('');
 }
 function addSport() {
   const name = document.getElementById('sport-name').value.trim();
@@ -1304,13 +1326,8 @@ function addSport() {
   document.getElementById('sport-name').value = '';
   save(); renderSports(); renderWeek();
 }
-function deleteSport(id) {
-  if(!DATA[selectedDateKey]) return;
-  DATA[selectedDateKey].sports = DATA[selectedDateKey].sports.filter(s => s.id !== id);
-  save(); renderSports(); renderWeek();
-}
+function deleteSport(id) { if(!DATA[selectedDateKey]) return; DATA[selectedDateKey].sports = DATA[selectedDateKey].sports.filter(s => s.id !== id); save(); renderSports(); renderWeek(); }
 
-// ── MINI CALENDAR ──
 function openCal() {
   const now = new Date(); calViewYear = now.getFullYear(); calViewMonth = now.getMonth();
   renderCal(); document.getElementById('mini-cal').classList.add('open'); document.body.style.overflow = 'hidden';
@@ -1338,17 +1355,24 @@ function renderCal() {
     else if (k >= weekStartKey && k <= weekEndKey) el.classList.add('in-week');
     if (getTasksForDay(k).length > 0 || (DATA[k]?.note || '').trim().length > 0) el.classList.add('has-data');
     el.textContent = day;
-    el.onclick = () => { currentWeekStart = getMondayOf(d); closeCal(); renderWeek(); };
+    el.onclick = () => { currentWeekStart = getMondayOf(d); closeCal(); switchMainTab('week'); renderWeek(); };
     grid.appendChild(el);
   }
 }
 
-// ── IMPORT / EXPORT ──
 function openIO() { document.getElementById('io-panel').classList.add('open'); document.body.style.overflow='hidden'; }
 function closeIO() { document.getElementById('io-panel').classList.remove('open'); document.body.style.overflow=''; }
 function ioPanelClick(e) { if(e.target===document.getElementById('io-panel')) closeIO(); }
 function exportData() {
-  const blob = new Blob([JSON.stringify({ data: DATA, recurring: RECURRING, theme }, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify({ 
+    data: DATA, 
+    recurring: RECURRING, 
+    theme,
+    g_books: GLOBAL_BOOKS,
+    g_movies: GLOBAL_MOVIES,
+    g_rules: GLOBAL_RULES,
+    w_notes: WEEKLY_NOTES
+  }, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'ajanda-backup.json'; a.click();
   URL.revokeObjectURL(url); closeIO();
@@ -1362,6 +1386,10 @@ function importData(e) {
       if (parsed.data) DATA = parsed.data;
       if (parsed.recurring) RECURRING = parsed.recurring;
       if (parsed.theme) theme = parsed.theme;
+      if (parsed.g_books) GLOBAL_BOOKS = parsed.g_books;
+      if (parsed.g_movies) GLOBAL_MOVIES = parsed.g_movies;
+      if (parsed.g_rules) GLOBAL_RULES = parsed.g_rules;
+      if (parsed.w_notes) WEEKLY_NOTES = parsed.w_notes;
       save(); applyTheme(); renderWeek(); closeIO();
     } catch(err) { alert('Geçersiz dosya!'); }
   };
@@ -1374,6 +1402,8 @@ function init() {
   currentWeekStart = getMondayOf(new Date());
   applyTheme();
   renderWeek();
+  
+  // Editör blur event'leri
   document.getElementById('note-area').addEventListener('blur', () => {
     if (selectedDateKey) {
       ensureData();
