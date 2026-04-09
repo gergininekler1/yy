@@ -29,6 +29,7 @@
     --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
     --radius: 14px;
     --radius-sm: 8px;
+    --shelf-color: #dcdcdc;
   }
   [data-theme="dark"] {
     --bg: #0e0e0e;
@@ -51,6 +52,7 @@
     --modal-bg: rgba(0,0,0,0.7);
     --shadow: 0 2px 16px rgba(0,0,0,0.4);
     --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+    --shelf-color: #333333;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -60,6 +62,32 @@
     min-height: 100vh;
     transition: background 0.3s, color 0.3s;
   }
+
+  /* --- YANIP SÖNEN UYARI İKONU EFEKTİ --- */
+  @keyframes blinkWarning {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+  .blink-icon {
+    display: inline-block;
+    animation: blinkWarning 1.2s infinite;
+  }
+
+  /* ── YENİ EKLENEN STİLLER (Bölüm/Filtre/Rozet) ── */
+  .media-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,0.65); color: #fff;
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    z-index: 10; backdrop-filter: blur(4px);
+  }
+  .filter-btn {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text2);
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.15s; font-family: inherit; font-weight: 600;
+  }
+  .filter-btn.active { background: var(--accent); color: var(--today-text); border-color: var(--accent); }
+  .filter-btn:hover:not(.active) { background: var(--border); }
 
   /* ── TOP BAR ── */
   .topbar {
@@ -122,63 +150,66 @@
     color: var(--text3); padding: 10px 14px;
     border-bottom: 2px solid transparent;
     transition: color 0.15s, border-color 0.15s;
+    display: flex; align-items: center; gap: 6px;
   }
   .main-tab.active { color: var(--text); border-bottom-color: var(--accent); }
   .main-tab-pane { display: none; }
   .main-tab-pane.active { display: block; animation: fadeIn 0.2s; }
 
-  /* ── CARDS (RAF & DVDS) ── */
-  .media-grid {
+  /* ── CARDS (RAF) ── */
+  .shelf-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 16px; 
+    padding: 24px 16px;
+  }
+  .shelf-item-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .shelf-item-wrapper::after {
+    content: "";
+    position: absolute;
+    bottom: -12px;
+    left: -8px;
+    right: -8px;
+    height: 10px;
+    background: var(--shelf-color);
+    border-radius: 4px;
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    z-index: 0;
   }
   .media-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-sm); overflow: hidden;
     box-shadow: var(--shadow); transition: transform 0.15s;
     display: flex; flex-direction: column;
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    cursor: pointer;
   }
-  .media-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .media-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  
   .media-img {
-    width: 100%; height: 240px; object-fit: cover;
+    width: 100%; height: 200px; object-fit: cover;
     background: var(--surface2);
   }
   .media-content { padding: 12px; flex: 1; display: flex; flex-direction: column; }
   .media-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
   .media-desc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; flex: 1; }
-  .media-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+  .media-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
   .media-rating { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
-
-  /* ── RICH TEXT EDITOR (KURAL) ── */
-  .rte-toolbar {
-    display: flex; gap: 6px; background: var(--surface2);
-    padding: 8px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    border: 1px solid var(--border); border-bottom: none;
-    flex-wrap: wrap;
+  
+  .edit-btn {
+    font-size: 11px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 6px 10px; cursor: pointer; color: var(--text);
+    font-weight: 600; text-align: center; width: 100%;
+    transition: background 0.15s;
   }
-  .rte-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); border-radius: 4px; padding: 6px 10px;
-    font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s;
-  }
-  .rte-btn:hover { background: var(--border); }
-  .rte-editor {
-    min-height: 400px; background: var(--surface); color: var(--text);
-    border: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-    padding: 16px; font-size: 15px; outline: none;
-    overflow-y: auto;
-    
-    /* Defter Çizgisi Görüntüsü */
-    line-height: 28px;
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 27px, var(--border) 27px, var(--border) 28px);
-    background-attachment: local;
-    background-position: 0 12px;
-  }
-  .rte-editor h3 { margin-bottom: 10px; margin-top: 16px; color: var(--text); line-height: 28px; }
-  .rte-editor h3:first-child { margin-top: 0; }
-  .rte-editor ul { padding-left: 20px; margin-bottom: 10px; line-height: 28px; }
+  .edit-btn:hover { background: var(--surface2); }
 
   /* ── BANNERS ROW ── */
   .banners-row { display: none; gap: 8px; padding: 14px 16px 0; flex-wrap: wrap; }
@@ -189,7 +220,7 @@
     box-shadow: 0 2px 12px rgba(255,59,48,0.08); transition: box-shadow 0.2s;
   }
   #high-banner.show { display: flex; }
-  #high-banner .banner-icon { color: var(--high); flex-shrink: 0; display: flex; align-items: center; }
+  #high-banner .banner-icon { font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 24px;}
   #high-banner .banner-content { flex: 1; min-width: 0; }
   #high-banner .banner-title { font-size: 10px; font-weight: 700; color: var(--high); margin-bottom: 2px; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.8; }
   #high-banner .banner-list { list-style: none; }
@@ -404,16 +435,34 @@
 </div>
 
 <div class="main-tabs-container">
-  <button class="main-tab active" data-main-tab="week" onclick="switchMainTab('week')">Haftalık</button>
-  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">Raf</button>
-  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">Dvd</button>
-  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">Kural</button>
+  <button class="main-tab active" data-main-tab="week" onclick="switchMainTab('week')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    Haftalık
+  </button>
+  <button class="main-tab" data-main-tab="library" onclick="switchMainTab('library')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+    Raf
+  </button>
+  <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+    Kural
+  </button>
+  <button class="main-tab" data-main-tab="alltasks" onclick="switchMainTab('alltasks')" title="Tüm Görevler">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+  </button>
 </div>
 
 <div id="pane-week" class="main-tab-pane active">
+  <div id="weekly-progress-info" style="font-size: 12px; color: var(--text3); padding: 16px 16px 0; text-align: center; font-weight: 500;"></div>
+
+  <div id="books-banner" style="display:none; margin: 16px 16px 0; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
+    <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
+    <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+
   <div class="banners-row" id="banners-row">
     <div id="high-banner">
-      <div class="banner-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="banner-icon blink-icon">⚠️</div>
       <div class="banner-content">
         <div class="banner-title">Yüksek Öncelik</div>
         <ul class="banner-list" id="banner-list"></ul>
@@ -434,11 +483,6 @@
 
   <div class="week-grid" id="week-grid"></div>
 
-  <div id="books-banner" style="display:none; margin: 0 16px 24px; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
-    <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
-    <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
-  </div>
-
   <div style="padding: 0 16px 24px;">
     <div class="section-label" style="margin-top:0;">Haftanın Genel Notu</div>
     <div class="note-wrapper">
@@ -449,7 +493,15 @@
 </div>
 
 <div id="pane-library" class="main-tab-pane">
-  <div style="padding: 16px;">
+  <div style="padding: 16px 16px 0;">
+    <div id="shelf-info" style="font-size: 13px; color: var(--text3); margin-bottom: 12px; font-weight: 500;"></div>
+    <div class="shelf-filters" style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <button onclick="setShelfFilter('all')" class="filter-btn active" data-filter="all">Tümü</button>
+      <button onclick="setShelfFilter('book')" class="filter-btn" data-filter="book">Kitaplar</button>
+      <button onclick="setShelfFilter('movie')" class="filter-btn" data-filter="movie">Filmler</button>
+    </div>
+  </div>
+  <div style="padding: 0 16px;">
     <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
       <input class="task-input" id="lib-title" placeholder="Kitap Adı" style="flex:100%;">
       <input class="task-input" id="lib-desc" placeholder="Kısa Açıklama..." style="flex:100%;">
@@ -464,39 +516,36 @@
       <button class="add-task-btn" onclick="addGlobalBook()">Ekle</button>
     </div>
   </div>
-  <div class="media-grid" id="global-books-grid"></div>
-</div>
-
-<div id="pane-dvds" class="main-tab-pane">
-  <div style="padding: 16px;">
-    <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
-      <input class="task-input" id="dvd-title" placeholder="Film/Dizi Adı" style="flex:100%;">
-      <input class="task-input" id="dvd-img" placeholder="Görsel URL (İsteğe bağlı)" style="flex:2;">
-      <select class="prio-select" id="dvd-rating" style="flex:1;">
-        <option value="1">1 Yıldız</option>
-        <option value="2">2 Yıldız</option>
-        <option value="3" selected>3 Yıldız</option>
-        <option value="4">4 Yıldız</option>
-        <option value="5">5 Yıldız</option>
-      </select>
-      <button class="add-task-btn" onclick="addGlobalMovie()">Ekle</button>
-    </div>
-  </div>
-  <div class="media-grid" id="global-movies-grid"></div>
+  <div class="shelf-grid" id="global-books-grid"></div>
 </div>
 
 <div id="pane-rules" class="main-tab-pane">
   <div style="padding: 16px;">
-    <div class="rte-toolbar">
-      <button class="rte-btn" onclick="document.execCommand('formatBlock', false, 'H3')">Başlık (H3)</button>
-      <button class="rte-btn" onclick="document.execCommand('bold')"><b>Kalın</b></button>
-      <button class="rte-btn" onclick="document.execCommand('italic')"><i>Eğik</i></button>
-      <button class="rte-btn" onclick="document.execCommand('insertUnorderedList')">Madde İmi</button>
-      <button class="rte-btn" onclick="document.execCommand('insertOrderedList')">Numaralı</button>
-      <button class="rte-btn" onclick="document.execCommand('indent')">Girinti Artır ➡</button>
-      <button class="rte-btn" onclick="document.execCommand('outdent')">Girinti Azalt ⬅</button>
+    <button class="add-task-btn" style="width:100%; margin-bottom:16px; padding: 12px; font-size: 14px;" onclick="addRule()">+ Yeni Kural Ekle</button>
+    <div id="rules-list-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+  </div>
+</div>
+
+<div id="pane-alltasks" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="section-label" style="margin-top:0;">Tüm Görevler</div>
+    <ul class="task-list" id="all-tasks-list"></ul>
+  </div>
+</div>
+
+<div class="overlay" id="media-note-overlay" onclick="if(event.target.id==='media-note-overlay') closeMediaNote()">
+  <div class="modal" style="max-height: 50vh;">
+    <div class="modal-header">
+      <span class="modal-date" id="media-note-title" style="font-size: 15px;">Not</span>
+      <button class="modal-close" onclick="closeMediaNote()">✕</button>
     </div>
-    <div class="rte-editor" id="rules-editor" contenteditable="true" onblur="saveRules()" placeholder="Hayat kurallarını, öğretileri ve çıkarımlarını buraya yaz..."></div>
+    <div class="modal-body" style="padding-top: 10px;">
+      <div class="note-wrapper">
+        <div class="note-lines"></div>
+        <textarea class="note-area" id="media-note-area" placeholder="Bu eser hakkında notların..."></textarea>
+      </div>
+      <button class="note-save-btn" onclick="saveMediaNote()">Kaydet</button>
+    </div>
   </div>
 </div>
 
@@ -553,7 +602,7 @@
         <div class="task-input-row">
           <input class="task-input" id="task-input" placeholder="Yeni görev…" onkeydown="if(event.key==='Enter')addTask()">
           <select class="prio-select" id="prio-select">
-            <option value="high">⚡ Yüksek</option>
+            <option value="high">⚠️ Yüksek</option>
             <option value="mid" selected>🔸 Orta</option>
             <option value="low">✅ Düşük</option>
           </select>
@@ -662,11 +711,16 @@ let DATA = {};
 let RECURRING = [];
 let theme = 'light';
 
-// YENİ EKLENEN VERİ YAPILARI
 let GLOBAL_BOOKS = [];
-let GLOBAL_MOVIES = [];
-let GLOBAL_RULES = "";
 let WEEKLY_NOTES = {};
+
+let BOOK_IMAGES = {}; 
+let MOVIE_IMAGES = {};
+let RULES_LIST = []; 
+
+let currentShelfFilter = 'all';
+let MEDIA_NOTES = {};
+let activeMediaNoteId = null;
 
 const MONTHS_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const DAYS_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
@@ -693,23 +747,32 @@ function save() {
   localStorage.setItem('ajanda_data', JSON.stringify(DATA));
   localStorage.setItem('ajanda_recur', JSON.stringify(RECURRING));
   localStorage.setItem('ajanda_theme', theme);
-  
-  // Yeni verilerin kaydedilmesi
   localStorage.setItem('ajanda_g_books', JSON.stringify(GLOBAL_BOOKS));
-  localStorage.setItem('ajanda_g_movies', JSON.stringify(GLOBAL_MOVIES));
-  localStorage.setItem('ajanda_g_rules', GLOBAL_RULES);
   localStorage.setItem('ajanda_w_notes', JSON.stringify(WEEKLY_NOTES));
+  
+  localStorage.setItem('ajanda_book_images', JSON.stringify(BOOK_IMAGES));
+  localStorage.setItem('ajanda_movie_images', JSON.stringify(MOVIE_IMAGES));
+  localStorage.setItem('ajanda_rules_list', JSON.stringify(RULES_LIST));
+  localStorage.setItem('ajanda_media_notes', JSON.stringify(MEDIA_NOTES));
 }
 function load() {
   try { DATA = JSON.parse(localStorage.getItem('ajanda_data') || '{}'); } catch(e){ DATA={}; }
   try { RECURRING = JSON.parse(localStorage.getItem('ajanda_recur') || '[]'); } catch(e){ RECURRING=[]; }
   theme = localStorage.getItem('ajanda_theme') || 'light';
-
-  // Yeni verilerin yüklenmesi
   try { GLOBAL_BOOKS = JSON.parse(localStorage.getItem('ajanda_g_books') || '[]'); } catch(e){ GLOBAL_BOOKS=[]; }
-  try { GLOBAL_MOVIES = JSON.parse(localStorage.getItem('ajanda_g_movies') || '[]'); } catch(e){ GLOBAL_MOVIES=[]; }
-  GLOBAL_RULES = localStorage.getItem('ajanda_g_rules') || '';
   try { WEEKLY_NOTES = JSON.parse(localStorage.getItem('ajanda_w_notes') || '{}'); } catch(e){ WEEKLY_NOTES={}; }
+  try { BOOK_IMAGES = JSON.parse(localStorage.getItem('ajanda_book_images') || '{}'); } catch(e){ BOOK_IMAGES={}; }
+  try { MOVIE_IMAGES = JSON.parse(localStorage.getItem('ajanda_movie_images') || '{}'); } catch(e){ MOVIE_IMAGES={}; }
+  try { RULES_LIST = JSON.parse(localStorage.getItem('ajanda_rules_list') || '[]'); } catch(e){ RULES_LIST=[]; }
+  try { MEDIA_NOTES = JSON.parse(localStorage.getItem('ajanda_media_notes') || '{}'); } catch(e){ MEDIA_NOTES={}; }
+
+  // Eski Kural verisi varsa otomatik yeni sisteme geçir
+  const oldRules = localStorage.getItem('ajanda_g_rules');
+  if (oldRules && RULES_LIST.length === 0) {
+    RULES_LIST.push({ id: uid(), text: oldRules.replace(/<[^>]*>?/gm, '\n').trim() });
+    localStorage.removeItem('ajanda_g_rules');
+    save();
+  }
 }
 
 // ── ANA SEKMELER (YENİ) ──
@@ -719,17 +782,131 @@ function switchMainTab(tabId) {
   document.getElementById('pane-' + tabId).classList.add('active');
   
   if(tabId === 'library') renderGlobalBooks();
-  if(tabId === 'dvds') renderGlobalMovies();
-  if(tabId === 'rules') document.getElementById('rules-editor').innerHTML = GLOBAL_RULES;
+  if(tabId === 'rules') renderRules();
+  if(tabId === 'alltasks') renderAllTasks();
 }
 
-// ── RAF VE DVDLER FONKSİYONLARI ──
+function renderAllTasks() {
+  const list = document.getElementById('all-tasks-list');
+  let html = '';
+  
+  const keys = Object.keys(DATA).sort();
+  keys.forEach(k => {
+    if (DATA[k].tasks && DATA[k].tasks.length > 0) {
+      const d = parseKey(k);
+      const dateStr = `${d.getDate()} ${MONTHS_TR[d.getMonth()]} ${d.getFullYear()}`;
+      html += `<div class="section-label" style="margin-top:14px; color:var(--text); font-size:12px;">${dateStr}</div>`;
+      DATA[k].tasks.forEach(t => {
+        const prioClass = 'prio-' + t.prio;
+        const prioLabel = t.prio === 'high' ? 'Yüksek' : t.prio === 'mid' ? 'Orta' : 'Düşük';
+        html += `
+          <li class="task-item${t.done?' done':''}" style="margin-bottom:6px;">
+            <div class="task-check" style="cursor:default;"></div>
+            <span class="task-text">${escHtml(t.text)}</span>
+            <span class="task-prio-badge ${prioClass}">${prioLabel}</span>
+          </li>`;
+      });
+    }
+  });
+  
+  if (!html) html = '<div style="color:var(--text3); font-size:13px; margin-top:10px;">Görev bulunamadı.</div>';
+  list.innerHTML = html;
+}
+
+// ── KURALLAR (RULES) ──
+function renderRules() {
+  const container = document.getElementById('rules-list-container');
+  container.innerHTML = RULES_LIST.map((r, index) => `
+    <div class="rule-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow);">
+      <div style="background: var(--surface2); padding: 10px 14px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <span>Kural ${index + 1}</span>
+        <button onclick="deleteRule('${r.id}')" style="background:none; border:none; color:var(--text3); cursor:pointer; font-size:16px; padding: 0 4px; transition: color 0.15s;">✕</button>
+      </div>
+      <div class="note-wrapper" style="border: none; border-radius: 0;">
+          <div class="note-lines"></div>
+          <textarea onblur="updateRuleText('${r.id}', this.value)" class="note-area" style="width: 100%; min-height: 120px; border: none; padding: 14px; background: transparent; color: var(--text); font-family: inherit; font-size: 14px; outline: none; resize: vertical; line-height: 28px; position: relative; z-index: 1;" placeholder="Kuralın detaylarını veya notlarını buraya ekle...">${escHtml(r.text)}</textarea>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addRule() {
+  RULES_LIST.push({ id: uid(), text: '' });
+  save();
+  renderRules();
+}
+
+function updateRuleText(id, text) {
+  const rule = RULES_LIST.find(r => r.id === id);
+  if (rule) { rule.text = text; save(); }
+}
+
+function deleteRule(id) {
+  RULES_LIST = RULES_LIST.filter(r => r.id !== id);
+  save();
+  renderRules();
+}
+
+// ── MEDYA NOT MODALI ──
+function openMediaNote(name) {
+  activeMediaNoteId = name;
+  document.getElementById('media-note-title').textContent = name;
+  document.getElementById('media-note-area').value = MEDIA_NOTES[name] || '';
+  document.getElementById('media-note-overlay').classList.add('open');
+}
+
+function closeMediaNote() {
+  document.getElementById('media-note-overlay').classList.remove('open');
+  activeMediaNoteId = null;
+}
+
+function saveMediaNote() {
+  if (activeMediaNoteId) {
+    MEDIA_NOTES[activeMediaNoteId] = document.getElementById('media-note-area').value;
+    save();
+    closeMediaNote();
+  }
+}
+
+// ── RAF FONKSİYONLARI ──
+function setShelfFilter(filterType) {
+  currentShelfFilter = filterType;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filterType);
+  });
+  renderGlobalBooks();
+}
+
+function editDailyBookImage(name) {
+  const currentUrl = BOOK_IMAGES[name] || '';
+  const url = prompt(`"${name}" için kapak görseli URL'si girin:\n(Kaldırmak için boş bırakıp Tamam'a basın)`, currentUrl);
+  if (url !== null) {
+    BOOK_IMAGES[name] = url.trim();
+    save();
+    renderGlobalBooks();
+  }
+}
+
+function editDailyMovieImage(name) {
+  const currentUrl = MOVIE_IMAGES[name] || '';
+  const url = prompt(`"${name}" için afiş görseli URL'si girin:\n(Kaldırmak için boş bırakıp Tamam'a basın)`, currentUrl);
+  if (url !== null) {
+    MOVIE_IMAGES[name] = url.trim();
+    save();
+    renderGlobalBooks();
+  }
+}
+
 function renderGlobalBooks() {
   const grid = document.getElementById('global-books-grid');
   let html = '';
 
-  // 1. Günlük olarak eklenen kitapları dinamik çek
   const activeBooks = {};
+  const activeMovies = {};
+  
+  let bookCount = 0;
+  let movieCount = 0;
+
   Object.keys(DATA).sort().forEach(key => {
     if(DATA[key].books) {
       DATA[key].books.forEach(b => {
@@ -738,24 +915,47 @@ function renderGlobalBooks() {
         }
       });
     }
+    if(DATA[key].movies) {
+      DATA[key].movies.forEach(m => {
+        activeMovies[m.name] = m;
+      });
+    }
   });
 
-  // Önce günlük okumaları (farklı stilde) ekle
+  // Günlük İlerleme Kitapları
   Object.values(activeBooks).forEach(b => {
+    bookCount++;
+    if (currentShelfFilter === 'movie') return;
+
     const pct = Math.min(100, Math.round((b.current / b.total) * 100));
-    html += `
-      <div class="media-card" style="border-color: var(--accent); background: var(--surface2);">
-        <div style="height: 120px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text); padding: 16px; text-align: center;">
+    const safeName = escHtml(b.name).replace(/'/g, "\\'");
+    const imgSrc = BOOK_IMAGES[b.name];
+    
+    const imgBlock = imgSrc 
+      ? `<img src="${escHtml(imgSrc)}" class="media-img" alt="${escHtml(b.name)}">`
+      : `<div style="height: 140px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text); padding: 16px; text-align: center; position:relative; background: var(--surface2);">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.5;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
           <div style="font-size: 11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Günlük İlerleme</div>
-        </div>
-        <div class="media-content">
-          <div class="media-title">${escHtml(b.name)}</div>
-          <div class="media-desc" style="margin-bottom:14px;">Sayfa: ${b.current} / ${b.total}</div>
-          <div class="media-footer" style="flex-direction:column; align-items:stretch;">
-            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; font-weight:600;"><span>%${pct}</span></div>
-            <div class="stats-bar-wrap" style="height:4px; background:var(--border); width:100%; margin:0;">
-              <div class="stats-bar" style="width:${pct}%; background:var(--accent);"></div>
+        </div>`;
+
+    html += `
+      <div class="shelf-item-wrapper">
+        <div class="media-card" style="border-color: var(--accent);" onclick="openMediaNote('${safeName}')">
+          <div class="media-badge">KİTAP</div>
+          ${imgBlock}
+          <div class="media-content">
+            <div class="media-title">${escHtml(b.name)}</div>
+            <div class="media-desc" style="margin-bottom:14px;">Sayfa: ${b.current} / ${b.total}</div>
+            <div class="media-footer">
+              <div style="width:100%;">
+                <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:4px; font-weight:600;"><span>%${pct}</span></div>
+                <div class="stats-bar-wrap" style="height:4px; background:var(--border); width:100%; margin:0;">
+                  <div class="stats-bar" style="width:${pct}%; background:var(--accent);"></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:12px;">
+                <button class="edit-btn" onclick="event.stopPropagation(); editDailyBookImage('${safeName}')">Görsel Düzenle</button>
             </div>
           </div>
         </div>
@@ -763,22 +963,64 @@ function renderGlobalBooks() {
     `;
   });
 
-  // 2. Global (Sabit) Kitapları ekle
-  html += GLOBAL_BOOKS.map(b => `
-    <div class="media-card">
-      ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
-      <div class="media-content">
-        <div class="media-title">${escHtml(b.title)}</div>
-        <div class="media-desc">${escHtml(b.desc)}</div>
-        <div class="media-footer">
-          <div class="media-rating">${'⭐'.repeat(b.rating)}</div>
-          <button class="task-del" onclick="deleteGlobalBook('${b.id}')">✕</button>
+  // Günlük Eklenen Filmler
+  Object.values(activeMovies).forEach(m => {
+    movieCount++;
+    if (currentShelfFilter === 'book') return;
+
+    const safeName = escHtml(m.name).replace(/'/g, "\\'");
+    const imgSrc = MOVIE_IMAGES[m.name];
+    
+    const imgBlock = imgSrc 
+      ? `<img src="${escHtml(imgSrc)}" class="media-img" alt="${escHtml(m.name)}">`
+      : `<div style="height: 140px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text); padding: 16px; text-align: center; position:relative; background: var(--surface2);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.5;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <div style="font-size: 11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Film / Dizi</div>
+        </div>`;
+
+    html += `
+      <div class="shelf-item-wrapper">
+        <div class="media-card" style="border-color: #007aff; border-width: 2px;" onclick="openMediaNote('${safeName}')">
+          <div class="media-badge">FİLM</div>
+          ${imgBlock}
+          <div class="media-content">
+            <div class="media-title">${escHtml(m.name)}</div>
+            <div class="media-desc" style="margin-bottom:14px;">Puan: <span style="color:var(--mid);">${'⭐'.repeat(m.rating)}</span></div>
+            <div class="media-footer" style="margin-top:auto;">
+                <button class="edit-btn" onclick="event.stopPropagation(); editDailyMovieImage('${safeName}')">Görsel Düzenle</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  });
+
+  // Global Sabit Kitaplar
+  GLOBAL_BOOKS.forEach(b => {
+    bookCount++;
+    if (currentShelfFilter === 'movie') return;
+    const safeName = escHtml(b.title).replace(/'/g, "\\'");
+
+    html += `
+      <div class="shelf-item-wrapper">
+        <div class="media-card" onclick="openMediaNote('${safeName}')">
+          <div class="media-badge">KİTAP</div>
+          ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
+          <div class="media-content">
+            <div class="media-title">${escHtml(b.title)}</div>
+            <div class="media-desc">${escHtml(b.desc)}</div>
+            <div class="media-footer">
+              <div class="media-rating">${'⭐'.repeat(b.rating)}</div>
+              <button class="task-del" onclick="event.stopPropagation(); deleteGlobalBook('${b.id}')">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
 
   grid.innerHTML = html;
+  document.getElementById('shelf-info').innerHTML = `Bu rafta <strong>${bookCount}</strong> tane kitap, <strong>${movieCount}</strong> tane film vardır.`;
 }
 
 function addGlobalBook() {
@@ -798,43 +1040,6 @@ function deleteGlobalBook(id) {
   save(); renderGlobalBooks();
 }
 
-function renderGlobalMovies() {
-  const grid = document.getElementById('global-movies-grid');
-  grid.innerHTML = GLOBAL_MOVIES.map(m => `
-    <div class="media-card">
-      ${m.img ? `<img src="${escHtml(m.img)}" class="media-img" alt="${escHtml(m.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
-      <div class="media-content">
-        <div class="media-title">${escHtml(m.title)}</div>
-        <div class="media-footer">
-          <div class="media-rating">${'⭐'.repeat(m.rating)}</div>
-          <button class="task-del" onclick="deleteGlobalMovie('${m.id}')">✕</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-function addGlobalMovie() {
-  const title = document.getElementById('dvd-title').value.trim();
-  const img = document.getElementById('dvd-img').value.trim();
-  const rating = parseInt(document.getElementById('dvd-rating').value);
-  if (!title) return;
-  GLOBAL_MOVIES.push({ id: uid(), title, img, rating });
-  document.getElementById('dvd-title').value = '';
-  document.getElementById('dvd-img').value = '';
-  save(); renderGlobalMovies();
-}
-function deleteGlobalMovie(id) {
-  GLOBAL_MOVIES = GLOBAL_MOVIES.filter(m => m.id !== id);
-  save(); renderGlobalMovies();
-}
-
-// ── KURALLAR (ZENGİN METİN) ──
-function saveRules() {
-  GLOBAL_RULES = document.getElementById('rules-editor').innerHTML;
-  save();
-}
-
-// ── HAFTALIK NOT ──
 function renderWeeklyNote() {
   const wKey = dateKey(currentWeekStart);
   document.getElementById('weekly-note').value = WEEKLY_NOTES[wKey] || '';
@@ -845,8 +1050,6 @@ function saveWeeklyNote() {
   save();
 }
 
-
-// ── RECURRING ──
 function recurringMatchesDay(r, d) {
   const dow = dowIndex(d);
   if (r.recur === 'daily') return true;
@@ -872,7 +1075,6 @@ function getTasksForDay(key) {
   return [...own, ...injected];
 }
 
-// ── THEME ──
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', theme);
   const moonEl = document.getElementById('theme-icon-moon');
@@ -884,7 +1086,6 @@ function applyTheme() {
 }
 function toggleTheme() { theme = theme === 'light' ? 'dark' : 'light'; applyTheme(); save(); }
 
-// ── SEARCH ──
 function closeSearch() { 
   document.getElementById('search-input').value = '';
   document.getElementById('search-results').innerHTML = '';
@@ -912,7 +1113,6 @@ function doSearch() {
   resEl.innerHTML = html || '<div style="padding:16px 20px; color:var(--text3); font-size:14px;">Sonuç bulunamadı.</div>';
 }
 
-// ── DRAG & DROP ──
 function dragStart(e, dateKey, taskId) {
   e.dataTransfer.setData('dateKey', dateKey);
   e.dataTransfer.setData('taskId', taskId);
@@ -937,7 +1137,6 @@ function dropTask(e, toKey) {
   }
 }
 
-// ── WEEK ──
 function shiftWeek(n) { currentWeekStart = addDays(currentWeekStart, n * 7); renderWeek(); }
 function goToday() { currentWeekStart = getMondayOf(new Date()); renderWeek(); }
 function getWeekNumber(d) {
@@ -1067,6 +1266,21 @@ function renderWeek() {
     <div class="stats-body">${statsBodyContent}</div>
   `;
   grid.appendChild(statsCard);
+
+  // AY VE HAFTA BİLGİSİ EKLENTİSİ
+  let monthTotal = 0, monthDone = 0;
+  const m = currentWeekStart.getMonth();
+  const y = currentWeekStart.getFullYear();
+  const daysInM = new Date(y, m+1, 0).getDate();
+  for(let d=1; d<=daysInM; d++) {
+    const k = dateKey(new Date(y, m, d));
+    const t = getTasksForDay(k);
+    monthTotal += t.length;
+    monthDone += t.filter(x=>x.done).length;
+  }
+  const mPct = monthTotal === 0 ? 0 : Math.round((monthDone/monthTotal)*100);
+  const wPctStr = pct === null ? 0 : pct;
+  document.getElementById('weekly-progress-info').innerHTML = `Bu haftanın <strong>%${wPctStr}</strong>'sini tamamladın, bu ayın ise <strong>%${mPct}</strong>'sini tamamladın.`;
 
   const sportsBanner = document.getElementById('sports-banner');
   if (daysActive > 0) {
@@ -1225,7 +1439,7 @@ function renderTasks() {
     midSection.parentNode.insertBefore(highContainer, midSection);
   }
   if (highTasks.length > 0) {
-    highContainer.innerHTML = `<div class="section-label" style="color:var(--high)">⚡ Yüksek Öncelik</div><ul class="task-list">${highTasks.map(task => taskHTML(task)).join('')}</ul><div class="sep"></div>`;
+    highContainer.innerHTML = `<div class="section-label" style="color:var(--high)"><span class="blink-icon">⚠️</span> Yüksek Öncelik</div><ul class="task-list">${highTasks.map(task => taskHTML(task)).join('')}</ul><div class="sep"></div>`;
   } else { highContainer.innerHTML = ''; }
   midList.innerHTML = otherTasks.map(task => taskHTML(task)).join('');
   midSection.style.display = otherTasks.length > 0 ? '' : 'none';
@@ -1416,9 +1630,11 @@ function exportData() {
     recurring: RECURRING, 
     theme,
     g_books: GLOBAL_BOOKS,
-    g_movies: GLOBAL_MOVIES,
-    g_rules: GLOBAL_RULES,
-    w_notes: WEEKLY_NOTES
+    w_notes: WEEKLY_NOTES,
+    book_images: BOOK_IMAGES,
+    movie_images: MOVIE_IMAGES,
+    rules_list: RULES_LIST,
+    media_notes: MEDIA_NOTES
   }, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'ajanda-backup.json'; a.click();
@@ -1434,9 +1650,11 @@ function importData(e) {
       if (parsed.recurring) RECURRING = parsed.recurring;
       if (parsed.theme) theme = parsed.theme;
       if (parsed.g_books) GLOBAL_BOOKS = parsed.g_books;
-      if (parsed.g_movies) GLOBAL_MOVIES = parsed.g_movies;
-      if (parsed.g_rules) GLOBAL_RULES = parsed.g_rules;
       if (parsed.w_notes) WEEKLY_NOTES = parsed.w_notes;
+      if (parsed.book_images) BOOK_IMAGES = parsed.book_images;
+      if (parsed.movie_images) MOVIE_IMAGES = parsed.movie_images;
+      if (parsed.rules_list) RULES_LIST = parsed.rules_list;
+      if (parsed.media_notes) MEDIA_NOTES = parsed.media_notes;
       save(); applyTheme(); renderWeek(); closeIO();
     } catch(err) { alert('Geçersiz dosya!'); }
   };
