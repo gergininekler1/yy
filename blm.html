@@ -74,6 +74,21 @@
     animation: blinkWarning 1.2s infinite;
   }
 
+  /* ── YENİ EKLENEN STİLLER (Bölüm/Filtre/Rozet) ── */
+  .media-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,0.65); color: #fff;
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    z-index: 10; backdrop-filter: blur(4px);
+  }
+  .filter-btn {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text2);
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.15s; font-family: inherit; font-weight: 600;
+  }
+  .filter-btn.active { background: var(--accent); color: var(--today-text); border-color: var(--accent); }
+  .filter-btn:hover:not(.active) { background: var(--border); }
+
   /* ── TOP BAR ── */
   .topbar {
     position: sticky; top: 0; z-index: 100;
@@ -141,15 +156,7 @@
   .main-tab-pane { display: none; }
   .main-tab-pane.active { display: block; animation: fadeIn 0.2s; }
 
-  /* ── CARDS (RAF & DVDS) ── */
-  .media-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    padding: 16px;
-  }
-
-  /* ── YENİ RAF GÖRÜNÜMÜ EFEKTİ ── */
+  /* ── CARDS (RAF) ── */
   .shelf-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -182,6 +189,7 @@
     position: relative;
     z-index: 1;
     height: 100%;
+    cursor: pointer;
   }
   .media-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
   
@@ -190,7 +198,8 @@
     background: var(--surface2);
   }
   .media-content { padding: 12px; flex: 1; display: flex; flex-direction: column; }
-  .media-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+  .media-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; line-height: 1.3; }
+  .media-date { font-size: 10px; font-weight: 600; color: var(--text3); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
   .media-desc { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; flex: 1; }
   .media-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 8px; }
   .media-rating { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
@@ -435,17 +444,23 @@
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
     Raf
   </button>
-  <button class="main-tab" data-main-tab="dvds" onclick="switchMainTab('dvds')">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-    Dvd
-  </button>
   <button class="main-tab" data-main-tab="rules" onclick="switchMainTab('rules')">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
     Kural
   </button>
+  <button class="main-tab" data-main-tab="alltasks" onclick="switchMainTab('alltasks')" title="Tüm Görevler">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+  </button>
 </div>
 
 <div id="pane-week" class="main-tab-pane active">
+  <div id="weekly-progress-info" style="padding: 16px 16px 0; text-align: center;"></div>
+
+  <div id="books-banner" style="display:none; margin: 16px 16px 0; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
+    <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
+    <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </div>
+
   <div class="banners-row" id="banners-row">
     <div id="high-banner">
       <div class="banner-icon blink-icon">⚠️</div>
@@ -469,11 +484,6 @@
 
   <div class="week-grid" id="week-grid"></div>
 
-  <div id="books-banner" style="display:none; margin: 0 16px 24px; padding: 16px; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); box-shadow: var(--shadow);">
-    <div class="section-label" style="margin-top:0; margin-bottom:12px;">Okunan Kitaplar (Bu Hafta)</div>
-    <div id="books-banner-list" style="display:flex; flex-direction:column; gap:12px;"></div>
-  </div>
-
   <div style="padding: 0 16px 24px;">
     <div class="section-label" style="margin-top:0;">Haftanın Genel Notu</div>
     <div class="note-wrapper">
@@ -484,7 +494,15 @@
 </div>
 
 <div id="pane-library" class="main-tab-pane">
-  <div style="padding: 16px;">
+  <div style="padding: 16px 16px 0;">
+    <div id="shelf-info" style="font-size: 13px; color: var(--text3); margin-bottom: 12px; font-weight: 500;"></div>
+    <div class="shelf-filters" style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <button onclick="setShelfFilter('all')" class="filter-btn active" data-filter="all">Tümü</button>
+      <button onclick="setShelfFilter('book')" class="filter-btn" data-filter="book">Kitaplar</button>
+      <button onclick="setShelfFilter('movie')" class="filter-btn" data-filter="movie">Filmler</button>
+    </div>
+  </div>
+  <div style="padding: 0 16px;">
     <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
       <input class="task-input" id="lib-title" placeholder="Kitap Adı" style="flex:100%;">
       <input class="task-input" id="lib-desc" placeholder="Kısa Açıklama..." style="flex:100%;">
@@ -502,28 +520,33 @@
   <div class="shelf-grid" id="global-books-grid"></div>
 </div>
 
-<div id="pane-dvds" class="main-tab-pane">
-  <div style="padding: 16px;">
-    <div class="task-input-row" style="background: var(--surface); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
-      <input class="task-input" id="dvd-title" placeholder="Film/Dizi Adı" style="flex:100%;">
-      <input class="task-input" id="dvd-img" placeholder="Görsel URL (İsteğe bağlı)" style="flex:2;">
-      <select class="prio-select" id="dvd-rating" style="flex:1;">
-        <option value="1">1 Yıldız</option>
-        <option value="2">2 Yıldız</option>
-        <option value="3" selected>3 Yıldız</option>
-        <option value="4">4 Yıldız</option>
-        <option value="5">5 Yıldız</option>
-      </select>
-      <button class="add-task-btn" onclick="addGlobalMovie()">Ekle</button>
-    </div>
-  </div>
-  <div class="media-grid" id="global-movies-grid"></div>
-</div>
-
 <div id="pane-rules" class="main-tab-pane">
   <div style="padding: 16px;">
     <button class="add-task-btn" style="width:100%; margin-bottom:16px; padding: 12px; font-size: 14px;" onclick="addRule()">+ Yeni Kural Ekle</button>
     <div id="rules-list-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+  </div>
+</div>
+
+<div id="pane-alltasks" class="main-tab-pane">
+  <div style="padding: 16px;">
+    <div class="section-label" style="margin-top:0;">Tüm Görevler</div>
+    <ul class="task-list" id="all-tasks-list"></ul>
+  </div>
+</div>
+
+<div class="overlay" id="media-note-overlay" onclick="if(event.target.id==='media-note-overlay') closeMediaNote()">
+  <div class="modal" style="max-height: 50vh;">
+    <div class="modal-header">
+      <span class="modal-date" id="media-note-title" style="font-size: 15px;">Not</span>
+      <button class="modal-close" onclick="closeMediaNote()">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top: 10px;">
+      <div class="note-wrapper">
+        <div class="note-lines"></div>
+        <textarea class="note-area" id="media-note-area" placeholder="Bu eser hakkında notların..."></textarea>
+      </div>
+      <button class="note-save-btn" onclick="saveMediaNote()">Kaydet</button>
+    </div>
   </div>
 </div>
 
@@ -679,6 +702,160 @@
 </div>
 
 <script>
+// ── FELSEFİ ALINTILAR 150 (Dosyadan) ──
+const PHILOSOPHY_QUOTES = [
+  {text: "Kendini mutlu etmek için ihtiyaç duyduğun her şey kendi içindedir.", author: "Marcus Aurelius"},
+  {text: "Engel, yolu tıkayan şey değil; yolun ta kendisidir.", author: "Marcus Aurelius"},
+  {text: "Başkalarının ne düşündüğüyle bu kadar meşgul olma; kendi aklının efendisi ol.", author: "Marcus Aurelius"},
+  {text: "Bugün ölecekmişsin gibi yaşa. Sonsuza dek yaşayacakmışsın gibi öğren.", author: "Marcus Aurelius"},
+  {text: "Zihnini disiplin altına al; çünkü zihin her şeyin efendisidir.", author: "Marcus Aurelius"},
+  {text: "Bir insan, düşünceleri ne ise odur.", author: "Marcus Aurelius"},
+  {text: "Kaybettiğini düşündüğün şeye yas tutma. Sahip olduklarının şükrünü tut.", author: "Marcus Aurelius"},
+  {text: "Yorulduğunda bırakma; yorulduğunda dinlen.", author: "Marcus Aurelius"},
+  {text: "Evren değişimdir; hayat algılamaktır.", author: "Marcus Aurelius"},
+  {text: "İnsanın ruhu, başkalarına yaptığı iyiliklerle renk kazanır.", author: "Marcus Aurelius"},
+  {text: "Seni kızdıran şey seni yener; ona boyun eğme.", author: "Marcus Aurelius"},
+  {text: "Başkalarının ne yaptığını değil, kendi yapman gerekeni düşün.", author: "Marcus Aurelius"},
+  {text: "Şu ana odaklan; geçmiş gitmiş, gelecek henüz gelmemiştir.", author: "Marcus Aurelius"},
+  {text: "Her sabah kendine şunu söyle: Bugün zorlu, nankör, kaba insanlarla karşılaşacağım. Ama onlar da benim gibidirler.", author: "Marcus Aurelius"},
+  {text: "Doğaya uygun yaşa ve asla pişmanlık duymayacaksın.", author: "Marcus Aurelius"},
+  {text: "Bazı şeyler bizim gücümüzdedir, bazıları değildir. Gücümüzdeki şeylere odaklan.", author: "Epiktetos"},
+  {text: "İnsanları rahatsız eden olaylar değil, olaylar hakkındaki düşüncelerdir.", author: "Epiktetos"},
+  {text: "Özgürlük, istediğini elde etmek değil; istemediğin şeyi istememektir.", author: "Epiktetos"},
+  {text: "Başkalarını değiştirmeye çalışma; yalnızca kendinle ilgili olanı değiştir.", author: "Epiktetos"},
+  {text: "Beden bir kafes olabilir, ama ruh her zaman özgürdür.", author: "Epiktetos"},
+  {text: "Eğer ıstırap çekiyorsan, bunun sebebi dış dünya değil, senin ona verdiğin değerdir.", author: "Epiktetos"},
+  {text: "Bilge insan, olayları değil, onlara verdiği tepkileri kontrol eder.", author: "Epiktetos"},
+  {text: "Susmasını bilen, konuşmasını da bilir.", author: "Epiktetos"},
+  {text: "Beklentilerini küçült ki şükranın büyük olsun.", author: "Epiktetos"},
+  {text: "İnsanı köle eden zincirleri değil, kendi arzularıdır.", author: "Epiktetos"},
+  {text: "Uzun değil, dolu yaşa.", author: "Seneca"},
+  {text: "Yarına bel bağlayan bugünü kaybeder.", author: "Seneca"},
+  {text: "Öğretmek, iki kez öğrenmektir.", author: "Seneca"},
+  {text: "Kendi kendine yetemeyen kimse mutlu olamaz.", author: "Seneca"},
+  {text: "Zaman hızla geçer; onu tutmaya çalışsan bile kaçar.", author: "Seneca"},
+  {text: "Büyük ruhlar, büyük sıkıntıları sessizce taşır.", author: "Seneca"},
+  {text: "Kendine iyi davrandığın müddetçe başkalarına da iyi davranabilirsin.", author: "Seneca"},
+  {text: "Bilgelik, ne kadar yaşadığında değil; nasıl yaşadığındadır.", author: "Seneca"},
+  {text: "Her gün yeni bir hayat gibi yaşa; her gece, tüm hayatı bitirmiş gibi uy.", author: "Seneca"},
+  {text: "Daha az şeye ihtiyaç duyan insan, daha özgür insandır.", author: "Seneca"},
+  {text: "Fırtınalı denizlerde liman arayan gemi, kaptansız gemidir.", author: "Seneca"},
+  {text: "Aceleci olan her şeyi yavaşlatır.", author: "Seneca"},
+  {text: "Tek bildiğim, hiçbir şey bilmediğimdir.", author: "Sokrates"},
+  {text: "Sorgulanmamış bir hayat, yaşamaya değmez.", author: "Sokrates"},
+  {text: "Kendini tanı.", author: "Sokrates"},
+  {text: "Zenginlik bilgelik getirmez; ama bilgelik zenginlik getirir.", author: "Sokrates"},
+  {text: "Güçlü insan, başkalarını değil; kendini yenen insandır.", author: "Sokrates"},
+  {text: "Her birimizin içinde bir güneş vardır; onu parlatmak için yol ver.", author: "Sokrates"},
+  {text: "İyi insan olmak, iyi görünmekten daha önemlidir.", author: "Sokrates"},
+  {text: "Doğru insanla konuşmak, kitap okumaktan daha fazlasını öğretir.", author: "Sokrates"},
+  {text: "Merak, bilgeliğin başlangıcıdır.", author: "Sokrates"},
+  {text: "Ölümden korkmak, bilge olmadığın hâlde bilge olduğunu sanmaktır.", author: "Sokrates"},
+  {text: "Gerçeklik, gözlerimizin gördüğü değil; aklımızın kavradığıdır.", author: "Platon"},
+  {text: "Adalet, güçlünün işine gelen şey değil; herkese hakkını vermektir.", author: "Platon"},
+  {text: "Mağaradaki gölgeler gerçek sanılır; ama güneşe çıkmak gerekir.", author: "Platon"},
+  {text: "Ruh, öğrenmez; yalnızca hatırlar.", author: "Platon"},
+  {text: "En büyük servet, az ihtiyaç duymaktır.", author: "Platon"},
+  {text: "Sevgi, ölümsüzlüğü elde etmek için fâninin çabalamasıdır.", author: "Platon"},
+  {text: "Güzellik, iyiliğin görünür hâlidir.", author: "Platon"},
+  {text: "Filozoflar yönetmezse ya da yöneticiler felsefe yapmazsa, devlet asla mutlu olmaz.", author: "Platon"},
+  {text: "Müzik, ruhun eğitimidir.", author: "Platon"},
+  {text: "Sonsuz iyi, aklın bildiği; geçici iyi ise duyuların gördüğüdür.", author: "Platon"},
+  {text: "Mutluluk, insanın amacıdır; erdem ise oraya giden yoldur.", author: "Aristoteles"},
+  {text: "Biz, tekrar tekrar yaptıklarımızız. O hâlde mükemmellik bir eylem değil, alışkanlıktır.", author: "Aristoteles"},
+  {text: "Eğitimin kökü acıdır, ama meyvesi tatlıdır.", author: "Aristoteles"},
+  {text: "Akıl, ahlakın temelidir; ahlak ise mutluluğun temelidir.", author: "Aristoteles"},
+  {text: "İnsan, doğası gereği toplumsal bir hayvandır.", author: "Aristoteles"},
+  {text: "Gerçek dostluk, fayda üzerine değil; erdem üzerine kurulur.", author: "Aristoteles"},
+  {text: "Cömertlik, ne aşırı vermek ne de hiç vermemektir; doğru miktarda vermektir.", author: "Aristoteles"},
+  {text: "Bilgelik, yalnızca bilgi değil; doğru zamanı bilmektir.", author: "Aristoteles"},
+  {text: "İyi insan, iyiliği sever; kötü insan ise yalnızca iyilik görüntüsünü sever.", author: "Aristoteles"},
+  {text: "Doğanın hiçbir şeyinde boşuna olan yoktur.", author: "Aristoteles"},
+  {text: "Yaşamak için bir nedenin olduğunda, neredeyse her türlü zorlukla baş edebilirsin.", author: "Friedrich Nietzsche"},
+  {text: "Uçuruma çok uzun bakarsan, uçurum da sana bakmaya başlar.", author: "Friedrich Nietzsche"},
+  {text: "Kendini sevmeden başkasını sevemezsin.", author: "Friedrich Nietzsche"},
+  {text: "Büyüklük, istemeyi değil; olmayı gerektirir.", author: "Friedrich Nietzsche"},
+  {text: "Kaos içinden dans eden bir yıldız doğurabilmek için içinde kaos taşımalısın.", author: "Friedrich Nietzsche"},
+  {text: "En çok acı çeken, en derin sevinci de hissedebilir.", author: "Friedrich Nietzsche"},
+  {text: "İnsan, aşılması gereken bir şeydir.", author: "Friedrich Nietzsche"},
+  {text: "Gerçek, bu dünyada en güçlü olan şeydir.", author: "Friedrich Nietzsche"},
+  {text: "Kendi hayatını sanatsal bir eser olarak yarat.", author: "Friedrich Nietzsche"},
+  {text: "Hakikat, yanılsamalar olmadan yaşayamayacağımız yanılsamalardır.", author: "Friedrich Nietzsche"},
+  {text: "Her derin düşünce, bir maskedir.", author: "Friedrich Nietzsche"},
+  {text: "Yaşam, acıdır; ama acı, büyümenin fiyatıdır.", author: "Friedrich Nietzsche"},
+  {text: "Sisifos'un mutlu olduğunu hayal etmeliyiz.", author: "Albert Camus"},
+  {text: "Yaşamak yetmez; bir anlam bulmak gerekir.", author: "Albert Camus"},
+  {text: "Absürd, dünyanın sessizliği ile insanın haykırışı arasındaki çarpışmadır.", author: "Albert Camus"},
+  {text: "İnsan ölümlü olduğunu bilerek yaşayan tek varlıktır ve bu onu büyük kılar.", author: "Albert Camus"},
+  {text: "Hayatı anlamak için geri bakmak, yaşamak için ise ileri bakmak gerekir.", author: "Albert Camus"},
+  {text: "Gerçek bir cömertlik, geleceğe her şeyi vermektir.", author: "Albert Camus"},
+  {text: "Bir şeyden anlam çıkaramıyorsan, o şeyle yaşamayı öğren.", author: "Albert Camus"},
+  {text: "Özgürlük, yalnızca var olmanın değil; var olmanın farkında olmanın armağanıdır.", author: "Albert Camus"},
+  {text: "Servet deniz suyuna benzer; ne kadar içersen o kadar susarsın.", author: "Arthur Schopenhauer"},
+  {text: "İnsan ya yalnız olur ya da sıradan biri olur.", author: "Arthur Schopenhauer"},
+  {text: "Sağlık, mutluluğun en büyük bileşenidir; oysa onu yalnızca kaybedince fark ederiz.", author: "Arthur Schopenhauer"},
+  {text: "Kitap okuyan insan, başkasının düşündüğünü düşünür; düşünen insan ise kendi düşüncesini yaşar.", author: "Arthur Schopenhauer"},
+  {text: "Acı hayatın gerçeğidir; zevk ise acının geçici olmamasıdır.", author: "Arthur Schopenhauer"},
+  {text: "Çoğu insan mutluluğu değil; dikkatin dağılmasını arar.", author: "Arthur Schopenhauer"},
+  {text: "Sabır, bilgeliğin tohumunu taşıyan topraktır.", author: "Arthur Schopenhauer"},
+  {text: "Her usta, bir zamanlar acemi olmuştur.", author: "Arthur Schopenhauer"},
+  {text: "İnsanın en büyük yanılgısı, mutluluğu dışarıda aramasıdır.", author: "Arthur Schopenhauer"},
+  {text: "Düşünmeden okuyan insan, sindirmeden yiyen insana benzer.", author: "Arthur Schopenhauer"},
+  {text: "Gerçek bilgelik, ne bildiğini ve ne bilmediğini tanımaktır.", author: "Konfüçyüs"},
+  {text: "Başkalarına yaptığını sana yapmamalarını istediğin şeyi yapma.", author: "Konfüçyüs"},
+  {text: "Söylemek kolay, yapmak zordur; ama söylediğini yapmak bilgeliktir.", author: "Konfüçyüs"},
+  {text: "Öğrenmeden düşünmek boşa çabadır; düşünmeden öğrenmek tehlikelidir.", author: "Konfüçyüs"},
+  {text: "Herkes seni beğeniyorsa, dikkatli ol; herkes senden nefret ediyorsa, yine dikkatli ol.", author: "Konfüçyüs"},
+  {text: "Sıradan insan fark ister, erdemli insan ise adalet.", author: "Konfüçyüs"},
+  {text: "Güzel sözler ve alımlı tavır, nadiren gerçek erdemi taşır.", author: "Konfüçyüs"},
+  {text: "Düşmanına intikam almak istiyorsan, iyi bir mezar kaz; zira onun için de kazıyorsun.", author: "Konfüçyüs"},
+  {text: "İnsanın kendini aşması, en büyük zaferdir.", author: "Konfüçyüs"},
+  {text: "Sabırla oturan kişi, güzel şeyler görür.", author: "Konfüçyüs"},
+  {text: "İnsanı öldürmeyen şey onu güçlendirir.", author: "Konfüçyüs"},
+  {text: "Yolculuk bin milin başlangıcı tek bir adımdan başlar.", author: "Laozi"},
+  {text: "Kendini tanıyan aydınlanmıştır; başkalarını yenen güçlüdür ama kendini yenen güçlerin güçlüsüdür.", author: "Laozi"},
+  {text: "Doğa acele etmez; yine de her şey tamamlanır.", author: "Laozi"},
+  {text: "Boşluk olmadan bir tekerlek işe yaramaz; boşluk olmadan bir kap faydasızdır.", author: "Laozi"},
+  {text: "Konuşan bilmez; bilen konuşmaz.", author: "Laozi"},
+  {text: "Su gibi ol; en yumuşak olan, en sert taşı aşındırır.", author: "Laozi"},
+  {text: "Savaşmadan elde edilen zafer, gerçek zaferdir.", author: "Laozi"},
+  {text: "En büyük güzellik, basitlikte saklıdır.", author: "Laozi"},
+  {text: "Fazladan bir şey eklemek yerine bir şeyi çıkarabilmek, bilgeliğin işaretidir.", author: "Laozi"},
+  {text: "Her zirvenin bir vadisi vardır; her ışığın bir gölgesi.", author: "Laozi"},
+  {text: "Acının kaynağı, arzudur.", author: "Gautama Buddha"},
+  {text: "Zihin her şeydir; ne düşünürsen o olursun.", author: "Gautama Buddha"},
+  {text: "Geçmişte yaşama; gelecekte yaşama. Aklını şimdiki ana yoğunlaştır.", author: "Gautama Buddha"},
+  {text: "Binlerce şamdan tek bir mum ile yakılabilir ve mumun ömrü kısalmaz. Mutluluk paylaşıldıkça azalmaz.", author: "Gautama Buddha"},
+  {text: "Sağlık en büyük kazanç, hoşnutluk en büyük zenginliktir.", author: "Gautama Buddha"},
+  {text: "Şüphe edin, araştırın; kör inanç, bilgeliğin düşmanıdır.", author: "Gautama Buddha"},
+  {text: "Her şey geçicidir; bu gerçeği gören huzuru bulur.", author: "Gautama Buddha"},
+  {text: "Yargılama, zira her yargı kendi cehaletinden doğar.", author: "Gautama Buddha"},
+  {text: "Kızgın biri, yanan bir kömür tutar ve atmayı düşünür; kendisi yanar.", author: "Gautama Buddha"},
+  {text: "Dışarıda ne ararsan, içeride bulursun.", author: "Gautama Buddha"},
+  {text: "Aynı nehre iki kez giremezsin; çünkü ne nehir aynıdır ne de sen.", author: "Herakleitos"},
+  {text: "Her şey akar; hiçbir şey durağan değildir.", author: "Herakleitos"},
+  {text: "Gizli uyum, görünür uyumdan daha güçlüdür.", author: "Herakleitos"},
+  {text: "Karşıtlar olmadan hiçbir şey var olamaz; zira zıtlık, birliğin koşuludur.", author: "Herakleitos"},
+  {text: "İnsanların çoğu, görmeden bakar ve duymadan dinler.", author: "Herakleitos"},
+  {text: "Her insan kendi başına bir dünyadır.", author: "Michel de Montaigne"},
+  {text: "Ölümü düşünmek, özgürlüğü düşünmektir.", author: "Michel de Montaigne"},
+  {text: "Cahilliğin en büyük düşmanı, bilgi değil; bilgi yanılsamasıdır.", author: "Michel de Montaigne"},
+  {text: "İnsanın sahip olduğu en büyük mucize, kendisidir.", author: "Michel de Montaigne"},
+  {text: "İnsanın tüm mutsuzluğu, tek bir odada sessizce oturamamasından kaynaklanır.", author: "Blaise Pascal"},
+  {text: "Kalbin, aklın bilmediği nedenleri vardır.", author: "Blaise Pascal"},
+  {text: "Sessizliğin sonsuz uzayları beni korkutur.", author: "Blaise Pascal"},
+  {text: "Düşünüyorum, öyleyse varım.", author: "René Descartes"},
+  {text: "Şüphe, bilgiye giden yoldur.", author: "René Descartes"},
+  {text: "Barış, savaşın yokluğu değil; erdemin güçten doğmasıdır.", author: "Baruch Spinoza"},
+  {text: "Korkudan doğan umut güvenilmez; sevgiden doğan güven ise kalıcıdır.", author: "Baruch Spinoza"},
+  {text: "İnsanı yalnızca bir araç olarak değil; daima bir amaç olarak da gör.", author: "Immanuel Kant"},
+  {text: "Üstümde yıldızlı gökyüzü, içimde ahlak yasası; her ikisi de beni derin bir saygıyla doldurur.", author: "Immanuel Kant"},
+  {text: "Gerçek bütündür; parçalar ise yalnızca bütünün içinde anlam kazanır.", author: "Georg Wilhelm Friedrich Hegel"},
+  {text: "Tarih, özgürlüğün bilincinin ilerleyişidir.", author: "Georg Wilhelm Friedrich Hegel"},
+  {text: "Varoluş özden önce gelir; önce var olursun, sonra kendini yaratırsın.", author: "Jean-Paul Sartre"},
+  {text: "Özgürlüğe mahkûm edilmişizdir.", author: "Jean-Paul Sartre"}
+];
+
 // ── STATE ──
 let currentWeekStart = null;
 let selectedDateKey = null;
@@ -690,12 +867,15 @@ let RECURRING = [];
 let theme = 'light';
 
 let GLOBAL_BOOKS = [];
-let GLOBAL_MOVIES = [];
 let WEEKLY_NOTES = {};
 
-// YENİ STATE YAPILARI
 let BOOK_IMAGES = {}; 
+let MOVIE_IMAGES = {};
 let RULES_LIST = []; 
+
+let currentShelfFilter = 'all';
+let MEDIA_NOTES = {};
+let activeMediaNoteId = null;
 
 const MONTHS_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const DAYS_TR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
@@ -716,6 +896,21 @@ function addDays(d, n) { const copy = new Date(d); copy.setDate(copy.getDate() +
 function uid() { return Math.random().toString(36).slice(2,10); }
 function dowIndex(d) { const day = d.getDay(); return day === 0 ? 6 : day - 1; }
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatDateTR(key) {
+  if(!key) return '';
+  const parts = key.split('-');
+  if(parts.length !== 3) return key;
+  return `${parts[2]} ${MONTHS_TR[parseInt(parts[1])-1]} ${parts[0]}`;
+}
+
+// RASTGELE ALINTI GÖSTERİCİ
+function displayRandomQuote() {
+  const q = PHILOSOPHY_QUOTES[Math.floor(Math.random() * PHILOSOPHY_QUOTES.length)];
+  const infoDiv = document.getElementById('weekly-progress-info');
+  if(infoDiv) {
+    infoDiv.innerHTML = `<div style="font-size: 13px; font-style: italic; color: var(--text); margin-bottom: 4px;">"${q.text}"</div><div style="font-size: 11px; font-weight: 600; color: var(--text3);">— ${q.author}</div>`;
+  }
+}
 
 // ── PERSIST ──
 function save() {
@@ -723,23 +918,24 @@ function save() {
   localStorage.setItem('ajanda_recur', JSON.stringify(RECURRING));
   localStorage.setItem('ajanda_theme', theme);
   localStorage.setItem('ajanda_g_books', JSON.stringify(GLOBAL_BOOKS));
-  localStorage.setItem('ajanda_g_movies', JSON.stringify(GLOBAL_MOVIES));
   localStorage.setItem('ajanda_w_notes', JSON.stringify(WEEKLY_NOTES));
   
   localStorage.setItem('ajanda_book_images', JSON.stringify(BOOK_IMAGES));
+  localStorage.setItem('ajanda_movie_images', JSON.stringify(MOVIE_IMAGES));
   localStorage.setItem('ajanda_rules_list', JSON.stringify(RULES_LIST));
+  localStorage.setItem('ajanda_media_notes', JSON.stringify(MEDIA_NOTES));
 }
 function load() {
   try { DATA = JSON.parse(localStorage.getItem('ajanda_data') || '{}'); } catch(e){ DATA={}; }
   try { RECURRING = JSON.parse(localStorage.getItem('ajanda_recur') || '[]'); } catch(e){ RECURRING=[]; }
   theme = localStorage.getItem('ajanda_theme') || 'light';
   try { GLOBAL_BOOKS = JSON.parse(localStorage.getItem('ajanda_g_books') || '[]'); } catch(e){ GLOBAL_BOOKS=[]; }
-  try { GLOBAL_MOVIES = JSON.parse(localStorage.getItem('ajanda_g_movies') || '[]'); } catch(e){ GLOBAL_MOVIES=[]; }
   try { WEEKLY_NOTES = JSON.parse(localStorage.getItem('ajanda_w_notes') || '{}'); } catch(e){ WEEKLY_NOTES={}; }
   try { BOOK_IMAGES = JSON.parse(localStorage.getItem('ajanda_book_images') || '{}'); } catch(e){ BOOK_IMAGES={}; }
+  try { MOVIE_IMAGES = JSON.parse(localStorage.getItem('ajanda_movie_images') || '{}'); } catch(e){ MOVIE_IMAGES={}; }
   try { RULES_LIST = JSON.parse(localStorage.getItem('ajanda_rules_list') || '[]'); } catch(e){ RULES_LIST=[]; }
+  try { MEDIA_NOTES = JSON.parse(localStorage.getItem('ajanda_media_notes') || '{}'); } catch(e){ MEDIA_NOTES={}; }
 
-  // Eski Kural verisi varsa otomatik yeni sisteme geçir
   const oldRules = localStorage.getItem('ajanda_g_rules');
   if (oldRules && RULES_LIST.length === 0) {
     RULES_LIST.push({ id: uid(), text: oldRules.replace(/<[^>]*>?/gm, '\n').trim() });
@@ -755,8 +951,35 @@ function switchMainTab(tabId) {
   document.getElementById('pane-' + tabId).classList.add('active');
   
   if(tabId === 'library') renderGlobalBooks();
-  if(tabId === 'dvds') renderGlobalMovies();
   if(tabId === 'rules') renderRules();
+  if(tabId === 'alltasks') renderAllTasks();
+}
+
+function renderAllTasks() {
+  const list = document.getElementById('all-tasks-list');
+  let html = '';
+  
+  const keys = Object.keys(DATA).sort();
+  keys.forEach(k => {
+    if (DATA[k].tasks && DATA[k].tasks.length > 0) {
+      const d = parseKey(k);
+      const dateStr = `${d.getDate()} ${MONTHS_TR[d.getMonth()]} ${d.getFullYear()}`;
+      html += `<div class="section-label" style="margin-top:14px; color:var(--text); font-size:12px;">${dateStr}</div>`;
+      DATA[k].tasks.forEach(t => {
+        const prioClass = 'prio-' + t.prio;
+        const prioLabel = t.prio === 'high' ? 'Yüksek' : t.prio === 'mid' ? 'Orta' : 'Düşük';
+        html += `
+          <li class="task-item${t.done?' done':''}" style="margin-bottom:6px;">
+            <div class="task-check" style="cursor:default;"></div>
+            <span class="task-text">${escHtml(t.text)}</span>
+            <span class="task-prio-badge ${prioClass}">${prioLabel}</span>
+          </li>`;
+      });
+    }
+  });
+  
+  if (!html) html = '<div style="color:var(--text3); font-size:13px; margin-top:10px;">Görev bulunamadı.</div>';
+  list.innerHTML = html;
 }
 
 // ── KURALLAR (RULES) ──
@@ -793,7 +1016,36 @@ function deleteRule(id) {
   renderRules();
 }
 
-// ── RAF VE DVDLER FONKSİYONLARI ──
+// ── MEDYA NOT MODALI ──
+function openMediaNote(name) {
+  activeMediaNoteId = name;
+  document.getElementById('media-note-title').textContent = name;
+  document.getElementById('media-note-area').value = MEDIA_NOTES[name] || '';
+  document.getElementById('media-note-overlay').classList.add('open');
+}
+
+function closeMediaNote() {
+  document.getElementById('media-note-overlay').classList.remove('open');
+  activeMediaNoteId = null;
+}
+
+function saveMediaNote() {
+  if (activeMediaNoteId) {
+    MEDIA_NOTES[activeMediaNoteId] = document.getElementById('media-note-area').value;
+    save();
+    closeMediaNote();
+  }
+}
+
+// ── RAF FONKSİYONLARI ──
+function setShelfFilter(filterType) {
+  currentShelfFilter = filterType;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === filterType);
+  });
+  renderGlobalBooks();
+}
+
 function editDailyBookImage(name) {
   const currentUrl = BOOK_IMAGES[name] || '';
   const url = prompt(`"${name}" için kapak görseli URL'si girin:\n(Kaldırmak için boş bırakıp Tamam'a basın)`, currentUrl);
@@ -804,23 +1056,46 @@ function editDailyBookImage(name) {
   }
 }
 
+function editDailyMovieImage(name) {
+  const currentUrl = MOVIE_IMAGES[name] || '';
+  const url = prompt(`"${name}" için afiş görseli URL'si girin:\n(Kaldırmak için boş bırakıp Tamam'a basın)`, currentUrl);
+  if (url !== null) {
+    MOVIE_IMAGES[name] = url.trim();
+    save();
+    renderGlobalBooks();
+  }
+}
+
 function renderGlobalBooks() {
   const grid = document.getElementById('global-books-grid');
   let html = '';
 
   const activeBooks = {};
+  const activeMovies = {};
+  
+  let bookCount = 0;
+  let movieCount = 0;
+
   Object.keys(DATA).sort().forEach(key => {
     if(DATA[key].books) {
       DATA[key].books.forEach(b => {
         if (!activeBooks[b.name] || b.current > activeBooks[b.name].current) {
-          activeBooks[b.name] = b;
+          activeBooks[b.name] = { ...b, lastDate: key };
         }
+      });
+    }
+    if(DATA[key].movies) {
+      DATA[key].movies.forEach(m => {
+        activeMovies[m.name] = { ...m, addedDate: key };
       });
     }
   });
 
   // Günlük İlerleme Kitapları
   Object.values(activeBooks).forEach(b => {
+    bookCount++;
+    if (currentShelfFilter === 'movie') return;
+
     const pct = Math.min(100, Math.round((b.current / b.total) * 100));
     const safeName = escHtml(b.name).replace(/'/g, "\\'");
     const imgSrc = BOOK_IMAGES[b.name];
@@ -834,10 +1109,12 @@ function renderGlobalBooks() {
 
     html += `
       <div class="shelf-item-wrapper">
-        <div class="media-card" style="border-color: var(--accent);">
+        <div class="media-card" style="border-color: var(--accent);" onclick="openMediaNote('${safeName}')">
+          <div class="media-badge">KİTAP</div>
           ${imgBlock}
           <div class="media-content">
             <div class="media-title">${escHtml(b.name)}</div>
+            <div class="media-date">📅 Son Okuma: ${b.lastDate ? formatDateTR(b.lastDate) : 'Bilinmiyor'}</div>
             <div class="media-desc" style="margin-bottom:14px;">Sayfa: ${b.current} / ${b.total}</div>
             <div class="media-footer">
               <div style="width:100%;">
@@ -848,7 +1125,40 @@ function renderGlobalBooks() {
               </div>
             </div>
             <div style="display:flex; justify-content:space-between; margin-top:12px;">
-                <button class="edit-btn" onclick="editDailyBookImage('${safeName}')">Görsel Düzenle</button>
+                <button class="edit-btn" onclick="event.stopPropagation(); editDailyBookImage('${safeName}')">Görsel Düzenle</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Günlük Eklenen Filmler
+  Object.values(activeMovies).forEach(m => {
+    movieCount++;
+    if (currentShelfFilter === 'book') return;
+
+    const safeName = escHtml(m.name).replace(/'/g, "\\'");
+    const imgSrc = MOVIE_IMAGES[m.name];
+    
+    const imgBlock = imgSrc 
+      ? `<img src="${escHtml(imgSrc)}" class="media-img" alt="${escHtml(m.name)}">`
+      : `<div style="height: 140px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text); padding: 16px; text-align: center; position:relative; background: var(--surface2);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:8px; opacity:0.5;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <div style="font-size: 11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Film / Dizi</div>
+        </div>`;
+
+    html += `
+      <div class="shelf-item-wrapper">
+        <div class="media-card" style="border-color: #007aff; border-width: 2px;" onclick="openMediaNote('${safeName}')">
+          <div class="media-badge">FİLM</div>
+          ${imgBlock}
+          <div class="media-content">
+            <div class="media-title">${escHtml(m.name)}</div>
+            <div class="media-date">📅 İzlenme: ${m.addedDate ? formatDateTR(m.addedDate) : 'Bilinmiyor'}</div>
+            <div class="media-desc" style="margin-bottom:14px;">Puan: <span style="color:var(--mid);">${'⭐'.repeat(m.rating)}</span></div>
+            <div class="media-footer" style="margin-top:auto;">
+                <button class="edit-btn" onclick="event.stopPropagation(); editDailyMovieImage('${safeName}')">Görsel Düzenle</button>
             </div>
           </div>
         </div>
@@ -857,23 +1167,32 @@ function renderGlobalBooks() {
   });
 
   // Global Sabit Kitaplar
-  html += GLOBAL_BOOKS.map(b => `
-    <div class="shelf-item-wrapper">
-      <div class="media-card">
-        ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
-        <div class="media-content">
-          <div class="media-title">${escHtml(b.title)}</div>
-          <div class="media-desc">${escHtml(b.desc)}</div>
-          <div class="media-footer">
-            <div class="media-rating">${'⭐'.repeat(b.rating)}</div>
-            <button class="task-del" onclick="deleteGlobalBook('${b.id}')">✕</button>
+  GLOBAL_BOOKS.forEach(b => {
+    bookCount++;
+    if (currentShelfFilter === 'movie') return;
+    const safeName = escHtml(b.title).replace(/'/g, "\\'");
+
+    html += `
+      <div class="shelf-item-wrapper">
+        <div class="media-card" onclick="openMediaNote('${safeName}')">
+          <div class="media-badge">KİTAP</div>
+          ${b.img ? `<img src="${escHtml(b.img)}" class="media-img" alt="${escHtml(b.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
+          <div class="media-content">
+            <div class="media-title">${escHtml(b.title)}</div>
+            <div class="media-date">📅 Eklenme: ${b.date ? formatDateTR(b.date) : 'Önceden Eklendi'}</div>
+            <div class="media-desc">${escHtml(b.desc)}</div>
+            <div class="media-footer">
+              <div class="media-rating">${'⭐'.repeat(b.rating)}</div>
+              <button class="task-del" onclick="event.stopPropagation(); deleteGlobalBook('${b.id}')">✕</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  });
 
   grid.innerHTML = html;
+  document.getElementById('shelf-info').innerHTML = `Bu rafta <strong>${bookCount}</strong> tane kitap, <strong>${movieCount}</strong> tane film vardır.`;
 }
 
 function addGlobalBook() {
@@ -882,7 +1201,7 @@ function addGlobalBook() {
   const img = document.getElementById('lib-img').value.trim();
   const rating = parseInt(document.getElementById('lib-rating').value);
   if (!title) return;
-  GLOBAL_BOOKS.push({ id: uid(), title, desc, img, rating });
+  GLOBAL_BOOKS.push({ id: uid(), title, desc, img, rating, date: todayKey() });
   document.getElementById('lib-title').value = '';
   document.getElementById('lib-desc').value = '';
   document.getElementById('lib-img').value = '';
@@ -891,36 +1210,6 @@ function addGlobalBook() {
 function deleteGlobalBook(id) {
   GLOBAL_BOOKS = GLOBAL_BOOKS.filter(b => b.id !== id);
   save(); renderGlobalBooks();
-}
-
-function renderGlobalMovies() {
-  const grid = document.getElementById('global-movies-grid');
-  grid.innerHTML = GLOBAL_MOVIES.map(m => `
-    <div class="media-card">
-      ${m.img ? `<img src="${escHtml(m.img)}" class="media-img" alt="${escHtml(m.title)}">` : `<div class="media-img" style="display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;">Görsel Yok</div>`}
-      <div class="media-content">
-        <div class="media-title">${escHtml(m.title)}</div>
-        <div class="media-footer">
-          <div class="media-rating">${'⭐'.repeat(m.rating)}</div>
-          <button class="task-del" onclick="deleteGlobalMovie('${m.id}')">✕</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-function addGlobalMovie() {
-  const title = document.getElementById('dvd-title').value.trim();
-  const img = document.getElementById('dvd-img').value.trim();
-  const rating = parseInt(document.getElementById('dvd-rating').value);
-  if (!title) return;
-  GLOBAL_MOVIES.push({ id: uid(), title, img, rating });
-  document.getElementById('dvd-title').value = '';
-  document.getElementById('dvd-img').value = '';
-  save(); renderGlobalMovies();
-}
-function deleteGlobalMovie(id) {
-  GLOBAL_MOVIES = GLOBAL_MOVIES.filter(m => m.id !== id);
-  save(); renderGlobalMovies();
 }
 
 function renderWeeklyNote() {
@@ -1498,10 +1787,11 @@ function exportData() {
     recurring: RECURRING, 
     theme,
     g_books: GLOBAL_BOOKS,
-    g_movies: GLOBAL_MOVIES,
     w_notes: WEEKLY_NOTES,
     book_images: BOOK_IMAGES,
-    rules_list: RULES_LIST
+    movie_images: MOVIE_IMAGES,
+    rules_list: RULES_LIST,
+    media_notes: MEDIA_NOTES
   }, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'ajanda-backup.json'; a.click();
@@ -1517,10 +1807,11 @@ function importData(e) {
       if (parsed.recurring) RECURRING = parsed.recurring;
       if (parsed.theme) theme = parsed.theme;
       if (parsed.g_books) GLOBAL_BOOKS = parsed.g_books;
-      if (parsed.g_movies) GLOBAL_MOVIES = parsed.g_movies;
       if (parsed.w_notes) WEEKLY_NOTES = parsed.w_notes;
       if (parsed.book_images) BOOK_IMAGES = parsed.book_images;
+      if (parsed.movie_images) MOVIE_IMAGES = parsed.movie_images;
       if (parsed.rules_list) RULES_LIST = parsed.rules_list;
+      if (parsed.media_notes) MEDIA_NOTES = parsed.media_notes;
       save(); applyTheme(); renderWeek(); closeIO();
     } catch(err) { alert('Geçersiz dosya!'); }
   };
@@ -1533,6 +1824,7 @@ function init() {
   currentWeekStart = getMondayOf(new Date());
   applyTheme();
   renderWeek();
+  displayRandomQuote(); // Sayfa yüklendiğinde rastgele alıntıyı gösterir
   
   // Editör blur event'leri
   document.getElementById('note-area').addEventListener('blur', () => {
