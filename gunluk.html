@@ -567,39 +567,27 @@
 </div>
 
 <div id="pane-habits" class="main-tab-pane">
-  <div style="padding: 16px;">
-    <!-- Yeni Alışkanlık Ekleme -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow);">
-      <div style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">✨ Yeni Alışkanlık</div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-        <div style="display:flex; gap:6px; align-items:center; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:4px 8px; cursor:pointer; font-size:20px;" id="habit-emoji-btn" onclick="openHabitEmojiPicker()">
-          <span id="habit-emoji-display">🎯</span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <input type="text" id="habit-input" class="task-input" placeholder="Alışkanlık adı..." style="flex:1; min-width:120px;" onkeydown="if(event.key==='Enter') addHabit()">
-        <button class="add-task-btn" onclick="addHabit()" style="padding: 9px 18px;">+ Ekle</button>
+  <div style="padding:16px;">
+
+    <!-- Ekleme alanı -->
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; margin-bottom:14px; box-shadow:var(--shadow);">
+      <div style="font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Yeni Alışkanlık Ekle</div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button id="habit-emoji-btn" onclick="habitEmojiToggle()" style="font-size:20px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:6px 10px; cursor:pointer; line-height:1;">🎯</button>
+        <input type="text" id="habit-input" class="task-input" placeholder="Alışkanlık adı..." style="flex:1; min-width:120px;" onkeydown="if(event.key==='Enter')addHabit()">
+        <button class="add-task-btn" onclick="addHabit()">+ Ekle</button>
       </div>
-      <!-- Emoji picker dropdown -->
-      <div id="habit-emoji-picker" style="display:none; margin-top:10px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; flex-wrap:wrap; gap:6px;">
-        <span style="font-size:11px; font-weight:600; color:var(--text3); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Emoji Seç</span>
-        <div style="display:flex; flex-wrap:wrap; gap:6px;">
-          ${['🎯','💪','📚','🏃','🧘','💧','🥗','😴','✍️','🎨','🎵','💊','🧹','📝','🌅','🚴','🏊','🍎','☕','🚫'].map(e=>`<span onclick="selectHabitEmoji('${e}')" style="font-size:22px; cursor:pointer; padding:4px; border-radius:6px; transition:background 0.15s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='transparent'">${e}</span>`).join('')}
-        </div>
+      <div id="habit-emoji-picker" style="display:none; margin-top:10px; padding:8px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm);">
+        <div id="habit-emoji-grid" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
       </div>
     </div>
 
-    <!-- Hafta Navigasyonu -->
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-      <div style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;">Bu Haftaki Takip</div>
-      <div style="display:flex; gap:4px; align-items:center;">
-        <button onclick="switchMainTab('habits')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;font-weight:600;" title="Bugüne dön">Bugün</button>
-      </div>
-    </div>
+    <!-- Özet -->
+    <div id="habits-summary" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;"></div>
 
-    <div id="habits-container" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden;"></div>
+    <!-- Liste -->
+    <div id="habits-container"></div>
 
-    <!-- Özet Kartlar -->
-    <div id="habits-summary" style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
   </div>
 </div>
 
@@ -1110,28 +1098,45 @@ function deleteRule(id) {
 }
 
 // ── ALIŞKANLIKLAR (HABITS) ──
-let selectedHabitEmoji = '🎯';
+var H_EMOJI = '🎯';
+var H_EMOJIS = ['🎯','💪','📚','🏃','🧘','💧','🥗','😴','✍️','🎨','🎵','💊','🧹','📝','🌅','🚴','🏊','🍎','☕','🚫'];
 
-function openHabitEmojiPicker() {
-  const picker = document.getElementById('habit-emoji-picker');
-  picker.style.display = picker.style.display === 'none' ? 'flex' : 'none';
+function habitEmojiToggle() {
+  var p = document.getElementById('habit-emoji-picker');
+  if (!p) return;
+  if (p.style.display === 'none') {
+    var grid = document.getElementById('habit-emoji-grid');
+    if (grid && grid.children.length === 0) {
+      H_EMOJIS.forEach(function(e) {
+        var sp = document.createElement('span');
+        sp.textContent = e;
+        sp.style.cssText = 'font-size:22px;cursor:pointer;padding:6px;border-radius:6px;display:inline-block;';
+        sp.onclick = function() { habitEmojiSelect(e); };
+        grid.appendChild(sp);
+      });
+    }
+    p.style.display = 'block';
+  } else {
+    p.style.display = 'none';
+  }
 }
 
-function selectHabitEmoji(emoji) {
-  selectedHabitEmoji = emoji;
-  document.getElementById('habit-emoji-display').textContent = emoji;
-  document.getElementById('habit-emoji-picker').style.display = 'none';
+function habitEmojiSelect(e) {
+  H_EMOJI = e;
+  var btn = document.getElementById('habit-emoji-btn');
+  if (btn) btn.textContent = e;
+  var p = document.getElementById('habit-emoji-picker');
+  if (p) p.style.display = 'none';
 }
 
-function getHabitStreak(h) {
-  // Bugünden geriye kaç gün üst üste işaretlenmiş
-  let streak = 0;
-  const today = new Date();
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(today);
+function habitStreak(h) {
+  var streak = 0;
+  var today = new Date();
+  for (var i = 0; i < 365; i++) {
+    var d = new Date(today);
     d.setDate(today.getDate() - i);
-    const k = dateKey(d);
-    if (h.dates.includes(k)) {
+    var k = dateKey(d);
+    if (h.dates && h.dates.indexOf(k) !== -1) {
       streak++;
     } else {
       break;
@@ -1140,140 +1145,131 @@ function getHabitStreak(h) {
   return streak;
 }
 
-function getHabitWeekPct(h) {
-  let done = 0;
-  for (let i = 0; i < 7; i++) {
-    const k = dateKey(addDays(currentWeekStart, i));
-    if (h.dates.includes(k)) done++;
-  }
-  return Math.round((done / 7) * 100);
-}
-
 function renderHabits() {
-  const container = document.getElementById('habits-container');
-  const summary = document.getElementById('habits-summary');
+  var container = document.getElementById('habits-container');
+  var summary = document.getElementById('habits-summary');
+  if (!container) return;
+
+  if (summary) {
+    var tk = todayKey();
+    var todayDone = 0;
+    var maxStreak = 0;
+    HABITS.forEach(function(h) {
+      if (h.dates && h.dates.indexOf(tk) !== -1) todayDone++;
+      var s = habitStreak(h);
+      if (s > maxStreak) maxStreak = s;
+    });
+    var allDone = HABITS.length > 0 && todayDone === HABITS.length;
+    summary.innerHTML =
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;">' +
+        '<div style="font-size:28px;font-weight:700;font-family:Instrument Serif,serif;color:' + (allDone ? 'var(--low)' : 'var(--text)') + ';">' + todayDone + '/' + HABITS.length + '</div>' +
+        '<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Bugün</div>' +
+        (allDone ? '<div style="font-size:11px;color:var(--low);font-weight:600;margin-top:4px;">Harika gün!</div>' : '') +
+      '</div>' +
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;">' +
+        '<div style="font-size:28px;font-weight:700;font-family:Instrument Serif,serif;color:' + (maxStreak >= 7 ? 'var(--low)' : maxStreak >= 3 ? 'var(--mid)' : 'var(--text)') + ';">' + (maxStreak > 0 ? '🔥' : '') + maxStreak + '</div>' +
+        '<div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">En Uzun Seri</div>' +
+      '</div>';
+  }
 
   if (HABITS.length === 0) {
-    container.innerHTML = `<div style="text-align:center; color:var(--text3); font-size:13px; padding: 40px 16px; line-height:1.8;">
-      <div style="font-size:36px; margin-bottom:12px;">🌱</div>
-      <div style="font-weight:600; margin-bottom:4px;">Henüz alışkanlık yok</div>
-      <div style="font-size:12px;">Yukarıdaki alandan ilk alışkanlığını ekle!</div>
-    </div>`;
-    if (summary) summary.innerHTML = '';
+    container.innerHTML =
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);text-align:center;padding:40px 16px;color:var(--text3);">' +
+        '<div style="font-size:36px;margin-bottom:12px;">🌱</div>' +
+        '<div style="font-weight:600;font-size:14px;margin-bottom:4px;">Henüz alışkanlık yok</div>' +
+        '<div style="font-size:12px;">Yukarıdan ekleyerek başla!</div>' +
+      '</div>';
     return;
   }
 
-  // Tablo başlığı
-  let html = `<div style="overflow-x:auto;">
-    <table style="width:100%; border-collapse:collapse; text-align:center; font-size:12px; min-width:420px;">
-      <thead>
-        <tr style="border-bottom:1px solid var(--border); background:var(--surface2);">
-          <th style="text-align:left; padding:10px 14px; font-weight:700; color:var(--text2); min-width:120px;">Alışkanlık</th>`;
+  var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">';
 
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(currentWeekStart, i);
-    const isToday = dateKey(d) === todayKey();
-    html += `<th style="padding:10px 6px; font-weight:600; color:${isToday ? 'var(--accent)' : 'var(--text2)'}; font-size:10px; min-width:36px;">
-      ${DAYS_TR[i]}<br>
-      <span style="font-size:13px; color:${isToday ? 'var(--accent)' : 'var(--text)'}; font-weight:700;">${d.getDate()}</span>
-    </th>`;
+  html += '<div style="display:grid;grid-template-columns:1fr repeat(7,36px) 48px 32px;background:var(--surface2);border-bottom:1px solid var(--border);padding:8px 12px;gap:4px;align-items:center;">';
+  html += '<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;">Alışkanlık</div>';
+  for (var i = 0; i < 7; i++) {
+    var d = addDays(currentWeekStart, i);
+    var isToday = dateKey(d) === todayKey();
+    html += '<div style="text-align:center;font-size:9px;font-weight:700;color:' + (isToday ? 'var(--accent)' : 'var(--text3)') + ';text-transform:uppercase;">' +
+      DAYS_TR[i] + '<br><span style="font-size:12px;color:' + (isToday ? 'var(--accent)' : 'var(--text)') + ';">' + d.getDate() + '</span></div>';
   }
-  html += `<th style="padding:10px 8px; font-size:10px; color:var(--text3);">Seri</th>
-           <th style="padding:10px 8px; min-width:28px;"></th></tr></thead><tbody>`;
+  html += '<div style="text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;">Seri</div>';
+  html += '<div></div>';
+  html += '</div>';
 
-  HABITS.forEach(h => {
-    const streak = getHabitStreak(h);
-    const weekPct = getHabitWeekPct(h);
-    const emoji = h.emoji || '🎯';
+  HABITS.forEach(function(h, idx) {
+    var streak = habitStreak(h);
+    var emoji = h.emoji || '🎯';
+    var weekDone = 0;
+    for (var j = 0; j < 7; j++) {
+      var k2 = dateKey(addDays(currentWeekStart, j));
+      if (h.dates && h.dates.indexOf(k2) !== -1) weekDone++;
+    }
+    var pct = Math.round((weekDone / 7) * 100);
+    var borderTop = idx > 0 ? 'border-top:1px solid var(--border);' : '';
 
-    html += `<tr style="border-bottom:1px solid var(--border); transition:background 0.15s;"
-              onmouseover="this.style.background='var(--surface2)'"
-              onmouseout="this.style.background='transparent'">
-      <td style="text-align:left; padding:10px 14px;">
-        <div style="display:flex; align-items:center; gap:7px;">
-          <span style="font-size:17px;">${emoji}</span>
-          <div>
-            <div style="font-weight:600; color:var(--text); font-size:12px;">${escHtml(h.name)}</div>
-            <div style="margin-top:3px; background:var(--surface2); border-radius:4px; height:3px; width:60px; overflow:hidden;">
-              <div style="height:100%; border-radius:4px; background:${weekPct >= 100 ? 'var(--low)' : weekPct >= 50 ? 'var(--mid)' : 'var(--accent)'}; width:${weekPct}%; transition:width 0.4s;"></div>
-            </div>
-          </div>
-        </div>
-      </td>`;
+    html += '<div style="display:grid;grid-template-columns:1fr repeat(7,36px) 48px 32px;padding:10px 12px;gap:4px;align-items:center;' + borderTop + '">';
 
-    for (let i = 0; i < 7; i++) {
-      const k = dateKey(addDays(currentWeekStart, i));
-      const isChecked = h.dates.includes(k);
-      const isToday = k === todayKey();
-      const isFuture = k > todayKey();
-      html += `<td style="padding:8px 6px;">
-        <div onclick="${isFuture ? '' : `toggleHabit('${h.id}', '${k}')`}"
-             style="width:28px; height:28px; border-radius:50%; margin:auto; display:flex; align-items:center; justify-content:center; cursor:${isFuture ? 'default' : 'pointer'}; transition:all 0.2s;
-             ${isChecked ? 'background:var(--low); border:2px solid var(--low);' : isFuture ? 'background:transparent; border:1.5px dashed var(--border);' : 'background:var(--surface); border:2px solid ' + (isToday ? 'var(--accent)' : 'var(--border)') + ';'}">
-          ${isChecked ? '<span style="color:white; font-size:13px; font-weight:bold;">✓</span>' : ''}
-        </div>
-      </td>`;
+    html += '<div>' +
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+        '<span style="font-size:16px;">' + emoji + '</span>' +
+        '<span style="font-size:12px;font-weight:600;color:var(--text);">' + escHtml(h.name) + '</span>' +
+      '</div>' +
+      '<div style="height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;">' +
+        '<div style="height:100%;border-radius:2px;width:' + pct + '%;background:' + (pct >= 100 ? 'var(--low)' : pct >= 50 ? 'var(--mid)' : 'var(--accent)') + ';"></div>' +
+      '</div>' +
+    '</div>';
+
+    for (var i = 0; i < 7; i++) {
+      var k = dateKey(addDays(currentWeekStart, i));
+      var checked = h.dates && h.dates.indexOf(k) !== -1;
+      var future = k > todayKey();
+      var isTodayCell = k === todayKey();
+      var boxStyle = 'width:26px;height:26px;border-radius:50%;margin:auto;display:flex;align-items:center;justify-content:center;font-size:13px;';
+      if (checked) {
+        boxStyle += 'background:var(--low);border:2px solid var(--low);cursor:pointer;';
+      } else if (future) {
+        boxStyle += 'background:transparent;border:1.5px dashed var(--border);cursor:default;';
+      } else {
+        boxStyle += 'background:var(--surface);border:2px solid ' + (isTodayCell ? 'var(--accent)' : 'var(--border)') + ';cursor:pointer;';
+      }
+      var clickAttr = future ? '' : ' onclick="toggleHabit('' + h.id + '','' + k + '')"';
+      html += '<div><div style="' + boxStyle + '"' + clickAttr + '>' + (checked ? '<span style="color:white;font-weight:700;">✓</span>' : '') + '</div></div>';
     }
 
-    const streakColor = streak >= 7 ? 'var(--low)' : streak >= 3 ? 'var(--mid)' : 'var(--text3)';
-    html += `<td style="padding:8px; text-align:center;">
-      <div style="font-size:11px; font-weight:700; color:${streakColor};">
-        ${streak > 0 ? `🔥${streak}` : '—'}
-      </div>
-    </td>
-    <td style="padding:8px;">
-      <button class="task-del" style="font-size:15px;" onclick="deleteHabit('${h.id}')" title="Sil">✕</button>
-    </td></tr>`;
+    var streakColor = streak >= 7 ? 'var(--low)' : streak >= 3 ? 'var(--mid)' : 'var(--text3)';
+    html += '<div style="text-align:center;font-size:11px;font-weight:700;color:' + streakColor + ';">' + (streak > 0 ? '🔥' + streak : '—') + '</div>';
+    html += '<div style="text-align:center;"><button class="task-del" style="font-size:15px;" onclick="deleteHabit('' + h.id + '')">✕</button></div>';
+    html += '</div>';
   });
 
-  html += `</tbody></table></div>`;
+  html += '</div>';
   container.innerHTML = html;
-
-  // Özet kartlar
-  if (summary) {
-    const totalHabits = HABITS.length;
-    let todayDone = 0;
-    const tk = todayKey();
-    HABITS.forEach(h => { if (h.dates.includes(tk)) todayDone++; });
-    const bestStreak = Math.max(...HABITS.map(h => getHabitStreak(h)), 0);
-    const weekCompletions = HABITS.reduce((acc, h) => {
-      for (let i = 0; i < 7; i++) {
-        if (h.dates.includes(dateKey(addDays(currentWeekStart, i)))) acc++;
-      }
-      return acc;
-    }, 0);
-
-    summary.innerHTML = `
-      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; text-align:center;">
-        <div style="font-size:26px; font-weight:700; color:${todayDone === totalHabits && totalHabits > 0 ? 'var(--low)' : 'var(--text)'}; font-family:'Instrument Serif', serif;">${todayDone}/${totalHabits}</div>
-        <div style="font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-top:4px;">Bugün Tamamlanan</div>
-        ${todayDone === totalHabits && totalHabits > 0 ? '<div style="font-size:11px; color:var(--low); font-weight:600; margin-top:4px;">🎉 Mükemmel gün!</div>' : ''}
-      </div>
-      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; text-align:center;">
-        <div style="font-size:26px; font-weight:700; color:${bestStreak >= 7 ? 'var(--low)' : bestStreak >= 3 ? 'var(--mid)' : 'var(--text)'}; font-family:'Instrument Serif', serif;">${bestStreak > 0 ? '🔥' : ''}${bestStreak}</div>
-        <div style="font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-top:4px;">En Uzun Seri (gün)</div>
-      </div>
-    `;
-  }
 }
 
 function addHabit() {
-  const val = document.getElementById('habit-input').value.trim();
+  var input = document.getElementById('habit-input');
+  if (!input) return;
+  var val = input.value.trim();
   if (!val) return;
-  const emoji = selectedHabitEmoji || '🎯';
-  HABITS.push({ id: uid(), name: val, emoji, dates: [] });
-  document.getElementById('habit-input').value = '';
-  selectedHabitEmoji = '🎯';
-  document.getElementById('habit-emoji-display').textContent = '🎯';
+  HABITS.push({ id: uid(), name: val, emoji: H_EMOJI, dates: [] });
+  input.value = '';
+  H_EMOJI = '🎯';
+  var btn = document.getElementById('habit-emoji-btn');
+  if (btn) btn.textContent = '🎯';
   save();
   renderHabits();
 }
 
 function toggleHabit(id, key) {
-  const h = HABITS.find(x => x.id === id);
+  var h = null;
+  for (var i = 0; i < HABITS.length; i++) {
+    if (HABITS[i].id === id) { h = HABITS[i]; break; }
+  }
   if (!h) return;
-  if (h.dates.includes(key)) {
-    h.dates = h.dates.filter(d => d !== key);
+  if (!h.dates) h.dates = [];
+  var idx = h.dates.indexOf(key);
+  if (idx !== -1) {
+    h.dates.splice(idx, 1);
   } else {
     h.dates.push(key);
   }
@@ -1282,11 +1278,11 @@ function toggleHabit(id, key) {
 }
 
 function deleteHabit(id) {
-  if (!confirm('Bu alışkanlığı silmek istediğinden emin misin?')) return;
-  HABITS = HABITS.filter(x => x.id !== id);
+  HABITS = HABITS.filter(function(x) { return x.id !== id; });
   save();
   renderHabits();
 }
+
 
 // ── ANLIK GÖREV (TIMER) ──
 function startTimer() {
