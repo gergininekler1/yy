@@ -539,7 +539,6 @@
 
   <div class="week-grid" id="week-grid" ontouchstart="weekTouchStart(event)" ontouchend="weekTouchEnd(event)"></div>
 
-  <!-- Hover Popup -->
   <div id="day-popup" class="day-popup"></div>
 
   <div style="margin: 4px 16px 24px; border-top: 2px solid var(--border); padding-top: 20px;">
@@ -602,9 +601,7 @@
 </div>
 
 
-<!-- pane-habits: Alışkanlık Takipçisi -->
 <div id="pane-habits" class="main-tab-pane">
-  <!-- Header -->
   <div class="habit-header-bar">
     <div class="habit-title-block">
       <h2>Alışkanlıklar</h2>
@@ -616,7 +613,6 @@
     </button>
   </div>
 
-  <!-- Yeni alışkanlık ekleme satırı -->
   <div id="habit-input-row" style="display:none; padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border);">
     <div class="habit-add-input-row">
       <input class="task-input" id="habit-name-input" placeholder="Alışkanlık adı... (örn: Su İç, Meditasyon)" style="flex:1;" onkeydown="if(event.key==='Enter') commitHabit()">
@@ -629,29 +625,23 @@
     </div>
   </div>
 
-  <!-- Hafta navigation -->
   <div class="habit-week-nav">
     <button onclick="shiftHabitWeek(-1)">‹</button>
     <span class="habit-week-label" id="habit-week-label"></span>
     <button onclick="shiftHabitWeek(1)">›</button>
   </div>
 
-  <!-- Gün başlıkları -->
   <div class="habit-days-header" id="habit-days-header">
     <div></div>
-    <!-- JS ile doldurulacak -->
-  </div>
+    </div>
 
-  <!-- Alışkanlık satırları -->
   <div id="habits-grid"></div>
 
-  <!-- Özet istatistikler -->
   <div class="habit-summary" id="habit-summary" style="display:none;"></div>
 </div>
 
 <div id="pane-alltasks" class="main-tab-pane">
   <div style="padding: 16px;">
-    <!-- Tekrarlayan Görevler bölümü -->
     <div style="margin-bottom:20px;">
       <div style="font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
@@ -663,7 +653,6 @@
 
     <div style="height:1px; background:var(--border); margin-bottom:20px;"></div>
 
-    <!-- Tüm Görevler bölümü -->
     <div>
       <div style="font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
@@ -740,7 +729,6 @@
           <textarea class="note-area" id="note-area" placeholder="Bu gün için notlarını yaz…"></textarea>
         </div>
         <input type="file" id="photo-file-input" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)">
-        <!-- Günün Anısı fotoğrafı -->
         <div id="day-photo-section" style="margin-top:10px; display:none;">
           <div style="position:relative; border-radius:var(--radius-sm); overflow:hidden;">
             <img id="day-photo-img" src="" alt="Günün anısı" style="width:100%; max-height:220px; object-fit:cover; border-radius:var(--radius-sm); display:block;">
@@ -2311,11 +2299,18 @@ function selectHabitColor(c) {
   renderHabitColorPicker();
 }
 function commitHabit() {
-  const name = document.getElementById('habit-name-input').value.trim();
-  if(!name) return;
-  HABITS.push({ id: uid(), name, color: selectedHabitColor, checks: {} });
+  const input = document.getElementById('habit-name-input');
+  const name = input.value.trim();
+  
+  if (!name) {
+    input.focus(); 
+    return; 
+  }
+  
+  HABITS.push({ id: uid(), name: name, color: selectedHabitColor, checks: {} });
   saveHabits();
   hideHabitInput();
+  
   selectedHabitColor = HABIT_COLORS[HABITS.length % HABIT_COLORS.length];
   renderHabits();
 }
@@ -2338,20 +2333,39 @@ function deleteHabit(id) {
 function getHabitStreak(habit) {
   let streak = 0;
   let d = new Date();
-  if(!habit.checks[dateKey(d)]) d.setDate(d.getDate()-1);
+  d.setHours(0, 0, 0, 0); 
+  
+  if (!habit.checks[dateKey(d)]) {
+    d.setDate(d.getDate() - 1);
+  }
+  
   while(true) {
     const k = dateKey(d);
-    if(habit.checks[k]) { streak++; d.setDate(d.getDate()-1); } else break;
+    if(habit.checks[k]) { 
+      streak++; 
+      d.setDate(d.getDate() - 1); 
+    } else {
+      break;
+    }
   }
   return streak;
 }
 
 function getHabitWeekCompletion(habit, days) {
   const tk = todayKey();
-  const total = days.filter(d => dateKey(d) <= tk).length;
-  if(total === 0) return 0;
-  const done = days.filter(d => habit.checks[dateKey(d)]).length;
-  return Math.round((done/total)*100);
+  let total = 0;
+  let done = 0;
+  
+  days.forEach(d => {
+    const k = dateKey(d);
+    if (k <= tk) {
+      total++;
+      if (habit.checks[k]) done++;
+    }
+  });
+  
+  if (total === 0) return 0;
+  return Math.round((done / total) * 100);
 }
 
 function shiftHabitWeek(n) {
@@ -2448,6 +2462,24 @@ function loadPhotos() {
   try { DAY_PHOTOS = JSON.parse(localStorage.getItem('ajanda_photos') || '{}'); } catch(e){ DAY_PHOTOS={}; }
 }
 function savePhotos() { localStorage.setItem('ajanda_photos', JSON.stringify(DAY_PHOTOS)); }
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (!selectedDateKey) return;
+    if (!DAY_PHOTOS[selectedDateKey]) {
+      DAY_PHOTOS[selectedDateKey] = {};
+    }
+    DAY_PHOTOS[selectedDateKey].src = e.target.result;
+    savePhotos();
+    renderPhotoInNotes();
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
 
 function renderPhotoInNotes() {
   if(!selectedDateKey) return;
