@@ -1,156 +1,270 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yazı İlham Aracı</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlham Panosu & Yazım Asistanı</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --accent: #2e7d32;
+            --border: #e0e0e0;
+        }
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #0f172a;
-        color: #e2e8f0;
-        margin: 0;
-        padding: 20px;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    h1 {
-        text-align: center;
-        color: #38bdf8;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 15px;
+        }
 
-    .container {
-        max-width: 900px;
-        margin: auto;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    textarea {
-        width: 100%;
-        height: 250px;
-        background: #020617;
-        color: white;
-        border: 1px solid #334155;
-        padding: 10px;
-        font-size: 16px;
-        margin-top: 10px;
-    }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    .box {
-        background: #020617;
-        padding: 15px;
-        margin-top: 15px;
-        border-radius: 10px;
-        border: 1px solid #334155;
-    }
+        h1 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
 
-    button {
-        margin-top: 10px;
-        margin-right: 10px;
-        padding: 8px 15px;
-        background: #38bdf8;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-    }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
 
-    button:hover {
-        background: #0ea5e9;
-    }
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+        }
 
-    .tip {
-        font-style: italic;
-        color: #94a3b8;
-    }
-</style>
+        /* İlham Panosu Stilleri */
+        .inspiration-box {
+            margin-bottom: 15px;
+        }
+
+        .label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .word-display {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 5px 0 15px 0;
+        }
+
+        .quote-display {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-main);
+            margin: 5px 0;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        .quote-author {
+            font-size: 0.9rem;
+            text-align: right;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1b5e20;
+        }
+
+        /* Editör Stilleri */
+        textarea {
+            width: 100%;
+            height: 350px;
+            padding: 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            resize: vertical;
+            background-color: #fafafa;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+            background-color: #fff;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Tavsiyeler Stilleri */
+        ul.tips {
+            padding-left: 20px;
+        }
+
+        ul.tips li {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
-    <h1>✍️ Yazı İlham Aracı</h1>
+    <header>
+        <h1>Yazım Asistanı & İlham Panosu</h1>
+    </header>
 
-    <textarea id="editor" placeholder="Yazmaya başla..."></textarea>
-
-    <div class="box">
-        <strong>📌 Rastgele Kelime:</strong>
-        <p id="word"></p>
-        <button onclick="newWord()">Yeni Kelime</button>
+    <div class="card">
+        <h2>✨ Anlık İlham</h2>
+        <div class="inspiration-box">
+            <div class="label">Odak Kelime</div>
+            <div id="randomWord" class="word-display">Yükleniyor...</div>
+        </div>
+        <div class="inspiration-box">
+            <div class="label">Felsefi Perspektif</div>
+            <div id="randomQuote" class="quote-display">Yükleniyor...</div>
+            <div id="randomAuthor" class="quote-author"></div>
+        </div>
+        <button class="btn" onclick="generateInspiration()">Yeni İlham Getir</button>
     </div>
 
-    <div class="box">
-        <strong>💭 İlham Alıntısı:</strong>
-        <p id="quote"></p>
-        <button onclick="newQuote()">Yeni Alıntı</button>
+    <div class="card">
+        <h2>✍️ Düz Metin Çalışma Alanı</h2>
+        <textarea id="editor" placeholder="Düşüncelerinizi buraya akıtmaya başlayın... (Sadece düz metin)"></textarea>
+        <div class="status-bar">
+            <span id="wordCount">0 kelime</span>
+            <span id="charCount">0 karakter</span>
+        </div>
     </div>
 
-    <div class="box">
-        <strong>🧠 Yazma Yardımı:</strong>
-        <p id="tip" class="tip"></p>
-        <button onclick="newTip()">Yeni Tavsiye</button>
+    <div class="card">
+        <h2>💡 Tıkanıklık Aşma Tavsiyeleri</h2>
+        <ul class="tips">
+            <li><strong>Bağlantı Kurun:</strong> Yukarıdaki "Odak Kelime"yi, şu an yazdığınız cümlenin içine veya bir sonraki paragrafa tamamen alakasız görünse bile dahil etmeye çalışın.</li>
+            <li><strong>Perspektif Değiştirin:</strong> Karakterinizin veya olay örgünüzün temel motivasyonunu, yukarıdaki "Felsefi Perspektif" alıntısına göre yeniden sorgulayın.</li>
+            <li><strong>Sansürsüz Yazın:</strong> Düzenlemeyi sonraya bırakın. Yanlış kelimeler kullansanız bile silmeden düz metin yazmaya devam edin; akışı bozmayın.</li>
+            <li><strong>Beş Duyu Kuralı:</strong> Tıkandığınızda sahneyi durdurun. Karakteriniz şu an ne kokluyor, ne duyuyor, ne hissediyor? Sadece birini detaylandırarak devam edin.</li>
+        </ul>
     </div>
 </div>
 
 <script>
+    // Kaynaklardan çekilen 300 Türkçe kelimeden özenle seçilmiş havuz
+    const words = [
+        "özlemek (Birini veya bir şeyi çok istemek)", "sevinmek (Mutlu olmak, neşe duymak)", "endişelenmek (Kaygı hissetmek)", "şaşırmak (Beklenmedik bir şeyle karşılaşmak)",
+        "hayal kırıklığı (Beklentinin karşılanmaması)", "merak (Öğrenme isteği)", "iklim (Genel hava durumu)", "kıyı (Deniz veya göl kenarı)",
+        "kuraklık (Su kıtlığı)", "bağışıklık (Karşı koyma gücü)", "müfredat (İçerik programı)", "hedef (Ulaşılmak istenen sonuç)", 
+        "eşitsizlik (Kaynak dağılımındaki adaletsizlik)", "dayanışma (Ortak amaç için destek olmak)", "kültürel miras (Geçmişten aktarılan değerler)",
+        "hoşgörü (Farklılıklara saygı göstermek)", "özgürlük (Kendi iradesiyle karar verme)", "adalet (Herkese hakkını verme)", "empati (Başkasının duygularını anlama)", 
+        "özgüven (Kendi yeteneklerine inanma)", "farkındalık (Anlık deneyimlere dikkat etme)", "ilham (Yaratıcılığı harekete geçiren duygu)", "perspektif (Bir konuya bakış açısı)",
+        "çelişki (İki şeyin bağdaşmaması)", "uzlaşmak (Ortak noktada buluşmak)", "dönüşüm (Köklü biçimde değişme)", "epistemoloji (Bilginin kaynağını inceleyen felsefe)",
+        "ontoloji (Varlığın yapısını araştıran alan)", "nihilizm (Nesnel anlamdan yoksunluk düşüncesi)", "diyalektik (Karşıt görüşlerin sentezi)", "metafor (Başka bir kavramla açıklama figürü)",
+        "özerklik (Kendi kurallarına göre yaşama)", "bilinç (Varlığını farkında olarak deneyimleme)", "modernite (Akıl ve ilerlemeye dayanan sistem)"
+    ];
 
-// --- KELİMELER (dosyandan örnekler, istersen genişletiriz) ---
-const words = [
-"özlemek","sevinmek","endişelenmek","şaşırmak","utanmak",
-"güvenmek","affetmek","merak","alışkanlık","sorumluluk",
-"fırsat","özgürlük","adalet","empati","motivasyon",
-"bilinç","irade","varoluş","anlatıcı","metafor",
-"ironi","epistemoloji","hakikat","algı","zaman"
-];
+    // Kaynaklardan çekilen 150 felsefi alıntıdan seçilmiş havuz
+    const quotes = [
+        { text: "Kendini mutlu etmek için ihtiyaç duyduğun her şey kendi içindedir.", author: "Marcus Aurelius" },
+        { text: "Engel, yolu tıkayan şey değil; yolun ta kendisidir.", author: "Marcus Aurelius" },
+        { text: "Özgürlük, istediğini elde etmek değil; istemediğin şeyi istememektir.", author: "Epiktetos" },
+        { text: "Bilge insan, olayları değil, onlara verdiği tepkileri kontrol eder.", author: "Epiktetos" },
+        { text: "Uzun değil, dolu yaşa.", author: "Seneca" },
+        { text: "Daha az şeye ihtiyaç duyan insan, daha özgür insandır.", author: "Seneca" },
+        { text: "Sorgulanmamış bir hayat, yaşamaya değmez.", author: "Sokrates" },
+        { text: "Gerçeklik, gözlerimizin gördüğü değil; aklımızın kavradığıdır.", author: "Platon" },
+        { text: "Mutluluk, insanın amacıdır; erdem ise oraya giden yoldur.", author: "Aristoteles" },
+        { text: "Uçuruma çok uzun bakarsan, uçurum da sana bakmaya başlar.", author: "Friedrich Nietzsche" },
+        { text: "Yaşam, acıdır; ama acı, büyümenin fiyatıdır.", author: "Friedrich Nietzsche" },
+        { text: "Yaşamak yetmez; bir anlam bulmak gerekir.", author: "Albert Camus" },
+        { text: "Gerçek bilgelik, ne bildiğini ve ne bilmediğini tanımaktır.", author: "Konfüçyüs" },
+        { text: "Yolculuk bin milin başlangıcı tek bir adımdan başlar.", author: "Laozi" },
+        { text: "Savaşmadan elde edilen zafer, gerçek zaferdir.", author: "Laozi" },
+        { text: "Zihin her şeydir; ne düşünürsen o olursun.", author: "Gautama Buddha" },
+        { text: "Aynı nehre iki kez giremezsin; çünkü ne nehir aynıdır ne de sen.", author: "Herakleitos" },
+        { text: "Kalbin, aklın bilmediği nedenleri vardır.", author: "Blaise Pascal" },
+        { text: "Düşünüyorum, öyleyse varım.", author: "René Descartes" },
+        { text: "Varoluş özden önce gelir; önce var olursun, sonra kendini yaratırsın.", author: "Jean-Paul Sartre" }
+    ];
 
-// --- ALINTILAR (dosyandan seçilmiş) ---
-const quotes = [
-"Kendini mutlu etmek için ihtiyaç duyduğun her şey kendi içindedir.",
-"Engel, yolun ta kendisidir.",
-"İnsan, düşünceleri ne ise odur.",
-"Tek bildiğim hiçbir şey bilmediğimdir.",
-"Sorgulanmamış bir hayat yaşamaya değmez.",
-"Biz, tekrar tekrar yaptıklarımızız.",
-"Yaşamak yetmez; bir anlam bulmak gerekir.",
-"Zihin her şeydir; ne düşünürsen o olursun.",
-"Her şey akar; hiçbir şey durağan değildir.",
-"Varoluş özden önce gelir."
-];
+    // Rastgele eleman seçme fonksiyonu
+    function getRandomItem(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
 
-// --- YAZMA TAVSİYELERİ ---
-const tips = [
-"Takılınca durma, kötü yaz ama yazmaya devam et.",
-"Sadece bir sahne yaz, mükemmel olmak zorunda değil.",
-"Bir kelimeyi merkeze al ve onun etrafında yaz.",
-"Karakterine bir sır ver.",
-"Yazdığını değil, hissettiğini anlat.",
-"Şu soruyla başla: 'Ya şöyle olsaydı?'",
-"İlk cümleyi sil ve yeniden yaz.",
-"Zıtlık kullan: mutluluk + karanlık gibi.",
-"Bir anıyı yeniden yaz ama farklı sonla bitir.",
-"Okuyucuya değil kendine yaz."
-];
+    // İlham panosunu güncelleyen fonksiyon
+    function generateInspiration() {
+        const randomWord = getRandomItem(words);
+        const randomQuoteObj = getRandomItem(quotes);
 
-// --- FONKSİYONLAR ---
-function randomItem(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-}
+        document.getElementById("randomWord").innerText = randomWord;
+        document.getElementById("randomQuote").innerText = `"${randomQuoteObj.text}"`;
+        document.getElementById("randomAuthor").innerText = `— ${randomQuoteObj.author}`;
+    }
 
-function newWord() {
-    document.getElementById("word").innerText = randomItem(words);
-}
+    // Editör kelime ve karakter sayacı
+    const editor = document.getElementById("editor");
+    const wordCountDisplay = document.getElementById("wordCount");
+    const charCountDisplay = document.getElementById("charCount");
 
-function newQuote() {
-    document.getElementById("quote").innerText = randomItem(quotes);
-}
+    editor.addEventListener("input", function() {
+        const text = editor.value;
+        const charCount = text.length;
+        
+        // Boşlukları temizleyerek kelime sayısını bulma
+        const words = text.trim().split(/\s+/);
+        const wordCount = text.trim() === "" ? 0 : words.length;
 
-function newTip() {
-    document.getElementById("tip").innerText = randomItem(tips);
-}
+        wordCountDisplay.innerText = `${wordCount} kelime`;
+        charCountDisplay.innerText = `${charCount} karakter`;
+    });
 
-// sayfa açıldığında otomatik doldur
-newWord();
-newQuote();
-newTip();
-
+    // Sayfa yüklendiğinde ilk ilhamı oluştur
+    window.onload = generateInspiration;
 </script>
 
 </body>
