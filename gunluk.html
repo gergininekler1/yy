@@ -3,991 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>İlham — Yazma Asistanı</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Mono:wght@300;400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<title>Yazı İlham Aracı</title>
+
 <style>
-  :root {
-    --bg: #0d0d0f;
-    --bg2: #13131a;
-    --bg3: #1a1a24;
-    --panel: #16161f;
-    --border: #2a2a3a;
-    --border2: #353548;
-    --text: #e8e4d9;
-    --text2: #9994a8;
-    --text3: #6a6578;
-    --accent: #c9a96e;
-    --accent2: #e8c98a;
-    --accent3: #a07840;
-    --gold-glow: rgba(201,169,110,0.12);
-    --b1: #4a9e7a;
-    --b2: #5b8fd4;
-    --c1: #d46b6b;
-    --serif: 'Cormorant Garamond', Georgia, serif;
-    --mono: 'DM Mono', monospace;
-    --instr: 'Instrument Serif', serif;
-    --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-  }
-  .light-mode {
-    --bg: #f5f0e8;
-    --bg2: #ede8dc;
-    --bg3: #e5dece;
-    --panel: #ece6d8;
-    --border: #ccc5b0;
-    --border2: #b8b09a;
-    --text: #1a1714;
-    --text2: #5a5040;
-    --text3: #8a7a60;
-    --accent: #8b5e1a;
-    --accent2: #a07030;
-    --accent3: #c9a96e;
-    --gold-glow: rgba(139,94,26,0.10);
-    --b1: #2a7a52;
-    --b2: #2a5a9a;
-    --c1: #9a3030;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
-  body {
-    font-family: var(--serif);
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    transition: var(--transition);
-  }
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+        margin: 0;
+        padding: 20px;
+    }
 
-  /* ── TOPBAR ── */
-  #topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px;
-    height: 52px;
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    gap: 12px;
-  }
-  .topbar-left { display: flex; align-items: center; gap: 16px; }
-  .app-title {
-    font-family: var(--instr);
-    font-size: 1.3rem;
-    font-style: italic;
-    color: var(--accent);
-    letter-spacing: 0.04em;
-  }
-  .stats-bar {
-    display: flex; gap: 14px; align-items: center;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--text3);
-  }
-  .stat-item { display: flex; align-items: center; gap: 4px; }
-  .stat-val { color: var(--text2); }
-  .topbar-right { display: flex; gap: 8px; align-items: center; }
-  .tb-btn {
-    background: none; border: 1px solid var(--border);
-    color: var(--text2); padding: 5px 12px;
-    border-radius: 6px; cursor: pointer;
-    font-family: var(--mono); font-size: 0.72rem;
-    transition: var(--transition);
-    white-space: nowrap;
-  }
-  .tb-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--gold-glow); }
-  .tb-btn.active { border-color: var(--accent); color: var(--accent); background: var(--gold-glow); }
-  #timerDisplay {
-    font-family: var(--mono); font-size: 0.8rem;
-    color: var(--accent2); letter-spacing: 0.08em;
-    padding: 4px 10px; border: 1px solid var(--accent3);
-    border-radius: 6px; background: var(--gold-glow);
-    display: none;
-  }
+    h1 {
+        text-align: center;
+        color: #38bdf8;
+    }
 
-  /* ── MAIN LAYOUT ── */
-  #main {
-    display: flex; flex: 1; overflow: hidden;
-    transition: var(--transition);
-  }
+    .container {
+        max-width: 900px;
+        margin: auto;
+    }
 
-  /* ── EDITOR PANEL ── */
-  #editorPanel {
-    flex: 1; display: flex; flex-direction: column;
-    overflow: hidden; min-width: 0;
-  }
-  #writingType {
-    display: flex; gap: 0; padding: 10px 20px 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-  }
-  .wtype-btn {
-    background: none; border: none;
-    color: var(--text3); padding: 8px 16px;
-    cursor: pointer; font-family: var(--serif);
-    font-size: 0.9rem; border-bottom: 2px solid transparent;
-    margin-bottom: -1px; transition: var(--transition);
-  }
-  .wtype-btn:hover { color: var(--text); }
-  .wtype-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  #editorWrap {
-    flex: 1; overflow-y: auto; padding: 40px 60px 80px;
-    background: var(--bg);
-  }
-  #editor {
-    width: 100%; max-width: 700px; margin: 0 auto;
-    min-height: 100%;
-    background: none; border: none; outline: none;
-    font-family: var(--serif);
-    font-size: 1.18rem; line-height: 1.85;
-    color: var(--text);
-    resize: none;
-    caret-color: var(--accent);
-  }
-  #editor::placeholder { color: var(--text3); font-style: italic; }
+    textarea {
+        width: 100%;
+        height: 250px;
+        background: #020617;
+        color: white;
+        border: 1px solid #334155;
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 10px;
+    }
 
-  /* ── RIGHT PANEL ── */
-  #rightPanel {
-    width: 320px; flex-shrink: 0;
-    background: var(--panel);
-    border-left: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    overflow: hidden;
-    transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
-  }
-  #rightPanel.collapsed { width: 0; border-left: none; overflow: hidden; }
+    .box {
+        background: #020617;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+    }
 
-  .panel-tabs {
-    display: flex; border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .ptab {
-    flex: 1; padding: 12px 4px;
-    background: none; border: none;
-    color: var(--text3); cursor: pointer;
-    font-family: var(--mono); font-size: 0.68rem;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    border-bottom: 2px solid transparent;
-    transition: var(--transition);
-  }
-  .ptab:hover { color: var(--text2); }
-  .ptab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+    button {
+        margin-top: 10px;
+        margin-right: 10px;
+        padding: 8px 15px;
+        background: #38bdf8;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
 
-  /* ── ALINTI KARTI ── */
-  .inspiration-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 18px;
-    margin-bottom: 14px;
-    position: relative;
-    transition: var(--transition);
-  }
-  .inspiration-card:hover { border-color: var(--accent3); }
-  .card-label {
-    font-family: var(--mono); font-size: 0.62rem;
-    color: var(--text3); letter-spacing: 0.1em;
-    text-transform: uppercase; margin-bottom: 10px;
-  }
-  .quote-text {
-    font-family: var(--instr);
-    font-size: 1.02rem;
-    line-height: 1.65;
-    color: var(--text);
-    font-style: italic;
-    margin-bottom: 12px;
-  }
-  .quote-text::before { content: '\201C'; color: var(--accent3); font-size: 1.4em; line-height: 0; vertical-align: -0.2em; }
-  .quote-text::after { content: '\201D'; color: var(--accent3); font-size: 1.4em; line-height: 0; vertical-align: -0.2em; }
-  .quote-meta {
-    font-family: var(--mono); font-size: 0.67rem;
-    color: var(--accent3);
-  }
-  .quote-book { color: var(--text3); margin-top: 2px; }
-  .refresh-btn {
-    position: absolute; top: 12px; right: 12px;
-    background: none; border: none; cursor: pointer;
-    color: var(--text3); font-size: 0.9rem;
-    transition: var(--transition); padding: 4px;
-    border-radius: 4px;
-  }
-  .refresh-btn:hover { color: var(--accent); background: var(--gold-glow); transform: rotate(90deg); }
+    button:hover {
+        background: #0ea5e9;
+    }
 
-  /* ── KELİME KARTI ── */
-  .word-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 10px;
-    transition: var(--transition);
-  }
-  .word-card:hover { border-color: var(--border2); }
-  .word-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .word-main {
-    font-family: var(--instr);
-    font-size: 1.1rem;
-    color: var(--text);
-  }
-  .level-badge {
-    font-family: var(--mono); font-size: 0.6rem;
-    padding: 2px 7px; border-radius: 20px;
-    font-weight: 500;
-  }
-  .lvl-B1 { background: rgba(74,158,122,0.15); color: var(--b1); border: 1px solid rgba(74,158,122,0.3); }
-  .lvl-B2 { background: rgba(91,143,212,0.15); color: var(--b2); border: 1px solid rgba(91,143,212,0.3); }
-  .lvl-C1 { background: rgba(212,107,107,0.15); color: var(--c1); border: 1px solid rgba(212,107,107,0.3); }
-  .word-cat {
-    font-family: var(--mono); font-size: 0.6rem;
-    color: var(--text3); margin-left: auto;
-  }
-  .word-def {
-    font-family: var(--serif);
-    font-size: 0.88rem;
-    line-height: 1.55;
-    color: var(--text2);
-    font-style: italic;
-  }
-  .use-word-btn {
-    margin-top: 8px;
-    background: none; border: 1px solid var(--border);
-    color: var(--text3); padding: 3px 10px;
-    border-radius: 5px; cursor: pointer;
-    font-family: var(--mono); font-size: 0.62rem;
-    transition: var(--transition);
-  }
-  .use-word-btn:hover { border-color: var(--b2); color: var(--b2); }
-
-  /* ── AI SORU PANELI ── */
-  #aiPanel { padding: 0; }
-  .ai-header {
-    padding: 14px 16px 10px;
-    border-bottom: 1px solid var(--border);
-  }
-  .ai-title {
-    font-family: var(--mono); font-size: 0.68rem;
-    color: var(--accent); letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .ai-subtitle {
-    font-size: 0.78rem; color: var(--text3);
-    margin-top: 4px; line-height: 1.4;
-    font-family: var(--serif);
-  }
-  #aiMessages {
-    flex: 1; overflow-y: auto;
-    padding: 14px 16px;
-    display: flex; flex-direction: column; gap: 10px;
-    max-height: 380px;
-  }
-  .ai-msg {
-    padding: 12px 14px; border-radius: 10px;
-    font-size: 0.88rem; line-height: 1.6;
-    font-family: var(--serif);
-    animation: fadeUp 0.3s ease;
-  }
-  .ai-msg.assistant {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-left: 3px solid var(--accent);
-  }
-  .ai-msg.user {
-    background: var(--gold-glow);
-    border: 1px solid var(--accent3);
-    color: var(--text2);
-    text-align: right;
-  }
-  .ai-msg.loading {
-    color: var(--text3);
-    font-style: italic;
-    border: 1px dashed var(--border);
-    background: var(--bg2);
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .quick-prompts {
-    padding: 10px 16px;
-    display: flex; flex-wrap: wrap; gap: 6px;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .qprompt {
-    background: none; border: 1px solid var(--border);
-    color: var(--text3); padding: 5px 10px;
-    border-radius: 20px; cursor: pointer;
-    font-size: 0.72rem; font-family: var(--serif);
-    transition: var(--transition);
-    font-style: italic;
-  }
-  .qprompt:hover { border-color: var(--accent); color: var(--accent); background: var(--gold-glow); }
-  .ai-input-area {
-    padding: 12px 16px;
-    display: flex; gap: 8px;
-    border-top: 1px solid var(--border);
-    margin-top: auto;
-  }
-  #aiInput {
-    flex: 1; background: var(--bg2);
-    border: 1px solid var(--border); border-radius: 8px;
-    color: var(--text); padding: 8px 12px;
-    font-family: var(--serif); font-size: 0.9rem;
-    outline: none; resize: none; min-height: 36px;
-    max-height: 90px; transition: var(--transition);
-  }
-  #aiInput:focus { border-color: var(--accent3); }
-  #aiInput::placeholder { color: var(--text3); font-style: italic; }
-  #sendBtn {
-    background: var(--accent);
-    border: none; border-radius: 8px;
-    color: var(--bg); padding: 8px 14px;
-    cursor: pointer; font-family: var(--mono);
-    font-size: 0.75rem; transition: var(--transition);
-    white-space: nowrap; font-weight: 500;
-  }
-  #sendBtn:hover { background: var(--accent2); }
-  #sendBtn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* ── SAVE TOAST ── */
-  #toast {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--bg3); border: 1px solid var(--accent);
-    color: var(--accent); padding: 8px 20px;
-    border-radius: 30px; font-family: var(--mono);
-    font-size: 0.75rem; opacity: 0;
-    transition: all 0.3s; pointer-events: none; z-index: 999;
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-
-  /* ── FOCUS MODE ── */
-  .focus-mode #rightPanel { width: 0; border-left: none; }
-  .focus-mode #writingType { display: none; }
-  .focus-mode #editorWrap { padding: 80px 80px 120px; }
-  .focus-mode #editor { max-width: 620px; font-size: 1.28rem; }
-
-  /* ── ORNAMENT ── */
-  .ornament {
-    text-align: center; color: var(--text3);
-    font-size: 0.7rem; letter-spacing: 0.3em;
-    padding: 14px 0 6px;
-    border-top: 1px solid var(--border);
-    margin: 8px 0;
-  }
-
-  /* ── FILTERED WORDS ── */
-  .filter-row {
-    display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;
-  }
-  .filter-btn {
-    background: none; border: 1px solid var(--border);
-    color: var(--text3); padding: 3px 10px;
-    border-radius: 20px; cursor: pointer;
-    font-family: var(--mono); font-size: 0.65rem;
-    transition: var(--transition);
-  }
-  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--gold-glow); }
-  .filter-btn.fb1.active { border-color: var(--b1); color: var(--b1); background: rgba(74,158,122,0.1); }
-  .filter-btn.fb2.active { border-color: var(--b2); color: var(--b2); background: rgba(91,143,212,0.1); }
-  .filter-btn.fc1.active { border-color: var(--c1); color: var(--c1); background: rgba(212,107,107,0.1); }
-
-  /* ── TIMER ── */
-  .timer-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-  .tc-btn {
-    background: none; border: 1px solid var(--border);
-    color: var(--text2); padding: 4px 10px;
-    border-radius: 6px; cursor: pointer;
-    font-family: var(--mono); font-size: 0.68rem;
-    transition: var(--transition);
-  }
-  .tc-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* ── WRITING TIPS ── */
-  .tip-card {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 14px;
-    margin-bottom: 8px;
-    border-left: 3px solid var(--accent3);
-  }
-  .tip-title {
-    font-family: var(--mono); font-size: 0.65rem;
-    color: var(--accent3); text-transform: uppercase;
-    letter-spacing: 0.06em; margin-bottom: 4px;
-  }
-  .tip-text {
-    font-size: 0.85rem; color: var(--text2);
-    line-height: 1.55; font-style: italic;
-  }
+    .tip {
+        font-style: italic;
+        color: #94a3b8;
+    }
 </style>
 </head>
+
 <body>
 
-<!-- TOPBAR -->
-<div id="topbar">
-  <div class="topbar-left">
-    <div class="app-title">İlham</div>
-    <div class="stats-bar">
-      <span class="stat-item">Kelime: <span class="stat-val" id="wordCount">0</span></span>
-      <span class="stat-item">Karakter: <span class="stat-val" id="charCount">0</span></span>
-      <span class="stat-item">Süre: <span class="stat-val" id="timeCount">00:00</span></span>
+<div class="container">
+    <h1>✍️ Yazı İlham Aracı</h1>
+
+    <textarea id="editor" placeholder="Yazmaya başla..."></textarea>
+
+    <div class="box">
+        <strong>📌 Rastgele Kelime:</strong>
+        <p id="word"></p>
+        <button onclick="newWord()">Yeni Kelime</button>
     </div>
-    <div id="timerDisplay">⏱ <span id="timerVal">25:00</span></div>
-  </div>
-  <div class="topbar-right">
-    <div class="timer-controls">
-      <button class="tc-btn" onclick="startTimer(25)">25 dk</button>
-      <button class="tc-btn" onclick="startTimer(15)">15 dk</button>
-      <button class="tc-btn" onclick="stopTimer()" id="stopTimerBtn" style="display:none">Durdur</button>
+
+    <div class="box">
+        <strong>💭 İlham Alıntısı:</strong>
+        <p id="quote"></p>
+        <button onclick="newQuote()">Yeni Alıntı</button>
     </div>
-    <button class="tb-btn" onclick="saveText()">↓ İndir</button>
-    <button class="tb-btn" id="focusBtn" onclick="toggleFocus()">Odak Modu</button>
-    <button class="tb-btn" onclick="toggleTheme()" id="themeBtn">☀ Aydınlık</button>
-    <button class="tb-btn active" id="panelToggleBtn" onclick="togglePanel()">Panel ◀</button>
-  </div>
+
+    <div class="box">
+        <strong>🧠 Yazma Yardımı:</strong>
+        <p id="tip" class="tip"></p>
+        <button onclick="newTip()">Yeni Tavsiye</button>
+    </div>
 </div>
-
-<!-- MAIN -->
-<div id="main">
-
-  <!-- EDITOR -->
-  <div id="editorPanel">
-    <div id="writingType">
-      <button class="wtype-btn active" onclick="setType(this,'Şiir')">Şiir</button>
-      <button class="wtype-btn" onclick="setType(this,'Kısa Öykü')">Kısa Öykü</button>
-      <button class="wtype-btn" onclick="setType(this,'Roman')">Roman</button>
-      <button class="wtype-btn" onclick="setType(this,'Deneme')">Deneme</button>
-      <button class="wtype-btn" onclick="setType(this,'Serbest')">Serbest</button>
-    </div>
-    <div id="editorWrap">
-      <textarea id="editor" placeholder="Yazmaya başla… Sessizlik de bir başlangıçtır."></textarea>
-    </div>
-  </div>
-
-  <!-- RIGHT PANEL -->
-  <div id="rightPanel">
-    <div class="panel-tabs">
-      <button class="ptab active" onclick="switchTab('inspiration',this)">İlham</button>
-      <button class="ptab" onclick="switchTab('words',this)">Kelimeler</button>
-      <button class="ptab" onclick="switchTab('ai',this)">AI Rehber</button>
-      <button class="ptab" onclick="switchTab('tips',this)">İpuçları</button>
-    </div>
-
-    <!-- TAB: İLHAM -->
-    <div class="panel-body" id="tab-inspiration">
-      <div id="quoteCard" class="inspiration-card">
-        <div class="card-label">Alıntı</div>
-        <button class="refresh-btn" onclick="refreshQuote()" title="Yeni alıntı">↻</button>
-        <div class="quote-text" id="quoteText">Engel, yolu tıkayan şey değil; yolun ta kendisidir.</div>
-        <div class="quote-meta" id="quoteAuthor">— Marcus Aurelius</div>
-        <div class="quote-meta quote-book" id="quoteBook">Kendime Düşünceler</div>
-      </div>
-
-      <div class="ornament">· · ·</div>
-
-      <div id="wordSpotlight" class="word-card">
-        <div class="card-label" style="margin-bottom:8px">Günün Kelimesi</div>
-        <div class="word-header">
-          <div class="word-main" id="spotWord">perspektif</div>
-          <span class="level-badge lvl-B2" id="spotLevel">B2</span>
-          <span class="word-cat" id="spotCat">Sanat</span>
-        </div>
-        <div class="word-def" id="spotDef">Bir konuya bakış açısı; resimde derinlik etkisi.</div>
-        <div style="display:flex;gap:6px;margin-top:10px">
-          <button class="use-word-btn" onclick="insertWordToEditor(document.getElementById('spotWord').textContent)">Metne ekle</button>
-          <button class="use-word-btn" onclick="refreshWordSpotlight()">Yeni kelime</button>
-        </div>
-      </div>
-
-      <div class="ornament">· · ·</div>
-
-      <div id="quote2Card" class="inspiration-card">
-        <div class="card-label">İkinci Alıntı</div>
-        <button class="refresh-btn" onclick="refreshQuote2()" title="Yeni alıntı">↻</button>
-        <div class="quote-text" id="quote2Text">Yolculuk bin milin başlangıcı tek bir adımdan başlar.</div>
-        <div class="quote-meta" id="quote2Author">— Laozi</div>
-        <div class="quote-meta quote-book" id="quote2Book">Tao Te Ching</div>
-      </div>
-    </div>
-
-    <!-- TAB: KELİMELER -->
-    <div class="panel-body" id="tab-words" style="display:none">
-      <div class="filter-row">
-        <button class="filter-btn fb1 active" onclick="filterWords('B1',this)">B1</button>
-        <button class="filter-btn fb2 active" onclick="filterWords('B2',this)">B2</button>
-        <button class="filter-btn fc1 active" onclick="filterWords('C1',this)">C1</button>
-        <button class="filter-btn" onclick="shuffleWords()" style="margin-left:auto">Karıştır</button>
-      </div>
-      <div id="wordList"></div>
-    </div>
-
-    <!-- TAB: AI REHBER -->
-    <div id="tab-ai" style="display:none; display:flex; flex-direction:column; height:100%;">
-      <div class="ai-header">
-        <div class="ai-title">✦ Yazma Rehberi</div>
-        <div class="ai-subtitle">Yazdıklarını paylaş, sana soru sorsun veya ilham versin.</div>
-      </div>
-      <div id="aiMessages">
-        <div class="ai-msg assistant">Merhaba! Yazmakta olduğun parçadan bir bölüm paylaş — veya sadece ne hakkında yazdığını anlat. Sana derinlemesine sorular soracağım. ✦</div>
-      </div>
-      <div class="quick-prompts">
-        <button class="qprompt" onclick="quickPrompt('Şu an ne hissediyorum?')">Ne hissediyorum?</button>
-        <button class="qprompt" onclick="quickPrompt('Karakterim kim?')">Karakterim kim?</button>
-        <button class="qprompt" onclick="quickPrompt('Neden tıkandım?')">Neden tıkandım?</button>
-        <button class="qprompt" onclick="quickPrompt('Metni geliştir')">Metni geliştir</button>
-        <button class="qprompt" onclick="quickPrompt('Bana bir metafor öner')">Metafor öner</button>
-        <button class="qprompt" onclick="sendCurrentText()">Metni gönder</button>
-      </div>
-      <div class="ai-input-area">
-        <textarea id="aiInput" placeholder="Yaz, sor, paylaş…" rows="1" onkeydown="aiKeydown(event)"></textarea>
-        <button id="sendBtn" onclick="sendAiMessage()">Gönder</button>
-      </div>
-    </div>
-
-    <!-- TAB: İPUÇLARI -->
-    <div class="panel-body" id="tab-tips" style="display:none">
-      <div id="tipsList"></div>
-    </div>
-
-  </div>
-</div>
-
-<div id="toast">Kaydedildi ✓</div>
 
 <script>
-// ══════════════════════════════════════════
-// DATA
-// ══════════════════════════════════════════
-const DATA = {"words":[{"word":"özlemek","def":"Birini veya bir şeyi çok istemek, hasretini çekmek.","level":"B1","category":"Duygular"},{"word":"sevinmek","def":"Mutlu olmak, neşe duymak.","level":"B1","category":"Duygular"},{"word":"endişelenmek","def":"Bir konuda kaygı veya korku hissetmek.","level":"B1","category":"Duygular"},{"word":"şaşırmak","def":"Beklenmedik bir şeyle karşılaşınca ne yapacağını bilememek.","level":"B1","category":"Duygular"},{"word":"utanmak","def":"Yaptığı bir şeyden dolayı mahcup hissetmek.","level":"B1","category":"Duygular"},{"word":"kıskanmak","def":"Başkasının sahip olduğu şeyi çekemez olmak.","level":"B1","category":"Duygular"},{"word":"güvenmek","def":"Birine veya bir şeye inanmak, emin olmak.","level":"B1","category":"Duygular"},{"word":"affetmek","def":"Birine yapılan kötülüğü bağışlamak.","level":"B1","category":"Duygular"},{"word":"hayal kırıklığı","def":"Beklentinin karşılanmamasından doğan hayal kırıklığı duygusu.","level":"B1","category":"Duygular"},{"word":"merak","def":"Bir şeyi öğrenmek veya anlamak için duyulan istek.","level":"B1","category":"Duygular"},{"word":"alışveriş","def":"Mağaza veya pazardan mal satın alma eylemi.","level":"B1","category":"Günlük Hayat"},{"word":"randevu","def":"Belirli bir yer ve zamanda buluşma sözü.","level":"B1","category":"Günlük Hayat"},{"word":"fatura","def":"Satın alınan mal veya hizmet için ödenmesi gereken belge.","level":"B1","category":"Günlük Hayat"},{"word":"kira","def":"Bir yeri veya eşyayı kullanmak için ödenen para.","level":"B1","category":"Günlük Hayat"},{"word":"taşınmak","def":"Yaşadığı yeri değiştirerek başka bir yere gitmek.","level":"B1","category":"Günlük Hayat"},{"word":"izin","def":"Birisinin bir şey yapmasına onay vermek; tatil hakkı.","level":"B1","category":"Günlük Hayat"},{"word":"öneri","def":"Bir konuda yapılabilecek şeylere dair fikir sunmak.","level":"B1","category":"Günlük Hayat"},{"word":"şikayet","def":"Bir durum veya kişi hakkında memnuniyetsizliği dile getirmek.","level":"B1","category":"Günlük Hayat"},{"word":"başvurmak","def":"Bir yere veya kişiye yardım için ya da amaçla gitmek.","level":"B1","category":"Günlük Hayat"},{"word":"düzenlemek","def":"Bir şeyi belirli bir sıraya veya plana göre hazırlamak.","level":"B1","category":"Günlük Hayat"},{"word":"iklim","def":"Bir bölgede uzun yıllar boyunca görülen hava koşullarının genel durumu.","level":"B1","category":"Doğa"},{"word":"deprem","def":"Yer kabuğunun sarsılmasıyla oluşan doğal felaket.","level":"B1","category":"Doğa"},{"word":"kıyı","def":"Deniz, göl veya nehrin karaya yakın kenar bölgesi.","level":"B1","category":"Doğa"},{"word":"çevre","def":"Canlıları çevreleyen doğal ortam.","level":"B1","category":"Doğa"},{"word":"orman","def":"Ağaç ve bitkilerin yoğun olarak bulunduğu geniş alan.","level":"B1","category":"Doğa"},{"word":"sel","def":"Aşırı yağmur veya kar erimesiyle oluşan su baskını.","level":"B1","category":"Doğa"},{"word":"kuraklık","def":"Uzun süre yağış olmadığı için oluşan su kıtlığı.","level":"B1","category":"Doğa"},{"word":"kirlilik","def":"Çevrenin zararlı maddelerle bozulması.","level":"B1","category":"Doğa"},{"word":"ameliyat","def":"Hastalığı tedavi etmek için cerrah tarafından yapılan tıbbi müdahale.","level":"B1","category":"Sağlık"},{"word":"reçete","def":"Doktorun yazdığı ilaç listesi.","level":"B1","category":"Sağlık"},{"word":"aşı","def":"Hastalıklara karşı bağışıklık kazandırmak için verilen madde.","level":"B1","category":"Sağlık"},{"word":"alerji","def":"Bazı maddelere karşı vücudun gösterdiği aşırı tepki.","level":"B1","category":"Sağlık"},{"word":"tansiyon","def":"Kalbin pompaladığı kanın damar duvarlarına uyguladığı basınç.","level":"B1","category":"Sağlık"},{"word":"beslenme","def":"Sağlıklı kalmak için yiyecek ve içecek tüketimi.","level":"B1","category":"Sağlık"},{"word":"egzersiz","def":"Bedeni güçlendirmek ve sağlığı korumak için yapılan fiziksel etkinlik.","level":"B1","category":"Sağlık"},{"word":"stres","def":"Baskı veya zorluklar karşısında hissedilen zihinsel gerginlik.","level":"B1","category":"Sağlık"},{"word":"bağışıklık","def":"Vücudun hastalıklara karşı koyma gücü.","level":"B1","category":"Sağlık"},{"word":"müfredat","def":"Okullarda okutulacak derslerin içeriğini belirleyen program.","level":"B1","category":"Eğitim"},{"word":"burs","def":"Öğrencilere verilen maddi destek veya ödül.","level":"B1","category":"Eğitim"},{"word":"sınav","def":"Öğrencilerin bilgisini ölçen yazılı veya sözlü değerlendirme.","level":"B1","category":"Eğitim"},{"word":"ödev","def":"Öğrenciden evde yapması istenen çalışma.","level":"B1","category":"Eğitim"},{"word":"mezuniyet","def":"Okulu başarıyla bitirme töreni veya durumu.","level":"B1","category":"Eğitim"},{"word":"araştırma","def":"Bilgi edinmek için yapılan sistematik inceleme.","level":"B1","category":"Eğitim"},{"word":"sunum","def":"Bir konuyu dinleyicilere anlatmak için hazırlanan konuşma.","level":"B1","category":"Eğitim"},{"word":"kaynak","def":"Bilgi almak için başvurulan kitap, site veya kişi.","level":"B1","category":"Eğitim"},{"word":"tartışma","def":"Bir konuyu farklı görüşlerle ele alma, münazara.","level":"B1","category":"Eğitim"},{"word":"meslektaş","def":"Aynı meslekte çalışan kişi.","level":"B1","category":"İş"},{"word":"toplantı","def":"Belirli bir amaçla bir araya gelen grup.","level":"B1","category":"İş"},{"word":"maaş","def":"Çalışan kişiye aylık olarak ödenen para.","level":"B1","category":"İş"},{"word":"terfi","def":"İş yerinde daha üst bir göreve yükselmek.","level":"B1","category":"İş"},{"word":"özgeçmiş","def":"Kişinin eğitim ve iş deneyimini özetleyen belge.","level":"B1","category":"İş"},{"word":"performans","def":"Bir kişinin görevini ne kadar iyi yaptığının ölçüsü.","level":"B1","category":"İş"},{"word":"hedef","def":"Ulaşılmak istenen amaç veya sonuç.","level":"B1","category":"İş"},{"word":"proje","def":"Belirli bir amaca yönelik planlı çalışma.","level":"B1","category":"İş"},{"word":"müşteri","def":"Mal veya hizmet satın alan kişi.","level":"B1","category":"İş"},{"word":"sözleşme","def":"İki taraf arasında yapılan yazılı anlaşma.","level":"B1","category":"İş"},{"word":"uygulama","def":"Akıllı telefon veya bilgisayarda çalışan program.","level":"B1","category":"Teknoloji"},{"word":"şifre","def":"Bir hesaba girmek için kullanılan gizli kod.","level":"B1","category":"Teknoloji"},{"word":"güncelleme","def":"Yazılımın daha yeni bir sürümüne geçiş.","level":"B1","category":"Teknoloji"},{"word":"veri","def":"İşlenmek üzere toplanan ham bilgi.","level":"B1","category":"Teknoloji"},{"word":"bağlantı","def":"İki cihaz veya kişi arasındaki iletişim köprüsü.","level":"B1","category":"Teknoloji"},{"word":"yedek","def":"Bir dosyanın kaybolmaması için alınan kopyası.","level":"B1","category":"Teknoloji"},{"word":"ekran","def":"Bilgisayar veya telefonda görsellerin gösterildiği yüzey.","level":"B1","category":"Teknoloji"},{"word":"donanım","def":"Bilgisayarın fiziksel parçalarının tümü.","level":"B1","category":"Teknoloji"},{"word":"yazılım","def":"Bilgisayarı çalıştıran program ve kodların tümü.","level":"B1","category":"Teknoloji"},{"word":"sosyal medya","def":"İnsanların içerik paylaştığı çevrimiçi platformlar.","level":"B1","category":"Teknoloji"},{"word":"pasaport","def":"Yurt dışına çıkışta kullanılan resmi kimlik belgesi.","level":"B1","category":"Seyahat"},{"word":"vize","def":"Yabancı ülkeye giriş için alınan resmi izin.","level":"B1","category":"Seyahat"},{"word":"aktarma","def":"Yolculuk sırasında başka bir araca geçiş yapmak.","level":"B1","category":"Seyahat"},{"word":"rezervasyon","def":"Otel, uçak veya restoran için önceden yer ayırtmak.","level":"B1","category":"Seyahat"},{"word":"rehber","def":"Turistlere bir yeri gezdiren uzman kişi.","level":"B1","category":"Seyahat"},{"word":"gümrük","def":"Yurt dışından gelen malların kontrol edildiği sınır kapısı.","level":"B1","category":"Seyahat"},{"word":"bilet","def":"Bir hizmet veya etkinlik için ödeme yapıldığını gösteren belge.","level":"B1","category":"Seyahat"},{"word":"durak","def":"Otobüs veya trenlerin belirli aralıklarla durduğu yer.","level":"B1","category":"Seyahat"},{"word":"harita","def":"Bir yerin küçültülmüş çizgisel gösterimi.","level":"B1","category":"Seyahat"},{"word":"tur","def":"Belirli yerleri gezdiren organize seyahat programı.","level":"B1","category":"Seyahat"},{"word":"alışkanlık","def":"Sık tekrarla kazanılan otomatik davranış biçimi.","level":"B1","category":"Günlük Hayat"},{"word":"sorumluluk","def":"Bir işin veya kişinin üstlenilmesi gereken yükümlülük.","level":"B1","category":"Günlük Hayat"},{"word":"fırsat","def":"İstenen bir şeyi yapmaya elverişli durum veya zaman.","level":"B1","category":"Günlük Hayat"},{"word":"tercih","def":"Birkaç seçenek arasından birini seçme.","level":"B1","category":"Günlük Hayat"},{"word":"karşılaştırmak","def":"İki ya da daha fazla şeyin benzerlik ve farklarını incelemek.","level":"B1","category":"Eğitim"},{"word":"etkilemek","def":"Bir şeyin başka bir şey üzerinde değişiklik yaratması.","level":"B1","category":"Eğitim"},{"word":"geliştirmek","def":"Bir şeyi daha iyi veya daha ileri bir duruma getirmek.","level":"B1","category":"Eğitim"},{"word":"tanımlamak","def":"Bir şeyin ne olduğunu açık biçimde belirtmek.","level":"B1","category":"Eğitim"},{"word":"önlemek","def":"Kötü bir şeyin olmasını engellemek.","level":"B1","category":"Sağlık"},{"word":"iyileşmek","def":"Hastalık veya yaralanmadan sonra sağlığa kavuşmak.","level":"B1","category":"Sağlık"},{"word":"sürdürmek","def":"Bir şeyi devam ettirmek, durdurmamak.","level":"B1","category":"İş"},{"word":"başarmak","def":"Hedeflenen sonuca ulaşmak.","level":"B1","category":"İş"},{"word":"çözmek","def":"Bir sorunu ele alarak ortadan kaldırmak.","level":"B1","category":"İş"},{"word":"tüketmek","def":"Bir kaynağı ya da ürünü kullanmak.","level":"B1","category":"Doğa"},{"word":"korumak","def":"Zarar görmesini engelleyerek güvende tutmak.","level":"B1","category":"Doğa"},{"word":"paylaşmak","def":"Sahip olunan bir şeyi başkalarıyla bölüşmek.","level":"B1","category":"Duygular"},{"word":"desteklemek","def":"Birine yardım etmek, onu güçlendirmek.","level":"B1","category":"Duygular"},{"word":"anlamak","def":"Bir şeyin manasını kavramak.","level":"B1","category":"Eğitim"},{"word":"katılmak","def":"Bir görüşü paylaşmak veya bir etkinliğe girmek.","level":"B1","category":"Toplum"},{"word":"kullanmak","def":"Bir araç veya kaynaktan yararlanmak.","level":"B1","category":"Teknoloji"},{"word":"eşitsizlik","def":"İnsanlar arasındaki fırsat veya kaynak dağılımındaki adaletsizlik.","level":"B2","category":"Toplum"},{"word":"ayrımcılık","def":"Kişilere ırk, cinsiyet veya başka özellikleri yüzünden farklı davranılması.","level":"B2","category":"Toplum"},{"word":"dayanışma","def":"Ortak bir amaç için birbirine destek olmak.","level":"B2","category":"Toplum"},{"word":"göç","def":"İnsanların yaşadığı yeri bırakıp başka bir yere yerleşmesi.","level":"B2","category":"Toplum"},{"word":"entegrasyon","def":"Farklı toplulukların bir arada uyum içinde yaşaması.","level":"B2","category":"Toplum"},{"word":"sivil toplum","def":"Devlet dışında bireylerin oluşturduğu gönüllü organizasyonlar.","level":"B2","category":"Toplum"},{"word":"kültürel miras","def":"Geçmiş kuşaklardan aktarılan gelenek, sanat ve değerlerin bütünü.","level":"B2","category":"Toplum"},{"word":"hoşgörü","def":"Farklı görüş ve yaşam biçimlerine saygı göstermek.","level":"B2","category":"Toplum"},{"word":"azınlık","def":"Toplumun geri kalanından farklı özellikler taşıyan küçük grup.","level":"B2","category":"Toplum"},{"word":"nüfus","def":"Belirli bir bölgede yaşayan insan sayısı.","level":"B2","category":"Toplum"},{"word":"enflasyon","def":"Fiyatların genel düzeyinin sürekli yükselmesi.","level":"B2","category":"Ekonomi"},{"word":"bütçe","def":"Belirli bir dönem için gelir ve giderlerin planlanması.","level":"B2","category":"Ekonomi"},{"word":"yatırım","def":"Gelir elde etmek amacıyla para veya kaynak ayırmak.","level":"B2","category":"Ekonomi"},{"word":"borç","def":"Geri ödenmesi gereken alınan para veya mal.","level":"B2","category":"Ekonomi"},{"word":"faiz","def":"Borç para kullanımı karşılığında ödenen ek miktar.","level":"B2","category":"Ekonomi"},{"word":"kâr","def":"Gelirin gideri aştığında elde edilen kazanç.","level":"B2","category":"Ekonomi"},{"word":"zarar","def":"Harcamanın geliri aştığında yaşanan kayıp.","level":"B2","category":"Ekonomi"},{"word":"ihracat","def":"Üretilen mal ve hizmetlerin başka ülkelere satılması.","level":"B2","category":"Ekonomi"},{"word":"ithalat","def":"Başka ülkelerden mal veya hizmet satın almak.","level":"B2","category":"Ekonomi"},{"word":"piyasa","def":"Alıcı ve satıcıların buluştuğu ticaret ortamı.","level":"B2","category":"Ekonomi"},{"word":"demokrasi","def":"Halkın seçimle yöneticilerini belirlediği yönetim biçimi.","level":"B2","category":"Politika"},{"word":"anayasa","def":"Bir devletin temel yapısını ve haklarını düzenleyen en üst yasa.","level":"B2","category":"Politika"},{"word":"seçim","def":"Halkın oy kullanarak temsilcilerini belirlediği süreç.","level":"B2","category":"Politika"},{"word":"yaptırım","def":"Kurallara uymayanlara uygulanan ceza veya kısıtlama.","level":"B2","category":"Politika"},{"word":"muhalefet","def":"İktidardaki yönetime karşı çıkan siyasi güç.","level":"B2","category":"Politika"},{"word":"lobicilik","def":"Belirli bir grup adına siyasi kararları etkileme faaliyeti.","level":"B2","category":"Politika"},{"word":"hak","def":"Kişinin toplumsal veya hukuki olarak sahip olduğu yetki.","level":"B2","category":"Politika"},{"word":"özgürlük","def":"Kişinin kendi iradesiyle karar verme ve hareket etme gücü.","level":"B2","category":"Politika"},{"word":"adalet","def":"Herkesin hakkına sahip olmasını sağlayan ilke.","level":"B2","category":"Politika"},{"word":"reform","def":"Mevcut sistemde iyileştirme amacıyla yapılan değişiklik.","level":"B2","category":"Politika"},{"word":"karbon ayak izi","def":"Bir kişi veya kuruluşun saldığı sera gazı miktarı.","level":"B2","category":"Çevre"},{"word":"yenilenebilir enerji","def":"Güneş, rüzgar gibi doğada kendini yenileyen enerji kaynakları.","level":"B2","category":"Çevre"},{"word":"biyoçeşitlilik","def":"Bir ekosistemde bulunan canlı türlerinin çeşitliliği.","level":"B2","category":"Çevre"},{"word":"geri dönüşüm","def":"Atık maddelerin yeniden kullanılabilir hale getirilmesi.","level":"B2","category":"Çevre"},{"word":"küresel ısınma","def":"Sera gazları nedeniyle dünya sıcaklıklarının yükselmesi.","level":"B2","category":"Çevre"},{"word":"erozyon","def":"Toprağın su veya rüzgar etkisiyle taşınıp azalması.","level":"B2","category":"Çevre"},{"word":"ekosistem","def":"Canlıların ve çevrelerinin birbirleriyle oluşturduğu doğal sistem.","level":"B2","category":"Çevre"},{"word":"sürdürülebilirlik","def":"Kaynakları gelecek nesilleri de göz önünde tutarak kullanmak.","level":"B2","category":"Çevre"},{"word":"iklim değişikliği","def":"Uzun vadeli hava koşullarındaki küresel ölçekli dönüşüm.","level":"B2","category":"Çevre"},{"word":"atık","def":"Kullanıldıktan sonra artık işe yaramayan madde.","level":"B2","category":"Çevre"},{"word":"öz saygı","def":"Kişinin kendine duyduğu değer ve saygı.","level":"B2","category":"Psikoloji"},{"word":"motivasyon","def":"Bir hedefe ulaşmak için harekete geçiren içsel güç.","level":"B2","category":"Psikoloji"},{"word":"önyargı","def":"Bir kişi veya durumu önceden yargılama eğilimi.","level":"B2","category":"Psikoloji"},{"word":"empati","def":"Başkasının duygularını anlama ve hissedebilme yetisi.","level":"B2","category":"Psikoloji"},{"word":"savunma mekanizması","def":"Kişinin stres ve kaygıya karşı geliştirdiği bilinçdışı tepki.","level":"B2","category":"Psikoloji"},{"word":"özgüven","def":"Kişinin kendi yeteneklerine duyduğu inanç.","level":"B2","category":"Psikoloji"},{"word":"farkındalık","def":"Anlık deneyimlere bilinçli ve yargısız dikkat etmek.","level":"B2","category":"Psikoloji"},{"word":"kaygı","def":"Belirsizlik veya tehdit karşısında hissedilen yoğun endişe.","level":"B2","category":"Psikoloji"},{"word":"bağımlılık","def":"Bir madde veya davranışa kontrolsüzce bağlı olma hâli.","level":"B2","category":"Psikoloji"},{"word":"kişilik","def":"Kişiyi diğerlerinden ayıran düşünce, duygu ve davranış özellikleri.","level":"B2","category":"Psikoloji"},{"word":"estetik","def":"Güzellik ve sanatla ilgili felsefi düşünce alanı.","level":"B2","category":"Sanat"},{"word":"sembol","def":"Bir şeyi temsil eden işaret veya nesne.","level":"B2","category":"Sanat"},{"word":"özgün","def":"Başkasından kopyalanmamış, kendine has olan.","level":"B2","category":"Sanat"},{"word":"eleştiri","def":"Bir eser veya durumu tarafsızca değerlendirme.","level":"B2","category":"Sanat"},{"word":"akım","def":"Sanatta ya da düşüncede belirli bir dönemde hâkim olan eğilim.","level":"B2","category":"Sanat"},{"word":"sergi","def":"Sanat eserlerinin halka sunulduğu etkinlik.","level":"B2","category":"Sanat"},{"word":"ilham","def":"Yaratıcılığı harekete geçiren güçlü duygu veya düşünce.","level":"B2","category":"Sanat"},{"word":"yorum","def":"Bir eserin veya durumun anlamını açıklamak.","level":"B2","category":"Sanat"},{"word":"biçem","def":"Bir sanatçının kendine özgü anlatım tarzı.","level":"B2","category":"Sanat"},{"word":"perspektif","def":"Bir konuya bakış açısı; resimde derinlik etkisi.","level":"B2","category":"Sanat"},{"word":"hipotez","def":"Sınanmak üzere öne sürülen ön açıklama.","level":"B2","category":"Bilim"},{"word":"deney","def":"Hipotezi sınamak için yapılan kontrollü gözlem.","level":"B2","category":"Bilim"},{"word":"sonuç","def":"Araştırma veya sürecin ortaya çıkardığı çıkarım.","level":"B2","category":"Bilim"},{"word":"yöntem","def":"Bir amaca ulaşmak için izlenen sistematik yol.","level":"B2","category":"Bilim"},{"word":"teori","def":"Birçok kanıtla desteklenmiş bilimsel açıklama çerçevesi.","level":"B2","category":"Bilim"},{"word":"analiz","def":"Bir konuyu ayrıntılı biçimde incelemek ve yorumlamak.","level":"B2","category":"Bilim"},{"word":"sentez","def":"Farklı unsurları bir araya getirerek bütün oluşturmak.","level":"B2","category":"Bilim"},{"word":"gözlem","def":"Bir olayı dikkatle ve sistematik biçimde izlemek.","level":"B2","category":"Bilim"},{"word":"değişken","def":"Deneyde ölçülen veya değişebilen etken.","level":"B2","category":"Bilim"},{"word":"kanıt","def":"Bir iddiayı destekleyen somut veri veya bilgi.","level":"B2","category":"Bilim"},{"word":"propaganda","def":"Belirli bir görüşü yaymak için kullanılan etkili iletişim araçları.","level":"B2","category":"Medya"},{"word":"dezenformasyon","def":"Kasıtlı olarak yayılan yanlış veya yanıltıcı bilgi.","level":"B2","category":"Medya"},{"word":"sansür","def":"Bilgi veya ifadenin otorite tarafından kısıtlanması.","level":"B2","category":"Medya"},{"word":"tarafsızlık","def":"Bir konuda belirli bir tarafı tutmamak.","level":"B2","category":"Medya"},{"word":"gazetecilik","def":"Haber toplama ve yayma mesleği.","level":"B2","category":"Medya"},{"word":"özgür basın","def":"Devlet müdahalesi olmadan yayın yapan medya.","level":"B2","category":"Medya"},{"word":"algoritma","def":"Belirli bir görevi gerçekleştirmek için izlenen adım adım kural dizisi.","level":"B2","category":"Medya"},{"word":"içerik üretici","def":"Sosyal medya veya internet için düzenli içerik oluşturan kişi.","level":"B2","category":"Medya"},{"word":"viral","def":"Kısa sürede çok fazla kişiye yayılan içerik.","level":"B2","category":"Medya"},{"word":"etki alanı","def":"Bir kişi, kurum veya fikrin nüfuz ettiği alan.","level":"B2","category":"Medya"},{"word":"çelişki","def":"İki şeyin birbiriyle bağdaşmaması, zıtlık.","level":"B2","category":"Toplum"},{"word":"uzlaşmak","def":"Tarafların ortak bir noktada buluşması.","level":"B2","category":"Toplum"},{"word":"dönüşüm","def":"Bir şeyin yapısının veya biçiminin köklü biçimde değişmesi.","level":"B2","category":"Toplum"},{"word":"etkileşim","def":"İki kişi veya şeyin birbirini karşılıklı etkilemesi.","level":"B2","category":"Toplum"},{"word":"bütünleşme","def":"Farklı parçaların bir araya gelerek bütün oluşturması.","level":"B2","category":"Ekonomi"},{"word":"kalkınma","def":"Ekonomik ve sosyal gelişme süreci.","level":"B2","category":"Ekonomi"},{"word":"rekabet","def":"Aynı hedefe ulaşmak için birbirinin önüne geçmeye çalışma.","level":"B2","category":"Ekonomi"},{"word":"özelleştirme","def":"Devlete ait işletmelerin özel sektöre devredilmesi.","level":"B2","category":"Ekonomi"},{"word":"kamuoyu","def":"Toplumun genel kanı ve tutumu.","level":"B2","category":"Politika"},{"word":"katılımcı demokrasi","def":"Vatandaşların doğrudan karar alma süreçlerine dahil olduğu yönetim biçimi.","level":"B2","category":"Politika"},{"word":"bağımsızlık","def":"Başka bir güce bağımlı olmama durumu.","level":"B2","category":"Politika"},{"word":"karar alma","def":"Seçenekler arasında en uygun olanı tercih etme süreci.","level":"B2","category":"Psikoloji"},{"word":"öz farkındalık","def":"Kişinin kendi duygu ve düşüncelerinin bilincinde olması.","level":"B2","category":"Psikoloji"},{"word":"direnç","def":"Bir şeye veya baskıya karşı koyma gücü.","level":"B2","category":"Psikoloji"},{"word":"uyum","def":"Yeni koşullara ya da çevreye başarılı biçimde alışmak.","level":"B2","category":"Psikoloji"},{"word":"başa çıkmak","def":"Zorlu bir durumu yönetmek veya üstesinden gelmek.","level":"B2","category":"Psikoloji"},{"word":"ifade özgürlüğü","def":"Kişilerin görüşlerini serbestçe dile getirme hakkı.","level":"B2","category":"Medya"},{"word":"kitlesel iletişim","def":"Geniş bir kitleye aynı anda ulaşan mesaj ve araçlar.","level":"B2","category":"Medya"},{"word":"araştırmacı gazetecilik","def":"Kamuoyunu ilgilendiren gizli gerçekleri ortaya çıkaran habercilik.","level":"B2","category":"Medya"},{"word":"dijital okuryazarlık","def":"Dijital araçları eleştirel biçimde kullanabilme becerisi.","level":"B2","category":"Medya"},{"word":"epistemoloji","def":"Bilginin kaynağı, doğası ve sınırlarını inceleyen felsefe dalı.","level":"C1","category":"Felsefe"},{"word":"ontoloji","def":"Varlığın ne olduğunu ve temel yapısını araştıran felsefe dalı.","level":"C1","category":"Felsefe"},{"word":"determinizm","def":"Her olayın önceki nedenlere bağlı olduğunu savunan görüş.","level":"C1","category":"Felsefe"},{"word":"nihilizm","def":"Hayatın nesnel anlam veya değerden yoksun olduğunu savunan düşünce.","level":"C1","category":"Felsefe"},{"word":"pragmatizm","def":"Bir fikrin değerini pratik sonuçlarıyla ölçen felsefi akım.","level":"C1","category":"Felsefe"},{"word":"diyalektik","def":"Karşıt görüşlerin çatışmasından daha üst bir senteze ulaşma yöntemi.","level":"C1","category":"Felsefe"},{"word":"fenomenoloji","def":"Bilinç deneyimlerini ve bunların yapısını inceleyen felsefe akımı.","level":"C1","category":"Felsefe"},{"word":"rölativizm","def":"Hakikat ve değerlerin evrensel olmadığını, bağlama göre değiştiğini savunan görüş.","level":"C1","category":"Felsefe"},{"word":"absürdizm","def":"İnsan anlam arayışıyla evrenin anlamsızlığı arasındaki çatışmayı ele alan görüş.","level":"C1","category":"Felsefe"},{"word":"varoluşçuluk","def":"Bireyin özgür seçimleriyle kendi özünü ve anlamını yarattığını savunan akım.","level":"C1","category":"Felsefe"},{"word":"söylem","def":"Belirli bir bağlamda dili kullanma biçimi; ideolojik dil örüntüsü.","level":"C1","category":"Dilbilim"},{"word":"sözdizim","def":"Cümle kuruluşunu ve dilbilgisi kurallarını inceleyen dilbilim dalı.","level":"C1","category":"Dilbilim"},{"word":"anlambilim","def":"Dil işaretlerinin anlamlarını araştıran dilbilim dalı.","level":"C1","category":"Dilbilim"},{"word":"edimbilim","def":"Dilin gerçek konuşma bağlamında nasıl kullanıldığını inceleyen alan.","level":"C1","category":"Dilbilim"},{"word":"metafor","def":"Bir kavramı başka bir kavramla açıklamak için kullanılan dil figürü.","level":"C1","category":"Dilbilim"},{"word":"çokanlamlılık","def":"Bir sözcüğün birden fazla anlam taşıması.","level":"C1","category":"Dilbilim"},{"word":"retorik","def":"Etkili ve ikna edici konuşma veya yazma sanatı.","level":"C1","category":"Dilbilim"},{"word":"semiyotik","def":"İşaret ve sembol sistemlerini inceleyen bilim dalı.","level":"C1","category":"Dilbilim"},{"word":"toplumsallaşma","def":"Bireyin toplumun norm ve değerlerini öğrenme süreci.","level":"C1","category":"Sosyoloji"},{"word":"norm","def":"Toplumda kabul görmüş davranış kuralları ve beklentiler.","level":"C1","category":"Sosyoloji"},{"word":"statü","def":"Bireyin toplumsal hiyerarşideki konumu.","level":"C1","category":"Sosyoloji"},{"word":"tabakalaşma","def":"Toplumun farklı sosyal katmanlara ayrılması.","level":"C1","category":"Sosyoloji"},{"word":"küreselleşme","def":"Dünya genelinde ekonomik, kültürel ve siyasi bütünleşme süreci.","level":"C1","category":"Sosyoloji"},{"word":"kimlik","def":"Bir kişi ya da grubun kendini nasıl tanımladığı.","level":"C1","category":"Sosyoloji"},{"word":"hegemonya","def":"Bir devlet veya grubun diğerleri üzerindeki kültürel ve siyasi egemenliği.","level":"C1","category":"Sosyoloji"},{"word":"alt kültür","def":"Ana kültür içinde farklı değer ve pratiklerle öne çıkan küçük grup.","level":"C1","category":"Sosyoloji"},{"word":"kolektif bilinç","def":"Bir toplumun paylaştığı ortak inanç ve değerler bütünü.","level":"C1","category":"Sosyoloji"},{"word":"anlatıcı","def":"Bir hikayeyi anlatan kurgusal ses veya varlık.","level":"C1","category":"Edebiyat"},{"word":"ironi","def":"Söylenenin aksini kasteden dil veya durum.","level":"C1","category":"Edebiyat"},{"word":"allegori","def":"Soyut kavramları somut imgelerle anlatan uzun benzetme.","level":"C1","category":"Edebiyat"},{"word":"epik","def":"Kahramanlık maceralarını anlatan uzun şiir veya anlatı türü.","level":"C1","category":"Edebiyat"},{"word":"lirizm","def":"Şiirde yoğun duygu ve müzikalite.","level":"C1","category":"Edebiyat"},{"word":"bilinç akışı","def":"Karakterin iç dünyasını kesintisiz aktaran anlatım tekniği.","level":"C1","category":"Edebiyat"},{"word":"geriye dönüş","def":"Anlatıda geçmiş olaylara geri giden teknik.","level":"C1","category":"Edebiyat"},{"word":"arketip","def":"Kültürler arası ortaklaşan evrensel karakter veya tema.","level":"C1","category":"Edebiyat"},{"word":"parodi","def":"Bir eseri taklit ederek komik veya eleştirel etki yaratan yapıt.","level":"C1","category":"Edebiyat"},{"word":"intertekstüellik","def":"Bir metnin başka metinlere gönderme yapması.","level":"C1","category":"Edebiyat"},{"word":"özerklik","def":"Kişinin kendi kurallarını koyup bunlara göre yaşama kapasitesi.","level":"C1","category":"Etik"},{"word":"faydacılık","def":"Doğru eylemin en fazla mutluluğu sağlayan eylem olduğunu savunan görüş.","level":"C1","category":"Etik"},{"word":"deontoloji","def":"Eylemin ahlaki değerinin sonuçlarına değil, kurallara uygunluğuna göre belirlenmesi.","level":"C1","category":"Etik"},{"word":"erdem etiği","def":"İyi yaşamı iyi karakterin geliştirilmesiyle mümkün gören ahlak anlayışı.","level":"C1","category":"Etik"},{"word":"ahlaki ikilem","def":"Her iki seçeneğin de ahlaki sorun taşıdığı karar durumu.","level":"C1","category":"Etik"},{"word":"bilinç","def":"Kişinin kendi varlığını ve çevresini farkında olarak deneyimlemesi.","level":"C1","category":"Etik"},{"word":"irade","def":"Kişinin seçim yapma ve amacına yönelme gücü.","level":"C1","category":"Etik"},{"word":"totalitarizm","def":"Devletin bireyin tüm yaşam alanlarını denetim altına aldığı yönetim biçimi.","level":"C1","category":"Siyaset"},{"word":"çoğulculuk","def":"Toplumda farklı görüş ve grupların bir arada var olmasını destekleyen ilke.","level":"C1","category":"Siyaset"},{"word":"sivil itaatsizlik","def":"Adaletsiz yasalara karşı şiddetsiz biçimde direniş.","level":"C1","category":"Siyaset"},{"word":"popülizm","def":"Halk adına seçkinlere karşı çıkan siyasi söylem.","level":"C1","category":"Siyaset"},{"word":"diplomasi","def":"Devletlerin birbirleriyle müzakere ve iletişim yoluyla ilişki kurma sanatı.","level":"C1","category":"Siyaset"},{"word":"egemenlik","def":"Bir devletin kendi topraklarında bağımsız otorite kullanma hakkı.","level":"C1","category":"Siyaset"},{"word":"paradigma","def":"Bir dönemde bilim insanlarının paylaştığı temel varsayımlar çerçevesi.","level":"C1","category":"Tarih"},{"word":"post-koloniyalizm","def":"Sömürgecilik sonrası kültürel ve kimliksel dönüşümleri inceleyen alan.","level":"C1","category":"Tarih"},{"word":"modernite","def":"Sanayi devrimi sonrası dönemin akıl, bireycilik ve ilerlemeye dayanan değer sistemi.","level":"C1","category":"Tarih"},{"word":"postmodernizm","def":"Büyük anlatılara ve nesnel hakikate şüpheyle yaklaşan düşünce akımı.","level":"C1","category":"Tarih"},{"word":"yapay zeka","def":"İnsan benzeri akıl yürütme ve öğrenme yeteneğini taklit eden bilgisayar sistemi.","level":"C1","category":"Teknoloji"},{"word":"makine öğrenimi","def":"Bilgisayarların veriden kendi kendine öğrenmesini sağlayan yapay zeka yöntemi.","level":"C1","category":"Teknoloji"},{"word":"şifreleme","def":"Verilerin yetkisiz erişimi önlemek için dönüştürülmesi.","level":"C1","category":"Teknoloji"},{"word":"otomasyon","def":"İnsan müdahalesi olmadan çalışan sistemlerle işleri otomatikleştirmek.","level":"C1","category":"Teknoloji"},{"word":"siber güvenlik","def":"Bilgisayar sistemlerini kötü amaçlı saldırılardan koruma alanı.","level":"C1","category":"Teknoloji"},{"word":"örtük bilgi","def":"Söze dökülmesi güç, deneyimle kazanılan bilgi türü.","level":"C1","category":"Felsefe"}],"quotes":[{"text":"Kendini mutlu etmek için ihtiyaç duyduğun her şey kendi içindedir.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Engel, yolu tıkayan şey değil; yolun ta kendisidir.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Başkalarının ne düşündüğüyle bu kadar meşgul olma; kendi aklının efendisi ol.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Bugün ölecekmişsin gibi yaşa. Sonsuza dek yaşayacakmışsın gibi öğren.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Zihnini disiplin altına al; çünkü zihin her şeyin efendisidir.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Bir insan, düşünceleri ne ise odur.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Kaybettiğini düşündüğün şeye yas tutma. Sahip olduklarının şükrünü tut.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Evren değişimdir; hayat algılamaktır.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Seni kızdıran şey seni yener; ona boyun eğme.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Şu ana odaklan; geçmiş gitmiş, gelecek henüz gelmemiştir.","author":"Marcus Aurelius","book":"Kendime Düşünceler"},{"text":"Bazı şeyler bizim gücümüzdedir, bazıları değildir. Gücümüzdeki şeylere odaklan.","author":"Epiktetos","book":"Enchiridion"},{"text":"İnsanları rahatsız eden olaylar değil, olaylar hakkındaki düşüncelerdir.","author":"Epiktetos","book":"Söylevler"},{"text":"Özgürlük, istediğini elde etmek değil; istemediğin şeyi istememektir.","author":"Epiktetos","book":"Söylevler"},{"text":"Beden bir kafes olabilir, ama ruh her zaman özgürdür.","author":"Epiktetos","book":"Söylevler"},{"text":"Bilge insan, olayları değil, onlara verdiği tepkileri kontrol eder.","author":"Epiktetos","book":"Söylevler"},{"text":"Susmasını bilen, konuşmasını da bilir.","author":"Epiktetos","book":"Altın Sözler"},{"text":"İnsanı köle eden zincirleri değil, kendi arzularıdır.","author":"Epiktetos","book":"Söylevler"},{"text":"Uzun değil, dolu yaşa.","author":"Seneca","book":"Lucilius'a Mektuplar"},{"text":"Yarına bel bağlayan bugünü kaybeder.","author":"Seneca","book":"Hayatın Kısalığı Üzerine"},{"text":"Öğretmek, iki kez öğrenmektir.","author":"Seneca","book":"Lucilius'a Mektuplar"},{"text":"Büyük ruhlar, büyük sıkıntıları sessizce taşır.","author":"Seneca","book":"Lucilius'a Mektuplar"},{"text":"Bilgelik, ne kadar yaşadığında değil; nasıl yaşadığındadır.","author":"Seneca","book":"Hayatın Kısalığı Üzerine"},{"text":"Daha az şeye ihtiyaç duyan insan, daha özgür insandır.","author":"Seneca","book":"Lucilius'a Mektuplar"},{"text":"Tek bildiğim, hiçbir şey bilmediğimdir.","author":"Sokrates","book":"Platon'un Diyalogları"},{"text":"Sorgulanmamış bir hayat, yaşamaya değmez.","author":"Sokrates","book":"Savunma"},{"text":"Kendini tanı.","author":"Sokrates","book":"Delphi Tapınağı Yazısı"},{"text":"Güçlü insan, başkalarını değil; kendini yenen insandır.","author":"Sokrates","book":"Platon'un Diyalogları"},{"text":"Merak, bilgeliğin başlangıcıdır.","author":"Sokrates","book":"Platon'un Diyalogları"},{"text":"Gerçeklik, gözlerimizin gördüğü değil; aklımızın kavradığıdır.","author":"Platon","book":"Devlet"},{"text":"Mağaradaki gölgeler gerçek sanılır; ama güneşe çıkmak gerekir.","author":"Platon","book":"Devlet"},{"text":"Ruh, öğrenmez; yalnızca hatırlar.","author":"Platon","book":"Menon"},{"text":"Sevgi, ölümsüzlüğü elde etmek için fâninin çabalamasıdır.","author":"Platon","book":"Şölen"},{"text":"Güzellik, iyiliğin görünür hâlidir.","author":"Platon","book":"Phaidros"},{"text":"Mutluluk, insanın amacıdır; erdem ise oraya giden yoldur.","author":"Aristoteles","book":"Nikomakhos'a Etik"},{"text":"Biz, tekrar tekrar yaptıklarımızız. O hâlde mükemmellik bir eylem değil, alışkanlıktır.","author":"Aristoteles","book":"Nikomakhos'a Etik"},{"text":"Eğitimin kökü acıdır, ama meyvesi tatlıdır.","author":"Aristoteles","book":"Nikomakhos'a Etik"},{"text":"İnsan, doğası gereği toplumsal bir hayvandır.","author":"Aristoteles","book":"Politika"},{"text":"Gerçek dostluk, fayda üzerine değil; erdem üzerine kurulur.","author":"Aristoteles","book":"Nikomakhos'a Etik"},{"text":"Yaşamak için bir nedenin olduğunda, neredeyse her türlü zorlukla baş edebilirsin.","author":"Friedrich Nietzsche","book":"Putların Alacakaranlığı"},{"text":"Uçuruma çok uzun bakarsan, uçurum da sana bakmaya başlar.","author":"Friedrich Nietzsche","book":"İyinin ve Kötünün Ötesinde"},{"text":"Kaos içinden dans eden bir yıldız doğurabilmek için içinde kaos taşımalısın.","author":"Friedrich Nietzsche","book":"Böyle Buyurdu Zerdüşt"},{"text":"En çok acı çeken, en derin sevinci de hissedebilir.","author":"Friedrich Nietzsche","book":"Şen Bilim"},{"text":"İnsan, aşılması gereken bir şeydir.","author":"Friedrich Nietzsche","book":"Böyle Buyurdu Zerdüşt"},{"text":"Kendi hayatını sanatsal bir eser olarak yarat.","author":"Friedrich Nietzsche","book":"Şen Bilim"},{"text":"Sisifos'un mutlu olduğunu hayal etmeliyiz.","author":"Albert Camus","book":"Sisifos Söyleni"},{"text":"Yaşamak yetmez; bir anlam bulmak gerekir.","author":"Albert Camus","book":"Başkaldıran İnsan"},{"text":"Absürd, dünyanın sessizliği ile insanın haykırışı arasındaki çarpışmadır.","author":"Albert Camus","book":"Sisifos Söyleni"},{"text":"Bir şeyden anlam çıkaramıyorsan, o şeyle yaşamayı öğren.","author":"Albert Camus","book":"Sisifos Söyleni"},{"text":"Özgürlük, yalnızca var olmanın değil; var olmanın farkında olmanın armağanıdır.","author":"Albert Camus","book":"Başkaldıran İnsan"},{"text":"Servet deniz suyuna benzer; ne kadar içersen o kadar susarsın.","author":"Arthur Schopenhauer","book":"Hayat Bilgeliği Üzerine Aforizmalar"},{"text":"İnsan ya yalnız olur ya da sıradan biri olur.","author":"Arthur Schopenhauer","book":"Hayat Bilgeliği Üzerine Aforizmalar"},{"text":"Kitap okuyan insan, başkasının düşündüğünü düşünür; düşünen insan ise kendi düşüncesini yaşar.","author":"Arthur Schopenhauer","book":"Hayat Bilgeliği Üzerine Aforizmalar"},{"text":"Çoğu insan mutluluğu değil; dikkatin dağılmasını arar.","author":"Arthur Schopenhauer","book":"Hayat Bilgeliği Üzerine Aforizmalar"},{"text":"Düşünmeden okuyan insan, sindirmeden yiyen insana benzer.","author":"Arthur Schopenhauer","book":"Parerga ve Paralipomena"},{"text":"Gerçek bilgelik, ne bildiğini ve ne bilmediğini tanımaktır.","author":"Konfüçyüs","book":"Analektler"},{"text":"Öğrenmeden düşünmek boşa çabadır; düşünmeden öğrenmek tehlikelidir.","author":"Konfüçyüs","book":"Analektler"},{"text":"İnsanın kendini aşması, en büyük zaferdir.","author":"Konfüçyüs","book":"Analektler"},{"text":"Sabırla oturan kişi, güzel şeyler görür.","author":"Konfüçyüs","book":"Analektler"},{"text":"Yolculuk bin milin başlangıcı tek bir adımdan başlar.","author":"Laozi","book":"Tao Te Ching"},{"text":"Doğa acele etmez; yine de her şey tamamlanır.","author":"Laozi","book":"Tao Te Ching"},{"text":"Konuşan bilmez; bilen konuşmaz.","author":"Laozi","book":"Tao Te Ching"},{"text":"Su gibi ol; en yumuşak olan, en sert taşı aşındırır.","author":"Laozi","book":"Tao Te Ching"},{"text":"En büyük güzellik, basitlikte saklıdır.","author":"Laozi","book":"Tao Te Ching"},{"text":"Acının kaynağı, arzudur.","author":"Gautama Buddha","book":"Dhammapada"},{"text":"Zihin her şeydir; ne düşünürsen o olursun.","author":"Gautama Buddha","book":"Dhammapada"},{"text":"Geçmişte yaşama; gelecekte yaşama. Aklını şimdiki ana yoğunlaştır.","author":"Gautama Buddha","book":"Dhammapada"},{"text":"Her şey geçicidir; bu gerçeği gören huzuru bulur.","author":"Gautama Buddha","book":"Dhammapada"},{"text":"Kızgın biri, yanan bir kömür tutar ve atmayı düşünür; kendisi yanar.","author":"Gautama Buddha","book":"Dhammapada"},{"text":"Dışarıda ne ararsan, içeride bulursun.","author":"Gautama Buddha","book":"Dhammapada"},{"text":"Aynı nehre iki kez giremezsin; çünkü ne nehir aynıdır ne de sen.","author":"Herakleitos","book":"Fragmanlar"},{"text":"Her şey akar; hiçbir şey durağan değildir.","author":"Herakleitos","book":"Fragmanlar"},{"text":"Gizli uyum, görünür uyumdan daha güçlüdür.","author":"Herakleitos","book":"Fragmanlar"},{"text":"İnsanların çoğu, görmeden bakar ve duymadan dinler.","author":"Herakleitos","book":"Fragmanlar"},{"text":"Her insan kendi başına bir dünyadır.","author":"Michel de Montaigne","book":"Denemeler"},{"text":"Ölümü düşünmek, özgürlüğü düşünmektir.","author":"Michel de Montaigne","book":"Denemeler"},{"text":"İnsanın tüm mutsuzluğu, tek bir odada sessizce oturamamasından kaynaklanır.","author":"Blaise Pascal","book":"Düşünceler"},{"text":"Kalbin, aklın bilmediği nedenleri vardır.","author":"Blaise Pascal","book":"Düşünceler"},{"text":"Düşünüyorum, öyleyse varım.","author":"René Descartes","book":"Metot Üzerine Konuşma"},{"text":"Barış, savaşın yokluğu değil; erdemin güçten doğmasıdır.","author":"Baruch Spinoza","book":"Etika"},{"text":"İnsanı yalnızca bir araç olarak değil; daima bir amaç olarak da gör.","author":"Immanuel Kant","book":"Ahlak Metafiziğinin Temelleri"},{"text":"Üstümde yıldızlı gökyüzü, içimde ahlak yasası; her ikisi de beni derin bir saygıyla doldurur.","author":"Immanuel Kant","book":"Saf Aklın Eleştirisi"},{"text":"Varoluş özden önce gelir; önce var olursun, sonra kendini yaratırsın.","author":"Jean-Paul Sartre","book":"Varoluşçuluk Bir Hümanizmdir"},{"text":"Özgürlüğe mahkûm edilmişizdir.","author":"Jean-Paul Sartre","book":"Varlık ve Hiçlik"},{"text":"Dilimin sınırları, dünyamın sınırlarıdır.","author":"Ludwig Wittgenstein","book":"Tractatus Logico-Philosophicus"},{"text":"Söylenemeyeni, susarak geçmek gerekir.","author":"Ludwig Wittgenstein","book":"Tractatus Logico-Philosophicus"},{"text":"İnsan, varlığının anlamını soran tek varlıktır.","author":"Martin Heidegger","book":"Varlık ve Zaman"},{"text":"Kelebek olduğumu düşleyen bir adam mıyım, yoksa adam olduğunu düşleyen bir kelebek mi?","author":"Zhuangzi","book":"Zhuangzi"},{"text":"Olayların akışına direnmek yerine, onlarla dans et.","author":"Zhuangzi","book":"Zhuangzi"},{"text":"Ruhun bedene ihtiyacı yoktur; beden ruha muhtaçtır.","author":"İbn Sina","book":"Kitabü'n-Necat"},{"text":"Ölüm bizi ilgilendirmez; zira biz varken ölüm yoktur, ölüm varken biz yokuz.","author":"Epikür","book":"Menoikeus'a Mektup"},{"text":"Talih, dönen bir teker gibidir; seni bugün yükseltir, yarın alçaltır.","author":"Boethius","book":"Felsefenin Tesellisi"},{"text":"İnsan özgür doğar; ama her yerde zincire vurulmuştur.","author":"Jean-Jacques Rousseau","book":"Toplum Sözleşmesi"},{"text":"Hayat yalnızca geriye bakarak anlaşılır; ama ileriye bakarak yaşanmak zorundadır.","author":"Søren Kierkegaard","book":"Günlükler"},{"text":"Kaygı, özgürlüğün dönüp baktığı başdönmesidir.","author":"Søren Kierkegaard","book":"Kaygı Kavramı"},{"text":"Güven kendinle başlar; kendi sesin, tüm kitapların sesinden daha değerlidir.","author":"Ralph Waldo Emerson","book":"Öz Güven"},{"text":"Hayatın bitmesinden değil; hiç yaşamamış olmaktan kork.","author":"Henry David Thoreau","book":"Walden"},{"text":"Sadeleşt, sadeleşt, sadeleşt; bu hayatın özüdür.","author":"Henry David Thoreau","book":"Walden"},{"text":"Dikkat, sevginin en saf biçimidir.","author":"Simone Weil","book":"Yerçekimi ve Lütuf"},{"text":"Deneyim, başına gelenler değil; başına gelenlerle ne yaptığındır.","author":"Aldous Huxley","book":"Eylem ve Tefekkür"}]};
 
-const WRITING_TIPS = [
-  {title:"Göster, Anlatma", text:"'Üzgündü' demek yerine: 'Parmakları bardağın kenarını defalarca dolaştı.' Duyguyu aksiyona dönüştür."},
-  {title:"Şiirde Somut İmge", text:"Soyut kavramları somut nesnelerle taşı. Yalnızlık bir oda, yas bir taş, sevinç bir pencere olabilir."},
-  {title:"Tıkandığında", text:"İlk satırı sil ve ikincisinden başla. Çoğu zaman ilk satır girişin kendisi değil, ısınmadır."},
-  {title:"Ritim ve Durak", text:"Uzun cümleler akış yaratır. Kısa cümleler vurgular. Dene."},
-  {title:"Karakter Sesi", text:"Karakterin nasıl konuştuğu, ne düşündüğünü anlatır. Herkesin farklı bir cümle ritmi vardır."},
-  {title:"Sahne Kurmak", text:"Her sahneye bir duyuyla gir: koku, ses, doku. Okuyucuyu oraya taşı."},
-  {title:"Çatışma Üçgeni", text:"İç çatışma + dış çatışma + ilişki çatışması. En az ikisi bir arada olursa hikaye derinleşir."},
-  {title:"Boş Satır Gücü", text:"Şiirde boşluk da anlam taşır. Nerede durakladığın, ne söylediğin kadar önemlidir."},
-  {title:"Tekrar ve Motif", text:"Bir kelimeyi ya da imgeyi stratejik biçimde tekrar et. Bu bir leitmotif oluşturur."},
-  {title:"Deneme Yazarken", text:"'Ben şunu düşünüyorum' yerine direkt argümanla gir. İlk cümle bir iddia taşısın."},
-  {title:"Zaman Katmanları", text:"Geçmişi şimdiye katıştır. Bellek ile an arasındaki gerilim güçlü bir anlatı motoru olabilir."},
-  {title:"Özgün Metafor", text:"Klişe metaforlardan kaç. 'Kalp bir kuş gibi çarptı' yerine o karakterin dünyasından bir şey bul."},
+// --- KELİMELER (dosyandan örnekler, istersen genişletiriz) ---
+const words = [
+"özlemek","sevinmek","endişelenmek","şaşırmak","utanmak",
+"güvenmek","affetmek","merak","alışkanlık","sorumluluk",
+"fırsat","özgürlük","adalet","empati","motivasyon",
+"bilinç","irade","varoluş","anlatıcı","metafor",
+"ironi","epistemoloji","hakikat","algı","zaman"
 ];
 
-// ══════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════
-let currentWritingType = 'Şiir';
-let activeFilters = { B1: true, B2: true, C1: true };
-let shuffledWords = [...DATA.words];
-let currentWordPage = 0;
-const WORDS_PER_PAGE = 12;
-let sessionStart = Date.now();
-let sessionTimer = null;
-let timerInterval = null;
-let timerRemaining = 0;
-let aiHistory = [];
-let panelOpen = true;
-let focusMode = false;
-let lightMode = false;
-let autoSaveTimer = null;
+// --- ALINTILAR (dosyandan seçilmiş) ---
+const quotes = [
+"Kendini mutlu etmek için ihtiyaç duyduğun her şey kendi içindedir.",
+"Engel, yolun ta kendisidir.",
+"İnsan, düşünceleri ne ise odur.",
+"Tek bildiğim hiçbir şey bilmediğimdir.",
+"Sorgulanmamış bir hayat yaşamaya değmez.",
+"Biz, tekrar tekrar yaptıklarımızız.",
+"Yaşamak yetmez; bir anlam bulmak gerekir.",
+"Zihin her şeydir; ne düşünürsen o olursun.",
+"Her şey akar; hiçbir şey durağan değildir.",
+"Varoluş özden önce gelir."
+];
 
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
-window.onload = () => {
-  shuffleArray(shuffledWords);
-  renderWordList();
-  renderTips();
-  startSessionTimer();
-  refreshQuote(true);
-  refreshQuote2(true);
-  refreshWordSpotlight(true);
-  loadFromLocalStorage();
+// --- YAZMA TAVSİYELERİ ---
+const tips = [
+"Takılınca durma, kötü yaz ama yazmaya devam et.",
+"Sadece bir sahne yaz, mükemmel olmak zorunda değil.",
+"Bir kelimeyi merkeze al ve onun etrafında yaz.",
+"Karakterine bir sır ver.",
+"Yazdığını değil, hissettiğini anlat.",
+"Şu soruyla başla: 'Ya şöyle olsaydı?'",
+"İlk cümleyi sil ve yeniden yaz.",
+"Zıtlık kullan: mutluluk + karanlık gibi.",
+"Bir anıyı yeniden yaz ama farklı sonla bitir.",
+"Okuyucuya değil kendine yaz."
+];
 
-  document.getElementById('editor').addEventListener('input', onEditorInput);
-  document.getElementById('aiInput').addEventListener('input', autoResizeTextarea);
-};
-
-function loadFromLocalStorage() {
-  try {
-    const saved = sessionStorage.getItem('ilham_draft');
-    if (saved) document.getElementById('editor').value = saved;
-    updateStats();
-  } catch(e) {}
+// --- FONKSİYONLAR ---
+function randomItem(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function startSessionTimer() {
-  sessionTimer = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
-    const s = String(elapsed % 60).padStart(2, '0');
-    document.getElementById('timeCount').textContent = `${m}:${s}`;
-  }, 1000);
+function newWord() {
+    document.getElementById("word").innerText = randomItem(words);
 }
 
-// ══════════════════════════════════════════
-// EDITOR
-// ══════════════════════════════════════════
-function onEditorInput() {
-  updateStats();
-  clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => {
-    try { sessionStorage.setItem('ilham_draft', document.getElementById('editor').value); } catch(e) {}
-  }, 1500);
+function newQuote() {
+    document.getElementById("quote").innerText = randomItem(quotes);
 }
 
-function updateStats() {
-  const text = document.getElementById('editor').value;
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  document.getElementById('wordCount').textContent = words;
-  document.getElementById('charCount').textContent = text.length;
+function newTip() {
+    document.getElementById("tip").innerText = randomItem(tips);
 }
 
-function setType(btn, type) {
-  currentWritingType = type;
-  document.querySelectorAll('.wtype-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('editor').placeholder = getPlaceholder(type);
-}
+// sayfa açıldığında otomatik doldur
+newWord();
+newQuote();
+newTip();
 
-function getPlaceholder(type) {
-  const p = {
-    'Şiir': 'Yazmaya başla… Sessizlik de bir başlangıçtır.',
-    'Kısa Öykü': 'Hikayeni anlat… Bir karakter, bir an, bir dönüm noktası.',
-    'Roman': 'Sayfalar seni bekliyor… İlk cümle her şeyi değiştirir.',
-    'Deneme': 'Düşünceni yaz… Fikirler ancak dile döküldükçe netleşir.',
-    'Serbest': 'Ne istersen yaz… Burada kural yok.'
-  };
-  return p[type] || 'Yazmaya başla…';
-}
-
-function insertWordToEditor(word) {
-  const editor = document.getElementById('editor');
-  const pos = editor.selectionStart;
-  const text = editor.value;
-  editor.value = text.slice(0,pos) + word + text.slice(pos);
-  editor.selectionStart = editor.selectionEnd = pos + word.length;
-  editor.focus();
-  updateStats();
-}
-
-// ══════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════
-function switchTab(name, btn) {
-  ['inspiration','words','tips'].forEach(t => {
-    const el = document.getElementById('tab-' + t);
-    if (el) el.style.display = 'none';
-  });
-  const ai = document.getElementById('tab-ai');
-  if (ai) ai.style.display = 'none';
-
-  const target = document.getElementById('tab-' + name);
-  if (target) {
-    target.style.display = name === 'ai' ? 'flex' : 'block';
-    target.style.flexDirection = name === 'ai' ? 'column' : '';
-    target.style.height = name === 'ai' ? '100%' : '';
-  }
-  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-// ══════════════════════════════════════════
-// QUOTES
-// ══════════════════════════════════════════
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-function refreshQuote(silent) {
-  const q = rand(DATA.quotes);
-  document.getElementById('quoteText').textContent = q.text;
-  document.getElementById('quoteAuthor').textContent = '— ' + q.author;
-  document.getElementById('quoteBook').textContent = q.book;
-  if (!silent) animateCard('quoteCard');
-}
-
-function refreshQuote2(silent) {
-  const q = rand(DATA.quotes);
-  document.getElementById('quote2Text').textContent = q.text;
-  document.getElementById('quote2Author').textContent = '— ' + q.author;
-  document.getElementById('quote2Book').textContent = q.book;
-  if (!silent) animateCard('quote2Card');
-}
-
-function refreshWordSpotlight(silent) {
-  const w = rand(DATA.words);
-  document.getElementById('spotWord').textContent = w.word;
-  document.getElementById('spotLevel').textContent = w.level;
-  document.getElementById('spotLevel').className = 'level-badge lvl-' + w.level;
-  document.getElementById('spotCat').textContent = w.category;
-  document.getElementById('spotDef').textContent = w.def;
-  if (!silent) animateCard('wordSpotlight');
-}
-
-function animateCard(id) {
-  const el = document.getElementById(id);
-  el.style.opacity = '0'; el.style.transform = 'translateY(6px)';
-  requestAnimationFrame(() => {
-    el.style.transition = 'opacity 0.35s, transform 0.35s';
-    el.style.opacity = '1'; el.style.transform = 'translateY(0)';
-  });
-}
-
-// ══════════════════════════════════════════
-// WORD LIST
-// ══════════════════════════════════════════
-function filterWords(level, btn) {
-  activeFilters[level] = !activeFilters[level];
-  btn.classList.toggle('active');
-  currentWordPage = 0;
-  renderWordList();
-}
-
-function shuffleWords() {
-  shuffleArray(shuffledWords);
-  currentWordPage = 0;
-  renderWordList();
-}
-
-function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
-
-function renderWordList() {
-  const filtered = shuffledWords.filter(w => activeFilters[w.level]);
-  const container = document.getElementById('wordList');
-  const start = currentWordPage * WORDS_PER_PAGE;
-  const slice = filtered.slice(start, start + WORDS_PER_PAGE);
-
-  let html = '';
-  slice.forEach(w => {
-    html += `<div class="word-card">
-      <div class="word-header">
-        <div class="word-main">${w.word}</div>
-        <span class="level-badge lvl-${w.level}">${w.level}</span>
-        <span class="word-cat">${w.category}</span>
-      </div>
-      <div class="word-def">${w.def}</div>
-      <button class="use-word-btn" onclick="insertWordToEditor('${w.word.replace(/'/g,"\\'")}')">Metne ekle ↗</button>
-    </div>`;
-  });
-
-  // Pagination
-  const total = filtered.length;
-  const totalPages = Math.ceil(total / WORDS_PER_PAGE);
-  if (totalPages > 1) {
-    html += `<div style="display:flex;gap:8px;justify-content:center;margin-top:8px">`;
-    if (currentWordPage > 0)
-      html += `<button class="tb-btn" onclick="changePage(-1)">◀ Önceki</button>`;
-    html += `<span style="font-family:var(--mono);font-size:0.68rem;color:var(--text3);align-self:center">${currentWordPage+1}/${totalPages}</span>`;
-    if (currentWordPage < totalPages - 1)
-      html += `<button class="tb-btn" onclick="changePage(1)">Sonraki ▶</button>`;
-    html += `</div>`;
-  }
-
-  container.innerHTML = html || '<div style="color:var(--text3);font-size:0.85rem;text-align:center;padding:20px">Filtre seç.</div>';
-}
-
-function changePage(dir) {
-  const filtered = shuffledWords.filter(w => activeFilters[w.level]);
-  const totalPages = Math.ceil(filtered.length / WORDS_PER_PAGE);
-  currentWordPage = Math.max(0, Math.min(currentWordPage + dir, totalPages - 1));
-  renderWordList();
-}
-
-// ══════════════════════════════════════════
-// TIPS
-// ══════════════════════════════════════════
-function renderTips() {
-  const container = document.getElementById('tipsList');
-  let html = '';
-  WRITING_TIPS.forEach(t => {
-    html += `<div class="tip-card">
-      <div class="tip-title">${t.title}</div>
-      <div class="tip-text">${t.text}</div>
-    </div>`;
-  });
-  container.innerHTML = html;
-}
-
-// ══════════════════════════════════════════
-// AI REHBER
-// ══════════════════════════════════════════
-function aiKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage(); }
-}
-function autoResizeTextarea() {
-  const t = document.getElementById('aiInput');
-  t.style.height = 'auto';
-  t.style.height = Math.min(t.scrollHeight, 90) + 'px';
-}
-function quickPrompt(text) {
-  document.getElementById('aiInput').value = text;
-  sendAiMessage();
-}
-function sendCurrentText() {
-  const text = document.getElementById('editor').value.trim();
-  if (!text) { quickPrompt('Henüz bir şey yazmadım. Ne hakkında yazmaya başlayabilirim?'); return; }
-  const excerpt = text.length > 400 ? text.slice(0, 400) + '…' : text;
-  document.getElementById('aiInput').value = `Şu an yazdığım metin:\n\n"${excerpt}"\n\nBu metin hakkında sorular sor ve geliştirmeme yardım et.`;
-  sendAiMessage();
-}
-
-async function sendAiMessage() {
-  const input = document.getElementById('aiInput');
-  const msg = input.value.trim();
-  if (!msg) return;
-
-  input.value = '';
-  input.style.height = '36px';
-  document.getElementById('sendBtn').disabled = true;
-
-  appendMessage('user', msg);
-  const loadingId = appendMessage('loading', '✦ Düşünüyor…');
-
-  const systemPrompt = `Sen bir yazarlık ilham asistanısın. Kullanıcı Türkçe şiir, kısa öykü, deneme veya roman yazıyor. 
-Şu an yazdığı tür: ${currentWritingType}.
-Görevin:
-1. Yazarın tıkandığı noktalarda derin ve özgün sorular sor (karakterin motivasyonu, duygusal alt metin, imgeler, ritim vs.)
-2. Felsefi alıntılardan ve edebiyat tekniklerinden ilham ver
-3. Metni eleştirirken yıkıcı değil, inşa edici ol
-4. Kısa, odaklı yanıtlar ver — maksimum 3 paragraf
-5. Türkçe yaz, samimi ve yaratıcı bir dil kullan
-Kullanıcı bir metin paylaştığında, hem güçlü yönleri belirt hem de 1-2 odaklı soru sor.`;
-
-  aiHistory.push({ role: 'user', content: msg });
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: aiHistory
-      })
-    });
-    const data = await response.json();
-    const reply = data.content?.map(b => b.text || '').join('') || 'Bir hata oluştu.';
-    aiHistory.push({ role: 'assistant', content: reply });
-    removeMessage(loadingId);
-    appendMessage('assistant', reply);
-  } catch (e) {
-    removeMessage(loadingId);
-    appendMessage('assistant', 'Bağlantı hatası. API anahtarınızı kontrol edin veya daha sonra tekrar deneyin.');
-  }
-
-  document.getElementById('sendBtn').disabled = false;
-  if (aiHistory.length > 20) aiHistory = aiHistory.slice(-16);
-}
-
-let msgId = 0;
-function appendMessage(role, text) {
-  const id = 'msg-' + (++msgId);
-  const container = document.getElementById('aiMessages');
-  const div = document.createElement('div');
-  div.className = 'ai-msg ' + role;
-  div.id = id;
-  div.textContent = text;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  return id;
-}
-function removeMessage(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-}
-
-// ══════════════════════════════════════════
-// TIMER
-// ══════════════════════════════════════════
-function startTimer(minutes) {
-  clearInterval(timerInterval);
-  timerRemaining = minutes * 60;
-  document.getElementById('timerDisplay').style.display = 'flex';
-  document.getElementById('stopTimerBtn').style.display = 'inline-block';
-  updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    timerRemaining--;
-    updateTimerDisplay();
-    if (timerRemaining <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById('timerVal').textContent = '✓ Bitti!';
-      setTimeout(() => {
-        document.getElementById('timerDisplay').style.display = 'none';
-        document.getElementById('stopTimerBtn').style.display = 'none';
-      }, 3000);
-    }
-  }, 1000);
-}
-function stopTimer() {
-  clearInterval(timerInterval);
-  document.getElementById('timerDisplay').style.display = 'none';
-  document.getElementById('stopTimerBtn').style.display = 'none';
-}
-function updateTimerDisplay() {
-  const m = String(Math.floor(timerRemaining / 60)).padStart(2, '0');
-  const s = String(timerRemaining % 60).padStart(2, '0');
-  document.getElementById('timerVal').textContent = `${m}:${s}`;
-}
-
-// ══════════════════════════════════════════
-// MISC
-// ══════════════════════════════════════════
-function toggleFocus() {
-  focusMode = !focusMode;
-  document.body.classList.toggle('focus-mode', focusMode);
-  document.getElementById('focusBtn').classList.toggle('active', focusMode);
-  document.getElementById('focusBtn').textContent = focusMode ? 'Çık ✕' : 'Odak Modu';
-  if (focusMode) {
-    panelOpen = false;
-    document.getElementById('rightPanel').classList.add('collapsed');
-    document.getElementById('panelToggleBtn').classList.remove('active');
-    document.getElementById('panelToggleBtn').textContent = 'Panel ▶';
-  }
-}
-
-function togglePanel() {
-  if (focusMode) return;
-  panelOpen = !panelOpen;
-  document.getElementById('rightPanel').classList.toggle('collapsed', !panelOpen);
-  const btn = document.getElementById('panelToggleBtn');
-  btn.classList.toggle('active', panelOpen);
-  btn.textContent = panelOpen ? 'Panel ◀' : 'Panel ▶';
-}
-
-function toggleTheme() {
-  lightMode = !lightMode;
-  document.body.classList.toggle('light-mode', lightMode);
-  document.getElementById('themeBtn').textContent = lightMode ? '☾ Karanlık' : '☀ Aydınlık';
-}
-
-function saveText() {
-  const text = document.getElementById('editor').value;
-  if (!text.trim()) { showToast('Kaydedecek içerik yok.'); return; }
-  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `ilham_${currentWritingType.toLowerCase()}_${Date.now()}.txt`;
-  a.click(); URL.revokeObjectURL(url);
-  showToast('İndirildi ✓');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
 </script>
+
 </body>
 </html>
