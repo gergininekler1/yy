@@ -3,283 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Öykü Atölyesi</title>
+    <title>Matrix Storyteller Pro v5.0</title>
     <style>
         :root {
-            --bg-color: #f4f7f6;
-            --container-bg: #ffffff;
-            --primary-color: #4a90e2;
-            --text-main: #2c3e50;
-            --text-muted: #7f8c8d;
-            --border-color: #e1e8ed;
-            --hover-bg: #f0f4f8;
-            --hint-bg: #fffbf0;
-            --hint-border: #f1c40f;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --primary: #3b82f6;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --font-size: 18px;
+        }
+
+        /* Temalar */
+        body.dark-theme {
+            --bg: #0f172a; --surface: #1e293b; --text: #f1f5f9; --text-light: #94a3b8; --border: #334155;
+        }
+        body.sepia-theme {
+            --bg: #f4ecd8; --surface: #fdf6e3; --text: #5b4636; --text-light: #8c786a; --border: #e6dec9;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 0;
+            transition: all 0.3s ease;
+            overflow: hidden;
             display: flex;
+            flex-direction: column;
             height: 100vh;
         }
 
-        /* Üst Menü */
+        /* Navbar & Progress */
         .navbar {
-            position: absolute;
-            top: 0;
-            width: 100%;
             height: 60px;
-            background-color: var(--container-bg);
-            border-bottom: 1px solid var(--border-color);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
             display: flex;
+            align-items: center;
+            padding: 0 20px;
             justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            box-sizing: border-box;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-            z-index: 10;
+            z-index: 100;
         }
 
-        .navbar h1 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0;
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
         }
 
-        .nav-actions button {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 6px;
-            margin-left: 10px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .nav-actions button:hover {
-            background-color: var(--hover-bg);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        /* Ana Düzen */
-        .main-wrapper {
+        /* Layout */
+        .app-container {
             display: flex;
-            width: 100%;
-            margin-top: 60px; /* Navbar yüksekliği */
-            padding: 20px 30px;
-            gap: 20px;
-            box-sizing: border-box;
-        }
-
-        /* Sol Alan: Editör */
-        .editor-section {
-            flex: 3;
-            background-color: var(--container-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
+            flex: 1;
             overflow: hidden;
+            position: relative;
         }
 
-        .editor-header {
-            padding: 15px 25px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: #fafbfc;
-        }
-
-        .editor-header input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-main);
-            outline: none;
-        }
-
-        .editor-header input::placeholder {
-            color: #bdc3c7;
-        }
-
-        .editor-body {
-            flex: 1;
-            padding: 25px;
-        }
-
-        .editor-body textarea {
-            width: 100%;
-            height: 100%;
-            border: none;
-            resize: none;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--text-main);
-            outline: none;
-        }
-
-        /* Sağ Alan: Araçlar */
         .sidebar {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .card {
-            background-color: var(--container-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            width: 260px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .main-editor {
+            flex: 1;
             display: flex;
             flex-direction: column;
-        }
-
-        .card h3 {
-            margin: 0 0 15px 0;
-            font-size: 1rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
             align-items: center;
-            gap: 8px;
+            padding: 40px;
+            overflow-y: auto;
+            background: transparent;
         }
 
-        /* İpucu Modülü */
-        .hint-card {
-            background-color: var(--hint-bg);
-            border: 1px solid var(--hint-border);
-        }
+        /* Zen Mode Switch */
+        body.zen-mode .sidebar { transform: translateX(-100%); width: 0; padding: 0; }
+        body.zen-mode .navbar { opacity: 0; pointer-events: none; }
 
-        .hint-card h3 {
-            color: #d4ac0d;
-        }
-
-        .hint-text {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #5d4037;
-            margin-bottom: 15px;
-        }
-
-        .btn-refresh {
-            align-self: flex-start;
-            background: none;
-            border: none;
-            color: #d4ac0d;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 0;
-        }
-        
-        .btn-refresh:hover {
-            text-decoration: underline;
-        }
-
-        /* Atomik Notlar */
-        .atomic-notes {
-            flex: 1; /* Kalan tüm alanı kapla */
-        }
-
-        .atomic-notes textarea {
+        /* Editor Styling */
+        .writing-area {
             width: 100%;
-            flex: 1;
+            max-width: 800px;
+            background: var(--surface);
+            padding: 60px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            min-height: 1000px;
+        }
+
+        #story-title {
+            width: 100%;
             border: none;
-            resize: none;
-            background-color: transparent;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: var(--text-main);
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: transparent;
+            color: var(--text);
             outline: none;
         }
 
-        /* Scrollbar Estetiği */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
+        #story-body {
+            width: 100%;
+            border: none;
             background: transparent;
+            color: var(--text);
+            font-size: var(--font-size);
+            line-height: 1.8;
+            resize: none;
+            outline: none;
+            min-height: 800px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #d1d8e0;
+
+        /* Tool Cards */
+        .card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card h4 { margin: 0 0 10px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); }
+        
+        .btn-action {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 10px;
+        }
+
+        /* Floating Controls */
+        .floating-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .fab {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.2rem;
+        }
+
+        .highlight-alert {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 2px 4px;
             border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a5b1c2;
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <h1>Öykü Atölyesi</h1>
-        <div class="nav-actions">
-            <button onclick="alert('Dosya içe aktarma modülü tetiklendi.')">📥 İçe Aktar</button>
-            <button onclick="alert('Öykün başarıyla dışa aktarıldı.')">📤 Dışa Aktar</button>
+        <div style="font-weight: 800; letter-spacing: -1px; font-size: 1.4rem;">MATRIX <span style="color: var(--primary)">STORY</span></div>
+        <div style="display: flex; gap: 15px;">
+            <select onchange="changeTheme(this.value)" style="padding: 5px; border-radius: 4px;">
+                <option value="light">Gündüz</option>
+                <option value="dark">Gece</option>
+                <option value="sepia">Sepya</option>
+            </select>
+            <button onclick="toggleZen()" style="border: none; background: #e2e8f0; padding: 5px 15px; border-radius: 4px; cursor: pointer;">Zen Modu</button>
+            <button onclick="saveCheckpoint()" class="btn-action" style="margin:0; width: auto;">Kaydet</button>
         </div>
+        <div class="progress-container" id="progress-bar"></div>
     </nav>
 
-    <div class="main-wrapper">
-        
-        <main class="editor-section">
-            <div class="editor-header">
-                <input type="text" placeholder="Öykünün Başlığı...">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="card">
+                <h4>Karakter Kartları</h4>
+                <div id="char-list"></div>
+                <input type="text" id="char-input" placeholder="Yeni karakter..." style="width:100%; margin-top:5px; padding:5px; box-sizing:border-box;">
+                <button onclick="addCharacter()" class="btn-action" style="background: var(--success)">Ekle</button>
             </div>
-            <div class="editor-body">
-                <textarea placeholder="Buraya yazmaya başla... Aklına gelen ilk sahneyi dök ve kendini durdurma."></textarea>
+
+            <div class="card">
+                <h4>Olay Örgüsü (Timeline)</h4>
+                <textarea id="timeline-notes" placeholder="Olay sırasını buraya not et..." style="width:100%; height:80px; resize:none; border:none; background:transparent; font-size:0.85rem;"></textarea>
+            </div>
+
+            <div class="card" style="background: #fffbeb; border-color: #f59e0b;">
+                <h4>Analiz Raporu</h4>
+                <div id="analysis-box" style="font-size: 0.85rem; line-height: 1.5;">
+                    <div id="word-goal-text">Hedef: 0 / 1000 kelime</div>
+                    <div id="sentiment-text">Duygu: Nötr</div>
+                    <div id="tell-count" style="margin-top:5px; color: #b45309;"></div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-editor">
+            <div class="writing-area">
+                <input type="text" id="story-title" placeholder="İsimsiz Öykü">
+                <textarea id="story-body" oninput="runAnalysis()" placeholder="Bir zamanlar..."></textarea>
             </div>
         </main>
 
-        <aside class="sidebar">
-            
-            <div class="card hint-card">
-                <h3>💡 Yazım İpucu</h3>
-                <div class="hint-text" id="hint-display">
-                    "Karakterinin bir zaafını veya takıntısını daha ilk paragrafta sezdir. Bu, okuyucunun onunla bağ kurmasını hızlandırır."
-                </div>
-                <button class="btn-refresh" onclick="changeHint()">Başka bir ipucu ver</button>
-            </div>
-
-            <div class="card atomic-notes">
-                <h3>📝 Atomik Notlar</h3>
-                <textarea placeholder="Anlık fikirlerini, kullanmak istediğin kelimeleri veya kurgu notlarını buraya bırak..."></textarea>
-            </div>
-
-        </aside>
+        <div class="floating-controls">
+            <button class="fab" onclick="getRandomTrigger()" title="Rastgele Olay Tetikle">⚡</button>
+            <button class="fab" onclick="adjustFontSize(1)" title="Yazıyı Büyüt" style="background: #64748b;">+</button>
+            <button class="fab" onclick="adjustFontSize(-1)" title="Yazıyı Küçült" style="background: #64748b;">-</button>
+        </div>
     </div>
 
     <script>
-        const hints = [
-            "Duyguları doğrudan söyleme. 'Çok korkmuştu' demek yerine, 'Nefesi kesildi, ellerini cebine sakladı' de.",
-            "Karakterinin bir zaafını veya takıntısını daha ilk paragrafta sezdir. Bu, okuyucunun onunla bağ kurmasını hızlandırır.",
-            "Diyaloglarda karakterlerin birbirini her zaman doğrudan yanıtlamamasına izin ver. Gerçek hayatta iletişim kopuklukları vardır.",
-            "Mekanı sadece betimleme, karakterin ruh halini yansıtacak bir araç olarak kullan.",
-            "Çatışmayı tırmandır. Karakterinin işini kolaylaştırma, önüne beklemeyeceği bir engel daha çıkar.",
-            "Finalde her şeyi açıklamak zorunda değilsin. Okuyucunun zihninde tamamlayacağı açık bir kapı bırakmak genelde daha vurucudur."
-        ];
+        let charList = [];
+        let currentFontSize = 18;
 
-        function changeHint() {
-            const hintDisplay = document.getElementById('hint-display');
-            const randomHint = hints[Math.floor(Math.random() * hints.length)];
-            hintDisplay.style.opacity = 0;
+        // 1. Analiz Motoru (Duygu & Kelime Takibi)
+        function runAnalysis() {
+            const text = document.getElementById('story-body').value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
             
-            setTimeout(() => {
-                hintDisplay.innerText = randomHint;
-                hintDisplay.style.transition = "opacity 0.3s ease";
-                hintDisplay.style.opacity = 1;
-            }, 200);
+            // İlerleme Çubuğu (Hedef 1000 kelime varsayıldı)
+            const progress = Math.min((words / 1000) * 100, 100);
+            document.getElementById('progress-bar').style.width = progress + "%";
+            document.getElementById('word-goal-text').innerText = `Hedef: ${words} / 1000 kelime`;
+
+            // Basit "Gösterme, Anlat" Denetçisi (Zarflar ve anlatımcı kelimeler)
+            const tellWords = ["üzgündü", "korkmuştu", "çok", "oldukça", "biraz", "aniden", "yavaşça"];
+            let tellFound = 0;
+            tellWords.forEach(w => {
+                if(text.toLowerCase().includes(w)) tellFound++;
+            });
+            document.getElementById('tell-count').innerText = tellFound > 3 ? "⚠️ Çok fazla anlatımcı kelime var, 'göstermeye' çalış!" : "";
+
+            // Duygu Analizi Taklidi
+            const sentiments = ["Gergin", "Huzurlu", "Melankolik", "Heyecanlı", "Gizemli"];
+            document.getElementById('sentiment-text').innerText = "Duygu: " + sentiments[Math.floor(words / 50) % sentiments.length];
+        }
+
+        // 2. Rastgele Olay Tetikleyiciler
+        function getRandomTrigger() {
+            const triggers = [
+                "Beklenmedik bir telefon çalıyor.",
+                "Karakterin cebinden yabancı bir anahtar çıkıyor.",
+                "Dışarıda aniden bastıran garip bir sis...",
+                "Yoldan geçen biri karaktere adıyla sesleniyor ama o kişiyi tanımıyor.",
+                "Evin içinden bir cam kırılma sesi geliyor."
+            ];
+            alert("Kurgu Tetikleyici: " + triggers[Math.floor(Math.random() * triggers.length)]);
+        }
+
+        // 3. Karakter Yönetimi
+        function addCharacter() {
+            const input = document.getElementById('char-input');
+            if(input.value) {
+                charList.push(input.value);
+                const listDiv = document.getElementById('char-list');
+                const charTag = document.createElement('div');
+                charTag.style = "background: #e2e8f0; padding: 5px; margin: 5px 0; border-radius: 4px; font-size: 0.8rem;";
+                charTag.innerText = "👤 " + input.value;
+                listDiv.appendChild(charTag);
+                input.value = "";
+            }
+        }
+
+        // 4. Görünüm Ayarları
+        function changeTheme(theme) {
+            document.body.className = theme + "-theme";
+        }
+
+        function toggleZen() {
+            document.body.classList.toggle('zen-mode');
+        }
+
+        function adjustFontSize(delta) {
+            currentFontSize += delta;
+            document.getElementById('story-body').style.fontSize = currentFontSize + "px";
+        }
+
+        function saveCheckpoint() {
+            const data = {
+                title: document.getElementById('story-title').value,
+                body: document.getElementById('story-body').value,
+                chars: charList
+            };
+            localStorage.setItem('matrix_draft', JSON.stringify(data));
+            alert("Taslak 'Atomic History' modülüne (Tarayıcı Hafızası) kaydedildi.");
+        }
+
+        // Başlangıç Yüklemesi
+        window.onload = () => {
+            const saved = localStorage.getItem('matrix_draft');
+            if(saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('story-title').value = data.title;
+                document.getElementById('story-body').value = data.body;
+                runAnalysis();
+            }
         }
     </script>
 </body>
