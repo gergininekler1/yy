@@ -1,786 +1,577 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Takibi</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg:      #0d0f14;
-    --surface: #161a24;
-    --surface2: #1e2333;
-    --border:  #2a3045;
-    --accent:  #f0c93a;
-    --accent2: #4ef0a0;
-    --accent3: #4ec8f0;
-    --danger:  #f05a4e;
-    --purple:  #c44ef0;
-    --text:    #e8ecf7;
-    --muted:   #6b7599;
-    --radius:  14px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh; padding: 36px 20px 60px;
-  }
-  body::before {
-    content: ''; position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(240,201,58,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
-    background-size: 40px 40px; pointer-events: none; z-index: 0;
-  }
-  .container { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Tek Oturuşta Öykü · 5 Adım Aracı</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* ── Timer Bar ── */
-  .timer-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 14px 20px;
-    margin-bottom: 20px; gap: 16px; flex-wrap: wrap;
-    position: relative; overflow: hidden;
-  }
-  .timer-bar::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent3), var(--purple), var(--accent2));
-  }
-  .timer-left { display: flex; align-items: center; gap: 12px; }
-  .timer-icon { font-size: 18px; }
-  .timer-label {
-    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 2px;
-  }
-  .timer-display {
-    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
-    color: var(--accent3); letter-spacing: 0.05em;
-    transition: color 0.3s;
-  }
-  .timer-display.running { color: var(--accent2); }
-  .timer-btns { display: flex; gap: 8px; }
-  .timer-btn {
-    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
-    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
-    letter-spacing: 0.08em; transition: all 0.15s;
-  }
-  .timer-btn-start { background: var(--accent2); color: #000; }
-  .timer-btn-start:hover { background: #5fffa8; }
-  .timer-btn-stop  { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  .timer-btn-stop:hover  { background: var(--border); color: var(--text); }
-  .timer-btn-reset { background: transparent; color: var(--muted); border: 1px solid var(--border); font-size: 11px; padding: 8px 12px; }
-  .timer-btn-reset:hover { border-color: var(--danger); color: var(--danger); }
-  .timer-total {
-    font-size: 11px; color: var(--muted); text-align: right;
-    white-space: nowrap;
-  }
-  .timer-total span { color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; display: block; font-size: 14px; }
+    body {
+      background: #f7f5f0;
+      font-family: 'Courier New', Courier, monospace;
+      color: #1e1e1e;
+      padding: 24px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-  /* ── Header ── */
-  header { margin-bottom: 20px; }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
 
-  /* ── Title block ── */
-  .title-block { text-align: center; margin-bottom: 20px; }
-  .tag {
-    display: inline-block;
-    background: var(--accent); color: #000;
-    font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 4px; margin-bottom: 12px;
-  }
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(24px,5vw,42px); font-weight: 800; line-height: 1.05;
-    margin-bottom: 6px;
-  }
-  h1 span { color: var(--accent); }
-  .subtitle { color: var(--muted); font-size: 12px; }
+    /* başlık & kronometre */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 3px dashed #2c3e50;
+      padding-bottom: 16px;
+    }
 
-  /* ── Cover block ── */
-  .cover-block {
-    display: flex; flex-direction: column; align-items: center;
-    margin-bottom: 20px;
-  }
-  .cover-img {
-    width: 120px; height: 180px; object-fit: cover;
-    border-radius: 8px; display: none;
-    border: 1px solid var(--border);
-    box-shadow: 6px 10px 30px rgba(0,0,0,0.6);
-    margin-bottom: 10px;
-  }
-  .cover-placeholder {
-    width: 120px; height: 180px; border-radius: 8px;
-    background: var(--surface); border: 1px dashed var(--border);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 8px; cursor: pointer; transition: border-color 0.2s; margin-bottom: 10px;
-  }
-  .cover-placeholder:hover { border-color: var(--accent3); }
-  .cover-placeholder span { font-size: 28px; }
-  .cover-placeholder p { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; line-height: 1.5; }
-  .cover-url-row { display: flex; gap: 6px; width: 100%; max-width: 340px; }
-  .cover-url-inp {
-    flex: 1; min-width: 0;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 12px; outline: none;
-    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted);
-    transition: border-color 0.15s;
-  }
-  .cover-url-inp::placeholder { color: var(--border); }
-  .cover-url-inp:focus { border-color: var(--accent3); }
-  .cover-url-btn {
-    background: var(--accent3); color: #000; border: none;
-    border-radius: 8px; padding: 8px 14px; cursor: pointer;
-    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
-    white-space: nowrap; transition: background 0.15s;
-  }
-  .cover-url-btn:hover { background: #6dd8f5; }
+    h1 {
+      font-weight: 400;
+      font-size: 2.2rem;
+      letter-spacing: -0.5px;
+      color: #1e3c4f;
+    }
 
-  /* ── Künye ── */
-  .kunye-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden; margin-bottom: 20px;
-    position: relative;
-  }
-  .kunye-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--purple), var(--accent3));
-  }
-  .kunye-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 11px 18px; background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
-  }
-  .kunye-status {
-    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
-    letter-spacing: 0.05em; text-transform: none; color: var(--text);
-  }
-  .kunye-body {
-    display: flex; gap: 0;
-  }
-  /* ── Cover (künye dışında) ── */
-  .cover-outer {
-    display: flex; justify-content: center; margin-bottom: 16px;
-  }
-  .cover-img {
-    width: 130px; height: 195px; object-fit: cover;
-    border-radius: 10px; display: none;
-    border: 1px solid var(--border);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(240,201,58,0.1);
-  }
-  .cover-placeholder {
-    width: 130px; height: 195px; border-radius: 10px;
-    background: var(--surface); border: 1px dashed var(--border);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 8px; cursor: pointer; transition: border-color 0.2s;
-  }
-  .cover-placeholder:hover { border-color: var(--accent3); }
-  .cover-placeholder span { font-size: 28px; }
-  .cover-placeholder p { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
-  .kunye-fields { flex: 1; display: flex; flex-direction: column; }
-  .kunye-row {
-    display: flex; align-items: center;
-    border-bottom: 1px solid var(--border);
-  }
-  .kunye-row:last-child { border-bottom: none; }
-  .kunye-lbl {
-    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--muted); padding: 10px 12px;
-    border-right: 1px solid var(--border);
-    white-space: nowrap; min-width: 100px; text-align: right; flex-shrink: 0;
-  }
-  .kunye-inp {
-    flex: 1; background: transparent; border: none; outline: none;
-    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
-    color: var(--text); padding: 10px 12px; transition: background 0.15s; width: 100%;
-  }
-  .kunye-inp::placeholder { color: var(--border); font-weight: 400; }
-  .kunye-inp:focus { background: rgba(240,201,58,0.04); }
-  .cover-url-btn {
-    background: var(--accent3); color: #000; border: none;
-    border-radius: 6px; padding: 6px 10px; cursor: pointer;
-    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
-    flex-shrink: 0; transition: background 0.15s; margin-right: 8px;
-  }
-  .cover-url-btn:hover { background: #6dd8f5; }
-  .pace-bar {
-    padding: 10px 18px; border-top: 1px solid var(--border);
-    font-size: 13px; color: var(--muted); min-height: 38px; display: flex; align-items: center;
-  }
-  .pace-bar span.hi { color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; }
+    .timer-panel {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #e9e3d9;
+      padding: 8px 18px;
+      border-radius: 40px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    }
 
-  /* ── Stats ── */
-  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 16px 0; }
-  .stat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 14px 12px; text-align: center;
-  }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
-  .stat-num.yellow { color: var(--accent); }
-  .stat-num.green  { color: var(--accent2); }
-  .stat-num.blue   { color: var(--accent3); }
-  .stat-lbl { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .timer-display {
+      font-size: 2.8rem;
+      font-weight: 600;
+      font-family: monospace;
+      background: #1e2b32;
+      color: #f0e9de;
+      padding: 4px 18px;
+      border-radius: 36px;
+      letter-spacing: 4px;
+    }
 
-  /* ── Counter ── */
-  .counter-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px 24px;
-    text-align: center; margin-bottom: 12px;
-    position: relative; overflow: hidden;
-  }
-  .counter-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-  }
-  .counter-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
-  .counter-main { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 18px; }
-  .page-display {
-    font-family: 'Syne', sans-serif; font-size: 88px; font-weight: 800;
-    color: var(--text); line-height: 1; min-width: 180px;
-    text-shadow: 0 0 40px rgba(240,201,58,0.15);
-  }
-  .page-unit { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
-  .cnt-btn { width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; font-weight: 700; font-family: 'Syne', sans-serif; display: flex; align-items: center; justify-content: center; transition: all 0.12s; user-select: none; }
-  .cnt-plus  { background: var(--accent); color: #000; }
-  .cnt-plus:hover  { background: #ffd84a; transform: scale(1.1); }
-  .cnt-plus:active { transform: scale(0.92); }
-  .cnt-minus { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  .cnt-minus:hover { background: var(--border); color: var(--text); }
-  .step-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 18px; }
-  .step-lbl { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
-  .step-pill { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.12s; }
-  .step-pill.active, .step-pill:hover { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
-  .prog-track { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 7px; }
-  .prog-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.5s cubic-bezier(.4,0,.2,1); }
-  .prog-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+    .timer-btn {
+      background: #2c3e50;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 0 #0f1a22;
+      transition: 0.1s ease;
+      border: 1px solid #5d7a92;
+    }
 
-  /* ── Goal ── */
-  .goal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-  .goal-header { padding: 10px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
-  .goal-body { display: flex; flex-wrap: wrap; }
-  .goal-field { flex: 1; min-width: 150px; padding: 14px 18px; border-right: 1px solid var(--border); }
-  .goal-field:last-child { border-right: none; }
-  .goal-lbl { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-  .goal-inp { background: transparent; border: none; outline: none; font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent2); width: 100%; }
-  .goal-inp::placeholder { color: var(--border); font-weight: 400; font-size: 16px; }
-  .pace-bar { padding: 10px 18px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); min-height: 38px; display: flex; align-items: center; }
-  .pace-bar span.hi { color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; }
+    .timer-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #0f1a22;
+    }
 
-  /* ── Section cards ── */
-  .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
-  .sec-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); }
-  .sec-icon { font-size: 15px; }
-  .sec-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-  .sec-count { margin-left: auto; font-size: 11px; color: var(--muted); }
-  .quote-item { padding: 14px 18px; border-bottom: 1px solid var(--border); animation: fadeUp 0.25s ease; }
-  .quote-item:last-child { border-bottom: none; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)} }
-  .quote-text { font-size: 14px; line-height: 1.65; color: var(--text); margin-bottom: 6px; position: relative; padding-left: 14px; }
-  .quote-text::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; background: var(--accent); border-radius: 2px; }
-  .quote-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); }
-  .q-del { background: transparent; border: none; cursor: pointer; color: var(--border); font-size: 15px; padding: 0 4px; transition: color 0.15s; }
-  .q-del:hover { color: var(--danger); }
-  .no-quotes { padding: 24px; text-align: center; font-size: 13px; color: var(--border); }
-  .quote-form { padding: 14px 18px; background: var(--bg); border-top: 1px solid var(--border); }
-  .quote-ta { width: 100%; min-height: 68px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; resize: none; outline: none; line-height: 1.6; transition: border-color 0.15s; margin-bottom: 8px; }
-  .quote-ta::placeholder { color: var(--muted); }
-  .quote-ta:focus { border-color: var(--accent); }
-  .form-row { display: flex; gap: 8px; align-items: center; }
-  .page-inp { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; outline: none; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); width: 100px; }
-  .page-inp::placeholder { color: var(--border); }
-  .page-inp:focus { border-color: var(--accent3); outline: none; }
-  .add-btn { margin-left: auto; background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 8px 20px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; transition: background 0.15s; }
-  .add-btn:hover { background: #ffd84a; }
-  .notes-ta { width: 100%; min-height: 140px; background: transparent; border: none; outline: none; padding: 16px 18px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.8; resize: vertical; }
-  .notes-ta::placeholder { color: var(--muted); }
+    .timer-btn.reset {
+      background: #6b4f3c;
+      box-shadow: 0 4px 0 #4a3525;
+    }
 
-  /* ── Footer ── */
-  .footer-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
-  .ghost-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 9px 20px; border-radius: 8px; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.08em; transition: all 0.2s; }
-  .ghost-btn:hover { border-color: var(--danger); color: var(--danger); }
-  .import-btn:hover { border-color: var(--accent2) !important; color: var(--accent2) !important; }
-  .footer-note { text-align: center; margin-top: 14px; font-size: 11px; color: var(--muted); }
+    /* ana grid: rehber + yazma alanı */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.1fr 1.9fr;
+      gap: 24px;
+    }
 
-  /* ── Modals ── */
-  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; padding:20px; }
-  .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; width:100%; max-width:500px; }
-  .modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-  .modal-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
-  .modal-close { background:transparent; border:none; color:var(--muted); font-size:20px; cursor:pointer; line-height:1; }
-  .modal-ta { width:100%; height:140px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px; color:var(--accent2); font-family:'DM Mono',monospace; font-size:11px; resize:none; outline:none; }
-  .modal-btn { width:100%; background:var(--accent); color:#000; border:none; border-radius:8px; padding:10px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; cursor:pointer; margin-top:10px; }
-  .modal-btn:hover { background:#ffd84a; }
-  .modal-sub { width:100%; background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:10px; font-family:'Syne',sans-serif; font-size:12px; cursor:pointer; }
+    /* REHBER KARTLAR (sol) */
+    .guide {
+      background: #ffffffd9;
+      backdrop-filter: blur(2px);
+      border-radius: 28px;
+      padding: 24px 20px;
+      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.12);
+      border: 1px solid #d6cdc0;
+      height: fit-content;
+    }
 
-  #confettiCanvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999; }
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-  @media(max-width:500px){
-    .book-top { flex-direction: column; align-items: center; }
-    .cover-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; }
-    .cover-placeholder, .cover-img { width: 120px; }
-    .page-display { font-size: 64px; }
-    .goal-field { min-width: 120px; }
-    .timer-bar { flex-direction: column; align-items: flex-start; }
-  }
-</style>
+    .step-card {
+      background: #fefcf9;
+      border-left: 10px solid #b87c4d;
+      padding: 16px 18px;
+      border-radius: 16px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+      border: 1px solid #e1d7cc;
+    }
+
+    .step-num {
+      display: inline-block;
+      background: #1e3c4f;
+      color: white;
+      font-weight: bold;
+      padding: 2px 14px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .step-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #1e3c4f;
+      border-bottom: 1px dotted #bbb09d;
+      padding-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+
+    .micro-tool {
+      background: #eae3d9;
+      padding: 12px 12px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    .two-col {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .two-col input {
+      flex: 1;
+      background: white;
+      border: 1px solid #b9aa99;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-family: inherit;
+    }
+
+    .skeleton-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid #b9aa99;
+      background: white;
+      margin-top: 8px;
+      font-family: inherit;
+    }
+
+    .reminder {
+      background: #2e5a5a10;
+      padding: 6px 12px;
+      border-radius: 24px;
+      color: #1a3a3a;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    /* SAĞ TARAF - YAZMA ALANI */
+    .writing-area {
+      background: #fdfaf7;
+      border-radius: 32px;
+      padding: 24px 24px 30px;
+      box-shadow: inset 0 0 0 1px #e5d9ce, 0 10px 20px -10px rgba(0,0,0,0.1);
+      border: 1px solid #c8bba9;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .writing-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .writing-header h2 {
+      font-weight: 400;
+      font-size: 1.8rem;
+      color: #3e2c1b;
+    }
+
+    .stage-badge {
+      background: #b87c4d;
+      color: white;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      flex: 1;
+      min-height: 380px;
+      background: #fffcf8;
+      border: 2px dashed #b7a48e;
+      border-radius: 24px;
+      padding: 24px 22px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-family: 'Courier New', Courier, monospace;
+      resize: vertical;
+      box-shadow: inset 0 6px 10px rgba(0,0,0,0.02);
+      color: #1e1e1e;
+      outline: none;
+    }
+
+    textarea:focus {
+      border: 2px solid #1e3c4f;
+      background: #ffffff;
+    }
+
+    .writing-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: #2c3e50;
+      border: none;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #121e26;
+      transition: 0.1s;
+      border: 1px solid #5a7c96;
+      font-family: inherit;
+      flex: 0 0 auto;
+    }
+
+    .action-btn.secondary {
+      background: #6f5e4e;
+      box-shadow: 0 3px 0 #4d3f33;
+    }
+
+    .action-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #121e26;
+    }
+
+    .tip-footer {
+      margin-top: 16px;
+      font-style: italic;
+      background: #ece2d7;
+      padding: 12px 18px;
+      border-radius: 28px;
+      color: #1e2e3b;
+      font-size: 0.9rem;
+    }
+
+    /* mobil uyum */
+    @media (max-width: 850px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .header {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .timer-display {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
-<canvas id="confettiCanvas"></canvas>
-
-<!-- Export Modal -->
-<div class="modal" id="exportModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <span class="modal-title" style="color:var(--accent)">⬇ Yedek Verisi</span>
-      <button class="modal-close" onclick="document.getElementById('exportModal').style.display='none'">✕</button>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Aşağıdaki metni kopyalayıp <strong style="color:var(--text)">yedek.json</strong> adıyla kaydet:</p>
-    <textarea class="modal-ta" id="exportText" readonly></textarea>
-    <button class="modal-btn" onclick="navigator.clipboard.writeText(document.getElementById('exportText').value).then(()=>alert('✅ Kopyalandı!'))">Metni Kopyala</button>
-  </div>
-</div>
-
-<!-- Import Modal -->
-<div class="modal" id="importModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <span class="modal-title" style="color:var(--accent2)">⬆ Veri Yükle</span>
-      <button class="modal-close" onclick="document.getElementById('importModal').style.display='none'">✕</button>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Yedek metnini buraya yapıştır ve Yükle'ye bas:</p>
-    <textarea class="modal-ta" id="importText" placeholder='{"book_name":"..."}' style="color:var(--text)"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;">
-      <button class="modal-sub" onclick="document.getElementById('importFile').click()">📁 Dosyadan Seç</button>
-      <button class="modal-btn" style="margin-top:0" onclick="importFromText()">Yükle</button>
-    </div>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
-  </div>
-</div>
-
 <div class="container">
-
-  <!-- Header: title -->
-  <header>
-    <div class="title-block">
-      <div class="tag">📚 Okuma Takibi</div>
-      <h1>Kitap <span>Günlüğü</span></h1>
-      <p class="subtitle">Sayfa sayacı · Zamanlayıcı · Alıntılar · Notlar</p>
-    </div>
-  </header>
-
-  <!-- Kitap Kapağı (Künye dışında) -->
-  <div class="cover-outer">
-    <img class="cover-img" id="coverImg" src="" alt="Kitap kapağı">
-    <div class="cover-placeholder" id="coverPlaceholder" onclick="document.getElementById('coverUrlInp').focus()">
-      <span>📖</span>
-      <p>Kapak ekle</p>
+  <div class="header">
+    <h1>✍️ Tek Oturuşta Öykü</h1>
+    <div class="timer-panel">
+      <span class="timer-display" id="timerDisplay">25:00</span>
+      <button class="timer-btn" id="startTimerBtn" title="25 dk başlat">▶</button>
+      <button class="timer-btn reset" id="resetTimerBtn" title="Sıfırla">↻</button>
     </div>
   </div>
 
-  <!-- Künye Tablosu (kapaksız) -->
-  <div class="kunye-card">
-    <div class="kunye-header">
-      <span>📋 Künye</span>
-      <span class="kunye-status" id="kunyeStatus">—</span>
-    </div>
-    <div class="kunye-fields">
-      <div class="kunye-row">
-        <span class="kunye-lbl">Kitap Adı</span>
-        <input class="kunye-inp" id="bookName" placeholder="Kitabın adı..." oninput="saveMeta()">
-      </div>
-      <div class="kunye-row">
-        <span class="kunye-lbl">Yazar</span>
-        <input class="kunye-inp" id="authorName" placeholder="Yazar adı..." oninput="saveMeta()">
-      </div>
-      <div class="kunye-row">
-        <span class="kunye-lbl">Kapak URL</span>
-        <div style="display:flex;gap:6px;flex:1;min-width:0;">
-          <input class="kunye-inp" id="coverUrlInp" placeholder="https://..." oninput="saveMeta()" style="flex:1;min-width:0;">
-          <button class="cover-url-btn" onclick="applyCover()">↵</button>
+  <div class="workspace">
+    <!-- SOL: REHBER ADIMLAR -->
+    <div class="guide">
+      <div class="step-list">
+        <!-- Adım 1 -->
+        <div class="step-card">
+          <span class="step-num">1. KIVILCIM (5 dk)</span>
+          <div class="step-title">Karşıt An</div>
+          <div class="step-desc">Gerçek bir anıyı al, tersini hayal et.</div>
+          <div class="micro-tool">
+            <div class="two-col">
+              <input type="text" placeholder="Gerçek an (örn: fazla para üstü)" id="realMoment">
+              <input type="text" placeholder="Tersi (örn: hırsızlık suçlaması)" id="oppositeMoment">
+            </div>
+          </div>
+        </div>
+        <!-- Adım 2 -->
+        <div class="step-card">
+          <span class="step-num">2. ŞİMDİ & BURADA (5 dk)</span>
+          <div class="step-title">Tek mekân · 15dk-2saat</div>
+          <div class="micro-tool">
+            <input type="text" placeholder="Mekân (asansör / banka sırası...)" id="placeInput" style="width:100%; padding:8px; border-radius:20px; border:1px solid #ccc;">
+            <input type="text" placeholder="Eylem (beklemek / tamir etmek...)" id="actionInput" style="width:100%; margin-top:8px; padding:8px; border-radius:20px; border:1px solid #ccc;">
+          </div>
+        </div>
+        <!-- Adım 3: İskelet -->
+        <div class="step-card">
+          <span class="step-num">3. İSKELET (10 dk)</span>
+          <div class="step-title">3 Cümlelik Şablon</div>
+          <div class="micro-tool">
+            <input type="text" class="skeleton-input" id="skel1" placeholder="1. [Karakter] [Mekan]'da [Eylem] yaparken, [Sorun]...">
+            <input type="text" class="skeleton-input" id="skel2" placeholder="2. İlk hamle işe yaramayınca [Duygu Değişimi] hissetti.">
+            <input type="text" class="skeleton-input" id="skel3" placeholder="3. Tam o anda [Detay] fark etti ve bakışı [Değişti].">
+          </div>
+          <div class="reminder">✓ Bu üç cümleyi kafanda canlandır.</div>
+        </div>
+        <!-- Adım 4 -->
+        <div class="step-card">
+          <span class="step-num">4. SERBEST YAZIM (25 dk)</span>
+          <div class="step-title">Ses kaydı gibi yaz</div>
+          <div class="step-desc">Silme, düzeltme. Akışa bırak.<br> 
+            <strong>Sıra:</strong> Ses/Koku → Aksiyon → Zihinsel → Küçük Kapanış
+          </div>
+        </div>
+        <!-- Adım 5 -->
+        <div class="step-card">
+          <span class="step-num">5. BIÇAK (10 dk)</span>
+          <div class="step-title">İlk 2 cümleyi sil · Nesneyle bitir</div>
+          <div class="step-desc">“Ve asansörün kapısı sessizce açıldı.” gibi.</div>
+          <button class="action-btn secondary" id="trimFirstTwoBtn" style="margin-top:10px; padding:8px 16px;">✂️ İlk 2 cümleyi sil</button>
         </div>
       </div>
-      <div class="kunye-row">
-        <span class="kunye-lbl">Başlangıç</span>
-        <input class="kunye-inp" type="date" id="startDate" oninput="saveMeta();updateAll()">
-      </div>
-      <div class="kunye-row">
-        <span class="kunye-lbl">Bitiş Hedefi</span>
-        <input class="kunye-inp" type="date" id="deadlineDate" oninput="saveMeta();updateAll()">
-      </div>
-      <div class="kunye-row">
-        <span class="kunye-lbl">Toplam Sayfa</span>
-        <input class="kunye-inp" type="number" id="totalPages" placeholder="örn. 320" min="1" oninput="saveMeta();updateAll()">
-      </div>
     </div>
-    <div class="pace-bar" id="paceBar">Hedef & tarih girince günlük hız hesaplanır.</div>
-  </div>
 
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num yellow" id="stat-read">0</div>
-      <div class="stat-lbl">Okunan Sayfa</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num green" id="stat-left">—</div>
-      <div class="stat-lbl">Kalan Sayfa</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num blue" id="stat-days">—</div>
-      <div class="stat-lbl">Kalan Gün</div>
-    </div>
-  </div>
-
-  <!-- Counter -->
-  <div class="counter-card">
-    <div class="counter-label">Toplam Okunan Sayfa</div>
-    <div class="counter-main">
-      <button class="cnt-btn cnt-minus" onclick="addPages(-step)">−</button>
-      <div>
-        <div class="page-display" id="pageNum">0</div>
-        <div class="page-unit">sayfa</div>
+    <!-- SAĞ: YAZMA ALANI -->
+    <div class="writing-area">
+      <div class="writing-header">
+        <h2>📄 Öykü Taslağı</h2>
+        <span class="stage-badge" id="stageHint">Serbest Yazım</span>
       </div>
-      <button class="cnt-btn cnt-plus" onclick="addPages(step)">+</button>
-    </div>
-    <div class="step-row">
-      <span class="step-lbl">Adım</span>
-      <button class="step-pill active" onclick="setStep(1,this)">1</button>
-      <button class="step-pill" onclick="setStep(5,this)">5</button>
-      <button class="step-pill" onclick="setStep(10,this)">10</button>
-      <button class="step-pill" onclick="setStep(25,this)">25</button>
-    </div>
-    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    <div class="prog-labels">
-      <span id="progLeft">Toplam sayfa girilmedi</span>
-      <span id="progPct"></span>
-    </div>
-  </div>
-
-  <!-- Timer (sayaç ile alıntılar arasında) -->
-  <div class="timer-bar">
-    <div class="timer-left">
-      <span class="timer-icon">⏱</span>
-      <div>
-        <div class="timer-label">Okuma Süresi</div>
-        <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <textarea id="storyTextarea" placeholder="Hikayeni buraya yazmaya başla...&#10;&#10;Klimanın uğultusu, metalik bir yankı..."></textarea>
+      <div class="writing-actions">
+        <button class="action-btn" id="applySkeletonBtn">📌 İskeleti Metne Aktar</button>
+        <button class="action-btn secondary" id="clearTextBtn">🧹 Temizle</button>
       </div>
-    </div>
-    <div class="timer-btns">
-      <button class="timer-btn timer-btn-start" id="timerStartBtn" onclick="timerToggle()">▶ Başlat</button>
-      <button class="timer-btn timer-btn-reset" onclick="timerReset()">↺</button>
-    </div>
-    <div class="timer-total">
-      Toplam oturum<span id="timerTotal">0 dk</span>
-    </div>
-  </div>
-
-  <!-- Quotes -->
-  <div class="section-card">
-    <div class="sec-header">
-      <span class="sec-icon">❝</span>
-      <span class="sec-title">Alıntılar</span>
-      <span class="sec-count" id="quoteCount">0 alıntı</span>
-    </div>
-    <div id="quotesList"></div>
-    <div class="quote-form">
-      <textarea class="quote-ta" id="quoteInput" placeholder="Kitaptan beğendiğin bir cümle..."></textarea>
-      <div class="form-row">
-        <input class="page-inp" type="number" id="quotePageInp" placeholder="Sayfa no">
-        <button class="add-btn" onclick="addQuote()">+ Ekle</button>
+      <div class="tip-footer" id="liveTip">
+        💡 25 dakika boyunca durma. Kronometreyi başlat, yaz.
       </div>
     </div>
   </div>
-
-  <!-- Notes -->
-  <div class="section-card">
-    <div class="sec-header">
-      <span class="sec-icon">📝</span>
-      <span class="sec-title">Notlar & Düşünceler</span>
-    </div>
-    <textarea class="notes-ta" id="notesArea"
-      placeholder="Karakterler, olaylar, kafana takılan sorular, kitabın sende bıraktıkları..."
-      oninput="saveNotes()"></textarea>
-  </div>
-
-  <div class="footer-row">
-    <button class="ghost-btn" onclick="exportData()">⬇ Dışa Aktar</button>
-    <button class="ghost-btn import-btn" onclick="document.getElementById('importModal').style.display='flex'">⬆ İçe Aktar</button>
-    <button class="ghost-btn" onclick="resetAll()">↺ Sıfırla</button>
-  </div>
-  <p class="footer-note">Verileri yedeklemek için <strong style="color:var(--accent)">Dışa Aktar</strong> · Başka cihazda yüklemek için <strong style="color:var(--accent2)">İçe Aktar</strong></p>
-
 </div>
 
 <script>
-/* ─── State ─── */
-let pages   = parseInt(localStorage.getItem('book_pages'))||0;
-let step    = 1;
-let quotes  = JSON.parse(localStorage.getItem('book_quotes')||'[]');
-let finished = false;
+  (function(){
+    "use strict";
 
-/* ─── Timer ─── */
-let timerRunning  = false;
-let timerSeconds  = 0;
-let timerInterval = null;
-let timerTotalMin = parseInt(localStorage.getItem('book_timer_total'))||0;
+    // ----- Zamanlayıcı (25:00) -----
+    let timerInterval = null;
+    let totalSeconds = 25 * 60; // 1500 sn
+    const timerDisplay = document.getElementById('timerDisplay');
+    const startBtn = document.getElementById('startTimerBtn');
+    const resetBtn = document.getElementById('resetTimerBtn');
 
-function timerToggle(){
-  if(timerRunning){
-    clearInterval(timerInterval);
-    timerRunning = false;
-    // save session to total
-    timerTotalMin += Math.floor(timerSeconds/60);
-    localStorage.setItem('book_timer_total', timerTotalMin);
-    timerSeconds = 0;
-    document.getElementById('timerDisplay').classList.remove('running');
-    document.getElementById('timerStartBtn').textContent = '▶ Başlat';
-  } else {
-    timerRunning = true;
-    document.getElementById('timerDisplay').classList.add('running');
-    document.getElementById('timerStartBtn').textContent = '⏸ Duraklat';
-    timerInterval = setInterval(()=>{
-      timerSeconds++;
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function updateTimerDisplay() {
+      timerDisplay.textContent = formatTime(totalSeconds);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      if (totalSeconds <= 0) {
+        totalSeconds = 25 * 60;
+        updateTimerDisplay();
+      }
+      timerInterval = setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          updateTimerDisplay();
+          // 5 dakika kala uyarı (isteğe bağlı, metinde belirtilmemiş ama hafif hatırlatma)
+          if (totalSeconds === 300) {
+            document.getElementById('liveTip').innerHTML = '⏳ Son 5 dakika! Kapanışa geç.';
+          }
+          if (totalSeconds === 0) {
+            stopTimer();
+            document.getElementById('liveTip').innerHTML = '✅ Süre doldu. Şimdi BIÇAK aşamasına geç.';
+            alert('25 dakika bitti! Yazmayı durdur ve 5. adıma geç.');
+          }
+        } else {
+          stopTimer();
+        }
+      }, 1000);
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    resetBtn.addEventListener('click', function() {
+      stopTimer();
+      totalSeconds = 25 * 60;
       updateTimerDisplay();
-    }, 1000);
-  }
-}
+      document.getElementById('liveTip').innerHTML = '💡 25 dakika boyunca durma. Kronometreyi başlat, yaz.';
+    });
 
-function timerReset(){
-  if(!confirm('Mevcut oturum sıfırlansın mı?')) return;
-  clearInterval(timerInterval);
-  timerRunning = false; timerSeconds = 0;
-  document.getElementById('timerDisplay').classList.remove('running');
-  document.getElementById('timerStartBtn').textContent = '▶ Başlat';
-  updateTimerDisplay();
-}
+    // ----- metin alanı ve diğer elementler -----
+    const textarea = document.getElementById('storyTextarea');
+    const realInput = document.getElementById('realMoment');
+    const oppInput = document.getElementById('oppositeMoment');
+    const placeInput = document.getElementById('placeInput');
+    const actionInput = document.getElementById('actionInput');
+    const skel1 = document.getElementById('skel1');
+    const skel2 = document.getElementById('skel2');
+    const skel3 = document.getElementById('skel3');
+    const stageHint = document.getElementById('stageHint');
+    const liveTip = document.getElementById('liveTip');
 
-function updateTimerDisplay(){
-  const h = Math.floor(timerSeconds/3600);
-  const m = Math.floor((timerSeconds%3600)/60);
-  const s = timerSeconds%60;
-  document.getElementById('timerDisplay').textContent =
-    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  const total = timerTotalMin + Math.floor(timerSeconds/60);
-  document.getElementById('timerTotal').textContent =
-    total >= 60 ? `${Math.floor(total/60)}s ${total%60}dk` : `${total} dk`;
-}
+    // örnek placeholder'ları dolduralım ki kullanıcı fikir alsın
+    realInput.placeholder = 'Gerçek an: kasiyer fazla para verdi';
+    oppInput.placeholder = 'Tersi: hırsızlıkla suçlanmak';
+    placeInput.placeholder = 'asansör';
+    actionInput.placeholder = 'telefonuna bakmak';
+    skel1.placeholder = 'Ali asansörde telefonuna bakarken ışıklar söndü.';
+    skel2.placeholder = 'Düğme işe yaramayınca panik yerine sakinlik hissetti.';
+    skel3.placeholder = 'Aynadaki yorgun ifadesini fark etti, acele etmenin anlamsızlığını düşündü.';
 
-/* ─── Cover ─── */
-function applyCover(){
-  const url = document.getElementById('coverUrlInp').value.trim();
-  if(!url){ hideCover(); return; }
-  const img = document.getElementById('coverImg');
-  img.src = url;
-  img.onload  = ()=>{ img.style.display='block'; document.getElementById('coverPlaceholder').style.display='none'; };
-  img.onerror = ()=>{ hideCover(); alert('Resim yüklenemedi. URL\'yi kontrol et.'); };
-  saveMeta();
-}
-function hideCover(){
-  document.getElementById('coverImg').style.display='none';
-  document.getElementById('coverPlaceholder').style.display='flex';
-}
+    // İskeleti metne aktar (Adım 3'teki cümleleri başlangıç noktası olarak ekler)
+    document.getElementById('applySkeletonBtn').addEventListener('click', function() {
+      let skeletonText = '';
+      if (skel1.value.trim() !== '') skeletonText += skel1.value.trim() + '\n\n';
+      if (skel2.value.trim() !== '') skeletonText += skel2.value.trim() + '\n\n';
+      if (skel3.value.trim() !== '') skeletonText += skel3.value.trim() + '\n\n';
+      
+      if (skeletonText === '') {
+        alert('Lütfen en az bir iskelet cümlesi gir.');
+        return;
+      }
+      
+      // Mevcut metnin başına ekle (ya da direkt yaz)
+      const current = textarea.value;
+      if (current.trim() === '') {
+        textarea.value = skeletonText + '—\n';
+      } else {
+        textarea.value = skeletonText + '—\n' + current;
+      }
+      stageHint.textContent = 'İskelet eklendi';
+      liveTip.innerHTML = '📝 İskelet cümlelerini genişlet, detaylandır.';
+    });
 
-/* ─── Init ─── */
-function init(){
-  document.getElementById('bookName').value     = localStorage.getItem('book_name')||'';
-  document.getElementById('authorName').value   = localStorage.getItem('book_author')||'';
-  document.getElementById('totalPages').value   = localStorage.getItem('book_total')||'';
-  document.getElementById('startDate').value    = localStorage.getItem('book_start')||'';
-  document.getElementById('deadlineDate').value = localStorage.getItem('book_deadline')||'';
-  document.getElementById('notesArea').value    = localStorage.getItem('book_notes')||'';
-  const coverUrl = localStorage.getItem('book_cover')||'';
-  if(coverUrl){
-    document.getElementById('coverUrlInp').value = coverUrl;
-    applyCover();
-  }
-  timerTotalMin = parseInt(localStorage.getItem('book_timer_total'))||0;
-  updateTimerDisplay();
-  const total = parseInt(localStorage.getItem('book_total'))||0;
-  if(total > 0 && pages >= total) finished = true;
-  updateAll(); renderQuotes();
-}
+    // İlk iki cümleyi sil (Adım 5 aracı)
+    document.getElementById('trimFirstTwoBtn').addEventListener('click', function() {
+      let text = textarea.value;
+      // Nokta, ünlem, soru işareti ve satır sonuna göre cümleleri ayırmaya çalış.
+      const sentences = text.split(/(?<=[.!?])\s+/);
+      if (sentences.length > 2) {
+        // ilk iki cümleyi çıkar
+        const trimmed = sentences.slice(2).join(' ');
+        textarea.value = trimmed;
+        liveTip.innerHTML = '✂️ İlk iki cümle silindi. Son cümleni bir nesne/eylemle bitir.';
+      } else if (sentences.length > 0) {
+        // 2'den az cümle varsa uyarı ver ama yine de silmeyi dene (ilk cümleyi sil)
+        if (sentences.length === 1) {
+          textarea.value = '';
+          liveTip.innerHTML = '⚠️ Tek cümle vardı, tamamen silindi. Yeniden başla.';
+        } else {
+          // 2 cümle: ilk ikisini sil -> boş
+          textarea.value = '';
+          liveTip.innerHTML = '✂️ İlk iki cümle silindi, metin boş.';
+        }
+      } else {
+        liveTip.innerHTML = 'ℹ️ Silinecek cümle yok.';
+      }
+      stageHint.textContent = 'BIÇAK aşaması';
+    });
 
-function saveMeta(){
-  localStorage.setItem('book_name',     document.getElementById('bookName').value);
-  localStorage.setItem('book_author',   document.getElementById('authorName').value);
-  localStorage.setItem('book_total',    document.getElementById('totalPages').value);
-  localStorage.setItem('book_start',    document.getElementById('startDate').value);
-  localStorage.setItem('book_deadline', document.getElementById('deadlineDate').value);
-  localStorage.setItem('book_cover',    document.getElementById('coverUrlInp').value);
-}
-function saveNotes(){ localStorage.setItem('book_notes', document.getElementById('notesArea').value); }
+    // Temizle butonu
+    document.getElementById('clearTextBtn').addEventListener('click', function() {
+      if (confirm('Metni temizlemek istediğine emin misin?')) {
+        textarea.value = '';
+        stageHint.textContent = 'Serbest Yazım';
+        liveTip.innerHTML = '💡 25 dakika boyunca durma. Kronometreyi başlat, yaz.';
+      }
+    });
 
-function addPages(delta){
-  const prev = pages;
-  pages = Math.max(0, pages+delta);
-  localStorage.setItem('book_pages', pages);
-  const total = parseInt(document.getElementById('totalPages').value)||0;
-  if(total>0 && pages>=total && prev<total && !finished){ finished=true; launchConfetti(); }
-  if(pages<(total||Infinity)) finished=false;
-  updateAll();
-}
+    // Yazma alanına tıklayınca ipucu güncelle
+    textarea.addEventListener('focus', () => {
+      if (textarea.value.length < 20) {
+        liveTip.innerHTML = '📌 Ses, koku, ışıkla başla. (Klima uğultusu, floresan cızırtısı...)';
+      }
+    });
 
-function setStep(n,btn){
-  step=n;
-  document.querySelectorAll('.step-pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
+    // Adım kartlarına tıklayınca ilgili ipucu (kullanıcı deneyimi)
+    document.querySelectorAll('.step-card').forEach((card, index) => {
+      card.addEventListener('click', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+        const tips = [
+          'Gerçek bir anı al, tersine çevir.',
+          'Mekân ve eylem tek, süre kısa.',
+          'Üç cümleyi doldur, iskeleti kur.',
+          'Ses kaydı gibi yaz, düzeltme.',
+          'İlk iki cümleyi sil, nesneyle bitir.'
+        ];
+        liveTip.innerHTML = `📋 Adım ${index+1}: ${tips[index]}`;
+      });
+    });
 
-function updateAll(){
-  const total    = parseInt(document.getElementById('totalPages').value)||0;
-  const deadline = document.getElementById('deadlineDate').value;
-  document.getElementById('pageNum').textContent    = pages;
-  document.getElementById('stat-read').textContent  = pages;
-  document.getElementById('stat-left').textContent  = total?Math.max(0,total-pages):'—';
+    // Girdiler değişince ipucu
+    skel1.addEventListener('input', () => { liveTip.innerHTML = '✏️ İskelet cümleleri senin pusulan.'; });
+    
+    // Sayfa yüklendiğinde varsayılan ipucu
+    updateTimerDisplay();
 
-  // Status emoji in künye
-  const statusEl = document.getElementById('kunyeStatus');
-  if(total > 0){
-    const pct = Math.min(100, Math.round(pages/total*100));
-    let statusTxt;
-    if(pct === 100)       statusTxt = '🥹 Bitti';
-    else if(pct >= 71)    statusTxt = '🫅🏻 Bitmek Üzere';
-    else if(pct >= 31)    statusTxt = '🤩 Harika Gidiyor';
-    else                  statusTxt = '🙂 Başlangıç';
-    statusEl.textContent = statusTxt;
-  } else {
-    statusEl.textContent = '—';
-  }
+    // Kullanıcı kıvılcım alanlarından faydalansın diye placeholder dolu
+    // İsteğe bağlı: "Örnek doldur" butonu koymadım, sade.
 
-  let daysLeft='—';
-  if(deadline){
-    const today=new Date();today.setHours(0,0,0,0);
-    const end=new Date(deadline);end.setHours(0,0,0,0);
-    const diff=Math.ceil((end-today)/(1000*60*60*24));
-    daysLeft=diff>0?diff:diff===0?'Bugün!':'Geçti';
-  }
-  document.getElementById('stat-days').textContent=daysLeft;
-  if(total>0){
-    const pct=Math.min(100,Math.round(pages/total*100));
-    document.getElementById('progFill').style.width=pct+'%';
-    document.getElementById('progLeft').textContent=`${Math.max(0,total-pages)} sayfa kaldı`;
-    document.getElementById('progPct').textContent=pct+'%';
-  } else {
-    document.getElementById('progFill').style.width='0%';
-    document.getElementById('progLeft').textContent='Toplam sayfa girilmedi';
-    document.getElementById('progPct').textContent='';
-  }
-  const paceEl=document.getElementById('paceBar');
-  if(total>0 && deadline){
-    const today=new Date();today.setHours(0,0,0,0);
-    const end=new Date(deadline);end.setHours(0,0,0,0);
-    const diff=Math.ceil((end-today)/(1000*60*60*24));
-    const left=Math.max(0,total-pages);
-    if(diff>0&&left>0){ const daily=Math.ceil(left/diff); paceEl.innerHTML=`Hedefe ulaşmak için günde <span class="hi">${daily} sayfa</span> okumalısın.`; }
-    else if(left<=0){ paceEl.innerHTML=`<span class="hi">🎉 Kitabı tamamladın!</span>`; }
-    else { paceEl.innerHTML=`<span style="color:var(--danger)">Bitiş tarihi geçmiş.</span>`; }
-  } else { paceEl.innerHTML='Hedef & tarih girince günlük hız hesaplanır.'; }
-}
+    // Ekstra: Kullanıcı yazarken aşama ismini değiştirelim
+    textarea.addEventListener('input', function() {
+      if (textarea.value.length > 10) {
+        stageHint.textContent = 'Yazıyor...';
+      } else {
+        stageHint.textContent = 'Serbest Yazım';
+      }
+    });
 
-function addQuote(){
-  const text=document.getElementById('quoteInput').value.trim();
-  const pg=document.getElementById('quotePageInp').value.trim();
-  if(!text) return;
-  quotes.push({text,page:pg,date:new Date().toLocaleDateString('tr-TR')});
-  localStorage.setItem('book_quotes',JSON.stringify(quotes));
-  document.getElementById('quoteInput').value='';
-  document.getElementById('quotePageInp').value='';
-  renderQuotes();
-}
-function deleteQuote(i){ quotes.splice(i,1); localStorage.setItem('book_quotes',JSON.stringify(quotes)); renderQuotes(); }
-function renderQuotes(){
-  const list=document.getElementById('quotesList');
-  list.innerHTML='';
-  if(!quotes.length){ list.innerHTML='<div class="no-quotes">Henüz alıntı eklenmedi...</div>'; }
-  else { quotes.forEach((q,i)=>{ const d=document.createElement('div'); d.className='quote-item'; d.innerHTML=`<div class="quote-text">${q.text}</div><div class="quote-meta"><span>${q.page?'s.'+q.page+' · ':''}${q.date}</span><button class="q-del" onclick="deleteQuote(${i})">✕</button></div>`; list.appendChild(d); }); }
-  document.getElementById('quoteCount').textContent=quotes.length+' alıntı';
-}
-
-function resetAll(){
-  if(!confirm('Tüm veriler silinecek. Emin misin?')) return;
-  ['book_pages','book_quotes','book_notes','book_timer_total'].forEach(k=>localStorage.removeItem(k));
-  pages=0; quotes=[]; finished=false; timerTotalMin=0; timerSeconds=0;
-  if(timerRunning){ clearInterval(timerInterval); timerRunning=false; document.getElementById('timerStartBtn').textContent='▶ Başlat'; }
-  document.getElementById('notesArea').value='';
-  updateTimerDisplay(); updateAll(); renderQuotes();
-}
-
-/* ─── Export / Import ─── */
-function exportData(){
-  const data={
-    book_name:localStorage.getItem('book_name')||'',
-    book_author:localStorage.getItem('book_author')||'',
-    book_total:localStorage.getItem('book_total')||'',
-    book_start:localStorage.getItem('book_start')||'',
-    book_deadline:localStorage.getItem('book_deadline')||'',
-    book_cover:localStorage.getItem('book_cover')||'',
-    book_pages:localStorage.getItem('book_pages')||'0',
-    book_quotes:localStorage.getItem('book_quotes')||'[]',
-    book_notes:localStorage.getItem('book_notes')||'',
-    book_timer_total:localStorage.getItem('book_timer_total')||'0',
-    exported_at:new Date().toISOString()
-  };
-  const json=JSON.stringify(data,null,2);
-  document.getElementById('exportText').value=json;
-  document.getElementById('exportModal').style.display='flex';
-  try {
-    const blob=new Blob([json],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    const name=(data.book_name||'kitap').replace(/\s+/g,'-').toLowerCase()+'-yedek.json';
-    a.href=url; a.download=name;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
-  } catch(e){}
-}
-function importFromText(){
-  const text=document.getElementById('importText').value.trim();
-  if(!text){alert('Lütfen yedek metnini yapıştır.');return;}
-  applyImport(text);
-}
-function importData(input){
-  const file=input.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>applyImport(e.target.result);
-  reader.readAsText(file); input.value='';
-}
-function applyImport(text){
-  try {
-    const data=JSON.parse(text);
-    const keys=['book_name','book_author','book_total','book_start','book_deadline','book_cover','book_pages','book_quotes','book_notes','book_timer_total'];
-    keys.forEach(k=>{if(data[k]!==undefined)localStorage.setItem(k,data[k]);});
-    pages=parseInt(localStorage.getItem('book_pages'))||0;
-    quotes=JSON.parse(localStorage.getItem('book_quotes')||'[]');
-    timerTotalMin=parseInt(localStorage.getItem('book_timer_total'))||0;
-    finished=false;
-    document.getElementById('importModal').style.display='none';
-    document.getElementById('importText').value='';
-    init(); alert('✅ Veriler başarıyla yüklendi!');
-  } catch(err){ alert('❌ Geçersiz veri.'); }
-}
-
-/* ─── Confetti ─── */
-const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');
-let particles=[],animFrame=null;
-function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-window.addEventListener('resize',resizeCanvas);resizeCanvas();
-function launchConfetti(){
-  resizeCanvas();
-  const colors=['#f0c93a','#4ef0a0','#4ec8f0','#c44ef0','#f05a4e','#ffffff'];
-  for(let i=0;i<220;i++){particles.push({x:Math.random()*canvas.width,y:-10-Math.random()*250,w:5+Math.random()*10,h:3+Math.random()*5,color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*360,vx:(Math.random()-.5)*4,vy:1.5+Math.random()*5,vr:(Math.random()-.5)*8,opacity:1,gravity:.1+Math.random()*.1});}
-  if(!animFrame)animateConfetti();
-}
-function animateConfetti(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.rot+=p.vr;if(p.y>canvas.height*.72)p.opacity-=0.028;ctx.save();ctx.globalAlpha=Math.max(0,p.opacity);ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;if(p.w>12){ctx.beginPath();ctx.arc(0,0,p.w/2,0,Math.PI*2);ctx.fill();}else{ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);}ctx.restore();});
-  particles=particles.filter(p=>p.opacity>0);
-  if(particles.length>0){animFrame=requestAnimationFrame(animateConfetti);}
-  else{animFrame=null;ctx.clearRect(0,0,canvas.width,canvas.height);}
-}
-
-init();
+  })();
 </script>
 </body>
 </html>
