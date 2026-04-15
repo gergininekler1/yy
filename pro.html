@@ -1,0 +1,290 @@
+import os
+
+# Define the HTML content for Matrix Storyteller V4.5
+html_content = """<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Storyteller V4.5 - Demir Gibi Zihin</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --accent-color: #58a6ff;
+            --text-color: #c9d1d9;
+            --border-color: #30363d;
+            --highlight: #238636;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+        }
+
+        .version {
+            font-size: 12px;
+            background: var(--border-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        textarea, input {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .analysis-bar {
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid var(--highlight);
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+        }
+
+        .hint-box {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px dashed var(--accent-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background-color: var(--highlight);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>MATRIX STORYTELLER</h1>
+        <span class="version">v4.5 - Demir Gibi Zihin Modülü</span>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'step1')">1. Kıvılcım</button>
+        <button class="tab-btn" onclick="openTab(event, 'step2')">2. Çerçeve</button>
+        <button class="tab-btn" onclick="openTab(event, 'step3')">3. Yol Haritası</button>
+        <button class="tab-btn" onclick="openTab(event, 'step4')">4. Yazım Bölgesi</button>
+        <button class="tab-btn" onclick="openTab(event, 'step5')">5-7. Rafine</button>
+    </div>
+
+    <div id="step1" class="content-section active">
+        <div class="hint-box">
+            <strong>İpucu:</strong> "Ya şöyle olsaydı?" sorusunu sor. Fikrin distopik veya varoluşçu bir temele dayanıyorsa, karakterin üzerindeki baskıyı hemen hissettir.
+        </div>
+        <label>Öykünün Ana Fikri (Tek Cümle)</label>
+        <input type="text" placeholder="Örn: Bir adamın gölgesinin ondan bağımsız hareket etmeye başlaması...">
+        <label>Ana Çatışma</label>
+        <textarea rows="3" placeholder="Karakter ne istiyor ve önündeki engel ne?"></textarea>
+    </div>
+
+    <div id="step2" class="content-section">
+        <div class="grid-2">
+            <div>
+                <label>Karakter (Atomic Profil)</label>
+                <textarea rows="5" placeholder="İsim, en belirgin özellik, temel korkusu ve varoluşsal sancısı..."></textarea>
+            </div>
+            <div>
+                <label>Mekan ve Atmosfer</label>
+                <textarea rows="5" placeholder="Hikaye nerede geçiyor? Mekan karakterin ruh halini nasıl yansıtıyor?"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="step3" class="content-section">
+        <label>Giriş (Tetikleyici Olay)</label>
+        <input type="text" placeholder="Huzuru bozan ilk olay nedir?">
+        <label>Gelişme ve Doruk Noktası</label>
+        <textarea rows="3" placeholder="Gerilimin zirveye çıktığı an..."></textarea>
+        <label>Vurucu Final</label>
+        <input type="text" placeholder="Okuyucuda hangi his kalmalı?">
+    </div>
+
+    <div id="step4" class="content-section">
+        <div class="hint-box">
+            <strong>Demir Gibi Zihin Kuralı:</strong> Yazarken durma, düzeltme. Sadece akışa odaklan. Kelime analiz modülü aşağıda seni takip ediyor.
+        </div>
+        <label>Öykü Taslağı</label>
+        <textarea id="main-editor" rows="15" placeholder="Buraya yazmaya başla..." oninput="analyzeText()"></textarea>
+    </div>
+
+    <div id="step5" class="content-section">
+        <label>Kontrol Listesi</label>
+        <div style="margin-bottom: 20px;">
+            <input type="checkbox" style="width: auto;"> Nadas: Metni en az 24 saat beklettin mi?<br>
+            <input type="checkbox" style="width: auto;"> Budama: Gereksiz sıfatları ve yan olayları attın mı?<br>
+            <input type="checkbox" style="width: auto;"> Sesli Okuma: Ritim bozukluğu var mı?<br>
+            <input type="checkbox" style="width: auto;"> "Gösterme, Anlat": Duyguları eylemlerle verdin mi?
+        </div>
+        <label>Kelime Analizi Özeti</label>
+        <div id="detailed-analysis" style="font-family: monospace; font-size: 14px; background: #000; padding: 10px;">
+            Henüz analiz yapılacak veri yok.
+        </div>
+    </div>
+
+    <div class="analysis-bar">
+        <span>Karakter Sayısı: <strong id="char-count">0</strong></span>
+        <span>Kelime Sayısı: <strong id="word-count">0</strong></span>
+        <span>Tahmini Okuma Süresi: <strong id="read-time">0 dk</strong></span>
+    </div>
+
+    <button class="btn-save" onclick="saveDraft()">TASLAĞI KAYDET</button>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, content, tablinks;
+        content = document.getElementsByClassName("content-section");
+        for (i = 0; i < content.length; i++) {
+            content[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    function analyzeText() {
+        const text = document.getElementById('main-editor').value;
+        const charCount = text.length;
+        const wordCount = text.trim() === "" ? 0 : text.trim().split(/\\s+/).length;
+        const readTime = Math.ceil(wordCount / 200);
+
+        document.getElementById('char-count').innerText = charCount;
+        document.getElementById('word-count').innerText = wordCount;
+        document.getElementById('read-time').innerText = readTime + " dk";
+
+        // Kelime Analiz Detayı
+        const sentences = text.split(/[.!?]+/).filter(Boolean).length;
+        const avgSentenceLength = wordCount > 0 ? (wordCount / sentences).toFixed(1) : 0;
+        
+        document.getElementById('detailed-analysis').innerText = 
+            `Cümle Sayısı: ${sentences} | Ort. Cümle Uzunluğu: ${avgSentenceLength} kelime`;
+    }
+
+    function saveDraft() {
+        const content = document.getElementById('main-editor').value;
+        if(content.length < 10) {
+            alert("Kaydetmek için biraz daha yazmalısın.");
+            return;
+        }
+        alert("Taslak tarayıcı hafızasına simüle edildi. (Gerçek projede 'Matrix Atomic History' modülüne kaydedilir)");
+    }
+</script>
+
+</body>
+</html>"""
+
+file_path = "matrix_storyteller_v4_5.html"
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(html_content)
