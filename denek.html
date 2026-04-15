@@ -2,8 +2,10 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Tek Oturuşta Öykü · 5 Adım Aracı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Derin Yazı Atölyesi · Yazar Asistanı</title>
+  <!-- Font Awesome (İkonlar için) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * {
       box-sizing: border-box;
@@ -12,381 +14,422 @@
     }
 
     body {
-      background: #f7f5f0;
-      font-family: 'Courier New', Courier, monospace;
-      color: #1e1e1e;
-      padding: 24px 20px;
-      min-height: 100vh;
+      background: #f3eee8;
+      background-image: radial-gradient(circle at 10% 20%, rgba(235, 225, 215, 0.4) 0%, transparent 30%);
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #2c2a29;
     }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
+    /* Ana Konteyner: 3 Sütunlu Atölye */
+    .workshop {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 0.9fr;
+      gap: 18px;
+      max-width: 1600px;
       width: 100%;
+      height: 100%;
+      max-height: 95vh;
+    }
+
+    /* Ortak Panel Stili */
+    .panel {
+      background: rgba(255, 252, 248, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 32px;
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(210, 190, 175, 0.3);
+      padding: 22px 18px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      overflow-y: auto;
+      transition: all 0.2s ease;
     }
 
-    /* başlık & kronometre */
-    .header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      border-bottom: 3px dashed #2c3e50;
-      padding-bottom: 16px;
+    .panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    .panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .panel::-webkit-scrollbar-thumb {
+      background: #c9b6a5;
+      border-radius: 20px;
     }
 
-    h1 {
-      font-weight: 400;
-      font-size: 2.2rem;
-      letter-spacing: -0.5px;
-      color: #1e3c4f;
-    }
-
-    .timer-panel {
+    .panel-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      background: #e9e3d9;
-      padding: 8px 18px;
-      border-radius: 40px;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
-    }
-
-    .timer-display {
-      font-size: 2.8rem;
+      gap: 10px;
+      border-bottom: 2px dashed #d9c7b8;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
       font-weight: 600;
-      font-family: monospace;
-      background: #1e2b32;
-      color: #f0e9de;
-      padding: 4px 18px;
-      border-radius: 36px;
-      letter-spacing: 4px;
+      letter-spacing: -0.3px;
     }
 
-    .timer-btn {
-      background: #2c3e50;
+    .panel-header i {
+      font-size: 1.4rem;
+      color: #7f5a4b;
+      background: #ede0d6;
+      padding: 8px;
+      border-radius: 14px;
+    }
+
+    .panel-header h2 {
+      font-size: 1.3rem;
+      color: #4a3b32;
+    }
+
+    /* ----- SOL PANEL: YAZI ALANI (Not Defteri) ----- */
+    .writing-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #storyInput {
+      width: 100%;
+      flex: 1;
+      background: rgba(250, 245, 240, 0.7);
       border: none;
-      color: white;
-      font-size: 1.2rem;
-      width: 48px;
-      height: 48px;
-      border-radius: 30px;
+      border-radius: 20px;
+      padding: 20px 18px;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #2e241e;
+      resize: none;
+      outline: none;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(200, 170, 150, 0.2);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      transition: box-shadow 0.2s;
+    }
+
+    #storyInput:focus {
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03), 0 0 0 2px #b7a089;
+    }
+
+    .writing-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 14px;
+      gap: 10px;
+    }
+
+    .word-count {
+      font-size: 0.85rem;
+      color: #8b7769;
+      align-self: center;
+    }
+
+    .btn-icon {
+      background: #e7dbd1;
+      border: none;
+      border-radius: 40px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #3e2f26;
       cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 0 #0f1a22;
-      transition: 0.1s ease;
-      border: 1px solid #5d7a92;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      border: 1px solid #d6c4b6;
     }
 
-    .timer-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #0f1a22;
+    .btn-icon:hover {
+      background: #dacbbf;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(90, 60, 40, 0.08);
     }
 
-    .timer-btn.reset {
-      background: #6b4f3c;
-      box-shadow: 0 4px 0 #4a3525;
-    }
-
-    /* ana grid: rehber + yazma alanı */
-    .workspace {
-      display: grid;
-      grid-template-columns: 1.1fr 1.9fr;
-      gap: 24px;
-    }
-
-    /* REHBER KARTLAR (sol) */
-    .guide {
-      background: #ffffffd9;
-      backdrop-filter: blur(2px);
-      border-radius: 28px;
-      padding: 24px 20px;
-      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.12);
-      border: 1px solid #d6cdc0;
-      height: fit-content;
-    }
-
-    .step-list {
+    /* ----- ORTA PANEL: İLHAM / TIKANMA ÇÖZÜCÜ ----- */
+    .inspiration-grid {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    .step-card {
-      background: #fefcf9;
-      border-left: 10px solid #b87c4d;
-      padding: 16px 18px;
-      border-radius: 16px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.03);
-      border: 1px solid #e1d7cc;
-    }
-
-    .step-num {
-      display: inline-block;
-      background: #1e3c4f;
-      color: white;
-      font-weight: bold;
-      padding: 2px 14px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
-
-    .step-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #1e3c4f;
-      border-bottom: 1px dotted #bbb09d;
-      padding-bottom: 4px;
-    }
-
-    .step-desc {
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: #2c3e50;
-      margin-bottom: 12px;
-    }
-
-    .micro-tool {
-      background: #eae3d9;
-      padding: 12px 12px;
-      border-radius: 14px;
-      font-size: 0.9rem;
-      margin-top: 8px;
-    }
-
-    .two-col {
-      display: flex;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .two-col input {
-      flex: 1;
-      background: white;
-      border: 1px solid #b9aa99;
-      padding: 8px 10px;
-      border-radius: 12px;
-      font-family: inherit;
-    }
-
-    .skeleton-input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid #b9aa99;
-      background: white;
-      margin-top: 8px;
-      font-family: inherit;
-    }
-
-    .reminder {
-      background: #2e5a5a10;
-      padding: 6px 12px;
+    .card {
+      background: #faf5f0;
       border-radius: 24px;
-      color: #1a3a3a;
-      font-weight: 500;
-      margin-top: 8px;
+      padding: 18px 16px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.02);
     }
 
-    /* SAĞ TARAF - YAZMA ALANI */
-    .writing-area {
-      background: #fdfaf7;
-      border-radius: 32px;
-      padding: 24px 24px 30px;
-      box-shadow: inset 0 0 0 1px #e5d9ce, 0 10px 20px -10px rgba(0,0,0,0.1);
-      border: 1px solid #c8bba9;
+    .card-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7b6252;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dice-box {
       display: flex;
       flex-direction: column;
+      gap: 12px;
     }
 
-    .writing-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .writing-header h2 {
-      font-weight: 400;
-      font-size: 1.8rem;
-      color: #3e2c1b;
-    }
-
-    .stage-badge {
-      background: #b87c4d;
-      color: white;
-      padding: 6px 18px;
-      border-radius: 40px;
-      font-weight: bold;
-    }
-
-    textarea {
-      width: 100%;
-      flex: 1;
-      min-height: 380px;
-      background: #fffcf8;
-      border: 2px dashed #b7a48e;
-      border-radius: 24px;
-      padding: 24px 22px;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      font-family: 'Courier New', Courier, monospace;
-      resize: vertical;
-      box-shadow: inset 0 6px 10px rgba(0,0,0,0.02);
-      color: #1e1e1e;
-      outline: none;
-    }
-
-    textarea:focus {
-      border: 2px solid #1e3c4f;
-      background: #ffffff;
-    }
-
-    .writing-actions {
-      display: flex;
-      gap: 16px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      background: #2c3e50;
-      border: none;
-      color: white;
-      padding: 14px 24px;
-      border-radius: 40px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 3px 0 #121e26;
-      transition: 0.1s;
-      border: 1px solid #5a7c96;
-      font-family: inherit;
-      flex: 0 0 auto;
-    }
-
-    .action-btn.secondary {
-      background: #6f5e4e;
-      box-shadow: 0 3px 0 #4d3f33;
-    }
-
-    .action-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #121e26;
-    }
-
-    .tip-footer {
-      margin-top: 16px;
+    .prompt-text {
+      font-family: 'Georgia', serif;
+      font-size: 1.15rem;
+      color: #2b1f18;
+      background: #fffbf8;
+      padding: 14px 16px;
+      border-radius: 20px;
+      border-left: 6px solid #b28b7a;
       font-style: italic;
-      background: #ece2d7;
-      padding: 12px 18px;
-      border-radius: 28px;
-      color: #1e2e3b;
-      font-size: 0.9rem;
+      min-height: 85px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      word-break: break-word;
     }
 
-    /* mobil uyum */
-    @media (max-width: 850px) {
-      .workspace {
-        grid-template-columns: 1fr;
-      }
-      .header {
-        flex-direction: column;
-        gap: 16px;
-      }
-      .timer-display {
-        font-size: 2.2rem;
-      }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .btn-small {
+      background: #ffffffd9;
+      border: 1px solid #cfbcae;
+      border-radius: 40px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #4d3b30;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: 0.1s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-small:hover {
+      background: #e4d5c9;
+      border-color: #aa8e7c;
+    }
+
+    /* Sağ Panel: Araştırma ve Şablonlar */
+    .research-section {
+      margin-bottom: 25px;
+    }
+
+    .keyword-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .keyword-tag {
+      background: #e5d8ce;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #3d2d23;
+      cursor: pointer;
+      transition: 0.1s;
+      border: 1px solid #cbb6a6;
+    }
+
+    .keyword-tag:hover {
+      background: #cfbcad;
+    }
+
+    .search-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .template-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .template-btn {
+      background: #f2e8e0;
+      border: none;
+      padding: 12px 14px;
+      border-radius: 18px;
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #3a2c23;
+      cursor: pointer;
+      border-left: 5px solid #a5836e;
+      transition: 0.1s;
+    }
+
+    .template-btn i {
+      margin-right: 10px;
+      color: #735e50;
+    }
+
+    .template-btn:hover {
+      background: #e0d1c4;
+    }
+
+    .status-message {
+      font-size: 0.8rem;
+      color: #6f8f7c;
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px dashed #d9c7b8;
+      margin: 15px 0;
+    }
+
+    /* Küçük ekran uyarısı (responsive değil ama scroll var) */
+    @media (max-width: 1000px) {
+      body { align-items: flex-start; }
+      .workshop { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h1>✍️ Tek Oturuşta Öykü</h1>
-    <div class="timer-panel">
-      <span class="timer-display" id="timerDisplay">25:00</span>
-      <button class="timer-btn" id="startTimerBtn" title="25 dk başlat">▶</button>
-      <button class="timer-btn reset" id="resetTimerBtn" title="Sıfırla">↻</button>
+
+<div class="workshop">
+
+  <!-- 1. SÜTUN: YAZI ALANI -->
+  <div class="panel">
+    <div class="panel-header">
+      <i class="fas fa-feather-alt"></i>
+      <h2>El Yazması · Not Defteri</h2>
+    </div>
+    <div class="writing-area">
+      <textarea id="storyInput" placeholder="Öykün, şiirin ya da blog yazın burada nefes alsın...
+Kelime kelime, boşlukları beraber dolduracağız.
+
+İpucu: Takıldığında sağdaki 'Duyusal Zar'ı at ya da şablon kullan.">Yağmurun altında bekleyen kadın, vitrindeki eski daktiloya bakıyordu. Parmakları...</textarea>
+      <div class="writing-footer">
+        <span class="word-count" id="wordCountDisplay">0 kelime</span>
+        <div>
+          <button class="btn-icon" id="clearBtn" title="Sayfayı Temizle"><i class="fas fa-eraser"></i>Temizle</button>
+          <button class="btn-icon" id="saveBtn" title="Notu Tarayıcıya Kaydet"><i class="fas fa-save"></i>Kaydet</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 8px; font-size: 0.8rem; opacity: 0.7; text-align: right;">
+      <i class="fas fa-circle"></i> Otomatik kayıt aktif
     </div>
   </div>
 
-  <div class="workspace">
-    <!-- SOL: REHBER ADIMLAR -->
-    <div class="guide">
-      <div class="step-list">
-        <!-- Adım 1 -->
-        <div class="step-card">
-          <span class="step-num">1. KIVILCIM (5 dk)</span>
-          <div class="step-title">Karşıt An</div>
-          <div class="step-desc">Gerçek bir anıyı al, tersini hayal et.</div>
-          <div class="micro-tool">
-            <div class="two-col">
-              <input type="text" placeholder="Gerçek an (örn: fazla para üstü)" id="realMoment">
-              <input type="text" placeholder="Tersi (örn: hırsızlık suçlaması)" id="oppositeMoment">
-            </div>
+  <!-- 2. SÜTUN: İLHAM / TIKANMA ÇÖZÜCÜ -->
+  <div class="panel">
+    <div class="panel-header">
+      <i class="fas fa-dice-d6"></i>
+      <h2>İlham Kuyusu · Tıkanma Çözücü</h2>
+    </div>
+    <div class="inspiration-grid">
+      
+      <!-- Duyusal Zar / Rastgele Prompt -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-dice"></i> Duyusal Detay Zarları</div>
+        <div class="dice-box">
+          <div class="prompt-text" id="promptDisplay">"Karakterin avucunda ne hissediyor?"</div>
+          <div class="button-group">
+            <button class="btn-small" id="rollDiceBtn"><i class="fas fa-dice-d20"></i> Zar At (Rastgele)</button>
+            <button class="btn-small" id="insertPromptBtn"><i class="fas fa-arrow-right-to-bracket"></i> Metne Ekle</button>
+          </div>
+          <div style="font-size:0.8rem; margin-top: 6px; color:#6e5b4e;">
+            <i class="far fa-lightbulb"></i> Tıkandığında bu soruyu metnin altına ekle.
           </div>
         </div>
-        <!-- Adım 2 -->
-        <div class="step-card">
-          <span class="step-num">2. ŞİMDİ & BURADA (5 dk)</span>
-          <div class="step-title">Tek mekân · 15dk-2saat</div>
-          <div class="micro-tool">
-            <input type="text" placeholder="Mekân (asansör / banka sırası...)" id="placeInput" style="width:100%; padding:8px; border-radius:20px; border:1px solid #ccc;">
-            <input type="text" placeholder="Eylem (beklemek / tamir etmek...)" id="actionInput" style="width:100%; margin-top:8px; padding:8px; border-radius:20px; border:1px solid #ccc;">
-          </div>
+      </div>
+
+      <!-- Eksiltme / Genişletme Tekniği -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-compress-alt"></i> Snowflake Metodu</div>
+        <div class="button-group" style="justify-content: space-around;">
+          <button class="btn-small" id="condenseBtn"><i class="fas fa-down-left-and-up-right-to-center"></i> Tek Cümleye Düşür</button>
+          <button class="btn-small" id="expandBtn"><i class="fas fa-up-right-and-down-left-from-center"></i> Paragrafa Genişlet</button>
         </div>
-        <!-- Adım 3: İskelet -->
-        <div class="step-card">
-          <span class="step-num">3. İSKELET (10 dk)</span>
-          <div class="step-title">3 Cümlelik Şablon</div>
-          <div class="micro-tool">
-            <input type="text" class="skeleton-input" id="skel1" placeholder="1. [Karakter] [Mekan]'da [Eylem] yaparken, [Sorun]...">
-            <input type="text" class="skeleton-input" id="skel2" placeholder="2. İlk hamle işe yaramayınca [Duygu Değişimi] hissetti.">
-            <input type="text" class="skeleton-input" id="skel3" placeholder="3. Tam o anda [Detay] fark etti ve bakışı [Değişti].">
-          </div>
-          <div class="reminder">✓ Bu üç cümleyi kafanda canlandır.</div>
+        <div style="margin-top: 12px;">
+          <p style="font-size:0.85rem; background: #e9dfd7; padding: 8px 12px; border-radius: 18px;" id="snowflakePreview">Seçili metin yok. Tıkla ve dönüşümü gör.</p>
         </div>
-        <!-- Adım 4 -->
-        <div class="step-card">
-          <span class="step-num">4. SERBEST YAZIM (25 dk)</span>
-          <div class="step-title">Ses kaydı gibi yaz</div>
-          <div class="step-desc">Silme, düzeltme. Akışa bırak.<br> 
-            <strong>Sıra:</strong> Ses/Koku → Aksiyon → Zihinsel → Küçük Kapanış
-          </div>
-        </div>
-        <!-- Adım 5 -->
-        <div class="step-card">
-          <span class="step-num">5. BIÇAK (10 dk)</span>
-          <div class="step-title">İlk 2 cümleyi sil · Nesneyle bitir</div>
-          <div class="step-desc">“Ve asansörün kapısı sessizce açıldı.” gibi.</div>
-          <button class="action-btn secondary" id="trimFirstTwoBtn" style="margin-top:10px; padding:8px 16px;">✂️ İlk 2 cümleyi sil</button>
+      </div>
+
+      <!-- Rastgele Karakter / Mekan Sorusu -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-user-astronaut"></i> Karakter Derinleştirici</div>
+        <div class="prompt-text" id="characterPromptDisplay" style="min-height: 60px; font-size:1rem;">"Bu karakter en çok neden korkar?"</div>
+        <div class="button-group">
+          <button class="btn-small" id="newCharPromptBtn"><i class="fas fa-shuffle"></i> Yeni Soru</button>
+          <button class="btn-small" id="insertCharPromptBtn"><i class="fas fa-pen"></i> Ekle</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- SAĞ: YAZMA ALANI -->
-    <div class="writing-area">
-      <div class="writing-header">
-        <h2>📄 Öykü Taslağı</h2>
-        <span class="stage-badge" id="stageHint">Serbest Yazım</span>
+  <!-- 3. SÜTUN: ARAŞTIRMA RAMPASI & YAPI ŞABLONLARI -->
+  <div class="panel">
+    <div class="panel-header">
+      <i class="fas fa-sitemap"></i>
+      <h2>Araştırma & Yapı İskelesi</h2>
+    </div>
+    
+    <!-- Araştırma Modülü -->
+    <div class="research-section">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <i class="fas fa-magnifying-glass" style="color:#7f5a4b;"></i>
+        <span style="font-weight:600;">Metindeki Anahtar Kelimeler</span>
       </div>
-      <textarea id="storyTextarea" placeholder="Hikayeni buraya yazmaya başla...&#10;&#10;Klimanın uğultusu, metalik bir yankı..."></textarea>
-      <div class="writing-actions">
-        <button class="action-btn" id="applySkeletonBtn">📌 İskeleti Metne Aktar</button>
-        <button class="action-btn secondary" id="clearTextBtn">🧹 Temizle</button>
+      <div class="keyword-cloud" id="keywordCloud">
+        <!-- Dinamik olarak JS ile doldurulacak -->
+        <span class="keyword-tag" style="opacity:0.6;">Henüz kelime yok</span>
       </div>
-      <div class="tip-footer" id="liveTip">
-        💡 25 dakika boyunca durma. Kronometreyi başlat, yaz.
+      <div class="search-actions">
+        <button class="btn-small" id="searchWikiBtn"><i class="fab fa-wikipedia-w"></i> Vikipedi</button>
+        <button class="btn-small" id="searchGoogleBtn"><i class="fab fa-google"></i> Google</button>
+        <button class="btn-small" id="searchImageBtn"><i class="fas fa-image"></i> Görsel</button>
       </div>
+      <div class="status-message" id="searchStatus">Bir kelimeye tıkla → ara</div>
+    </div>
+
+    <hr>
+
+    <!-- Yapı Şablonları -->
+    <div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <i class="fas fa-cubes"></i>
+        <span style="font-weight:600;">Yapı Şablonları (Tıkla Ekle)</span>
+      </div>
+      <div class="template-list">
+        <button class="template-btn" data-template="story"><i class="fas fa-book-open"></i> Öykü · Kahramanın Yolculuğu</button>
+        <button class="template-btn" data-template="poem"><i class="fas fa-feather"></i> Şiir · İmge-Çatışma-Epifani</button>
+        <button class="template-btn" data-template="blog"><i class="fas fa-pencil"></i> Blog · Giriş-Gelişme-Sonuç</button>
+      </div>
+      <p style="font-size:0.75rem; margin-top: 12px; opacity:0.7;">
+        <i class="far fa-clipboard"></i> Şablon metnin sonuna eklenir.
+      </p>
+    </div>
+
+    <hr>
+
+    <!-- İlham verici alıntı -->
+    <div style="margin-top: auto; text-align: center; font-style: italic; color: #6e5b4e; font-size:0.85rem; padding: 12px 0;">
+      “Yazmak, kazı yapmaktır; cevheri bulana kadar.” 
     </div>
   </div>
 </div>
@@ -395,182 +438,299 @@
   (function(){
     "use strict";
 
-    // ----- Zamanlayıcı (25:00) -----
-    let timerInterval = null;
-    let totalSeconds = 25 * 60; // 1500 sn
-    const timerDisplay = document.getElementById('timerDisplay');
-    const startBtn = document.getElementById('startTimerBtn');
-    const resetBtn = document.getElementById('resetTimerBtn');
+    // ---------- DOM Elementleri ----------
+    const textarea = document.getElementById('storyInput');
+    const wordCountSpan = document.getElementById('wordCountDisplay');
+    const clearBtn = document.getElementById('clearBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    
+    // İlham panelleri
+    const promptDisplay = document.getElementById('promptDisplay');
+    const rollDiceBtn = document.getElementById('rollDiceBtn');
+    const insertPromptBtn = document.getElementById('insertPromptBtn');
+    
+    const characterPromptDisplay = document.getElementById('characterPromptDisplay');
+    const newCharPromptBtn = document.getElementById('newCharPromptBtn');
+    const insertCharPromptBtn = document.getElementById('insertCharPromptBtn');
+    
+    const condenseBtn = document.getElementById('condenseBtn');
+    const expandBtn = document.getElementById('expandBtn');
+    const snowflakePreview = document.getElementById('snowflakePreview');
+    
+    // Araştırma
+    const keywordCloud = document.getElementById('keywordCloud');
+    const searchStatus = document.getElementById('searchStatus');
+    const searchWikiBtn = document.getElementById('searchWikiBtn');
+    const searchGoogleBtn = document.getElementById('searchGoogleBtn');
+    const searchImageBtn = document.getElementById('searchImageBtn');
+    
+    // Şablon butonları
+    const templateBtns = document.querySelectorAll('[data-template]');
+    
+    // ---------- Veri Havuzları ----------
+    const sensoryPrompts = [
+      "Bu sahnenin baskın kokusu ne? (ıhlamur, pas, yağmur sonrası toprak...)",
+      "Karakterin avucunda ne hissediyor? Sıcak bir anahtar mı, soğuk bir metal mi?",
+      "Duvardaki gölge nasıl bir şekil oluşturuyor?",
+      "Duyulan en uzak ses nedir? Bir kuş mu, yoksa bir makine uğultusu mu?",
+      "Mekandaki en eski eşya hangisi? Ona dokununca ne hatırlanıyor?",
+      "Birisi bu odaya ilk kez girse ilk neyi fark eder?",
+      "Bu anın rengi nedir? Soluk mavi mi, paslı turuncu mu?"
+    ];
 
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    const characterQuestions = [
+      "Bu karakter en çok neden korkar?",
+      "Çocukken en sevdiği oyuncak neydi?",
+      "Asla itiraf edemeyeceği sır nedir?",
+      "Sabah ilk iş olarak ne yapar?",
+      "En büyük pişmanlığı nedir?",
+      "Kendini en güvende hissettiği yer neresi?",
+      "Bu karakter kime hayranlık duyar?",
+      "Hangi yalanı söylemekten çekinmez?"
+    ];
+
+    // Şablon metinleri
+    const templates = {
+      story: `📖 **Kahramanın Yolculuğu Taslağı** 📖
+1. Sıradan Dünya: 
+2. Maceraya Çağrı: 
+3. Çağrının Reddedilişi: 
+4. Mentor ile Karşılaşma: 
+5. İlk Eşiği Geçiş: 
+6. Sınavlar, Müttefikler, Düşmanlar: 
+7. En Derin Mağaraya Yaklaşım: 
+8. Büyük Sınav (Çile): 
+9. Ödül: 
+10. Dönüş Yolu: 
+11. Diriliş: 
+12. İksirle Dönüş: `,
+      poem: `🌿 **Şiir Yapısı (İmge - Çatışma - Epifani)** 🌿
+*İmge:* 
+*Duygu/Çatışma:* 
+*Dönüşüm/Epifani:* 
+*Son Dize:* `,
+      blog: `📝 **Blog Yazısı İskelesi** 📝
+**Başlık:** 
+**Giriş (Okuyucunun derdini anla):** 
+**Gelişme (3 ana fikir / paragraf):** 
+1. 
+2. 
+3. 
+**Sonuç (Bir adım önerisi ya da ana fikir):** `
+    };
+
+    // Geçici seçili anahtar kelime
+    let currentSelectedKeyword = '';
+
+    // ---------- Yardımcı Fonksiyonlar ----------
+    function updateWordCount() {
+      const text = textarea.value.trim();
+      const words = text.length > 0 ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+      wordCountSpan.textContent = `${words} kelime`;
     }
 
-    function updateTimerDisplay() {
-      timerDisplay.textContent = formatTime(totalSeconds);
+    // Otomatik kayıt (localStorage)
+    function autoSave() {
+      localStorage.setItem('writingWorkshopContent', textarea.value);
     }
 
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+    function loadSavedContent() {
+      const saved = localStorage.getItem('writingWorkshopContent');
+      if (saved) {
+        textarea.value = saved;
+      } else {
+        // Varsayılan metni ayarla
+        textarea.value = "Yağmurun altında bekleyen kadın, vitrindeki eski daktiloya bakıyordu. Parmakları...";
       }
+      updateWordCount();
     }
 
-    function startTimer() {
-      if (timerInterval) return;
-      if (totalSeconds <= 0) {
-        totalSeconds = 25 * 60;
-        updateTimerDisplay();
-      }
-      timerInterval = setInterval(() => {
-        if (totalSeconds > 0) {
-          totalSeconds--;
-          updateTimerDisplay();
-          // 5 dakika kala uyarı (isteğe bağlı, metinde belirtilmemiş ama hafif hatırlatma)
-          if (totalSeconds === 300) {
-            document.getElementById('liveTip').innerHTML = '⏳ Son 5 dakika! Kapanışa geç.';
-          }
-          if (totalSeconds === 0) {
-            stopTimer();
-            document.getElementById('liveTip').innerHTML = '✅ Süre doldu. Şimdi BIÇAK aşamasına geç.';
-            alert('25 dakika bitti! Yazmayı durdur ve 5. adıma geç.');
-          }
-        } else {
-          stopTimer();
-        }
-      }, 1000);
-    }
-
-    startBtn.addEventListener('click', startTimer);
-    resetBtn.addEventListener('click', function() {
-      stopTimer();
-      totalSeconds = 25 * 60;
-      updateTimerDisplay();
-      document.getElementById('liveTip').innerHTML = '💡 25 dakika boyunca durma. Kronometreyi başlat, yaz.';
-    });
-
-    // ----- metin alanı ve diğer elementler -----
-    const textarea = document.getElementById('storyTextarea');
-    const realInput = document.getElementById('realMoment');
-    const oppInput = document.getElementById('oppositeMoment');
-    const placeInput = document.getElementById('placeInput');
-    const actionInput = document.getElementById('actionInput');
-    const skel1 = document.getElementById('skel1');
-    const skel2 = document.getElementById('skel2');
-    const skel3 = document.getElementById('skel3');
-    const stageHint = document.getElementById('stageHint');
-    const liveTip = document.getElementById('liveTip');
-
-    // örnek placeholder'ları dolduralım ki kullanıcı fikir alsın
-    realInput.placeholder = 'Gerçek an: kasiyer fazla para verdi';
-    oppInput.placeholder = 'Tersi: hırsızlıkla suçlanmak';
-    placeInput.placeholder = 'asansör';
-    actionInput.placeholder = 'telefonuna bakmak';
-    skel1.placeholder = 'Ali asansörde telefonuna bakarken ışıklar söndü.';
-    skel2.placeholder = 'Düğme işe yaramayınca panik yerine sakinlik hissetti.';
-    skel3.placeholder = 'Aynadaki yorgun ifadesini fark etti, acele etmenin anlamsızlığını düşündü.';
-
-    // İskeleti metne aktar (Adım 3'teki cümleleri başlangıç noktası olarak ekler)
-    document.getElementById('applySkeletonBtn').addEventListener('click', function() {
-      let skeletonText = '';
-      if (skel1.value.trim() !== '') skeletonText += skel1.value.trim() + '\n\n';
-      if (skel2.value.trim() !== '') skeletonText += skel2.value.trim() + '\n\n';
-      if (skel3.value.trim() !== '') skeletonText += skel3.value.trim() + '\n\n';
+    // Anahtar kelimeleri çıkar (basit, özel isim odaklı)
+    function extractKeywords(text) {
+      const words = text.split(/\s+/);
+      const stopWords = ['ve', 'veya', 'ile', 'ama', 'fakat', 'çünkü', 'bir', 'bu', 'şu', 'o', 'ben', 'sen', 'o', 'biz', 'siz', 'onlar', 'de', 'da', 'ki', 'mi', 'mu', 'mı', 'dı', 'di', 'du', 'dü'];
+      const candidates = words
+        .map(w => w.replace(/[.,!?;:()\-—"“”‘’…]/g, '').trim())
+        .filter(w => w.length > 3 && !stopWords.includes(w.toLowerCase()) && /^[A-Za-zÇçĞğİıÖöŞşÜü]+$/.test(w))
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .slice(0, 8);
       
-      if (skeletonText === '') {
-        alert('Lütfen en az bir iskelet cümlesi gir.');
+      if (candidates.length === 0) return ['İstanbul', 'daktilo', 'yağmur'];
+      return candidates;
+    }
+
+    function renderKeywordCloud() {
+      const text = textarea.value;
+      const keywords = extractKeywords(text);
+      keywordCloud.innerHTML = '';
+      if (keywords.length === 0) {
+        keywordCloud.innerHTML = '<span class="keyword-tag" style="opacity:0.6;">Kelime yok</span>';
         return;
       }
-      
-      // Mevcut metnin başına ekle (ya da direkt yaz)
-      const current = textarea.value;
-      if (current.trim() === '') {
-        textarea.value = skeletonText + '—\n';
-      } else {
-        textarea.value = skeletonText + '—\n' + current;
+      keywords.forEach(kw => {
+        const tag = document.createElement('span');
+        tag.className = 'keyword-tag';
+        tag.textContent = kw;
+        tag.addEventListener('click', () => {
+          currentSelectedKeyword = kw;
+          searchStatus.textContent = `Seçili: "${kw}" → Ara`;
+          // görsel vurgu
+          document.querySelectorAll('.keyword-tag').forEach(t => t.style.background = '#e5d8ce');
+          tag.style.background = '#cbb09b';
+        });
+        keywordCloud.appendChild(tag);
+      });
+      if (!currentSelectedKeyword && keywords.length) {
+        currentSelectedKeyword = keywords[0];
+        searchStatus.textContent = `Otomatik seçili: "${keywords[0]}"`;
       }
-      stageHint.textContent = 'İskelet eklendi';
-      liveTip.innerHTML = '📝 İskelet cümlelerini genişlet, detaylandır.';
+    }
+
+    // Araştırma fonksiyonları
+    function openSearch(type) {
+      let query = currentSelectedKeyword;
+      if (!query) {
+        const firstTag = keywordCloud.querySelector('.keyword-tag');
+        if (firstTag && firstTag.textContent !== 'Kelime yok') query = firstTag.textContent;
+        else query = 'yaratıcı yazarlık';
+      }
+      const encoded = encodeURIComponent(query);
+      let url = '';
+      if (type === 'wiki') url = `https://tr.wikipedia.org/wiki/${encoded}`;
+      else if (type === 'google') url = `https://www.google.com/search?q=${encoded}`;
+      else if (type === 'image') url = `https://www.google.com/search?tbm=isch&q=${encoded}`;
+      if (url) window.open(url, '_blank');
+    }
+
+    // Rastgele prompt
+    function rollSensoryPrompt() {
+      const randomIdx = Math.floor(Math.random() * sensoryPrompts.length);
+      promptDisplay.textContent = `"${sensoryPrompts[randomIdx]}"`;
+    }
+
+    function rollCharacterPrompt() {
+      const randomIdx = Math.floor(Math.random() * characterQuestions.length);
+      characterPromptDisplay.textContent = `"${characterQuestions[randomIdx]}"`;
+    }
+
+    // Metin ekleme
+    function insertTextToTextarea(content) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const before = text.substring(0, start);
+      const after = text.substring(end);
+      textarea.value = before + (before.length && !before.endsWith('\n') ? '\n' : '') + content + '\n' + after;
+      textarea.focus();
+      textarea.selectionStart = start + content.length + 1;
+      textarea.selectionEnd = start + content.length + 1;
+      updateWordCount();
+      autoSave();
+    }
+
+    // Snowflake işlemleri
+    function condenseText() {
+      const selected = window.getSelection().toString();
+      if (!selected) {
+        snowflakePreview.textContent = '⚠️ Önce metin seçmelisin.';
+        return;
+      }
+      const words = selected.split(/\s+/).filter(w => w.length > 0);
+      if (words.length < 3) {
+        snowflakePreview.textContent = `🔹 "${selected}" çok kısa.`;
+        return;
+      }
+      const condensed = words.slice(0, Math.ceil(words.length/2)).join(' ') + ' ...';
+      snowflakePreview.textContent = `✂️ Özet: "${condensed}"`;
+    }
+
+    function expandText() {
+      const selected = window.getSelection().toString();
+      if (!selected) {
+        snowflakePreview.textContent = '⚠️ Genişletmek için bir cümle seç.';
+        return;
+      }
+      const expansionIdeas = [
+        " çünkü arkasında yatan neden belki de hiç tahmin edilemezdi.",
+        " ve bu durum, karakterin iç dünyasında derin bir çatlak oluşturdu.",
+        " tıpkı bir zamanlar yaşadığı o unutulmaz an gibi.",
+        " ki bu, mekanın ruhunu ele geçiren bir detaydı."
+      ];
+      const randomAdd = expansionIdeas[Math.floor(Math.random() * expansionIdeas.length)];
+      snowflakePreview.textContent = `📝 "${selected}${randomAdd}"`;
+    }
+
+    // Şablon ekleme
+    function addTemplate(type) {
+      const templateText = templates[type] || '';
+      insertTextToTextarea('\n' + templateText + '\n');
+    }
+
+    // ---------- Event Listener'lar ----------
+    textarea.addEventListener('input', () => {
+      updateWordCount();
+      autoSave();
+      renderKeywordCloud();
     });
 
-    // İlk iki cümleyi sil (Adım 5 aracı)
-    document.getElementById('trimFirstTwoBtn').addEventListener('click', function() {
-      let text = textarea.value;
-      // Nokta, ünlem, soru işareti ve satır sonuna göre cümleleri ayırmaya çalış.
-      const sentences = text.split(/(?<=[.!?])\s+/);
-      if (sentences.length > 2) {
-        // ilk iki cümleyi çıkar
-        const trimmed = sentences.slice(2).join(' ');
-        textarea.value = trimmed;
-        liveTip.innerHTML = '✂️ İlk iki cümle silindi. Son cümleni bir nesne/eylemle bitir.';
-      } else if (sentences.length > 0) {
-        // 2'den az cümle varsa uyarı ver ama yine de silmeyi dene (ilk cümleyi sil)
-        if (sentences.length === 1) {
-          textarea.value = '';
-          liveTip.innerHTML = '⚠️ Tek cümle vardı, tamamen silindi. Yeniden başla.';
-        } else {
-          // 2 cümle: ilk ikisini sil -> boş
-          textarea.value = '';
-          liveTip.innerHTML = '✂️ İlk iki cümle silindi, metin boş.';
-        }
-      } else {
-        liveTip.innerHTML = 'ℹ️ Silinecek cümle yok.';
-      }
-      stageHint.textContent = 'BIÇAK aşaması';
+    textarea.addEventListener('mouseup', () => {
+      // seçim değişince ön izleme sıfırlanmasın ama opsiyonel
     });
 
-    // Temizle butonu
-    document.getElementById('clearTextBtn').addEventListener('click', function() {
-      if (confirm('Metni temizlemek istediğine emin misin?')) {
+    clearBtn.addEventListener('click', () => {
+      if (confirm('Sayfadaki tüm notlar silinecek. Emin misin?')) {
         textarea.value = '';
-        stageHint.textContent = 'Serbest Yazım';
-        liveTip.innerHTML = '💡 25 dakika boyunca durma. Kronometreyi başlat, yaz.';
+        updateWordCount();
+        autoSave();
+        renderKeywordCloud();
       }
     });
 
-    // Yazma alanına tıklayınca ipucu güncelle
-    textarea.addEventListener('focus', () => {
-      if (textarea.value.length < 20) {
-        liveTip.innerHTML = '📌 Ses, koku, ışıkla başla. (Klima uğultusu, floresan cızırtısı...)';
-      }
+    saveBtn.addEventListener('click', () => {
+      autoSave();
+      alert('Notların tarayıcı hafızasına kaydedildi.');
     });
 
-    // Adım kartlarına tıklayınca ilgili ipucu (kullanıcı deneyimi)
-    document.querySelectorAll('.step-card').forEach((card, index) => {
-      card.addEventListener('click', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-        const tips = [
-          'Gerçek bir anı al, tersine çevir.',
-          'Mekân ve eylem tek, süre kısa.',
-          'Üç cümleyi doldur, iskeleti kur.',
-          'Ses kaydı gibi yaz, düzeltme.',
-          'İlk iki cümleyi sil, nesneyle bitir.'
-        ];
-        liveTip.innerHTML = `📋 Adım ${index+1}: ${tips[index]}`;
+    // İlham butonları
+    rollDiceBtn.addEventListener('click', rollSensoryPrompt);
+    insertPromptBtn.addEventListener('click', () => {
+      insertTextToTextarea(`\n[İlham Sorusu]: ${promptDisplay.textContent}\n`);
+    });
+
+    newCharPromptBtn.addEventListener('click', rollCharacterPrompt);
+    insertCharPromptBtn.addEventListener('click', () => {
+      insertTextToTextarea(`\n[Karakter Sorusu]: ${characterPromptDisplay.textContent}\n`);
+    });
+
+    condenseBtn.addEventListener('click', condenseText);
+    expandBtn.addEventListener('click', expandText);
+
+    // Araştırma butonları
+    searchWikiBtn.addEventListener('click', () => openSearch('wiki'));
+    searchGoogleBtn.addEventListener('click', () => openSearch('google'));
+    searchImageBtn.addEventListener('click', () => openSearch('image'));
+
+    // Şablon butonları
+    templateBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const templateType = btn.dataset.template;
+        addTemplate(templateType);
       });
     });
 
-    // Girdiler değişince ipucu
-    skel1.addEventListener('input', () => { liveTip.innerHTML = '✏️ İskelet cümleleri senin pusulan.'; });
+    // İlk yükleme
+    loadSavedContent();
+    renderKeywordCloud();
+    rollSensoryPrompt();
+    rollCharacterPrompt();
     
-    // Sayfa yüklendiğinde varsayılan ipucu
-    updateTimerDisplay();
+    // Düzenli aralıklarla otomatik kayıt (opsiyonel)
+    setInterval(() => {
+      autoSave();
+    }, 10000);
 
-    // Kullanıcı kıvılcım alanlarından faydalansın diye placeholder dolu
-    // İsteğe bağlı: "Örnek doldur" butonu koymadım, sade.
-
-    // Ekstra: Kullanıcı yazarken aşama ismini değiştirelim
-    textarea.addEventListener('input', function() {
-      if (textarea.value.length > 10) {
-        stageHint.textContent = 'Yazıyor...';
-      } else {
-        stageHint.textContent = 'Serbest Yazım';
-      }
-    });
-
+    // Seçim değişikliğinde snowflake'i sıfırlama yapmayalım ama tıklayınca görünsün.
+    // Ekstra: başlangıç kelime bulutu
   })();
 </script>
 </body>
