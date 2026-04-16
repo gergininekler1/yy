@@ -1,655 +1,457 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="brutal">
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>ANLIK.GÖREV // BRUTAL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Anlık Görev</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  /* ═══════════════════════════════════════════════════════════════════════════════════
-     BRUTALIST BLACK & YELLOW — KALIN TİPOGRAFİ, YÜKSEK KONTRAST, SERT KENARLAR
-     ═══════════════════════════════════════════════════════════════════════════════════ */
   :root {
-    --bg: #000000;
-    --surface: #0a0a0a;
-    --primary: #FFE600;
-    --text: #FFFFFF;
-    --text-muted: #888888;
-    --border: #333333;
-    --border-light: #444444;
-    --success: #FFE600;
-    --warn: #FFE600;
-    
-    --radius: 0px;
-    --radius-sm: 0px;
-    --nav-h: 74px;
+    --black: #0a0a0a;
+    --black2: #111111;
+    --black3: #1a1a1a;
+    --black4: #242424;
+    --yellow: #f5c800;
+    --yellow-dim: rgba(245,200,0,0.12);
+    --yellow-mid: rgba(245,200,0,0.35);
+    --white: #f0f0f0;
+    --white-dim: rgba(240,240,240,0.45);
+    --white-faint: rgba(240,240,240,0.12);
+    --red: #e63946;
+    --green: #2ec27e;
+    --nav-h: 72px;
     --safe-b: env(safe-area-inset-bottom, 0px);
-    
-    /* Brutalist Spacing */
-    --border-width: 3px;
-    --border-width-thick: 5px;
   }
 
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  
-  html { scroll-behavior: smooth; background: var(--bg); }
+  /* Açık Tema */
+  :root[data-theme="light"] {
+    --black: #f8f9fa;
+    --black2: #ffffff;
+    --black3: #e9ecef;
+    --black4: #dee2e6;
+    --yellow: #0d6efd;
+    --yellow-dim: rgba(13,110,253,0.12);
+    --yellow-mid: rgba(13,110,253,0.35);
+    --white: #212529;
+    --white-dim: #6c757d;
+    --white-faint: #ced4da;
+  }
+
+  /* Hacker / Terminal Teması */
+  :root[data-theme="hacker"] {
+    --black: #050505;
+    --black2: #0a0a0a;
+    --black3: #111111;
+    --black4: #1a1a1a;
+    --yellow: #33ff00;
+    --yellow-dim: rgba(51,255,0,0.12);
+    --yellow-mid: rgba(51,255,0,0.35);
+    --white: #33ff00;
+    --white-dim: #1e9900;
+    --white-faint: #114d00;
+  }
+
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--black);
+    color: var(--white);
     min-height: 100dvh;
     overflow-x: hidden;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    font-weight: 700;
   }
 
-  /* Sert, keskin arka plan */
+  ::-webkit-scrollbar { width: 0; }
+
   .app {
-    position: relative; z-index: 1;
     max-width: 480px; margin: 0 auto;
     min-height: 100dvh;
     display: flex; flex-direction: column;
-    border-left: var(--border-width) solid var(--border);
-    border-right: var(--border-width) solid var(--border);
-    background: var(--bg);
+    position: relative;
   }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  SCREENS                                                                   */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
   .screen {
     display: none; flex: 1;
     padding: 0 20px calc(var(--nav-h) + var(--safe-b) + 20px);
-    animation: slideUp .25s cubic-bezier(.4,0,.2,1);
+    animation: fadeIn .22s ease;
   }
   .screen.active { display: flex; flex-direction: column; }
 
-  @keyframes slideUp {
-    from { opacity:0; transform:translateY(16px); }
-    to   { opacity:1; transform:translateY(0); }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  HEADER                                                                    */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
   .header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 48px 0 20px;
-    border-bottom: var(--border-width-thick) solid var(--primary);
+    padding: 52px 0 12px;
+    border-bottom: 2px solid var(--white-faint);
     margin-bottom: 24px;
   }
+
   .header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 36px; font-weight: 800;
-    letter-spacing: -1.5px;
-    text-transform: uppercase;
-    color: var(--primary);
+    font-family: 'Space Mono', monospace;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: -0.5px; text-transform: lowercase;
   }
-  .header h1 .dot { color: var(--text); }
+  .header h1 .accent { color: var(--yellow); }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  FORM ELEMENTS (BRUTAL)                                                    */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
+  .icon-btn {
+    width: 40px; height: 40px;
+    border: 2px solid var(--white-faint); border-radius: 4px;
+    background: transparent; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; color: var(--white-dim);
+  }
+  .icon-btn:active { transform: scale(.88); background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+
   .field-label {
-    font-size: 14px; font-weight: 800;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--text-muted); margin-bottom: 12px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--white-dim); margin-bottom: 10px;
   }
 
-  .task-input-wrap { margin-bottom: 24px; }
+  .home-section-title {
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--yellow); margin-top: 30px; margin-bottom: 12px;
+    letter-spacing: 1px; text-transform: lowercase; border-bottom: 1px dashed var(--black4); padding-bottom: 6px;
+  }
+
+  .task-input-wrap { margin-top: 0; }
 
   .task-input {
-    width: 100%;
-    background: var(--surface);
-    border: var(--border-width) solid var(--border);
-    padding: 18px 20px;
-    font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 700;
-    color: var(--text); outline: none;
-    text-transform: uppercase;
-    transition: all .1s ease;
+    width: 100%; background: var(--black2); border: 2px solid var(--black4);
+    border-radius: 4px; padding: 16px 18px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 500;
+    color: var(--white); outline: none; transition: border-color .15s;
   }
-  .task-input:focus {
-    border-color: var(--primary);
-    background: #000;
-  }
-  .task-input::placeholder {
-    color: #444;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
+  .task-input:focus { border-color: var(--yellow); }
+  .task-input::placeholder { color: var(--white-dim); }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  TEMPLATES (SÜRE SEÇ)                                                      */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .templates-wrap { margin-bottom: 20px; }
-  .templates {
-    display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;
-  }
+  .templates-wrap { margin-top: 20px; }
+  .templates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
   .tpl-btn {
-    background: var(--surface);
-    border: var(--border-width) solid var(--border);
-    padding: 16px 8px;
-    cursor: pointer; text-align: center;
-    transition: all .1s ease;
-    text-transform: uppercase;
+    background: var(--black2); border: 2px solid var(--black4); border-radius: 4px;
+    padding: 14px 4px; cursor: pointer; text-align: center; transition: all .15s;
   }
-  .tpl-btn:active { transform: scale(.96); }
-  .tpl-btn.active {
-    border-color: var(--primary);
-    background: #000;
-    color: var(--primary);
-  }
-  .tpl-dur {
-    font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800;
-    color: var(--primary); display: block;
-  }
-  .tpl-lbl {
-    font-size: 11px; color: var(--text-muted);
-    margin-top: 4px; display: block; letter-spacing: 1px;
-    font-weight: 700;
-  }
+  .tpl-btn:active { transform: scale(.93); }
+  .tpl-btn.active { border-color: var(--yellow); background: var(--yellow-dim); }
+  .tpl-dur { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--white); display: block; line-height: 1; }
+  .tpl-btn.active .tpl-dur { color: var(--yellow); }
+  .tpl-lbl { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--white-dim); margin-top: 4px; display: block; letter-spacing: 0.5px; text-transform: uppercase; }
+  .tpl-btn.active .tpl-lbl { color: var(--yellow); opacity: .7; }
 
-  .custom-wrap { margin-top: 16px; display: none; }
-  .custom-wrap.open { display: flex; gap: 12px; align-items: center; }
-  .custom-wrap label { font-size: 14px; color: var(--text-muted); white-space: nowrap; font-weight: 700; }
-  .custom-input {
-    flex: 1; background: var(--surface); border: var(--border-width) solid var(--border);
-    padding: 14px 18px;
-    font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800;
-    color: var(--primary); outline: none; text-align: center;
-  }
-  .custom-input:focus { border-color: var(--primary); }
+  .custom-wrap { margin-top: 10px; display: none; gap: 10px; align-items: center; }
+  .custom-wrap.open { display: flex; }
+  .custom-wrap label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; }
+  .custom-input { flex: 1; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 12px 16px; font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--yellow); outline: none; text-align: center; }
+  .custom-input:focus { border-color: var(--yellow); }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  TIMER RING                                                                */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .timer-section {
-    display: flex; flex-direction: column; align-items: center;
-    margin-top: 16px; gap: 0;
-  }
-
-  .ring-wrap {
-    position: relative; width: 240px; height: 240px;
-  }
-
-  .ring-svg {
-    width: 100%; height: 100%;
-    transform: rotate(-90deg);
-  }
-  .ring-track {
-    fill: none; stroke: var(--border); stroke-width: 8;
-  }
+  .timer-section { display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+  .ring-wrap { position: relative; width: 218px; height: 218px; }
+  .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: var(--black3); stroke-width: 10; }
   .ring-fill {
-    fill: none;
-    stroke: var(--primary);
-    stroke-width: 8;
-    stroke-linecap: butt;
-    stroke-dasharray: 609;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset .4s cubic-bezier(.4,0,.2,1);
+    fill: none; stroke: var(--yellow); stroke-width: 10; stroke-linecap: square;
+    stroke-dasharray: 596; stroke-dashoffset: 0; transition: stroke-dashoffset .5s linear;
+    filter: drop-shadow(0 0 8px var(--yellow-mid));
   }
 
-  .ring-center {
-    position: absolute; top:50%; left:50%;
-    transform: translate(-50%,-50%);
-    text-align: center; pointer-events: none;
-    width: 100%;
-  }
-  .t-display {
-    font-family: 'Syne', sans-serif;
-    font-size: 56px; font-weight: 800;
-    letter-spacing: -2px; line-height: 1;
-    color: var(--primary);
-    text-shadow: 3px 3px 0 #000;
-  }
-  .t-name {
-    font-size: 16px; color: var(--text);
-    margin-top: 8px; max-width: 180px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    font-weight: 700; text-transform: uppercase;
-  }
-  .t-state {
-    display: inline-block; margin-top: 12px;
-    padding: 6px 16px; border: var(--border-width) solid var(--border);
-    font-size: 12px; font-weight: 800;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    background: var(--surface);
-  }
-  .t-state.idle   { color: var(--text-muted); border-color: var(--border); }
-  .t-state.run    { color: var(--primary); border-color: var(--primary); background: #000; }
-  .t-state.paused { color: var(--primary); border-color: var(--primary); }
+  .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+  .t-display { font-family: 'Space Mono', monospace; font-size: 44px; font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; }
+  .t-name { font-size: 11px; color: var(--white-dim); margin-top: 6px; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+  .t-badge { display: inline-block; margin-top: 8px; padding: 3px 10px; border: 1.5px solid currentColor; border-radius: 2px; font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .t-badge.idle   { color: var(--white-dim); border-color: var(--white-faint); }
+  .t-badge.run    { color: var(--yellow); border-color: var(--yellow); }
+  .t-badge.paused { color: var(--white-dim); border-color: var(--white-faint); }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  CONTROLS                                                                  */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .controls {
-    display: flex; gap: 16px;
-    align-items: center; justify-content: center;
-    margin-top: 32px;
-  }
-
-  .btn-main {
-    background: var(--primary);
-    color: #000;
-    border: var(--border-width-thick) solid var(--primary);
-    padding: 0 48px; height: 64px; min-width: 180px;
-    font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
-    cursor: pointer; transition: all .1s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .btn-main:active  { transform: scale(.96); background: #000; color: var(--primary); }
-  .btn-main:disabled { opacity:.4; cursor:not-allowed; }
-
-  .btn-sq {
-    width: 64px; height: 64px;
-    background: var(--surface);
-    border: var(--border-width-thick) solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all .1s ease;
-    color: var(--text);
-  }
-  .btn-sq:active { transform: scale(.9); border-color: var(--primary); }
-  .btn-sq.danger  { color: #ff4444; }
-
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  STATS SCREEN                                                              */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .stats-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 16px; margin-top: 8px;
-  }
-  .s-card {
-    background: var(--surface);
-    border: var(--border-width) solid var(--border);
-    padding: 24px 20px;
-  }
-  .s-card.wide { grid-column: 1/-1; }
+  .controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 20px; width: 100%; }
+  .btn-main { background: var(--yellow); color: var(--black); border: none; border-radius: 4px; padding: 0 36px; height: 52px; min-width: 148px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; }
+  .btn-main:active  { transform: scale(.96); opacity: .8; }
+  .btn-main.secondary { background: var(--black3); color: var(--white); border: 2px solid var(--black4); }
   
-  .s-val {
-    font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800;
-    color: var(--primary); line-height: 1;
-  }
-  .s-lbl {
-    font-size: 14px; color: var(--text-muted);
-    margin-top: 8px; font-weight: 700;
-    text-transform: uppercase;
-  }
-  .s-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+  .btn-sq { width: 52px; height: 52px; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; color: var(--white-dim); }
+  .btn-sq:active { transform: scale(.88); border-color: var(--yellow); color: var(--yellow); }
+  .btn-sq.danger:active { border-color: var(--red); color: var(--red); }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  WEEKLY DONUT (HALKA GRAFİK)                                                */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .donut-wrap {
-    position: relative;
-    width: 200px; height: 200px;
-    margin: 16px auto 8px;
-  }
-  .donut {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    background: #333;
-    border: var(--border-width) solid var(--border);
-  }
-  .donut-hole {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 110px; height: 110px;
-    background: #000;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    border: var(--border-width) solid var(--border);
-  }
-  .donut-total {
-    font-size: 48px; font-weight: 900;
-    color: var(--primary); line-height: 1;
-    font-family: 'Syne', sans-serif;
-  }
-  .donut-label {
-    font-size: 12px; font-weight: 800;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
+  /* HOME WEEKLY VIEW */
+  .week-mini-boxes { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 12px; }
+  .w-box { flex: 1; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 8px 0; text-align: center; font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); font-weight: 700; text-transform: uppercase; transition: all .2s; }
+  .w-box.active { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
   
-  .week-labels {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-    padding: 0 10px;
-  }
-  .day-label {
-    font-size: 16px; font-weight: 800;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    transition: color .1s;
-  }
-  .day-label.active {
-    color: var(--primary);
-  }
+  .today-grouped { background: var(--black2); border: 1px solid var(--black4); border-radius: 4px; padding: 12px; font-family: 'Space Mono', monospace; font-size: 11px; }
+  .g-row { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--white); }
+  .g-row:last-child { margin-bottom: 0; }
+  .g-count { color: var(--yellow); font-weight: 700; width: 28px; flex-shrink: 0; }
+  .g-task { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--white-dim); }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  HISTORY SCREEN                                                            */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .hist-list { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  /* TERMINAL HISTORY */
+  .terminal-box { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 12px; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
+  .term-line { display: flex; gap: 8px; margin-bottom: 8px; line-height: 1.4; }
+  .term-line:last-child { margin-bottom: 0; }
+  .term-time { color: var(--yellow); }
+  .term-task { flex: 1; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .term-dur { color: var(--white-faint); }
+  .term-pag { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--black4); margin-top: 10px; padding-top: 10px; }
+  .term-btn { background: none; border: none; color: var(--yellow); cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 700; padding: 4px; }
+  .term-btn:disabled { color: var(--white-faint); cursor: not-allowed; }
 
-  .hist-item {
-    background: var(--surface);
-    border: var(--border-width) solid var(--border);
-    padding: 20px;
-    display: flex; align-items: center; gap: 16px;
-  }
-  .hist-dot {
-    width: 12px; height: 12px;
-    background: var(--primary);
-    flex-shrink: 0;
-  }
+  /* STATS SCREEN */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .s-card { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 18px 16px; }
+  .s-card.wide { grid-column: 1 / -1; }
+  .s-val { font-family: 'Space Mono', monospace; font-size: 38px; font-weight: 700; color: var(--yellow); line-height: 1; }
+  .s-lbl { font-size: 10px; color: var(--white-dim); margin-top: 5px; letter-spacing: 0.3px; }
+  .s-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+  
+  .week-donut-wrap { margin-top: 14px; display: flex; align-items: center; gap: 20px; }
+  .donut-svg-wrap { position: relative; flex-shrink: 0; }
+  .donut-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+  .donut-track { fill: none; stroke: var(--black3); stroke-width: 14; }
+  .donut-fill { fill: none; stroke: var(--yellow); stroke-width: 14; stroke-linecap: butt; transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1); filter: drop-shadow(0 0 6px var(--yellow-mid)); }
+  .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+  .donut-num { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: var(--yellow); line-height: 1; }
+  .donut-sub { font-size: 8px; color: var(--white-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  .week-days { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .week-row { display: flex; align-items: center; gap: 8px; }
+  .week-day-lbl { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--white-dim); letter-spacing: 1px; text-transform: uppercase; width: 28px; flex-shrink: 0; text-align: right; }
+  .week-row.is-today .week-day-lbl { color: var(--yellow); }
+  .week-bar-bg { flex: 1; height: 8px; background: var(--black3); border-radius: 2px; overflow: hidden; }
+  .week-bar-fill { height: 100%; background: var(--yellow); border-radius: 2px; transition: width .7s cubic-bezier(.4,0,.2,1); min-width: 0; }
+  .week-row:not(.is-today) .week-bar-fill { background: var(--white-dim); opacity: .6; }
+  .week-cnt { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--white-dim); width: 14px; text-align: right; }
+  .week-row.is-today .week-cnt { color: var(--yellow); }
+
+  /* LIST (Future) */
+  .hist-list { display: flex; flex-direction: column; gap: 8px; }
+  .hist-item { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; animation: fadeIn .3s ease; cursor: pointer; transition: border-color .15s; }
+  .hist-item:hover { border-color: var(--white-faint); }
+  .hist-dot { width: 8px; height: 8px; border-radius: 1px; background: var(--yellow); flex-shrink: 0; }
   .hist-info { flex: 1; min-width: 0; }
-  .hist-task {
-    font-size: 16px; font-weight: 800;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    text-transform: uppercase;
-  }
-  .hist-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
-  .hist-dur  {
-    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
-    color: var(--primary);
-  }
+  .hist-task { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
+  .empty { text-align: center; padding: 60px 20px; color: var(--white-dim); }
+  .empty svg { opacity: .2; margin-bottom: 14px; }
+  .empty p { font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.8; letter-spacing: 0.5px; }
 
-  .empty {
-    text-align: center; padding: 64px 20px; color: var(--text-muted);
-    border: var(--border-width) dashed var(--border);
-  }
+  /* BADGES */
+  .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .b-card { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 18px 8px; text-align: center; transition: all .15s; position: relative; overflow: hidden; }
+  .b-card.earned { border-color: var(--yellow); background: var(--yellow-dim); }
+  .b-card.earned::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--yellow); }
+  .b-card.locked { opacity: .28; }
+  .b-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+  .b-name { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--white); letter-spacing: 0.5px; text-transform: uppercase; }
+  .b-card.earned .b-name { color: var(--yellow); }
+  .b-desc { font-size: 9px; color: var(--white-dim); margin-top: 4px; line-height: 1.4; }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  BADGES SCREEN                                                             */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .badge-grid {
-    display: grid; grid-template-columns: repeat(3,1fr);
-    gap: 12px; margin-top: 20px;
-  }
-  .b-card {
-    background: var(--surface);
-    border: var(--border-width) solid var(--border);
-    padding: 24px 8px;
-    text-align: center;
-    position: relative;
-  }
-  .b-card.earned {
-    border-color: var(--primary);
-    background: #000;
-  }
-  .b-card.locked { opacity: .4; }
-  .b-icon { font-size: 36px; display: block; margin-bottom: 12px; }
-  .b-name { font-size: 14px; font-weight: 800; color: var(--text); text-transform: uppercase; }
-  .b-desc { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; font-weight: 500; }
+  /* BOTTOM NAV */
+  .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--nav-h) + var(--safe-b)); background: var(--black); border-top: 2px solid var(--black4); display: flex; align-items: flex-start; justify-content: space-around; padding: 0 8px; padding-bottom: var(--safe-b); z-index: 100; }
+  .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 12px 4px; color: var(--white-dim); transition: color .15s; }
+  .nav-tab.active { color: var(--yellow); }
+  .nav-tab svg { width: 20px; height: 20px; stroke-width: 2; }
+  .nav-lbl { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  BOTTOM NAV                                                                */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .nav {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 480px;
-    height: calc(var(--nav-h) + var(--safe-b));
-    background: #000;
-    border-top: var(--border-width-thick) solid var(--primary);
-    display: flex; align-items: flex-start; justify-content: space-around;
-    padding: 0 8px; padding-bottom: var(--safe-b);
-    z-index: 100;
-  }
-  .nav-tab {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; gap: 6px;
-    cursor: pointer; padding: 16px 4px;
-    transition: all .1s;
-    color: var(--text-muted);
-    text-transform: uppercase;
-  }
-  .nav-tab.active { color: var(--primary); }
-  .nav-tab svg { width: 24px; height: 24px; stroke-width: 2.5; }
-  .nav-lbl { font-size: 11px; font-weight: 800; letter-spacing: .5px; }
-
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  /*  TOAST & MODAL                                                             */
-  /* ═══════════════════════════════════════════════════════════════════════════ */
-  .toast {
-    position: fixed; top: 20px; left: 50%;
-    transform: translateX(-50%) translateY(-120px);
-    background: var(--primary); color: #000;
-    padding: 16px 32px; border: var(--border-width-thick) solid #000;
-    font-size: 16px; font-weight: 800; z-index: 999;
-    transition: transform .4s cubic-bezier(.34,1.56,.64,1);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
+  /* MODALS & TOAST */
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px); background: var(--yellow); color: var(--black); padding: 10px 22px; border-radius: 2px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; z-index: 999; transition: transform .4s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  .modal-bg {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.95);
-    z-index: 200; display: none;
-    align-items: center; justify-content: center;
-  }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; display: none; align-items: center; justify-content: center; }
   .modal-bg.show { display: flex; }
-  .modal {
-    background: #000;
-    border: var(--border-width-thick) solid var(--primary);
-    padding: 40px 30px;
-    text-align: center; max-width: 340px; width: 90%;
-  }
-  .modal-emoji { font-size: 64px; display:block; margin-bottom: 24px; }
-  .modal-title {
-    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
-    margin-bottom: 16px; color: var(--primary); text-transform: uppercase;
-  }
-  .modal-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; font-weight: 500; }
-  .modal-badge {
-    background: #000; border: var(--border-width) solid var(--primary);
-    padding: 16px; margin-bottom: 24px;
-    display: none;
-  }
+  .modal { background: var(--black2); border: 3px solid var(--yellow); border-radius: 4px; padding: 36px 28px; text-align: center; max-width: 320px; width: 90%; animation: popIn .35s cubic-bezier(.34,1.56,.64,1); max-height: 80vh; display: flex; flex-direction: column; }
+  @keyframes popIn { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+  
+  .modal-emoji { font-size: 54px; display: block; margin-bottom: 14px; }
+  .modal-title { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--yellow); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .modal-sub { font-size: 13px; color: var(--white-dim); line-height: 1.65; margin-bottom: 22px; white-space: pre-line; }
+  .modal-badge { background: var(--yellow-dim); border: 2px solid var(--yellow); border-radius: 4px; padding: 10px 14px; margin-bottom: 18px; display: none; }
   .modal-badge.show { display: block; }
-  .modal-badge p { font-size: 14px; color: var(--primary); font-weight: 800; text-transform: uppercase; }
+  .modal-badge p { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--yellow); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.45} }
+  .pulsing .t-display { animation: pulse 1.8s ease infinite; }
 </style>
 </head>
 <body>
 
 <div class="app">
 
-  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- Complete Modal -->
   <div class="modal-bg" id="modalBg">
     <div class="modal">
       <span class="modal-emoji" id="mEmoji">🎉</span>
-      <h2 class="modal-title">TAMAMLANDI!</h2>
-      <p class="modal-sub" id="mSub"></p>
+      <h2 class="modal-title">Tamamlandı!</h2>
+      <p class="modal-sub" id="mSub">Görevi başarıyla bitirdin.</p>
       <div class="modal-badge" id="mBadge">
-        <p>🏆 YENİ ROZET: <span id="mBadgeName"></span></p>
+        <p>🏅 Yeni rozet: <span id="mBadgeName"></span></p>
       </div>
-      <button class="btn-main" style="width:100%;min-width:0" onclick="closeModal()">DEVAM →</button>
+      <button class="btn-main" style="width:100%;min-width:0" onclick="closeModal()">DEVAM ET →</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════ TIMER SCREEN ═══ -->
+  <div class="modal-bg" id="futurePickModal">
+    <div class="modal" style="padding: 24px 20px;">
+      <h2 class="modal-title" style="font-size:16px;">GELECEK SEÇİMİ</h2>
+      <div class="hist-list" id="futurePickList" style="overflow-y:auto; flex:1; margin: 15px 0; text-align:left;"></div>
+      <button class="btn-main secondary" style="width:100%;min-width:0;height:44px;" onclick="document.getElementById('futurePickModal').classList.remove('show')">KAPAT</button>
+    </div>
+  </div>
+
   <div class="screen active" id="screen-timer">
     <div class="header">
-      <h1>ANLIK<span class="dot">.</span>GÖREV</h1>
+      <h1>anlık<span class="accent">_</span>görev</h1>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Tema Değiştir">
+        <svg id="themeIco" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          </svg>
+      </button>
     </div>
 
-    <!-- Task -->
     <div class="task-input-wrap">
-      <div class="field-label">NE YAPACAKSIN?</div>
-      <input class="task-input" id="taskInput" type="text" placeholder="GÖREVİNİ YAZ…" maxlength="60" />
+      <div class="field-label">// ne yapacaksın?</div>
+      <input class="task-input" id="taskInput" type="text" placeholder="görevini buraya yaz…" maxlength="60" />
     </div>
 
-    <!-- Duration templates -->
     <div class="templates-wrap">
-      <div class="field-label">SÜRE SEÇ</div>
+      <div class="field-label">// süre seç</div>
       <div class="templates">
-        <button class="tpl-btn active" data-min="5" onclick="pickTemplate(this,5)">
-          <span class="tpl-dur">5</span><span class="tpl-lbl">DAKİKA</span>
-        </button>
-        <button class="tpl-btn" data-min="15" onclick="pickTemplate(this,15)">
-          <span class="tpl-dur">15</span><span class="tpl-lbl">DAKİKA</span>
-        </button>
-        <button class="tpl-btn" data-min="25" onclick="pickTemplate(this,25)">
-          <span class="tpl-dur">25</span><span class="tpl-lbl">POMODORO</span>
-        </button>
-        <button class="tpl-btn" data-min="0" onclick="pickTemplate(this,0)">
-          <span class="tpl-dur" style="font-size:28px">⚙</span><span class="tpl-lbl">ÖZEL</span>
-        </button>
+        <button class="tpl-btn active" data-min="5" onclick="pickTemplate(this,5)"><span class="tpl-dur">05</span><span class="tpl-lbl">dk</span></button>
+        <button class="tpl-btn" data-min="15" onclick="pickTemplate(this,15)"><span class="tpl-dur">15</span><span class="tpl-lbl">dk</span></button>
+        <button class="tpl-btn" data-min="25" onclick="pickTemplate(this,25)"><span class="tpl-dur">25</span><span class="tpl-lbl">pomo</span></button>
+        <button class="tpl-btn" data-min="0" onclick="pickTemplate(this,0)"><span class="tpl-dur" style="font-size:16px;margin-top:2px">///</span><span class="tpl-lbl">özel</span></button>
       </div>
       <div class="custom-wrap" id="customWrap">
-        <label>DAKİKA:</label>
+        <label>DK:</label>
         <input class="custom-input" id="customMin" type="number" min="1" max="180" value="30" />
       </div>
     </div>
 
-    <!-- Ring -->
     <div class="timer-section" id="timerSection">
       <div class="ring-wrap">
-        <svg class="ring-svg" viewBox="0 0 224 224">
-          <circle class="ring-track" cx="112" cy="112" r="97"/>
-          <circle class="ring-fill"  cx="112" cy="112" r="97" id="ringFill"/>
+        <svg class="ring-svg" viewBox="0 0 200 200">
+          <circle class="ring-track" cx="100" cy="100" r="82"/>
+          <circle class="ring-fill"  cx="100" cy="100" r="82" id="ringFill"/>
         </svg>
         <div class="ring-center">
           <div class="t-display" id="tDisp">05:00</div>
-          <div class="t-name"   id="tName">HAZIR</div>
-          <span class="t-state idle" id="tState">BEKLİYOR</span>
+          <div class="t-name" id="tName">Hazır</div>
+          <span class="t-badge idle" id="tState">bekliyor</span>
         </div>
       </div>
 
-      <!-- Buttons -->
       <div class="controls">
-        <button class="btn-sq" onclick="resetTimer()" title="SIFIRLA">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-            <path d="M3 3v5h5"/>
-          </svg>
+        <button class="btn-sq danger" onclick="resetTimer()" title="Sıfırla">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         </button>
-
         <button class="btn-main" id="startBtn" onclick="handleStart()">BAŞLAT</button>
-
-        <button class="btn-sq" id="pauseBtn" onclick="togglePause()" style="display:none" title="DURAKLAT / DEVAM">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" id="pauseIco">
-            <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
-          </svg>
+        <button class="btn-sq" id="pauseBtn" onclick="togglePause()" style="display:none" title="Duraklat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="pauseIco"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
         </button>
       </div>
+      <button class="btn-main secondary" style="width:100%; margin-top:14px; height:44px; font-size:11px;" onclick="openFuturePicker()">+ GELECEKTEN GÖREV SEÇ</button>
+    </div>
+
+    <div class="home-section-title">// bu_hafta</div>
+    <div class="week-mini-boxes" id="homeDays"></div>
+    <div class="today-grouped" id="homeGroupedTasks"></div>
+
+    <div class="home-section-title">// terminal_geçmişi</div>
+    <div class="terminal-box">
+      <div id="termLines"></div>
+      <div class="term-pag">
+        <button class="term-btn" id="termPrev" onclick="changeTermPage(-1)">&lt; GERİ</button>
+        <span id="termPgStr" style="font-weight:700;">1/1</span>
+        <button class="term-btn" id="termNext" onclick="changeTermPage(1)">İLERİ &gt;</button>
+      </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════ STATS SCREEN ═══ -->
   <div class="screen" id="screen-stats">
-    <div class="header"><h1>İSTATİSTİK<span class="dot">.</span></h1></div>
+    <div class="header"><h1>istatistik<span class="accent">_</span></h1></div>
     <div class="stats-grid">
-      <div class="s-card">
-        <span class="s-icon" id="fireIcon">🔥</span>
-        <div class="s-val" id="sStreak">0</div>
-        <div class="s-lbl">GÜNLÜK SERİ</div>
-      </div>
-      <div class="s-card">
-        <span class="s-icon">📋</span>
-        <div class="s-val" id="sTotal">0</div>
-        <div class="s-lbl">TOPLAM GÖREV</div>
-      </div>
-      <div class="s-card">
-        <span class="s-icon">⏱️</span>
-        <div class="s-val" id="sMins">0</div>
-        <div class="s-lbl">TOPLAM DAKİKA</div>
-      </div>
-      <div class="s-card">
-        <span class="s-icon">✅</span>
-        <div class="s-val" id="sToday">0</div>
-        <div class="s-lbl">BUGÜN</div>
-      </div>
-      
-      <!-- HAFTALIK HALKA GRAFİK -->
+      <div class="s-card"><span class="s-icon" id="fireIcon">🔥</span><div class="s-val" id="sStreak">0</div><div class="s-lbl">Günlük Seri</div></div>
+      <div class="s-card"><span class="s-icon">📋</span><div class="s-val" id="sTotal">0</div><div class="s-lbl">Toplam Görev</div></div>
+      <div class="s-card"><span class="s-icon">⏱️</span><div class="s-val" id="sMins">0</div><div class="s-lbl">Toplam Dakika</div></div>
+      <div class="s-card"><span class="s-icon">✅</span><div class="s-val" id="sToday">0</div><div class="s-lbl">Bugün</div></div>
       <div class="s-card wide">
-        <div class="field-label" style="margin-bottom: 8px;">HAFTALIK AKTİVİTE</div>
-        <div class="donut-wrap">
-          <div class="donut" id="weekDonut"></div>
-          <div class="donut-hole">
-            <span class="donut-total" id="donutTotal">0</span>
-            <span class="donut-label">GÖREV</span>
+        <div class="field-label">// haftalık aktivite</div>
+        <div class="week-donut-wrap">
+          <div class="donut-svg-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle class="donut-track" cx="50" cy="50" r="38"/>
+              <circle class="donut-fill" cx="50" cy="50" r="38" id="donutFill"/>
+            </svg>
+            <div class="donut-center"><div class="donut-num" id="donutNum">0</div><div class="donut-sub">bu hafta</div></div>
           </div>
-        </div>
-        <div class="week-labels" id="weekLabels">
-          <!-- Dinamik olarak JS ile doldurulacak -->
+          <div class="week-days" id="weekDays"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════ HISTORY SCREEN ═══ -->
-  <div class="screen" id="screen-history">
+  <div class="screen" id="screen-future">
     <div class="header">
-      <h1>GEÇMİŞ<span class="dot">.</span></h1>
-      <button class="btn-sq" style="width:48px;height:48px;" onclick="clearHistory()" title="TEMİZLE">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
-          <polyline points="3 6 5 6 21 6"/>
-          <path d="M19 6l-1 14H6L5 6"/>
-          <path d="M10 11v6M14 11v6"/>
-          <path d="M9 6V4h6v2"/>
+      <h1>gelecek<span class="accent">_</span></h1>
+      <button class="icon-btn" onclick="clearFuture()" title="Temizle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
         </svg>
       </button>
     </div>
-    <div class="hist-list" id="histList"></div>
+    <div class="task-input-wrap">
+      <div class="field-label">// aklındaki görev</div>
+      <div style="display:flex; gap:10px;">
+        <input class="task-input" id="futureInput" type="text" placeholder="yarın ne yapacaksın?" maxlength="60" style="flex:1;">
+        <button class="btn-sq" onclick="addFuture()" style="background:var(--yellow); color:var(--black); border-color:var(--yellow);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="field-label" style="margin-top:24px;">// bekleme listesi</div>
+    <div class="hist-list" id="futureList"></div>
   </div>
 
-  <!-- ═══════════════════════════════ BADGES SCREEN ═══ -->
   <div class="screen" id="screen-badges">
-    <div class="header"><h1>ROZETLER<span class="dot">.</span></h1></div>
+    <div class="header"><h1>rozetler<span class="accent">_</span></h1></div>
     <div class="badge-grid" id="badgeGrid"></div>
   </div>
 
-  <!-- Bottom Nav -->
   <nav class="nav">
     <div class="nav-tab active" onclick="goTo('timer')" id="nav-timer">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-      </svg>
-      <span class="nav-lbl">GÖREV</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="nav-lbl">Görev</span>
     </div>
     <div class="nav-tab" onclick="goTo('stats')" id="nav-stats">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter">
-        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-      </svg>
-      <span class="nav-lbl">İSTATİSTİK</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="nav-lbl">İstatistik</span>
     </div>
-    <div class="nav-tab" onclick="goTo('history')" id="nav-history">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+    <div class="nav-tab" onclick="goTo('future')" id="nav-future">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
       </svg>
-      <span class="nav-lbl">GEÇMİŞ</span>
+      <span class="nav-lbl">Gelecek</span>
     </div>
     <div class="nav-tab" onclick="goTo('badges')" id="nav-badges">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter">
-        <circle cx="12" cy="8" r="6"/>
-        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
-      </svg>
-      <span class="nav-lbl">ROZETLER</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      <span class="nav-lbl">Rozetler</span>
     </div>
   </nav>
 
-</div><!-- /app -->
+</div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  BRUTALIST TIMER — KESKİN SİYAH & SARI
-// ═══════════════════════════════════════════════════════════════════════════════════
-const CIRC = 2 * Math.PI * 97; // ≈ 609.46
+// ═══════════════════════════════════════════
+//  CONFIG & CORE
+// ═══════════════════════════════════════════
+const CIRC_RING  = 2 * Math.PI * 82;
+const CIRC_DONUT = 2 * Math.PI * 38;
+const TR_DAYS_SHORT = ['PZT','SAL','ÇAR','PER','CUM','CMT','PAZ'];
 
 let selectedMs   = 5 * 60 * 1000;
 let endTimestamp = null;
@@ -657,418 +459,372 @@ let pausedAt     = null;
 let tickId       = null;
 let isRunning    = false;
 let isPaused     = false;
+let termCurrentPage = 0;
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  SES (BASİT WEB AUDIO)
-// ═══════════════════════════════════════════════════════════════════════════════════
+const LS_DATA   = 'agData_v2';
+const LS_TIMER  = 'agTimer_v2';
+const LS_BADGES = 'agBadges_v2';
+const LS_THEME  = 'agTheme_v2';
+
+// ═══════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════
 let actx = null;
 const audio = () => actx || (actx = new (window.AudioContext || window.webkitAudioContext)());
 
-function tone(freq, dur, type = 'square', vol = 0.25) { // Square wave daha brutal
+function tone(freq, dur, type='square', vol=0.1) {
   try {
-    const a = audio();
-    const o = a.createOscillator(), g = a.createGain();
-    o.connect(g); g.connect(a.destination);
-    o.frequency.value = freq; o.type = type;
-    g.gain.setValueAtTime(vol, a.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + dur);
+    const a = audio(); const o = a.createOscillator(), g = a.createGain();
+    o.connect(g); g.connect(a.destination); o.frequency.value = freq; o.type = type;
+    g.gain.setValueAtTime(vol, a.currentTime); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + dur);
     o.start(); o.stop(a.currentTime + dur);
   } catch(e) {}
 }
 
-const sfxStart    = () => { tone(440,.12); setTimeout(()=>tone(550,.15),110); };
-const sfxPause    = () => tone(330,.18,'triangle',.18);
-const sfxResume   = () => { tone(400,.1); setTimeout(()=>tone(500,.12),90); };
-const sfxComplete = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.45,'square',.22),i*140));
+const sfxStart    = () => { tone(220,.06); setTimeout(()=>tone(440,.1),60); };
+const sfxPause    = () => tone(180,.14,'triangle',.09);
+const sfxResume   = () => { tone(330,.08); setTimeout(()=>tone(440,.1),70); };
+const sfxComplete = () => [330,440,550,660].forEach((f,i)=>setTimeout(()=>tone(f,.3,'square',.12),i*120));
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  VERİ DEPOLAMA
-// ═══════════════════════════════════════════════════════════════════════════════════
-const LS_DATA   = 'agBrutalData';
-const LS_TIMER  = 'agBrutalTimer';
-const LS_BADGES = 'agBrutalBadges';
-
+// ═══════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════
 function getData() {
-  return JSON.parse(localStorage.getItem(LS_DATA) || JSON.stringify({
-    history:[], streak:0, lastDayStr:null, totalMins:0, weekly:{}
-  }));
+  const d = JSON.parse(localStorage.getItem(LS_DATA) || '{}');
+  return { history: d.history||[], future: d.future||[], streak: d.streak||0, lastDayStr: d.lastDayStr||null, totalMins: d.totalMins||0, weekly: d.weekly||{} };
 }
 function saveData(d) { localStorage.setItem(LS_DATA, JSON.stringify(d)); }
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  ZAMANLAYICI ÇEKİRDEĞİ
-// ═══════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════
 function handleStart() {
   if (isRunning) return;
-  const task = document.getElementById('taskInput').value.trim() || 'GÖREV';
-
-  endTimestamp = Date.now() + selectedMs;
-  pausedAt = null;
-  isRunning = true;
-  isPaused  = false;
-
+  const task = document.getElementById('taskInput').value.trim() || 'Görev';
+  endTimestamp = Date.now() + selectedMs; pausedAt = null; isRunning = true; isPaused = false;
   localStorage.setItem(LS_TIMER, JSON.stringify({ endTimestamp, selectedMs, task }));
-
-  startTick();
-  setUIState('run', task);
-  sfxStart();
+  startTick(); setUIState('run', task); sfxStart();
 }
 
-function startTick() {
-  if (tickId) clearInterval(tickId);
-  tickId = setInterval(tick, 250);
-}
+function startTick() { if (tickId) clearInterval(tickId); tickId = setInterval(tick, 250); }
 
 function tick() {
   if (isPaused || !endTimestamp) return;
   const rem = endTimestamp - Date.now();
   if (rem <= 0) { onComplete(); return; }
-  setDisplayMs(rem);
-  setRing(rem);
+  setDisplayMs(rem); setRing(rem);
 }
 
 function togglePause() {
   if (!isRunning) return;
-  if (!isPaused) {
-    pausedAt  = Date.now();
-    isPaused  = true;
-    setUIState('paused');
-    sfxPause();
-  } else {
-    endTimestamp += (Date.now() - pausedAt);
-    pausedAt  = null;
-    isPaused  = false;
-    const saved = JSON.parse(localStorage.getItem(LS_TIMER)||'{}');
-    saved.endTimestamp = endTimestamp;
-    localStorage.setItem(LS_TIMER, JSON.stringify(saved));
-    setUIState('run');
-    sfxResume();
+  if (!isPaused) { pausedAt = Date.now(); isPaused = true; setUIState('paused'); sfxPause(); }
+  else {
+    endTimestamp += (Date.now() - pausedAt); pausedAt = null; isPaused = false;
+    const s = JSON.parse(localStorage.getItem(LS_TIMER)||'{}'); s.endTimestamp = endTimestamp;
+    localStorage.setItem(LS_TIMER, JSON.stringify(s)); setUIState('run'); sfxResume();
   }
 }
 
 function resetTimer() {
-  clearInterval(tickId); tickId = null;
-  endTimestamp = null; pausedAt = null;
-  isRunning = false; isPaused = false;
-  localStorage.removeItem(LS_TIMER);
-  setDisplayMs(selectedMs);
-  setRing(selectedMs);
-  setUIState('idle');
+  clearInterval(tickId); tickId = null; endTimestamp = null; pausedAt = null; isRunning = false; isPaused = false;
+  localStorage.removeItem(LS_TIMER); setDisplayMs(selectedMs); setRing(selectedMs); setUIState('idle');
 }
 
 function onComplete() {
-  clearInterval(tickId); tickId = null;
-  localStorage.removeItem(LS_TIMER);
-
-  const task    = document.getElementById('taskInput').value.trim() || 'GÖREV';
+  clearInterval(tickId); tickId = null; localStorage.removeItem(LS_TIMER);
+  const task = document.getElementById('taskInput').value.trim() || 'Görev';
   const durMins = Math.round(selectedMs / 60000);
-
-  const d   = getData();
-  const now = new Date();
+  const d = getData(); const now = new Date();
 
   d.history.unshift({ task, duration: durMins, at: now.toISOString() });
-  if (d.history.length > 150) d.history.pop();
+  if (d.history.length > 200) d.history.pop();
 
   const dayStr = now.toDateString();
   if (d.lastDayStr !== dayStr) {
     const yest = new Date(now - 86400000).toDateString();
-    d.streak = (d.lastDayStr === yest) ? d.streak + 1 : 1;
-    d.lastDayStr = dayStr;
+    d.streak = (d.lastDayStr === yest) ? d.streak + 1 : 1; d.lastDayStr = dayStr;
   }
   d.totalMins = (d.totalMins || 0) + durMins;
-
-  const key = now.toISOString().split('T')[0];
-  d.weekly[key] = (d.weekly[key] || 0) + 1;
-
+  const key = now.toISOString().split('T')[0]; d.weekly[key] = (d.weekly[key] || 0) + 1;
   saveData(d);
 
   const newBadge = evalBadges(d);
-
   isRunning = false; isPaused = false; endTimestamp = null;
-  setDisplayMs(selectedMs);
-  setRing(selectedMs);
-  setUIState('idle');
-  sfxComplete();
+  setDisplayMs(selectedMs); setRing(selectedMs); setUIState('idle'); sfxComplete();
+  
+  renderHomeData(); // Update Home Data (Terminal + Week)
   showModal(task, durMins, d.streak, newBadge);
 }
 
-// Sayfa yenilendiğinde kurtarma
 function recoverTimer() {
-  const raw = localStorage.getItem(LS_TIMER);
-  if (!raw) return;
+  const raw = localStorage.getItem(LS_TIMER); if (!raw) return;
   try {
-    const s = JSON.parse(raw);
-    const rem = s.endTimestamp - Date.now();
+    const s = JSON.parse(raw); const rem = s.endTimestamp - Date.now();
     if (rem <= 200) { localStorage.removeItem(LS_TIMER); return; }
-
-    endTimestamp = s.endTimestamp;
-    selectedMs   = s.selectedMs;
-    isRunning    = true;
-
+    endTimestamp = s.endTimestamp; selectedMs = s.selectedMs; isRunning = true;
     document.getElementById('taskInput').value = s.task || '';
-
-    const mins = selectedMs / 60000;
-    document.querySelectorAll('.tpl-btn').forEach(b => {
-      b.classList.toggle('active', +b.dataset.min === mins);
-    });
-
-    startTick();
-    setUIState('run', s.task);
+    document.querySelectorAll('.tpl-btn').forEach(b => { b.classList.toggle('active', +b.dataset.min === selectedMs / 60000); });
+    startTick(); setUIState('run', s.task);
   } catch(e) { localStorage.removeItem(LS_TIMER); }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  GÖRÜNÜM YARDIMCILARI
-// ═══════════════════════════════════════════════════════════════════════════════════
 function setDisplayMs(ms) {
-  const s = Math.max(0, Math.ceil(ms / 1000));
-  const m = Math.floor(s / 60), sec = s % 60;
-  document.getElementById('tDisp').textContent =
-    String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  const s = Math.max(0, Math.ceil(ms / 1000)); const m = Math.floor(s / 60), sec = s % 60;
+  document.getElementById('tDisp').textContent = String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
 }
-
-function setRing(remMs) {
-  const pct = Math.max(0, Math.min(1, remMs / selectedMs));
-  document.getElementById('ringFill').style.strokeDashoffset = CIRC * (1 - pct);
-}
-
+function setRing(remMs) { const pct = Math.max(0, Math.min(1, remMs / selectedMs)); document.getElementById('ringFill').style.strokeDashoffset = CIRC_RING * (1 - pct); }
 function setUIState(state, task) {
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const tState   = document.getElementById('tState');
-  const tName    = document.getElementById('tName');
-
+  const startBtn = document.getElementById('startBtn'), pauseBtn = document.getElementById('pauseBtn'), tState = document.getElementById('tState'), tName = document.getElementById('tName'), sec = document.getElementById('timerSection');
   if (state === 'run') {
-    startBtn.style.display = 'none';
-    pauseBtn.style.display = 'flex';
-    document.getElementById('pauseIco').innerHTML =
-      '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-    tState.className = 't-state run'; tState.textContent = 'ÇALIŞIYOR';
-    if (task) tName.textContent = task;
+    startBtn.style.display = 'none'; pauseBtn.style.display = 'flex';
+    document.getElementById('pauseIco').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    tState.className = 't-badge run'; tState.textContent = 'çalışıyor'; if (task) tName.textContent = task; sec.classList.remove('pulsing');
   } else if (state === 'paused') {
-    document.getElementById('pauseIco').innerHTML =
-      '<polygon points="5 3 19 12 5 21 5 3"/>';
-    tState.className = 't-state paused'; tState.textContent = 'DURAKLATILDI';
+    document.getElementById('pauseIco').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    tState.className = 't-badge paused'; tState.textContent = 'duraklatıldı'; sec.classList.add('pulsing');
   } else {
-    startBtn.style.display = '';
-    pauseBtn.style.display = 'none';
-    tState.className = 't-state idle'; tState.textContent = 'BEKLİYOR';
-    tName.textContent = 'HAZIR';
+    startBtn.style.display = ''; pauseBtn.style.display = 'none'; tState.className = 't-badge idle'; tState.textContent = 'bekliyor'; tName.textContent = 'Hazır'; sec.classList.remove('pulsing');
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  ŞABLON SEÇİMİ
-// ═══════════════════════════════════════════════════════════════════════════════════
 function pickTemplate(el, min) {
   if (isRunning) return;
-  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active')); el.classList.add('active');
   const cw = document.getElementById('customWrap');
-  if (min === 0) {
-    cw.classList.add('open');
-    const v = parseInt(document.getElementById('customMin').value) || 30;
-    selectedMs = v * 60000;
-  } else {
-    cw.classList.remove('open');
-    selectedMs = min * 60000;
-  }
-  setDisplayMs(selectedMs);
-  setRing(selectedMs);
+  if (min === 0) { cw.classList.add('open'); selectedMs = (parseInt(document.getElementById('customMin').value) || 30) * 60000; }
+  else { cw.classList.remove('open'); selectedMs = min * 60000; }
+  setDisplayMs(selectedMs); setRing(selectedMs);
 }
-
 document.getElementById('customMin').addEventListener('input', function() {
-  const v = Math.max(1, Math.min(180, parseInt(this.value) || 1));
-  selectedMs = v * 60000;
-  setDisplayMs(selectedMs);
-  setRing(selectedMs);
+  selectedMs = Math.max(1, Math.min(180, parseInt(this.value) || 1)) * 60000; setDisplayMs(selectedMs); setRing(selectedMs);
 });
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  NAVİGASYON
-// ═══════════════════════════════════════════════════════════════════════════════════
-const SCREENS = ['timer','stats','history','badges'];
+// ═══════════════════════════════════════════
+//  THEME (3-Way Cycle)
+// ═══════════════════════════════════════════
+const THEMES = ['dark', 'light', 'hacker'];
+function toggleTheme() {
+  let curr = document.documentElement.dataset.theme || 'dark';
+  let next = THEMES[(THEMES.indexOf(curr) + 1) % THEMES.length];
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem(LS_THEME, next);
+  applyThemeIcon(next);
+}
+function applyThemeIcon(th) {
+  const ico = document.getElementById('themeIco');
+  if(th === 'light')      ico.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  else if(th === 'hacker') ico.innerHTML = '<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>';
+  else                     ico.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION & HOME RENDER
+// ═══════════════════════════════════════════
+const SCREENS = ['timer','stats','future','badges'];
 function goTo(id) {
-  SCREENS.forEach(s => {
-    document.getElementById('screen-'+s).classList.toggle('active', s===id);
-    document.getElementById('nav-'+s).classList.toggle('active', s===id);
-  });
-  if (id==='stats')   renderStats();
-  if (id==='history') renderHistory();
-  if (id==='badges')  renderBadges();
+  SCREENS.forEach(s => { document.getElementById('screen-'+s).classList.toggle('active', s===id); document.getElementById('nav-'+s).classList.toggle('active', s===id); });
+  if (id==='stats')  renderStats();
+  if (id==='future') renderFuture();
+  if (id==='badges') renderBadges();
+  if (id==='timer')  renderHomeData();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  MODAL & TOAST
-// ═══════════════════════════════════════════════════════════════════════════════════
-function showModal(task, mins, streak, newBadge) {
-  const emojis = ['🎉','🔥','⚡','🚀','💎','👑','🌟'];
-  document.getElementById('mEmoji').textContent = emojis[Math.min(streak-1, emojis.length-1)] || '🎉';
-  document.getElementById('mSub').innerHTML = `"${task}" — ${mins} DAKİKA<br>🔥 ${streak} GÜNLÜK SERİ!`;
-  const mb = document.getElementById('mBadge');
-  if (newBadge) { mb.classList.add('show'); document.getElementById('mBadgeName').textContent = newBadge.name; }
-  else          { mb.classList.remove('show'); }
-  document.getElementById('modalBg').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('modalBg').classList.remove('show');
-  document.getElementById('taskInput').value = '';
+function renderHomeData() {
+  const d = getData();
+  const todayIdx = (new Date().getDay() + 6) % 7; // Pzt=0
+  
+  // 1. Haftalık Kutucuklar
+  document.getElementById('homeDays').innerHTML = TR_DAYS_SHORT.map((day, i) => 
+    `<div class="w-box ${i === todayIdx ? 'active' : ''}">${day}</div>`
+  ).join('');
+
+  // 2. Bugünkü Görevlerin Gruplanması
+  const todayStr = new Date().toDateString();
+  const todayTasks = d.history.filter(h => new Date(h.at).toDateString() === todayStr);
+  const groups = {};
+  todayTasks.forEach(t => { groups[t.task] = (groups[t.task] || 0) + 1; });
+  
+  const gWrap = document.getElementById('homeGroupedTasks');
+  if (Object.keys(groups).length > 0) {
+    gWrap.innerHTML = Object.keys(groups).map(k => 
+      `<div class="g-row"><span class="g-count">${groups[k]}x</span><span class="g-task">${k}</span></div>`
+    ).join('');
+  } else {
+    gWrap.innerHTML = `<div class="g-row" style="color:var(--white-dim)">Bugün henüz görev tamamlanmadı.</div>`;
+  }
+
+  // 3. Terminal Geçmişi (Sayfalamalı)
+  renderTerminal(d);
 }
 
-let toastTimer;
-function toast(msg, color='#FFE600') {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.style.background = color; el.style.color = '#000';
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+function renderTerminal(d) {
+  const total = d.history.length;
+  const pages = Math.max(1, Math.ceil(total / 5));
+  if (termCurrentPage >= pages) termCurrentPage = pages - 1;
+  if (termCurrentPage < 0) termCurrentPage = 0;
+
+  const start = termCurrentPage * 5;
+  const slice = d.history.slice(start, start + 5);
+  
+  const tWrap = document.getElementById('termLines');
+  if (slice.length > 0) {
+    tWrap.innerHTML = slice.map(h => {
+      const t = new Date(h.at).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+      return `<div class="term-line"><span class="term-time">[${t}]</span><span class="term-task">${h.task}</span><span class="term-dur">${h.duration}m</span></div>`;
+    }).join('');
+  } else {
+    tWrap.innerHTML = `<div class="term-line" style="color:var(--white-faint)">-- geçmiş yok --</div>`;
+  }
+
+  document.getElementById('termPgStr').textContent = `${termCurrentPage + 1}/${pages}`;
+  document.getElementById('termPrev').disabled = (termCurrentPage === 0);
+  document.getElementById('termNext').disabled = (termCurrentPage === pages - 1);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  İSTATİSTİK & HALKA GRAFİK (DONUT)
-// ═══════════════════════════════════════════════════════════════════════════════════
-const TR_DAYS = ['PZT','SAL','ÇAR','PER','CUM','CMT','PAZ'];
+function changeTermPage(dir) {
+  termCurrentPage += dir; renderHomeData();
+}
 
+// ═══════════════════════════════════════════
+//  FUTURE TASKS
+// ═══════════════════════════════════════════
+function addFuture() {
+  const inp = document.getElementById('futureInput');
+  const val = inp.value.trim();
+  if(!val) return;
+  const d = getData(); d.future.unshift({ task: val, added: Date.now() }); saveData(d);
+  inp.value = ''; toast('GELECEK GÖREV EKLENDİ'); renderFuture();
+}
+
+function renderFuture() {
+  const d = getData();
+  const list = document.getElementById('futureList');
+  if (!d.future.length) {
+    list.innerHTML = `<div class="empty"><p>// LİSTE BOŞ<br>YENİ GÖREV EKLE</p></div>`; return;
+  }
+  list.innerHTML = d.future.map((f, i) => `
+    <div class="hist-item" onclick="pickFutureToStart(${i})">
+      <div class="hist-dot" style="background:var(--white-dim)"></div>
+      <div class="hist-info"><div class="hist-task">${f.task}</div></div>
+      <div class="hist-dur" style="font-size:18px; color:var(--white-dim)">+</div>
+    </div>
+  `).join('');
+}
+
+function pickFutureToStart(idx) {
+  const d = getData();
+  const task = d.future[idx].task;
+  d.future.splice(idx, 1); saveData(d);
+  document.getElementById('taskInput').value = task;
+  document.getElementById('futurePickModal').classList.remove('show');
+  toast('GÖREV SEÇİLDİ ✓'); goTo('timer');
+}
+
+function clearFuture() {
+  if(!confirm('Gelecek listesi temizlensin mi?')) return;
+  const d = getData(); d.future = []; saveData(d); renderFuture(); toast('TEMİZLENDİ');
+}
+
+function openFuturePicker() {
+  const d = getData();
+  const list = document.getElementById('futurePickList');
+  if(!d.future.length) { list.innerHTML = `<div class="empty" style="padding:20px 0"><p>Liste boş.</p></div>`; }
+  else {
+    list.innerHTML = d.future.map((f, i) => `
+      <div class="hist-item" onclick="pickFutureToStart(${i})" style="margin-bottom:8px">
+        <div class="hist-info"><div class="hist-task">${f.task}</div></div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('futurePickModal').classList.add('show');
+}
+
+// ═══════════════════════════════════════════
+//  STATS RENDER
+// ═══════════════════════════════════════════
 function renderStats() {
   const d = getData();
   document.getElementById('sStreak').textContent = d.streak || 0;
   document.getElementById('sTotal').textContent  = d.history.length;
   document.getElementById('sMins').textContent   = d.totalMins || 0;
-
-  const todayStr  = new Date().toDateString();
-  const todayCnt  = d.history.filter(h => new Date(h.at).toDateString()===todayStr).length;
+  const todayCnt = d.history.filter(h => new Date(h.at).toDateString()===new Date().toDateString()).length;
   document.getElementById('sToday').textContent  = todayCnt;
-
-  document.getElementById('fireIcon').textContent = d.streak>=7 ? '🔥🔥' : d.streak>=3 ? '🔥' : '⚡';
+  document.getElementById('fireIcon').textContent = d.streak>=7 ? '🔥' : d.streak>=3 ? '⚡' : '✨';
   renderWeekDonut(d);
 }
 
 function renderWeekDonut(d) {
   const today = new Date();
-  const days = [];
-  // Son 7 günü al (Pazartesi -> Pazar formatına uygun)
-  for (let i = 6; i >= 0; i--) {
-    const dt = new Date(today);
-    dt.setDate(today.getDate() - i);
-    days.push(dt);
-  }
-
+  const days = Array.from({length:7}, (_,i)=> { const dt = new Date(today); dt.setDate(today.getDate() - 6 + i); return dt; });
   const counts = days.map(dt => d.weekly[dt.toISOString().split('T')[0]] || 0);
-  const total = counts.reduce((a, b) => a + b, 0);
+  const weekSum = counts.reduce((a,b)=>a+b, 0); const mx = Math.max(1, ...counts);
+  const donutFill = document.getElementById('donutFill');
+  const pct = Math.min(1, weekSum / Math.max(7, weekSum));
+  donutFill.style.strokeDasharray  = CIRC_DONUT; donutFill.style.strokeDashoffset = CIRC_DONUT * (1 - pct);
+  document.getElementById('donutNum').textContent = weekSum;
+
+  const wrap = document.getElementById('weekDays'); wrap.innerHTML = '';
+  const todayKey = today.toISOString().split('T')[0];
+  const trDaysLong = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
   
-  // Haftalık etiketleri güncelle
-  const labelsContainer = document.getElementById('weekLabels');
-  labelsContainer.innerHTML = '';
-  
-  let gradient = 'conic-gradient(';
-  let currentAngle = 0;
-  const sliceAngle = 360 / 7; // 51.428...
-
-  counts.forEach((count, i) => {
-    const isActive = count > 0;
-    const color = isActive ? '#FFE600' : '#333333';
-    const start = currentAngle;
-    const end = currentAngle + sliceAngle;
-    gradient += `${color} ${start}deg ${end}deg, `;
-    currentAngle = end;
-    
-    // Etiket oluştur
-    const dayIdx = days[i].getDay() === 0 ? 6 : days[i].getDay() - 1; // Pzt=0
-    const label = document.createElement('span');
-    label.className = 'day-label' + (isActive ? ' active' : '');
-    label.textContent = TR_DAYS[dayIdx];
-    labelsContainer.appendChild(label);
-  });
-
-  gradient = gradient.slice(0, -2) + ')';
-  document.getElementById('weekDonut').style.background = gradient;
-  document.getElementById('donutTotal').textContent = total;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  GEÇMİŞ & ROZETLER
-// ═══════════════════════════════════════════════════════════════════════════════════
-function renderHistory() {
-  const d = getData();
-  const list = document.getElementById('histList');
-  if (!d.history.length) {
-    list.innerHTML = `<div class="empty"><p>HENÜZ GÖREV TAMAMLANMADI.<br>İLK GÖREVİNİ BAŞLAT! 🚀</p></div>`;
-    return;
-  }
-  list.innerHTML = d.history.map(h => {
-    const dt = new Date(h.at);
-    const dateStr = dt.toLocaleDateString('tr-TR',{day:'numeric',month:'short'})
-      + ' · ' + dt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="hist-item">
-      <div class="hist-dot"></div>
-      <div class="hist-info">
-        <div class="hist-task">${h.task}</div>
-        <div class="hist-meta">${dateStr}</div>
-      </div>
-      <div class="hist-dur">${h.duration}DK</div>
+  days.forEach((dt, i) => {
+    const isToday = dt.toISOString().split('T')[0] === todayKey;
+    const cnt = counts[i]; const pctW = Math.round((cnt / mx) * 100);
+    const dayIdx = dt.getDay() === 0 ? 6 : dt.getDay() - 1;
+    wrap.innerHTML += `<div class="week-row ${isToday?'is-today':''}">
+      <div class="week-day-lbl">${trDaysLong[dayIdx]}</div>
+      <div class="week-bar-bg"><div class="week-bar-fill" style="width:${Math.max(cnt>0?4:0, pctW)}%"></div></div>
+      <div class="week-cnt">${cnt||''}</div>
     </div>`;
-  }).join('');
+  });
 }
 
-function clearHistory() {
-  if (!confirm('TÜM GEÇMİŞ SİLİNSİN Mİ?')) return;
-  const d = getData();
-  d.history=[]; d.totalMins=0; d.weekly={};
-  saveData(d);
-  renderHistory();
-  toast('GEÇMİŞ TEMİZLENDİ ✓');
+// ═══════════════════════════════════════════
+//  MODALS & TOAST
+// ═══════════════════════════════════════════
+function showModal(task, mins, streak, newBadge) {
+  const emojis = ['⚡','🔥','💥','🎯','💎','👑','🌟'];
+  document.getElementById('mEmoji').textContent = emojis[Math.min(streak-1, emojis.length-1)] || '⚡';
+  document.getElementById('mSub').textContent = `"${task}" — ${mins} dakika tamamlandı!\n🔥 ${streak} günlük seri!`;
+  const mb = document.getElementById('mBadge');
+  if (newBadge) { mb.classList.add('show'); document.getElementById('mBadgeName').textContent = newBadge.name; } else mb.classList.remove('show');
+  document.getElementById('modalBg').classList.add('show');
 }
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); document.getElementById('taskInput').value = ''; }
+let toastTimer; function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 2800); }
 
+// ═══════════════════════════════════════════
+//  BADGES
+// ═══════════════════════════════════════════
 const BADGES = [
-  { id:'b1',  icon:'🌱', name:'İLK ADIM',    desc:'1 GÖREV',    ok: d => d.history.length>=1  },
-  { id:'b2',  icon:'⭐', name:'BEŞLİ',        desc:'5 GÖREV',    ok: d => d.history.length>=5  },
-  { id:'b3',  icon:'🏆', name:'ONLU',         desc:'10 GÖREV',   ok: d => d.history.length>=10 },
-  { id:'b4',  icon:'💎', name:'ELMAS',        desc:'50 GÖREV',   ok: d => d.history.length>=50 },
-  { id:'b5',  icon:'🔥', name:'ATEŞ',         desc:'3 GÜN SERİ', ok: d => d.streak>=3          },
-  { id:'b6',  icon:'⚡', name:'HAFTALIK',     desc:'7 GÜN SERİ', ok: d => d.streak>=7          },
-  { id:'b7',  icon:'👑', name:'EFSANE',       desc:'30 GÜN SERİ',ok: d => d.streak>=30         },
-  { id:'b8',  icon:'⏱️', name:'SAATÇİ',       desc:'60 DAKİKA',  ok: d => d.totalMins>=60      },
-  { id:'b9',  icon:'🚀', name:'MARATON',      desc:'500 DAKİKA', ok: d => d.totalMins>=500     },
-  { id:'b10', icon:'🌟', name:'YILDIZ',       desc:'30 GÖREV',   ok: d => d.history.length>=30 },
-  { id:'b11', icon:'🎯', name:'NİŞANCI',      desc:'25DK POMODORO', ok: d => d.history.some(h=>h.duration===25) },
+  { id:'b1', icon:'🌱', name:'İlk Adım', desc:'1 görev', ok:d=>d.history.length>=1 }, { id:'b2', icon:'⭐', name:'Beşli', desc:'5 görev', ok:d=>d.history.length>=5 },
+  { id:'b3', icon:'🏆', name:'Onlu', desc:'10 görev', ok:d=>d.history.length>=10 }, { id:'b4', icon:'💎', name:'Elmas', desc:'50 görev', ok:d=>d.history.length>=50 },
+  { id:'b5', icon:'🔥', name:'Ateş', desc:'3 gün seri', ok:d=>d.streak>=3 }, { id:'b6', icon:'⚡', name:'Haftalık', desc:'7 gün seri', ok:d=>d.streak>=7 },
+  { id:'b7', icon:'👑', name:'Efsane', desc:'30 gün seri', ok:d=>d.streak>=30 }, { id:'b8', icon:'⏱️', name:'Saatçi', desc:'60 dk', ok:d=>d.totalMins>=60 },
+  { id:'b9', icon:'🚀', name:'Maraton', desc:'500 dk', ok:d=>d.totalMins>=500 }, { id:'b10', icon:'🌟', name:'Yıldız', desc:'30 görev', ok:d=>d.history.length>=30 },
+  { id:'b11', icon:'🎯', name:'Nişancı', desc:'25dk pomo', ok:d=>d.history.some(h=>h.duration===25) }, { id:'b12', icon:'🌙', name:'Geç Kuş', desc:'Gece görev', ok:d=>d.history.some(h=>new Date(h.at).getHours()>=23) },
 ];
-
 function evalBadges(d) {
   const earned = JSON.parse(localStorage.getItem(LS_BADGES)||'[]');
-  for (const b of BADGES) {
-    if (!earned.includes(b.id) && b.ok(d)) {
-      earned.push(b.id);
-      localStorage.setItem(LS_BADGES, JSON.stringify(earned));
-      return b;
-    }
-  }
+  for (const b of BADGES) { if (!earned.includes(b.id) && b.ok(d)) { earned.push(b.id); localStorage.setItem(LS_BADGES, JSON.stringify(earned)); return b; } }
   return null;
 }
-
 function renderBadges() {
-  const d      = getData();
-  const earned = JSON.parse(localStorage.getItem(LS_BADGES)||'[]');
-  BADGES.forEach(b => { if (b.ok(d) && !earned.includes(b.id)) { earned.push(b.id); } });
-  localStorage.setItem(LS_BADGES, JSON.stringify(earned));
-
+  const d = getData(), earned = JSON.parse(localStorage.getItem(LS_BADGES)||'[]');
+  BADGES.forEach(b => { if (b.ok(d) && !earned.includes(b.id)) earned.push(b.id); }); localStorage.setItem(LS_BADGES, JSON.stringify(earned));
   document.getElementById('badgeGrid').innerHTML = BADGES.map(b => {
-    const got = earned.includes(b.id);
-    return `<div class="b-card ${got?'earned':'locked'}">
-      <span class="b-icon">${got ? b.icon : '🔒'}</span>
-      <div class="b-name">${b.name}</div>
-      <div class="b-desc">${b.desc}</div>
-    </div>`;
+    const got = earned.includes(b.id); return `<div class="b-card ${got?'earned':'locked'}"><span class="b-icon">${got ? b.icon : '🔒'}</span><div class="b-name">${b.name}</div><div class="b-desc">${b.desc}</div></div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════════
-//  BAŞLANGIÇ
-// ═══════════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
 (function init() {
-  document.getElementById('ringFill').style.strokeDasharray  = CIRC;
-  document.getElementById('ringFill').style.strokeDashoffset = 0;
-  setDisplayMs(selectedMs);
-  recoverTimer();
+  const saved = localStorage.getItem(LS_THEME) || 'dark';
+  document.documentElement.dataset.theme = saved; applyThemeIcon(saved);
+  document.getElementById('ringFill').style.strokeDasharray  = CIRC_RING; document.getElementById('ringFill').style.strokeDashoffset = 0;
+  setDisplayMs(selectedMs); recoverTimer(); renderHomeData();
 })();
 </script>
 </body>
