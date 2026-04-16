@@ -1,321 +1,1162 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant Task - Modern & Minimalist</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --accent-color: #10b981;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: #f8fafc;
-            transition: background-color 0.8s ease;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        .timer-circle {
-            position: relative;
-            width: 220px;
-            height: 220px;
-        }
-        svg {
-            transform: rotate(-90deg);
-        }
-        circle {
-            fill: none;
-            stroke-width: 8;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 1s linear, stroke 0.8s ease;
-        }
-        .bg-circle { stroke: rgba(255, 255, 255, 0.05); }
-        .progress-circle {
-            stroke-dasharray: 628;
-            stroke-dashoffset: 628;
-            stroke: var(--accent-color);
-        }
-        .commitment-active {
-            pointer-events: none;
-            opacity: 0.5;
-            filter: grayscale(1);
-        }
-        .xp-bar-inner {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes pulse-red {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); color: #ef4444; }
-        }
-        .emergency { animation: pulse-red 1s infinite; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Anlık Görev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --black2: #111111;
+    --black3: #1a1a1a;
+    --black4: #242424;
+    --yellow: #f5c800;
+    --yellow-dim: rgba(245,200,0,0.12);
+    --yellow-mid: rgba(245,200,0,0.35);
+    --white: #f0f0f0;
+    --white-dim: rgba(240,240,240,0.45);
+    --white-faint: rgba(240,240,240,0.12);
+    --red: #e63946;
+    --green: #2ec27e;
+    --nav-h: 72px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 0; }
+
+  /* ─── APP WRAPPER ─── */
+  .app {
+    max-width: 480px; margin: 0 auto;
+    min-height: 100dvh;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen {
+    display: none; flex: 1;
+    padding: 0 20px calc(var(--nav-h) + var(--safe-b) + 20px);
+    animation: fadeIn .22s ease;
+  }
+  .screen.active { display: flex; flex-direction: column; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 52px 0 12px;
+    border-bottom: 2px solid var(--white-faint);
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: -0.5px;
+    text-transform: lowercase;
+  }
+  .header h1 .accent { color: var(--yellow); }
+
+  .icon-btn {
+    width: 40px; height: 40px;
+    border: 2px solid var(--white-faint);
+    border-radius: 4px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s;
+    color: var(--white-dim);
+  }
+  .icon-btn:active { transform: scale(.88); background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+
+  /* ─── FIELD LABEL ─── */
+  .field-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--white-dim); margin-bottom: 10px;
+  }
+
+  /* ─── TASK INPUT ─── */
+  .task-input-wrap { margin-top: 0; }
+
+  .task-input {
+    width: 100%;
+    background: var(--black2);
+    border: 2px solid var(--black4);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px; font-weight: 500;
+    color: var(--white); outline: none;
+    transition: border-color .15s;
+  }
+  .task-input:focus { border-color: var(--yellow); }
+  .task-input::placeholder { color: var(--white-dim); }
+
+  /* ─── DURATION TEMPLATES ─── */
+  .templates-wrap { margin-top: 20px; }
+
+  .templates {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+
+  .tpl-btn {
+    background: var(--black2);
+    border: 2px solid var(--black4);
+    border-radius: 4px;
+    padding: 14px 4px;
+    cursor: pointer; text-align: center;
+    transition: all .15s;
+  }
+  .tpl-btn:active { transform: scale(.93); }
+  .tpl-btn.active {
+    border-color: var(--yellow);
+    background: var(--yellow-dim);
+  }
+  .tpl-dur {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px; font-weight: 700;
+    color: var(--white); display: block;
+    line-height: 1;
+  }
+  .tpl-btn.active .tpl-dur { color: var(--yellow); }
+  .tpl-lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px; color: var(--white-dim);
+    margin-top: 4px; display: block;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .tpl-btn.active .tpl-lbl { color: var(--yellow); opacity: .7; }
+
+  .custom-wrap { margin-top: 10px; display: none; gap: 10px; align-items: center; }
+  .custom-wrap.open { display: flex; }
+  .custom-wrap label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--white-dim);
+    white-space: nowrap; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .custom-input {
+    flex: 1; background: var(--black2); border: 2px solid var(--black4);
+    border-radius: 4px; padding: 12px 16px;
+    font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
+    color: var(--yellow); outline: none; text-align: center;
+  }
+  .custom-input:focus { border-color: var(--yellow); }
+
+  /* ─── TIMER RING ─── */
+  .timer-section {
+    display: flex; flex-direction: column; align-items: center;
+    margin-top: 20px;
+  }
+
+  .ring-wrap {
+    position: relative; width: 218px; height: 218px;
+  }
+
+  .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+  .ring-track { fill: none; stroke: var(--black3); stroke-width: 10; }
+  .ring-fill {
+    fill: none;
+    stroke: var(--yellow);
+    stroke-width: 10;
+    stroke-linecap: square;
+    stroke-dasharray: 596;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset .5s linear;
+    filter: drop-shadow(0 0 8px rgba(245,200,0,0.5));
+  }
+
+  .ring-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none;
+  }
+
+  .t-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 44px; font-weight: 700;
+    color: var(--white);
+    letter-spacing: -2px; line-height: 1;
+  }
+
+  .t-name {
+    font-size: 11px; color: var(--white-dim);
+    margin-top: 6px; max-width: 130px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-weight: 500;
+  }
+
+  .t-badge {
+    display: inline-block; margin-top: 8px;
+    padding: 3px 10px;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .t-badge.idle   { color: var(--white-dim); border-color: var(--white-faint); }
+  .t-badge.run    { color: var(--yellow); border-color: var(--yellow); }
+  .t-badge.paused { color: var(--white-dim); border-color: var(--white-faint); }
+
+  /* ─── CONTROLS ─── */
+  .controls {
+    display: flex; gap: 10px;
+    align-items: center; justify-content: center;
+    margin-top: 20px; width: 100%;
+  }
+
+  .btn-main {
+    background: var(--yellow);
+    color: var(--black);
+    border: none; border-radius: 4px;
+    padding: 0 36px; height: 52px; min-width: 148px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .15s;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .btn-main:active  { transform: scale(.96); background: #d4aa00; }
+  .btn-main:disabled { opacity: .3; cursor: not-allowed; }
+
+  .btn-sq {
+    width: 52px; height: 52px;
+    background: var(--black2); border: 2px solid var(--black4);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; color: var(--white-dim);
+  }
+  .btn-sq:active { transform: scale(.88); border-color: var(--yellow); color: var(--yellow); }
+  .btn-sq.danger:active { border-color: var(--red); color: var(--red); }
+
+  /* ─── STATS SCREEN ─── */
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+
+  .s-card {
+    background: var(--black2);
+    border: 2px solid var(--black4);
+    border-radius: 4px;
+    padding: 18px 16px;
+  }
+  .s-card.wide { grid-column: 1 / -1; }
+
+  .s-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 38px; font-weight: 700;
+    color: var(--yellow); line-height: 1;
+  }
+  .s-lbl {
+    font-size: 10px; color: var(--white-dim);
+    margin-top: 5px; letter-spacing: 0.3px;
+  }
+  .s-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+
+  /* ─── DONUT CHART ─── */
+  .week-donut-wrap {
+    margin-top: 14px;
+    display: flex; align-items: center; gap: 20px;
+  }
+
+  .donut-svg-wrap {
+    position: relative; flex-shrink: 0;
+  }
+
+  .donut-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+  .donut-track { fill: none; stroke: var(--black3); stroke-width: 14; }
+  .donut-fill {
+    fill: none; stroke: var(--yellow); stroke-width: 14;
+    stroke-linecap: butt;
+    transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);
+    filter: drop-shadow(0 0 6px rgba(245,200,0,.45));
+  }
+
+  .donut-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none;
+  }
+  .donut-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px; font-weight: 700;
+    color: var(--yellow); line-height: 1;
+  }
+  .donut-sub {
+    font-size: 8px; color: var(--white-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* Week day pills */
+  .week-days {
+    flex: 1; display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .week-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .week-day-lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; font-weight: 700;
+    color: var(--white-dim); letter-spacing: 1px;
+    text-transform: uppercase;
+    width: 28px; flex-shrink: 0; text-align: right;
+  }
+  .week-row.is-today .week-day-lbl { color: var(--yellow); }
+
+  .week-bar-bg {
+    flex: 1; height: 8px;
+    background: var(--black3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .week-bar-fill {
+    height: 100%; background: var(--yellow);
+    border-radius: 2px;
+    transition: width .7s cubic-bezier(.4,0,.2,1);
+    min-width: 0;
+  }
+  .week-row.is-today .week-bar-fill { background: var(--yellow); }
+  .week-row:not(.is-today) .week-bar-fill { background: var(--white-dim); opacity: .6; }
+
+  .week-cnt {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; font-weight: 700;
+    color: var(--white-dim); width: 14px; text-align: right;
+  }
+  .week-row.is-today .week-cnt { color: var(--yellow); }
+
+  /* ─── HISTORY ─── */
+  .hist-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .hist-item {
+    background: var(--black2);
+    border: 2px solid var(--black4);
+    border-radius: 4px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    animation: fadeIn .3s ease;
+  }
+  .hist-item:hover { border-color: var(--white-faint); }
+
+  .hist-dot {
+    width: 8px; height: 8px; border-radius: 1px;
+    background: var(--yellow); flex-shrink: 0;
+  }
+
+  .hist-info { flex: 1; min-width: 0; }
+  .hist-task {
+    font-size: 13px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .hist-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--white-dim);
+    margin-top: 3px; letter-spacing: 0.3px;
+  }
+  .hist-dur {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px; font-weight: 700; color: var(--yellow);
+    flex-shrink: 0;
+  }
+
+  .empty {
+    text-align: center; padding: 60px 20px; color: var(--white-dim);
+  }
+  .empty svg { opacity: .2; margin-bottom: 14px; }
+  .empty p {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; line-height: 1.8;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── BADGES ─── */
+  .badge-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .b-card {
+    background: var(--black2);
+    border: 2px solid var(--black4);
+    border-radius: 4px;
+    padding: 18px 8px;
+    text-align: center;
+    transition: all .15s; position: relative; overflow: hidden;
+  }
+  .b-card.earned {
+    border-color: var(--yellow);
+    background: var(--yellow-dim);
+  }
+  .b-card.earned::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--yellow);
+  }
+  .b-card.locked { opacity: .28; }
+
+  .b-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+  .b-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; font-weight: 700;
+    color: var(--white); letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .b-card.earned .b-name { color: var(--yellow); }
+  .b-desc {
+    font-size: 9px; color: var(--white-dim);
+    margin-top: 4px; line-height: 1.4;
+  }
+
+  /* ─── BOTTOM NAV ─── */
+  .nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    height: calc(var(--nav-h) + var(--safe-b));
+    background: var(--black);
+    border-top: 2px solid var(--black4);
+    display: flex; align-items: flex-start; justify-content: space-around;
+    padding: 0 8px; padding-bottom: var(--safe-b);
+    z-index: 100;
+  }
+
+  .nav-tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    cursor: pointer; padding: 12px 4px;
+    color: var(--white-dim);
+    transition: color .15s;
+  }
+  .nav-tab.active { color: var(--yellow); }
+  .nav-tab svg { width: 20px; height: 20px; stroke-width: 2; }
+  .nav-lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    background: var(--yellow); color: var(--black);
+    padding: 10px 22px; border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    z-index: 999;
+    transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── MODAL ─── */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 200; display: none;
+    align-items: center; justify-content: center;
+  }
+  .modal-bg.show { display: flex; }
+
+  .modal {
+    background: var(--black2);
+    border: 3px solid var(--yellow);
+    border-radius: 4px;
+    padding: 36px 28px;
+    text-align: center; max-width: 320px; width: 90%;
+    animation: popIn .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-emoji { font-size: 54px; display: block; margin-bottom: 14px; }
+
+  .modal-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px; font-weight: 700;
+    color: var(--yellow); margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .modal-sub {
+    font-size: 13px; color: var(--white-dim);
+    line-height: 1.65; margin-bottom: 22px; white-space: pre-line;
+  }
+  .modal-badge {
+    background: var(--yellow-dim); border: 2px solid var(--yellow);
+    border-radius: 4px; padding: 10px 14px; margin-bottom: 18px;
+    display: none;
+  }
+  .modal-badge.show { display: block; }
+  .modal-badge p {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--yellow);
+    font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+
+  /* ─── PULSE ANIM ─── */
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.45} }
+  .pulsing .t-display { animation: pulse 1.8s ease infinite; }
+</style>
 </head>
 <body>
 
-<div id="app" class="w-full max-w-md p-6">
-    <div class="flex justify-between items-center mb-8 px-2">
-        <div class="flex flex-col">
-            <span class="text-xs uppercase tracking-widest text-slate-400">Seviye <span id="level-val">1</span></span>
-            <div class="w-32 h-1.5 bg-slate-800 rounded-full mt-1 overflow-hidden">
-                <div id="xp-bar" class="xp-bar-inner h-full bg-emerald-500" style="width: 0%"></div>
-            </div>
-            <span class="text-[10px] mt-1 text-slate-500">XP: <span id="xp-val">0</span></span>
-        </div>
-        <div class="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-white/5">
-            <div class="text-emerald-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </div>
-            <span id="streak-val" class="font-semibold text-sm">0</span>
-            <span id="multiplier" class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 rounded hidden">1.5x</span>
-        </div>
+<div class="app">
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ── MODAL ── -->
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <span class="modal-emoji" id="mEmoji">🎉</span>
+      <h2 class="modal-title">Tamamlandı!</h2>
+      <p class="modal-sub" id="mSub">Görevi başarıyla bitirdin.</p>
+      <div class="modal-badge" id="mBadge">
+        <p>🏅 Yeni rozet: <span id="mBadgeName"></span></p>
+      </div>
+      <button class="btn-main" style="width:100%;min-width:0" onclick="closeModal()">DEVAM ET →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ TIMER ═══ -->
+  <div class="screen active" id="screen-timer">
+    <div class="header">
+      <h1>anlık<span class="accent">_</span>görev</h1>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Tema">
+        <svg id="themeIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
     </div>
 
-    <div class="glass-card p-8 flex flex-col items-center text-center">
-        <div id="task-input-area" class="w-full">
-            <input type="text" id="task-name" placeholder="Hangi göreve başlıyorsun?" class="w-full bg-transparent border-b border-slate-700 pb-2 text-center text-lg focus:outline-none focus:border-emerald-500 transition-colors placeholder:text-slate-600">
-            
-            <div class="flex justify-center space-x-4 mt-6">
-                <button onclick="setTime(5)" class="px-3 py-1 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 transition">5dk</button>
-                <button onclick="setTime(25)" class="px-3 py-1 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 transition">25dk</button>
-                <button onclick="setTime(50)" class="px-3 py-1 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 transition">50dk</button>
-            </div>
-
-            <div class="mt-8 flex items-center justify-center space-x-2">
-                <input type="checkbox" id="commitment-mode" class="accent-emerald-500">
-                <label for="commitment-mode" class="text-xs text-slate-400 cursor-pointer">Commitment Modu (İptal edilemez)</label>
-            </div>
-
-            <button onclick="startTask()" class="mt-8 w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
-                Görevi Başlat
-            </button>
-        </div>
-
-        <div id="timer-area" class="hidden w-full flex flex-col items-center">
-            <h2 id="active-task-title" class="text-sm text-slate-400 mb-4 tracking-wide truncate w-full">Görev Yapılıyor</h2>
-            <div class="timer-circle">
-                <svg width="220" height="220">
-                    <circle class="bg-circle" cx="110" cy="110" r="100"></circle>
-                    <circle id="progress" class="progress-circle" cx="110" cy="110" r="100"></circle>
-                </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <span id="time-display" class="text-5xl font-light tracking-tighter tabular-nums">00:00</span>
-                    <span id="cancel-btn" onclick="cancelTask()" class="mt-4 text-[10px] uppercase tracking-widest text-slate-500 cursor-pointer hover:text-red-400 transition">Görevi İptal Et</span>
-                </div>
-            </div>
-        </div>
+    <div class="task-input-wrap">
+      <div class="field-label">// ne yapacaksın?</div>
+      <input class="task-input" id="taskInput" type="text" placeholder="görevini buraya yaz…" maxlength="60" />
     </div>
 
-    <div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/90">
-        <div class="glass-card w-full p-8 text-center border-emerald-500/30">
-            <div class="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-            <h2 class="text-2xl font-bold mb-2">Görev Başarılı!</h2>
-            <p class="text-slate-400 text-sm mb-6">"Demir gibi bir zihin" yolunda bir adım daha attın.</p>
-            
-            <div class="bg-slate-800/50 rounded-xl p-4 mb-6">
-                <input type="text" id="micro-note" placeholder="Kısa bir not bırak (nasıl geçti?)" class="w-full bg-transparent text-center text-sm focus:outline-none border-b border-slate-700 pb-1">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="text-left bg-slate-800/30 p-3 rounded-lg">
-                    <span class="block text-[10px] text-slate-500 uppercase">Kazanılan XP</span>
-                    <span id="xp-earned" class="text-emerald-400 font-bold">+15</span>
-                </div>
-                <div class="text-left bg-slate-800/30 p-3 rounded-lg">
-                    <span class="block text-[10px] text-slate-500 uppercase">Streak</span>
-                    <span id="streak-added" class="text-orange-400 font-bold">Lvl 1</span>
-                </div>
-            </div>
-
-            <button onclick="closeModal()" class="w-full py-3 bg-emerald-500 text-slate-900 font-bold rounded-xl shadow-lg">Harika, Devam Et</button>
-            <p class="mt-4 text-[10px] text-emerald-400 animate-pulse">Öneri: Şimdi 2 dakikalık bir nefes egzersizi yap.</p>
-        </div>
+    <div class="templates-wrap">
+      <div class="field-label">// süre seç</div>
+      <div class="templates">
+        <button class="tpl-btn active" data-min="5" onclick="pickTemplate(this,5)">
+          <span class="tpl-dur">05</span><span class="tpl-lbl">dk</span>
+        </button>
+        <button class="tpl-btn" data-min="15" onclick="pickTemplate(this,15)">
+          <span class="tpl-dur">15</span><span class="tpl-lbl">dk</span>
+        </button>
+        <button class="tpl-btn" data-min="25" onclick="pickTemplate(this,25)">
+          <span class="tpl-dur">25</span><span class="tpl-lbl">pomo</span>
+        </button>
+        <button class="tpl-btn" data-min="0" onclick="pickTemplate(this,0)">
+          <span class="tpl-dur" style="font-size:16px;margin-top:2px">///</span><span class="tpl-lbl">özel</span>
+        </button>
+      </div>
+      <div class="custom-wrap" id="customWrap">
+        <label>DK:</label>
+        <input class="custom-input" id="customMin" type="number" min="1" max="180" value="30" />
+      </div>
     </div>
+
+    <div class="timer-section" id="timerSection">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 200 200">
+          <circle class="ring-track" cx="100" cy="100" r="82"/>
+          <circle class="ring-fill"  cx="100" cy="100" r="82" id="ringFill"/>
+        </svg>
+        <div class="ring-center">
+          <div class="t-display" id="tDisp">05:00</div>
+          <div class="t-name" id="tName">Hazır</div>
+          <span class="t-badge idle" id="tState">bekliyor</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-sq danger" onclick="resetTimer()" title="Sıfırla">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+
+        <button class="btn-main" id="startBtn" onclick="handleStart()">BAŞLAT</button>
+
+        <button class="btn-sq" id="pauseBtn" onclick="togglePause()" style="display:none" title="Duraklat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="pauseIco">
+            <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ STATS ═══ -->
+  <div class="screen" id="screen-stats">
+    <div class="header"><h1>istatistik<span class="accent">_</span></h1></div>
+    <div class="stats-grid">
+      <div class="s-card">
+        <span class="s-icon" id="fireIcon">🔥</span>
+        <div class="s-val" id="sStreak">0</div>
+        <div class="s-lbl">Günlük Seri</div>
+      </div>
+      <div class="s-card">
+        <span class="s-icon">📋</span>
+        <div class="s-val" id="sTotal">0</div>
+        <div class="s-lbl">Toplam Görev</div>
+      </div>
+      <div class="s-card">
+        <span class="s-icon">⏱️</span>
+        <div class="s-val" id="sMins">0</div>
+        <div class="s-lbl">Toplam Dakika</div>
+      </div>
+      <div class="s-card">
+        <span class="s-icon">✅</span>
+        <div class="s-val" id="sToday">0</div>
+        <div class="s-lbl">Bugün</div>
+      </div>
+      <div class="s-card wide">
+        <div class="field-label">// haftalık aktivite</div>
+        <div class="week-donut-wrap">
+          <!-- Donut -->
+          <div class="donut-svg-wrap">
+            <svg class="donut-svg" viewBox="0 0 100 100">
+              <circle class="donut-track" cx="50" cy="50" r="38"/>
+              <circle class="donut-fill" cx="50" cy="50" r="38" id="donutFill"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-num" id="donutNum">0</div>
+              <div class="donut-sub">bu hafta</div>
+            </div>
+          </div>
+          <!-- Day bars -->
+          <div class="week-days" id="weekDays"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ HISTORY ═══ -->
+  <div class="screen" id="screen-history">
+    <div class="header">
+      <h1>geçmiş<span class="accent">_</span></h1>
+      <button class="icon-btn" onclick="clearHistory()" title="Temizle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+          <path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </div>
+
+  <!-- ═══════════════════════ BADGES ═══ -->
+  <div class="screen" id="screen-badges">
+    <div class="header"><h1>rozetler<span class="accent">_</span></h1></div>
+    <div class="badge-grid" id="badgeGrid"></div>
+  </div>
+
+  <!-- ── NAV ── -->
+  <nav class="nav">
+    <div class="nav-tab active" onclick="goTo('timer')" id="nav-timer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <span class="nav-lbl">Görev</span>
+    </div>
+    <div class="nav-tab" onclick="goTo('stats')" id="nav-stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      <span class="nav-lbl">İstatistik</span>
+    </div>
+    <div class="nav-tab" onclick="goTo('history')" id="nav-history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <span class="nav-lbl">Geçmiş</span>
+    </div>
+    <div class="nav-tab" onclick="goTo('badges')" id="nav-badges">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="6"/>
+        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+      </svg>
+      <span class="nav-lbl">Rozetler</span>
+    </div>
+  </nav>
+
 </div>
 
 <script>
-    // State Management
-    let state = {
-        xp: parseInt(localStorage.getItem('xp')) || 0,
-        streak: parseInt(localStorage.getItem('streak')) || 0,
-        level: 1,
-        isRunning: false,
-        endTime: null,
-        totalDuration: 0,
-        selectedTime: 25,
-        commitment: false,
-        taskName: ''
-    };
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+const CIRC_RING  = 2 * Math.PI * 82;   // ring r=82
+const CIRC_DONUT = 2 * Math.PI * 38;   // donut r=38
 
-    // DOM Elements
-    const elements = {
-        timeDisplay: document.getElementById('time-display'),
-        progress: document.getElementById('progress'),
-        taskInputArea: document.getElementById('task-input-area'),
-        timerArea: document.getElementById('timer-area'),
-        xpBar: document.getElementById('xp-bar'),
-        xpVal: document.getElementById('xp-val'),
-        levelVal: document.getElementById('level-val'),
-        streakVal: document.getElementById('streak-val'),
-        successModal: document.getElementById('success-modal')
-    };
+let selectedMs   = 5 * 60 * 1000;
+let endTimestamp = null;
+let pausedAt     = null;
+let tickId       = null;
+let isRunning    = false;
+let isPaused     = false;
 
-    function init() {
-        updateStats();
-        checkActiveSession();
-        setInterval(updateTimer, 1000);
+const LS_DATA   = 'agData_v2';
+const LS_TIMER  = 'agTimer_v2';
+const LS_BADGES = 'agBadges_v2';
+const LS_THEME  = 'agTheme_v2';
+
+// ═══════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════
+let actx = null;
+const audio = () => actx || (actx = new (window.AudioContext || window.webkitAudioContext)());
+
+function tone(freq, dur, type='square', vol=0.1) {
+  try {
+    const a = audio();
+    const o = a.createOscillator(), g = a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.frequency.value = freq; o.type = type;
+    g.gain.setValueAtTime(vol, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + dur);
+    o.start(); o.stop(a.currentTime + dur);
+  } catch(e) {}
+}
+
+const sfxStart    = () => { tone(220,.06); setTimeout(()=>tone(440,.1),60); };
+const sfxPause    = () => tone(180,.14,'triangle',.09);
+const sfxResume   = () => { tone(330,.08); setTimeout(()=>tone(440,.1),70); };
+const sfxComplete = () => [330,440,550,660].forEach((f,i)=>setTimeout(()=>tone(f,.3,'square',.12),i*120));
+
+// ═══════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════
+function getData() {
+  return JSON.parse(localStorage.getItem(LS_DATA) || JSON.stringify({
+    history:[], streak:0, lastDayStr:null, totalMins:0, weekly:{}
+  }));
+}
+function saveData(d) { localStorage.setItem(LS_DATA, JSON.stringify(d)); }
+
+// ═══════════════════════════════════════════
+//  TIMER CORE
+// ═══════════════════════════════════════════
+function handleStart() {
+  if (isRunning) return;
+  const task = document.getElementById('taskInput').value.trim() || 'Görev';
+  endTimestamp = Date.now() + selectedMs;
+  pausedAt = null; isRunning = true; isPaused = false;
+  localStorage.setItem(LS_TIMER, JSON.stringify({ endTimestamp, selectedMs, task }));
+  startTick();
+  setUIState('run', task);
+  sfxStart();
+}
+
+function startTick() {
+  if (tickId) clearInterval(tickId);
+  tickId = setInterval(tick, 250);
+}
+
+function tick() {
+  if (isPaused || !endTimestamp) return;
+  const rem = endTimestamp - Date.now();
+  if (rem <= 0) { onComplete(); return; }
+  setDisplayMs(rem);
+  setRing(rem);
+}
+
+function togglePause() {
+  if (!isRunning) return;
+  if (!isPaused) {
+    pausedAt = Date.now(); isPaused = true;
+    setUIState('paused'); sfxPause();
+  } else {
+    endTimestamp += (Date.now() - pausedAt);
+    pausedAt = null; isPaused = false;
+    const s = JSON.parse(localStorage.getItem(LS_TIMER)||'{}');
+    s.endTimestamp = endTimestamp;
+    localStorage.setItem(LS_TIMER, JSON.stringify(s));
+    setUIState('run'); sfxResume();
+  }
+}
+
+function resetTimer() {
+  clearInterval(tickId); tickId = null;
+  endTimestamp = null; pausedAt = null;
+  isRunning = false; isPaused = false;
+  localStorage.removeItem(LS_TIMER);
+  setDisplayMs(selectedMs); setRing(selectedMs);
+  setUIState('idle');
+}
+
+function onComplete() {
+  clearInterval(tickId); tickId = null;
+  localStorage.removeItem(LS_TIMER);
+
+  const task    = document.getElementById('taskInput').value.trim() || 'Görev';
+  const durMins = Math.round(selectedMs / 60000);
+
+  const d   = getData();
+  const now = new Date();
+
+  d.history.unshift({ task, duration: durMins, at: now.toISOString() });
+  if (d.history.length > 200) d.history.pop();
+
+  const dayStr = now.toDateString();
+  if (d.lastDayStr !== dayStr) {
+    const yest = new Date(now - 86400000).toDateString();
+    d.streak = (d.lastDayStr === yest) ? d.streak + 1 : 1;
+    d.lastDayStr = dayStr;
+  }
+  d.totalMins = (d.totalMins || 0) + durMins;
+
+  const key = now.toISOString().split('T')[0];
+  d.weekly[key] = (d.weekly[key] || 0) + 1;
+  saveData(d);
+
+  const newBadge = evalBadges(d);
+  isRunning = false; isPaused = false; endTimestamp = null;
+  setDisplayMs(selectedMs); setRing(selectedMs);
+  setUIState('idle');
+  sfxComplete();
+  showModal(task, durMins, d.streak, newBadge);
+}
+
+function recoverTimer() {
+  const raw = localStorage.getItem(LS_TIMER);
+  if (!raw) return;
+  try {
+    const s = JSON.parse(raw);
+    const rem = s.endTimestamp - Date.now();
+    if (rem <= 200) { localStorage.removeItem(LS_TIMER); return; }
+    endTimestamp = s.endTimestamp; selectedMs = s.selectedMs; isRunning = true;
+    document.getElementById('taskInput').value = s.task || '';
+    document.querySelectorAll('.tpl-btn').forEach(b => {
+      b.classList.toggle('active', +b.dataset.min === selectedMs / 60000);
+    });
+    startTick(); setUIState('run', s.task);
+  } catch(e) { localStorage.removeItem(LS_TIMER); }
+}
+
+// ═══════════════════════════════════════════
+//  DISPLAY HELPERS
+// ═══════════════════════════════════════════
+function setDisplayMs(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(s / 60), sec = s % 60;
+  document.getElementById('tDisp').textContent =
+    String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function setRing(remMs) {
+  const pct = Math.max(0, Math.min(1, remMs / selectedMs));
+  document.getElementById('ringFill').style.strokeDashoffset = CIRC_RING * (1 - pct);
+}
+
+function setUIState(state, task) {
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const tState   = document.getElementById('tState');
+  const tName    = document.getElementById('tName');
+  const sec      = document.getElementById('timerSection');
+
+  if (state === 'run') {
+    startBtn.style.display = 'none';
+    pauseBtn.style.display = 'flex';
+    document.getElementById('pauseIco').innerHTML =
+      '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    tState.className = 't-badge run'; tState.textContent = 'çalışıyor';
+    if (task) tName.textContent = task;
+    sec.classList.remove('pulsing');
+  } else if (state === 'paused') {
+    document.getElementById('pauseIco').innerHTML =
+      '<polygon points="5 3 19 12 5 21 5 3"/>';
+    tState.className = 't-badge paused'; tState.textContent = 'duraklatıldı';
+    sec.classList.add('pulsing');
+  } else {
+    startBtn.style.display = '';
+    pauseBtn.style.display = 'none';
+    tState.className = 't-badge idle'; tState.textContent = 'bekliyor';
+    tName.textContent = 'Hazır';
+    sec.classList.remove('pulsing');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  TEMPLATE SELECTION
+// ═══════════════════════════════════════════
+function pickTemplate(el, min) {
+  if (isRunning) return;
+  document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const cw = document.getElementById('customWrap');
+  if (min === 0) {
+    cw.classList.add('open');
+    const v = parseInt(document.getElementById('customMin').value) || 30;
+    selectedMs = v * 60000;
+  } else {
+    cw.classList.remove('open');
+    selectedMs = min * 60000;
+  }
+  setDisplayMs(selectedMs); setRing(selectedMs);
+}
+
+document.getElementById('customMin').addEventListener('input', function() {
+  const v = Math.max(1, Math.min(180, parseInt(this.value) || 1));
+  selectedMs = v * 60000;
+  setDisplayMs(selectedMs); setRing(selectedMs);
+});
+
+// ═══════════════════════════════════════════
+//  THEME (light mode still works)
+// ═══════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.dataset.theme === 'light';
+  html.dataset.theme = isLight ? 'dark' : 'light';
+  localStorage.setItem(LS_THEME, html.dataset.theme);
+  applyThemeIcon(!isLight);
+}
+function applyThemeIcon(isLight) {
+  document.getElementById('themeIco').innerHTML = isLight
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+const SCREENS = ['timer','stats','history','badges'];
+function goTo(id) {
+  SCREENS.forEach(s => {
+    document.getElementById('screen-'+s).classList.toggle('active', s===id);
+    document.getElementById('nav-'+s).classList.toggle('active', s===id);
+  });
+  if (id==='stats')   renderStats();
+  if (id==='history') renderHistory();
+  if (id==='badges')  renderBadges();
+}
+
+// ═══════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════
+function showModal(task, mins, streak, newBadge) {
+  const emojis = ['⚡','🔥','💥','🎯','💎','👑','🌟'];
+  document.getElementById('mEmoji').textContent = emojis[Math.min(streak-1, emojis.length-1)] || '⚡';
+  document.getElementById('mSub').textContent =
+    `"${task}" — ${mins} dakika tamamlandı!\n🔥 ${streak} günlük seri!`;
+  const mb = document.getElementById('mBadge');
+  if (newBadge) { mb.classList.add('show'); document.getElementById('mBadgeName').textContent = newBadge.name; }
+  else          { mb.classList.remove('show'); }
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('show');
+  document.getElementById('taskInput').value = '';
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════
+//  STATS RENDER
+// ═══════════════════════════════════════════
+function renderStats() {
+  const d = getData();
+  document.getElementById('sStreak').textContent = d.streak || 0;
+  document.getElementById('sTotal').textContent  = d.history.length;
+  document.getElementById('sMins').textContent   = d.totalMins || 0;
+  const todayStr = new Date().toDateString();
+  const todayCnt = d.history.filter(h => new Date(h.at).toDateString()===todayStr).length;
+  document.getElementById('sToday').textContent  = todayCnt;
+  document.getElementById('fireIcon').textContent = d.streak>=7 ? '🔥' : d.streak>=3 ? '⚡' : '✨';
+
+  renderWeekDonut(d);
+}
+
+const TR_DAYS = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+
+function renderWeekDonut(d) {
+  const today  = new Date();
+  const days   = Array.from({length:7}, (_,i)=> {
+    const dt = new Date(today); dt.setDate(today.getDate() - 6 + i); return dt;
+  });
+  const counts  = days.map(dt => d.weekly[dt.toISOString().split('T')[0]] || 0);
+  const weekSum = counts.reduce((a,b)=>a+b, 0);
+  const mx      = Math.max(1, ...counts);
+
+  // Donut
+  const donutFill = document.getElementById('donutFill');
+  const DONUT_CIRC = CIRC_DONUT;
+  // Max possible for the week = 7 * best single day as a scale cap (or cap at 30)
+  const weekCap = Math.max(7, weekSum);
+  const pct = Math.min(1, weekSum / weekCap);
+  donutFill.style.strokeDasharray  = DONUT_CIRC;
+  donutFill.style.strokeDashoffset = DONUT_CIRC * (1 - pct);
+  document.getElementById('donutNum').textContent = weekSum;
+
+  // Day rows
+  const wrap = document.getElementById('weekDays');
+  wrap.innerHTML = '';
+  const todayKey = today.toISOString().split('T')[0];
+
+  days.forEach((dt, i) => {
+    const key   = dt.toISOString().split('T')[0];
+    const cnt   = counts[i];
+    const pctW  = Math.round((cnt / mx) * 100);
+    const dayIdx = dt.getDay() === 0 ? 6 : dt.getDay() - 1;
+    const isToday = key === todayKey;
+
+    const row = document.createElement('div');
+    row.className = 'week-row' + (isToday ? ' is-today' : '');
+    row.innerHTML = `
+      <div class="week-day-lbl">${TR_DAYS[dayIdx]}</div>
+      <div class="week-bar-bg">
+        <div class="week-bar-fill" style="width:${Math.max(cnt>0?4:0, pctW)}%"></div>
+      </div>
+      <div class="week-cnt">${cnt||''}</div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  HISTORY RENDER
+// ═══════════════════════════════════════════
+function renderHistory() {
+  const d = getData();
+  const list = document.getElementById('histList');
+  if (!d.history.length) {
+    list.innerHTML = `<div class="empty">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <p>// HENÜZ GÖREV YOK<br>İLK GÖREVİNİ BAŞLAT</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = d.history.map(h => {
+    const dt = new Date(h.at);
+    const dateStr = dt.toLocaleDateString('tr-TR',{day:'numeric',month:'short'})
+      + ' · ' + dt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="hist-item">
+      <div class="hist-dot"></div>
+      <div class="hist-info">
+        <div class="hist-task">${h.task}</div>
+        <div class="hist-meta">${dateStr}</div>
+      </div>
+      <div class="hist-dur">${h.duration}dk</div>
+    </div>`;
+  }).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Tüm geçmiş silinsin mi?')) return;
+  const d = getData();
+  d.history=[]; d.totalMins=0; d.weekly={};
+  saveData(d); renderHistory(); toast('GEÇMİŞ TEMİZLENDİ ✓');
+}
+
+// ═══════════════════════════════════════════
+//  BADGES
+// ═══════════════════════════════════════════
+const BADGES = [
+  { id:'b1',  icon:'🌱', name:'İlk Adım',  desc:'1 görev tamamla',    ok: d => d.history.length>=1  },
+  { id:'b2',  icon:'⭐', name:'Beşli',     desc:'5 görev tamamla',    ok: d => d.history.length>=5  },
+  { id:'b3',  icon:'🏆', name:'Onlu',      desc:'10 görev tamamla',   ok: d => d.history.length>=10 },
+  { id:'b4',  icon:'💎', name:'Elmas',     desc:'50 görev tamamla',   ok: d => d.history.length>=50 },
+  { id:'b5',  icon:'🔥', name:'Ateş',      desc:'3 günlük seri',      ok: d => d.streak>=3          },
+  { id:'b6',  icon:'⚡', name:'Haftalık',  desc:'7 günlük seri',      ok: d => d.streak>=7          },
+  { id:'b7',  icon:'👑', name:'Efsane',    desc:'30 günlük seri',     ok: d => d.streak>=30         },
+  { id:'b8',  icon:'⏱️', name:'Saatçi',    desc:'60 dakika tamamla',  ok: d => d.totalMins>=60      },
+  { id:'b9',  icon:'🚀', name:'Maraton',   desc:'500 dakika tamamla', ok: d => d.totalMins>=500     },
+  { id:'b10', icon:'🌟', name:'Yıldız',    desc:'30 görev tamamla',   ok: d => d.history.length>=30 },
+  { id:'b11', icon:'🎯', name:'Nişancı',   desc:'25dk pomodoro bitir',ok: d => d.history.some(h=>h.duration===25) },
+  { id:'b12', icon:'🌙', name:'Geç Kuş',   desc:'Gece yarısı görev',  ok: d => d.history.some(h=>new Date(h.at).getHours()>=23) },
+];
+
+function evalBadges(d) {
+  const earned = JSON.parse(localStorage.getItem(LS_BADGES)||'[]');
+  for (const b of BADGES) {
+    if (!earned.includes(b.id) && b.ok(d)) {
+      earned.push(b.id);
+      localStorage.setItem(LS_BADGES, JSON.stringify(earned));
+      return b;
     }
+  }
+  return null;
+}
 
-    function setTime(mins) {
-        state.selectedTime = mins;
-        document.querySelectorAll('#task-input-area button').forEach(btn => {
-            btn.classList.remove('bg-emerald-500', 'text-slate-900');
-            if(parseInt(btn.innerText) === mins) btn.classList.add('bg-emerald-500', 'text-slate-900');
-        });
-    }
+function renderBadges() {
+  const d      = getData();
+  const earned = JSON.parse(localStorage.getItem(LS_BADGES)||'[]');
+  BADGES.forEach(b => { if (b.ok(d) && !earned.includes(b.id)) earned.push(b.id); });
+  localStorage.setItem(LS_BADGES, JSON.stringify(earned));
 
-    function startTask() {
-        const name = document.getElementById('task-name').value;
-        if (!name) return alert("Lütfen bir görev adı girin.");
+  document.getElementById('badgeGrid').innerHTML = BADGES.map(b => {
+    const got = earned.includes(b.id);
+    return `<div class="b-card ${got?'earned':'locked'}">
+      <span class="b-icon">${got ? b.icon : '🔒'}</span>
+      <div class="b-name">${b.name}</div>
+      <div class="b-desc">${b.desc}</div>
+    </div>`;
+  }).join('');
+}
 
-        state.taskName = name;
-        state.commitment = document.getElementById('commitment-mode').checked;
-        state.totalDuration = state.selectedTime * 60 * 1000;
-        state.endTime = Date.now() + state.totalDuration;
-        state.isRunning = true;
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+(function init() {
+  const saved = localStorage.getItem(LS_THEME) || 'dark';
+  document.documentElement.dataset.theme = saved;
+  applyThemeIcon(saved === 'light');
 
-        localStorage.setItem('activeTask', JSON.stringify({
-            endTime: state.endTime,
-            totalDuration: state.totalDuration,
-            taskName: state.taskName,
-            commitment: state.commitment
-        }));
-
-        showTimerUI();
-    }
-
-    function checkActiveSession() {
-        const saved = JSON.parse(localStorage.getItem('activeTask'));
-        if (saved && saved.endTime > Date.now()) {
-            state.endTime = saved.endTime;
-            state.totalDuration = saved.totalDuration;
-            state.taskName = saved.taskName;
-            state.commitment = saved.commitment;
-            state.isRunning = true;
-            showTimerUI();
-        }
-    }
-
-    function showTimerUI() {
-        elements.taskInputArea.classList.add('hidden');
-        elements.timerArea.classList.remove('hidden');
-        document.getElementById('active-task-title').innerText = state.taskName;
-        document.getElementById('cancel-btn').style.display = state.commitment ? 'none' : 'block';
-    }
-
-    function updateTimer() {
-        if (!state.isRunning) return;
-
-        const now = Date.now();
-        const remaining = state.endTime - now;
-
-        if (remaining <= 0) {
-            completeTask();
-            return;
-        }
-
-        // Calculate time
-        const mins = Math.floor(remaining / 60000);
-        const secs = Math.floor((remaining % 60000) / 1000);
-        elements.timeDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-        // Update Progress Circle
-        const percentage = remaining / state.totalDuration;
-        const offset = 628 * (1 - percentage);
-        elements.progress.style.strokeDashoffset = 628 - offset;
-
-        // Dynamic Colors (Heatmap logic)
-        if (percentage < 0.1) {
-            document.body.style.backgroundColor = '#450a0a'; // Dark Red
-            elements.timeDisplay.classList.add('emergency');
-            elements.progress.style.stroke = '#ef4444';
-        } else if (percentage < 0.4) {
-            document.body.style.backgroundColor = '#431407'; // Dark Orange
-            elements.progress.style.stroke = '#f97316';
-        } else {
-            document.body.style.backgroundColor = '#0f172a';
-            elements.progress.style.stroke = '#10b981';
-        }
-    }
-
-    function completeTask() {
-        state.isRunning = false;
-        localStorage.removeItem('activeTask');
-        
-        // Reward Logic
-        const earnedXP = Math.floor(state.selectedTime * 0.8);
-        const multiplier = state.streak >= 5 ? 1.5 : 1;
-        const finalXP = Math.floor(earnedXP * multiplier);
-        
-        state.xp += finalXP;
-        state.streak += 1;
-        
-        localStorage.setItem('xp', state.xp);
-        localStorage.setItem('streak', state.streak);
-        
-        document.getElementById('xp-earned').innerText = `+${finalXP}`;
-        document.getElementById('streak-added').innerText = `Seri: ${state.streak}`;
-        
-        updateStats();
-        elements.successModal.classList.remove('hidden');
-    }
-
-    function updateStats() {
-        // Simple Level Formula: Her 100 XP bir seviye
-        state.level = Math.floor(state.xp / 100) + 1;
-        const currentXPInLevel = state.xp % 100;
-
-        elements.xpVal.innerText = state.xp;
-        elements.levelVal.innerText = state.level;
-        elements.streakVal.innerText = state.streak;
-        elements.xpBar.style.width = `${currentXPInLevel}%`;
-        
-        if(state.streak >= 5) document.getElementById('multiplier').classList.remove('hidden');
-    }
-
-    function cancelTask() {
-        if (state.commitment) return;
-        if (confirm("Görevi iptal etmek istediğine emin misin? Serin bozulabilir!")) {
-            state.isRunning = false;
-            state.streak = 0;
-            localStorage.setItem('streak', 0);
-            localStorage.removeItem('activeTask');
-            location.reload();
-        }
-    }
-
-    function closeModal() {
-        elements.successModal.classList.add('hidden');
-        location.reload();
-    }
-
-    init();
+  document.getElementById('ringFill').style.strokeDasharray  = CIRC_RING;
+  document.getElementById('ringFill').style.strokeDashoffset = 0;
+  setDisplayMs(selectedMs);
+  recoverTimer();
+})();
 </script>
-
 </body>
 </html>
