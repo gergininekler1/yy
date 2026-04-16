@@ -1,756 +1,321 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>an · görev</title>
-  <!-- modern font & minimal icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(145deg, #f7f9fc 0%, #eef0f5 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      margin: 0;
-      color: #1e1f2a;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 36px;
-      box-shadow: 
-        0 20px 40px -8px rgba(0, 0, 0, 0.08),
-        0 8px 20px -6px rgba(0, 0, 0, 0.05),
-        inset 0 1px 0 rgba(255,255,255,0.6);
-      border: 1px solid rgba(255,255,255,0.5);
-      width: 100%;
-      max-width: 440px;
-      padding: 28px 24px 32px;
-      transition: all 0.2s ease;
-    }
-
-    h1 {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-      font-size: 26px;
-      letter-spacing: -0.02em;
-      color: #1e1f2a;
-      margin-bottom: 8px;
-    }
-
-    h1 i {
-      font-size: 26px;
-      color: #ff7e5f;
-      background: rgba(255, 126, 95, 0.12);
-      padding: 8px;
-      border-radius: 18px;
-      backdrop-filter: blur(4px);
-    }
-
-    .streak-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      background: rgba(255,255,240,0.5);
-      padding: 12px 18px;
-      border-radius: 48px;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,215,150,0.3);
-    }
-
-    .streak-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .streak-icon {
-      font-size: 24px;
-      color: #ff8a5c;
-    }
-
-    .streak-text {
-      font-weight: 500;
-      font-size: 18px;
-    }
-
-    .streak-count {
-      font-weight: 700;
-      font-size: 32px;
-      line-height: 1;
-      color: #d85c3b;
-      margin-right: 4px;
-    }
-
-    .reset-streak-btn {
-      background: none;
-      border: none;
-      color: #9a9aae;
-      font-size: 18px;
-      padding: 6px 10px;
-      border-radius: 40px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .reset-streak-btn:hover {
-      background: rgba(0,0,0,0.03);
-      color: #5e5e7a;
-    }
-
-    .task-section {
-      margin-bottom: 28px;
-    }
-
-    .input-icon {
-      display: flex;
-      align-items: center;
-      background: rgba(255,255,255,0.65);
-      border-radius: 60px;
-      padding: 6px 6px 6px 20px;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.8);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-      margin-bottom: 12px;
-    }
-
-    .input-icon i {
-      color: #7f8c9a;
-      font-size: 18px;
-      margin-right: 12px;
-    }
-
-    #taskInput {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-size: 17px;
-      font-weight: 400;
-      padding: 16px 0;
-      outline: none;
-      color: #1e1f2a;
-      font-family: 'Inter', sans-serif;
-    }
-
-    #taskInput::placeholder {
-      color: #a6b1c2;
-      font-weight: 300;
-    }
-
-    .duration-selector {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.5);
-      padding: 6px 6px 6px 20px;
-      border-radius: 60px;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.6);
-    }
-
-    .duration-selector i {
-      color: #7f8c9a;
-      font-size: 18px;
-    }
-
-    #durationSelect {
-      flex: 1;
-      background: transparent;
-      border: none;
-      padding: 14px 0;
-      font-size: 16px;
-      font-weight: 500;
-      color: #1e1f2a;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-    }
-
-    .timer-display {
-      text-align: center;
-      margin: 24px 0 18px;
-    }
-
-    #timer {
-      font-size: 76px;
-      font-weight: 600;
-      font-feature-settings: "tnum";
-      letter-spacing: 2px;
-      color: #1a1c29;
-      line-height: 1.1;
-      text-shadow: 0 2px 10px rgba(255,140,100,0.2);
-    }
-
-    .timer-label {
-      font-size: 15px;
-      font-weight: 400;
-      color: #6d7588;
-      letter-spacing: 0.3px;
-      margin-top: 6px;
-    }
-
-    .action-row {
-      display: flex;
-      gap: 12px;
-      margin: 24px 0 12px;
-    }
-
-    .btn {
-      flex: 1;
-      border: none;
-      padding: 16px 10px;
-      border-radius: 60px;
-      font-weight: 600;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: white;
-      backdrop-filter: blur(8px);
-      background: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.9);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.03);
-      color: #1e1f2a;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .btn-primary {
-      background: #1e1f2a;
-      color: white;
-      border: 1px solid #2f3246;
-      box-shadow: 0 12px 24px -8px rgba(30,31,42,0.2);
-    }
-
-    .btn-primary i {
-      color: #ffb08c;
-    }
-
-    .btn-outline {
-      background: rgba(255,255,255,0.4);
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .complete-btn {
-      margin-top: 8px;
-      background: rgba(220, 240, 200, 0.7);
-      border: 1px solid rgba(160, 200, 140, 0.4);
-    }
-
-    .status-message {
-      text-align: center;
-      min-height: 28px;
-      font-size: 15px;
-      font-weight: 400;
-      color: #d85c3b;
-      margin-top: 14px;
-      opacity: 0.9;
-    }
-
-    .footer-note {
-      margin-top: 24px;
-      color: #8b95a5;
-      font-size: 13px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-    }
-
-    .footer-note i {
-      margin-right: 4px;
-      font-size: 12px;
-    }
-
-    hr {
-      border: none;
-      height: 1px;
-      background: linear-gradient(to right, transparent, rgba(0,0,0,0.05), transparent);
-      margin: 18px 0 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Task - Modern & Minimalist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --accent-color: #10b981;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            transition: background-color 0.8s ease;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .timer-circle {
+            position: relative;
+            width: 220px;
+            height: 220px;
+        }
+        svg {
+            transform: rotate(-90deg);
+        }
+        circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear, stroke 0.8s ease;
+        }
+        .bg-circle { stroke: rgba(255, 255, 255, 0.05); }
+        .progress-circle {
+            stroke-dasharray: 628;
+            stroke-dashoffset: 628;
+            stroke: var(--accent-color);
+        }
+        .commitment-active {
+            pointer-events: none;
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+        .xp-bar-inner {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); color: #ef4444; }
+        }
+        .emergency { animation: pulse-red 1s infinite; }
+    </style>
 </head>
 <body>
-<div class="glass-card">
-  <h1>
-    <i class="fas fa-bolt"></i> 
-    an·görev
-  </h1>
 
-  <!-- streak (ödül sistemi) -->
-  <div class="streak-container">
-    <div class="streak-badge">
-      <i class="fas fa-fire streak-icon"></i>
-      <span class="streak-text">seri</span>
-    </div>
-    <div style="display: flex; align-items: baseline;">
-      <span class="streak-count" id="streakValue">0</span>
-      <button class="reset-streak-btn" id="resetStreakBtn" title="Seriyi sıfırla"><i class="fas fa-undo-alt"></i></button>
-    </div>
-  </div>
-
-  <!-- görev girişi -->
-  <div class="task-section">
-    <div class="input-icon">
-      <i class="fas fa-pen"></i>
-      <input type="text" id="taskInput" placeholder="Ne üzerinde çalışacaksın?" value="Derin çalışma" maxlength="30">
+<div id="app" class="w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-8 px-2">
+        <div class="flex flex-col">
+            <span class="text-xs uppercase tracking-widest text-slate-400">Seviye <span id="level-val">1</span></span>
+            <div class="w-32 h-1.5 bg-slate-800 rounded-full mt-1 overflow-hidden">
+                <div id="xp-bar" class="xp-bar-inner h-full bg-emerald-500" style="width: 0%"></div>
+            </div>
+            <span class="text-[10px] mt-1 text-slate-500">XP: <span id="xp-val">0</span></span>
+        </div>
+        <div class="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-white/5">
+            <div class="text-emerald-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <span id="streak-val" class="font-semibold text-sm">0</span>
+            <span id="multiplier" class="text-[10px] bg-emerald-500/20 text-emerald-400 px-1.5 rounded hidden">1.5x</span>
+        </div>
     </div>
 
-    <div class="duration-selector">
-      <i class="far fa-clock"></i>
-      <select id="durationSelect">
-        <option value="1">1 dakika</option>
-        <option value="5" selected>5 dakika</option>
-        <option value="10">10 dakika</option>
-        <option value="15">15 dakika</option>
-        <option value="25">25 dakika</option>
-        <option value="30">30 dakika</option>
-      </select>
+    <div class="glass-card p-8 flex flex-col items-center text-center">
+        <div id="task-input-area" class="w-full">
+            <input type="text" id="task-name" placeholder="Hangi göreve başlıyorsun?" class="w-full bg-transparent border-b border-slate-700 pb-2 text-center text-lg focus:outline-none focus:border-emerald-500 transition-colors placeholder:text-slate-600">
+            
+            <div class="flex justify-center space-x-4 mt-6">
+                <button onclick="setTime(5)" class="px-3 py-1 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 transition">5dk</button>
+                <button onclick="setTime(25)" class="px-3 py-1 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 transition">25dk</button>
+                <button onclick="setTime(50)" class="px-3 py-1 rounded-lg bg-slate-800 text-xs hover:bg-slate-700 transition">50dk</button>
+            </div>
+
+            <div class="mt-8 flex items-center justify-center space-x-2">
+                <input type="checkbox" id="commitment-mode" class="accent-emerald-500">
+                <label for="commitment-mode" class="text-xs text-slate-400 cursor-pointer">Commitment Modu (İptal edilemez)</label>
+            </div>
+
+            <button onclick="startTask()" class="mt-8 w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
+                Görevi Başlat
+            </button>
+        </div>
+
+        <div id="timer-area" class="hidden w-full flex flex-col items-center">
+            <h2 id="active-task-title" class="text-sm text-slate-400 mb-4 tracking-wide truncate w-full">Görev Yapılıyor</h2>
+            <div class="timer-circle">
+                <svg width="220" height="220">
+                    <circle class="bg-circle" cx="110" cy="110" r="100"></circle>
+                    <circle id="progress" class="progress-circle" cx="110" cy="110" r="100"></circle>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span id="time-display" class="text-5xl font-light tracking-tighter tabular-nums">00:00</span>
+                    <span id="cancel-btn" onclick="cancelTask()" class="mt-4 text-[10px] uppercase tracking-widest text-slate-500 cursor-pointer hover:text-red-400 transition">Görevi İptal Et</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- geri sayım -->
-  <div class="timer-display">
-    <div id="timer">05:00</div>
-    <div class="timer-label" id="taskNameLabel">Derin çalışma</div>
-  </div>
+    <div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/90">
+        <div class="glass-card w-full p-8 text-center border-emerald-500/30">
+            <div class="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Görev Başarılı!</h2>
+            <p class="text-slate-400 text-sm mb-6">"Demir gibi bir zihin" yolunda bir adım daha attın.</p>
+            
+            <div class="bg-slate-800/50 rounded-xl p-4 mb-6">
+                <input type="text" id="micro-note" placeholder="Kısa bir not bırak (nasıl geçti?)" class="w-full bg-transparent text-center text-sm focus:outline-none border-b border-slate-700 pb-1">
+            </div>
 
-  <!-- kontrol butonları -->
-  <div class="action-row">
-    <button class="btn btn-primary" id="startBtn"><i class="fas fa-play"></i> Başlat</button>
-    <button class="btn btn-outline" id="resetBtn"><i class="fas fa-stop"></i> Sıfırla</button>
-  </div>
-  <button class="btn complete-btn" id="completeEarlyBtn"><i class="fas fa-check-circle"></i> Görevi bitir (seri kazan)</button>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="text-left bg-slate-800/30 p-3 rounded-lg">
+                    <span class="block text-[10px] text-slate-500 uppercase">Kazanılan XP</span>
+                    <span id="xp-earned" class="text-emerald-400 font-bold">+15</span>
+                </div>
+                <div class="text-left bg-slate-800/30 p-3 rounded-lg">
+                    <span class="block text-[10px] text-slate-500 uppercase">Streak</span>
+                    <span id="streak-added" class="text-orange-400 font-bold">Lvl 1</span>
+                </div>
+            </div>
 
-  <div id="statusMessage" class="status-message"></div>
-  
-  <hr>
-  <div class="footer-note">
-    <span><i class="far fa-bell"></i> kilit etkilemez</span>
-    <span><i class="fas fa-chart-line"></i> streak</span>
-  </div>
+            <button onclick="closeModal()" class="w-full py-3 bg-emerald-500 text-slate-900 font-bold rounded-xl shadow-lg">Harika, Devam Et</button>
+            <p class="mt-4 text-[10px] text-emerald-400 animate-pulse">Öneri: Şimdi 2 dakikalık bir nefes egzersizi yap.</p>
+        </div>
+    </div>
 </div>
 
 <script>
-  (function(){
-    "use strict";
+    // State Management
+    let state = {
+        xp: parseInt(localStorage.getItem('xp')) || 0,
+        streak: parseInt(localStorage.getItem('streak')) || 0,
+        level: 1,
+        isRunning: false,
+        endTime: null,
+        totalDuration: 0,
+        selectedTime: 25,
+        commitment: false,
+        taskName: ''
+    };
 
-    // ----- DOM elements -----
-    const taskInput = document.getElementById('taskInput');
-    const durationSelect = document.getElementById('durationSelect');
-    const timerDisplay = document.getElementById('timer');
-    const taskNameLabel = document.getElementById('taskNameLabel');
-    const startBtn = document.getElementById('startBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const completeEarlyBtn = document.getElementById('completeEarlyBtn');
-    const streakSpan = document.getElementById('streakValue');
-    const statusDiv = document.getElementById('statusMessage');
-    const resetStreakBtn = document.getElementById('resetStreakBtn');
+    // DOM Elements
+    const elements = {
+        timeDisplay: document.getElementById('time-display'),
+        progress: document.getElementById('progress'),
+        taskInputArea: document.getElementById('task-input-area'),
+        timerArea: document.getElementById('timer-area'),
+        xpBar: document.getElementById('xp-bar'),
+        xpVal: document.getElementById('xp-val'),
+        levelVal: document.getElementById('level-val'),
+        streakVal: document.getElementById('streak-val'),
+        successModal: document.getElementById('success-modal')
+    };
 
-    // ----- State -----
-    let timerInterval = null;
-    let endTime = null;             // timestamp (ms)
-    let currentTaskName = 'Derin çalışma';
-    let streak = 0;
-    let taskCompletedFlag = false;  // aynı görev için birden fazla seri artışını engeller
-    let lastCompletedTaskId = null; // opsiyonel
-
-    // ----- storage keys -----
-    const STORAGE_END_TIME = 'anGorev_endTime';
-    const STORAGE_TASK_NAME = 'anGorev_taskName';
-    const STORAGE_STREAK = 'anGorev_streak';
-    const STORAGE_COMPLETED_FLAG = 'anGorev_completedFlag';
-
-    // ----- yardımcı fonksiyonlar -----
-    function formatTimeFromMs(ms) {
-      if (ms < 0) ms = 0;
-      const totalSeconds = Math.floor(ms / 1000);
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    function init() {
+        updateStats();
+        checkActiveSession();
+        setInterval(updateTimer, 1000);
     }
 
-    function updateTimerDisplay() {
-      if (!endTime) {
-        // varsayılan süreyi göster
-        const mins = parseInt(durationSelect.value, 10);
-        timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
-        return;
-      }
-      const remaining = endTime - Date.now();
-      if (remaining <= 0) {
-        timerDisplay.textContent = '00:00';
-      } else {
-        timerDisplay.textContent = formatTimeFromMs(remaining);
-      }
+    function setTime(mins) {
+        state.selectedTime = mins;
+        document.querySelectorAll('#task-input-area button').forEach(btn => {
+            btn.classList.remove('bg-emerald-500', 'text-slate-900');
+            if(parseInt(btn.innerText) === mins) btn.classList.add('bg-emerald-500', 'text-slate-900');
+        });
     }
 
-    // görev adını etikete yaz
-    function updateTaskLabel() {
-      taskNameLabel.textContent = currentTaskName || 'Odaklan';
-    }
-
-    // streak gösterimini güncelle
-    function updateStreakUI() {
-      streakSpan.textContent = streak;
-    }
-
-    // durum mesajı
-    function setStatus(msg, isGood = true) {
-      statusDiv.textContent = msg;
-      statusDiv.style.color = isGood ? '#2b7a4b' : '#d85c3b';
-      if (isGood) setTimeout(() => { statusDiv.style.color = '#d85c3b'; }, 2000);
-    }
-
-    // storage'a yaz
-    function persistState() {
-      if (endTime) {
-        localStorage.setItem(STORAGE_END_TIME, endTime.toString());
-      } else {
-        localStorage.removeItem(STORAGE_END_TIME);
-      }
-      localStorage.setItem(STORAGE_TASK_NAME, currentTaskName);
-      localStorage.setItem(STORAGE_STREAK, streak.toString());
-      localStorage.setItem(STORAGE_COMPLETED_FLAG, taskCompletedFlag ? '1' : '0');
-    }
-
-    // seriyi arttır (ödül)
-    function incrementStreak() {
-      streak += 1;
-      updateStreakUI();
-      localStorage.setItem(STORAGE_STREAK, streak.toString());
-      setStatus(`🔥 Seri +1! Şimdi ${streak} günlük ateş.`, true);
-    }
-
-    // görevi tamamla (zaman dolduğunda veya erken bitirmede)
-    function completeTask(manual = false) {
-      if (taskCompletedFlag) {
-        if (manual) setStatus('Bu görev zaten tamamlandı.', false);
-        return false;
-      }
-      if (!endTime) {
-        if (manual) setStatus('Aktif görev yok.', false);
-        return false;
-      }
-
-      // timer varsa durdur
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-
-      // seriyi arttır (sadece bir kez)
-      if (!taskCompletedFlag) {
-        incrementStreak();
-        taskCompletedFlag = true;
-      }
-
-      // endTime temizle
-      endTime = null;
-      localStorage.removeItem(STORAGE_END_TIME);
-      localStorage.setItem(STORAGE_COMPLETED_FLAG, '1');
-      
-      // arayüzü güncelle
-      const mins = parseInt(durationSelect.value, 10);
-      timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
-      
-      if (manual) {
-        setStatus(`✅ "${currentTaskName}" tamamlandı, seri kazanıldı!`, true);
-      } else {
-        setStatus(`⏰ Süre doldu! "${currentTaskName}" için +1 seri 🔥`, true);
-      }
-      
-      // flag sıfırlanacak (yeni görev başlatıldığında)
-      return true;
-    }
-
-    // timer bittiğinde çağrılır (interval içinden)
-    function handleTimerFinish() {
-      if (taskCompletedFlag) return;
-      completeTask(false);
-    }
-
-    // interval güncelleme
-    function tick() {
-      if (!endTime) {
-        // güvenlik
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = null;
-        return;
-      }
-      
-      const remaining = endTime - Date.now();
-      timerDisplay.textContent = formatTimeFromMs(remaining > 0 ? remaining : 0);
-      
-      if (remaining <= 0) {
-        // süre bitti
-        handleTimerFinish();
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-      }
-      
-      // her tick'te storage'ı güncellemeye gerek yok, sadece endTime zaten var.
-    }
-
-    // interval başlat
-    function startTimerInterval() {
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(tick, 200); // akıcı güncelleme
-    }
-
-    // yeni görev başlat
     function startTask() {
-      // önceki interval varsa temizle
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      
-      const durationMinutes = parseInt(durationSelect.value, 10);
-      if (durationMinutes <= 0) return;
-      
-      const taskName = taskInput.value.trim();
-      currentTaskName = taskName === '' ? 'Odaklan' : taskName;
-      updateTaskLabel();
-      
-      // endTime oluştur
-      const now = Date.now();
-      endTime = now + (durationMinutes * 60 * 1000);
-      
-      // yeni görev başladı, tamamlanma flag'ini sıfırla
-      taskCompletedFlag = false;
-      
-      // storage güncelle
-      persistState();
-      
-      // arayüz
-      updateTimerDisplay();
-      startTimerInterval();
-      
-      setStatus(`▶️ "${currentTaskName}" başladı.`, true);
+        const name = document.getElementById('task-name').value;
+        if (!name) return alert("Lütfen bir görev adı girin.");
+
+        state.taskName = name;
+        state.commitment = document.getElementById('commitment-mode').checked;
+        state.totalDuration = state.selectedTime * 60 * 1000;
+        state.endTime = Date.now() + state.totalDuration;
+        state.isRunning = true;
+
+        localStorage.setItem('activeTask', JSON.stringify({
+            endTime: state.endTime,
+            totalDuration: state.totalDuration,
+            taskName: state.taskName,
+            commitment: state.commitment
+        }));
+
+        showTimerUI();
     }
 
-    // timer'ı sıfırla (görevi iptal et, seri etkilenmez)
-    function resetTimer(showMessage = true) {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      
-      endTime = null;
-      taskCompletedFlag = false;
-      localStorage.removeItem(STORAGE_END_TIME);
-      localStorage.setItem(STORAGE_COMPLETED_FLAG, '0');
-      
-      const mins = parseInt(durationSelect.value, 10);
-      timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
-      
-      if (showMessage) setStatus('🔄 Görev sıfırlandı.', false);
+    function checkActiveSession() {
+        const saved = JSON.parse(localStorage.getItem('activeTask'));
+        if (saved && saved.endTime > Date.now()) {
+            state.endTime = saved.endTime;
+            state.totalDuration = saved.totalDuration;
+            state.taskName = saved.taskName;
+            state.commitment = saved.commitment;
+            state.isRunning = true;
+            showTimerUI();
+        }
     }
 
-    // Streak'i sıfırla
-    function resetStreak() {
-      if (confirm('Seriyi sıfırlamak istediğine emin misin?')) {
-        streak = 0;
-        updateStreakUI();
-        localStorage.setItem(STORAGE_STREAK, '0');
-        setStatus('🔥 Seri sıfırlandı.', false);
-      }
+    function showTimerUI() {
+        elements.taskInputArea.classList.add('hidden');
+        elements.timerArea.classList.remove('hidden');
+        document.getElementById('active-task-title').innerText = state.taskName;
+        document.getElementById('cancel-btn').style.display = state.commitment ? 'none' : 'block';
     }
 
-    // sayfa yüklendiğinde localStorage'dan geri yükle
-    function loadPersistedState() {
-      // streak
-      const savedStreak = localStorage.getItem(STORAGE_STREAK);
-      if (savedStreak !== null) {
-        streak = parseInt(savedStreak, 10) || 0;
-      } else {
-        streak = 0;
-      }
-      updateStreakUI();
-      
-      // görev adı
-      const savedTask = localStorage.getItem(STORAGE_TASK_NAME);
-      if (savedTask) {
-        currentTaskName = savedTask;
-        taskInput.value = currentTaskName;
-      } else {
-        currentTaskName = taskInput.value.trim() || 'Derin çalışma';
-      }
-      updateTaskLabel();
-      
-      // endTime kontrolü
-      const savedEndTime = localStorage.getItem(STORAGE_END_TIME);
-      const completedFlag = localStorage.getItem(STORAGE_COMPLETED_FLAG) === '1';
-      
-      if (savedEndTime) {
-        const end = parseInt(savedEndTime, 10);
+    function updateTimer() {
+        if (!state.isRunning) return;
+
         const now = Date.now();
-        
-        if (end > now) {
-          // süre devam ediyor
-          endTime = end;
-          taskCompletedFlag = completedFlag; // normalde false olmalı
-          
-          // eğer daha önce tamamlanmış işaretlenmişse düzelt (tutarsızlık)
-          if (taskCompletedFlag) {
-            // muhtemelen eski bir durum, resetleyelim
-            endTime = null;
-            taskCompletedFlag = false;
-            localStorage.removeItem(STORAGE_END_TIME);
-          } else {
-            updateTimerDisplay();
-            startTimerInterval();
-            setStatus(`⏳ "${currentTaskName}" devam ediyor.`, true);
-          }
+        const remaining = state.endTime - now;
+
+        if (remaining <= 0) {
+            completeTask();
+            return;
+        }
+
+        // Calculate time
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        elements.timeDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        // Update Progress Circle
+        const percentage = remaining / state.totalDuration;
+        const offset = 628 * (1 - percentage);
+        elements.progress.style.strokeDashoffset = 628 - offset;
+
+        // Dynamic Colors (Heatmap logic)
+        if (percentage < 0.1) {
+            document.body.style.backgroundColor = '#450a0a'; // Dark Red
+            elements.timeDisplay.classList.add('emergency');
+            elements.progress.style.stroke = '#ef4444';
+        } else if (percentage < 0.4) {
+            document.body.style.backgroundColor = '#431407'; // Dark Orange
+            elements.progress.style.stroke = '#f97316';
         } else {
-          // süre dolmuş ama daha önce seri eklenmemiş olabilir
-          if (!completedFlag) {
-            // süresi geçmiş ama tamamlanmamış -> otomatik tamamla
-            endTime = end;
-            taskCompletedFlag = false;
-            // completeTask çağır (seri artar)
-            completeTask(false);
-          } else {
-            // zaten tamamlanmış, endTime'i temizle
-            endTime = null;
-            localStorage.removeItem(STORAGE_END_TIME);
-          }
-          updateTimerDisplay();
+            document.body.style.backgroundColor = '#0f172a';
+            elements.progress.style.stroke = '#10b981';
         }
-      } else {
-        // endTime yok
-        endTime = null;
-        taskCompletedFlag = false;
-        const mins = parseInt(durationSelect.value, 10);
-        timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
-      }
-      
-      // completed flag'i güncel duruma göre ayarla
-      if (endTime === null) {
-        taskCompletedFlag = false;
-        localStorage.setItem(STORAGE_COMPLETED_FLAG, '0');
-      }
     }
 
-    // ----- Event listeners -----
-    startBtn.addEventListener('click', () => {
-      // aktif görev varsa uyar? start yeni görev başlatır, eskisini iptal eder.
-      if (endTime) {
-        if (!confirm('Devam eden bir görev var. Yeni görev başlatılsın mı?')) {
-          return;
-        }
-        resetTimer(false);
-      }
-      startTask();
-    });
-
-    resetBtn.addEventListener('click', () => {
-      if (endTime) {
-        resetTimer(true);
-      } else {
-        // sadece ekranı varsayılana çek
-        const mins = parseInt(durationSelect.value, 10);
-        timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
-        setStatus('⏸️ Hazır', false);
-      }
-    });
-
-    completeEarlyBtn.addEventListener('click', () => {
-      if (!endTime) {
-        setStatus('⛔ Aktif görev yok.', false);
-        return;
-      }
-      if (taskCompletedFlag) {
-        setStatus('Bu görev zaten tamamlanmış.', false);
-        return;
-      }
-      completeTask(true);
-    });
-
-    resetStreakBtn.addEventListener('click', resetStreak);
-
-    // süre değişince timer'ı güncelle (eğer aktif görev yoksa)
-    durationSelect.addEventListener('change', () => {
-      if (!endTime) {
-        const mins = parseInt(durationSelect.value, 10);
-        timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
-      }
-    });
-
-    taskInput.addEventListener('input', (e) => {
-      currentTaskName = e.target.value.trim() || 'Odaklan';
-      updateTaskLabel();
-      if (!endTime) {
-        // aktif görev yoksa storage'ı güncelle
-        localStorage.setItem(STORAGE_TASK_NAME, currentTaskName);
-      } else {
-        // görev aktifken isim değişirse kaydet
-        localStorage.setItem(STORAGE_TASK_NAME, currentTaskName);
-      }
-    });
-
-    // Sayfa kapanırken / gizlenirken storage zaten güncel. Ama visibility değişiminde timer doğru kalsın.
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && endTime) {
-        // sekme tekrar aktif, timer'ı tazele
-        updateTimerDisplay();
-      }
-    });
-
-    // başlangıç
-    loadPersistedState();
-    
-    // eğer endTime yoksa, seçili süreyi göster
-    if (!endTime) {
-      const mins = parseInt(durationSelect.value, 10);
-      timerDisplay.textContent = formatTimeFromMs(mins * 60 * 1000);
+    function completeTask() {
+        state.isRunning = false;
+        localStorage.removeItem('activeTask');
+        
+        // Reward Logic
+        const earnedXP = Math.floor(state.selectedTime * 0.8);
+        const multiplier = state.streak >= 5 ? 1.5 : 1;
+        const finalXP = Math.floor(earnedXP * multiplier);
+        
+        state.xp += finalXP;
+        state.streak += 1;
+        
+        localStorage.setItem('xp', state.xp);
+        localStorage.setItem('streak', state.streak);
+        
+        document.getElementById('xp-earned').innerText = `+${finalXP}`;
+        document.getElementById('streak-added').innerText = `Seri: ${state.streak}`;
+        
+        updateStats();
+        elements.successModal.classList.remove('hidden');
     }
-    
-    // streak sıfırlama butonuna ekstra güvenlik
-    window.addEventListener('load', () => {
-      // ekran dönüşlerinde düzgün görünsün
-    });
-  })();
+
+    function updateStats() {
+        // Simple Level Formula: Her 100 XP bir seviye
+        state.level = Math.floor(state.xp / 100) + 1;
+        const currentXPInLevel = state.xp % 100;
+
+        elements.xpVal.innerText = state.xp;
+        elements.levelVal.innerText = state.level;
+        elements.streakVal.innerText = state.streak;
+        elements.xpBar.style.width = `${currentXPInLevel}%`;
+        
+        if(state.streak >= 5) document.getElementById('multiplier').classList.remove('hidden');
+    }
+
+    function cancelTask() {
+        if (state.commitment) return;
+        if (confirm("Görevi iptal etmek istediğine emin misin? Serin bozulabilir!")) {
+            state.isRunning = false;
+            state.streak = 0;
+            localStorage.setItem('streak', 0);
+            localStorage.removeItem('activeTask');
+            location.reload();
+        }
+    }
+
+    function closeModal() {
+        elements.successModal.classList.add('hidden');
+        location.reload();
+    }
+
+    init();
 </script>
-<!-- 10 öneri (tavsiye) aşağıda metin olarak yer alıyor -->
-<!-- 
-  ========== 10 TAVSİYE (özellik önerisi) ==========
-  1. Bildirim desteği: Görev tamamlandığında tarayıcı bildirimi gönderme (Notification API).
-  2. Sesli geri bildirim: Tamamlama anında hafif bir "ding" sesi veya titreşim (Vibration API).
-  3. Karanlık mod: Sistem tercihine göre otomatik tema değişimi.
-  4. İstatistik panosu: Günlük/haftalık tamamlanan görev sayısı ve toplam odak süresi.
-  5. Pomodoro entegrasyonu: Çalışma / mola döngüleri ve otomatik geçiş.
-  6. Görev etiketleri / kategoriler: "Çalışma", "Okuma", "Egzersiz" gibi ikonlarla filtreleme.
-  7. Hedef belirleme: Günlük hedef (ör. 4 görev) ve hedefe ulaşınca özel kutlama.
-  8. Arkadaşlarla yarış: Basit leaderboard veya arkadaş ekleyerek streak karşılaştırması (Firebase).
-  9. Widget desteği: Ana ekrana geri sayım widget'ı ekleme (PWA + Web APK).
-  10. Yapay zeka asistanı: Görev önerileri veya süre tavsiyesi (ör. "şu an 10dk meditasyon iyi gelir").
-  ==================================================
--->
+
 </body>
 </html>
