@@ -219,6 +219,16 @@
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; display: none; align-items: center; justify-content: center; }
   .modal-bg.show { display: flex; }
   .modal { background: var(--black2); border: 3px solid var(--yellow); border-radius: 4px; padding: 36px 28px; text-align: center; max-width: 320px; width: 90%; animation: popIn .3s; }
+  /* GÜNLÜK HEDEF */
+  .daily-goal-wrap { margin-top: 14px; cursor: pointer; padding: 12px 14px; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; transition: border-color .2s; }
+  .daily-goal-wrap:hover { border-color: var(--yellow-mid); }
+  .daily-goal-wrap.completed { border-color: var(--yellow); box-shadow: 0 0 10px var(--yellow-dim); }
+  .goal-bar-bg { width: 100%; height: 5px; background: var(--black4); border-radius: 3px; overflow: hidden; margin: 7px 0 5px; }
+  .goal-bar-fill { height: 100%; background: var(--yellow); border-radius: 3px; transition: width .8s cubic-bezier(.34,1.56,.64,1); }
+  .goal-row { display: flex; justify-content: space-between; align-items: center; }
+  .goal-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); letter-spacing: 0.5px; }
+  .goal-pct { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--yellow); }
+
   @keyframes popIn { from { transform: scale(.8); opacity:0; } to { transform: scale(1); opacity:1; } }
   .pulsing .t-display { animation: pulse 1.8s infinite; }
   @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.45} }
@@ -288,6 +298,15 @@
         <button class="btn-main" id="startBtn" onclick="handleStart()">BAŞLAT</button>
         <button class="btn-sq" id="pauseBtn" onclick="togglePause()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="pauseIco"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
       </div>
+    </div>
+
+    <div class="daily-goal-wrap" id="dailyGoalWrap" onclick="editDailyGoal()" title="Günlük hedefi düzenle">
+      <div class="goal-row">
+        <div class="field-label" style="margin:0;">// günlük_hedef</div>
+        <div class="goal-pct" id="goalPct">%0</div>
+      </div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" id="goalBarFill" style="width:0%"></div></div>
+      <div class="goal-text" id="goalText">0 / 60 dk · hedefe ulaşmak için tıkla</div>
     </div>
 
     <div class="home-section-title">// <span id="lblWeek">bu_hafta</span></div>
@@ -425,8 +444,22 @@ function tick() {
 }
 function togglePause() {
   if (!isRunning) return;
-  if (!isPaused) { pausedAt = Date.now(); isPaused = true; setUIState('paused'); }
-  else { endTimestamp += (Date.now() - pausedAt); pausedAt = null; isPaused = false; setUIState('run'); }
+  if (!isPaused) {
+    pausedAt = Date.now(); isPaused = true; setUIState('paused');
+    try {
+      const s = JSON.parse(localStorage.getItem(LS_TIMER) || '{}');
+      s.pauseRemMs = endTimestamp - pausedAt;
+      localStorage.setItem(LS_TIMER, JSON.stringify(s));
+    } catch(e) {}
+  } else {
+    endTimestamp += (Date.now() - pausedAt); pausedAt = null; isPaused = false; setUIState('run');
+    try {
+      const s = JSON.parse(localStorage.getItem(LS_TIMER) || '{}');
+      s.endTimestamp = endTimestamp;
+      delete s.pauseRemMs;
+      localStorage.setItem(LS_TIMER, JSON.stringify(s));
+    } catch(e) {}
+  }
 }
 function resetTimer() { clearInterval(tickId); isRunning = false; isPaused = false; endTimestamp = null; localStorage.removeItem(LS_TIMER); setDisplayMs(selectedMs); setRing(selectedMs); setUIState('idle'); document.title = 'Anlık Görev'; }
 
@@ -456,7 +489,7 @@ function onComplete() {
     new Notification("GÖREV TAMAMLANDI!", { body: `"${task}" bitti. Harika iş çıkardın! +${durMins} XP` });
   }
 
-  viewingDateStr = key; renderHomeData(); showModal(task, durMins, d.streak, newBadge);
+  viewingDateStr = key; renderHomeData(); renderDailyGoal(); showModal(task, durMins, d.streak, newBadge);
 }
 
 // UI YARDIMCILARI
@@ -546,6 +579,7 @@ function goTo(id) {
 // ANA SAYFA HAFTALIK & TERMİNAL GÖRÜNÜMÜ
 function renderHomeData() {
   const d = getData(), today = new Date();
+  renderDailyGoal();
   
   // Gün Seçici Kutular (Son 7 gün)
   const days = Array.from({length:7}, (_,i) => { const dt = new Date(today); dt.setDate(today.getDate() - 6 + i); return dt; });
@@ -752,6 +786,31 @@ function renderBadges() {
   }).join('');
 }
 
+// GÜNLÜK HEDEF
+const LS_GOAL = 'agGoal_v3';
+function getDailyGoal() { return parseInt(localStorage.getItem(LS_GOAL) || '60'); }
+function renderDailyGoal() {
+  const d = getData();
+  const goal = getDailyGoal();
+  const key = new Date().toISOString().split('T')[0];
+  const todayMins = d.history.filter(h => h.dateKey === key).reduce((s, h) => s + h.duration, 0);
+  const pct = Math.min(100, Math.round((todayMins / goal) * 100));
+  const wrap = document.getElementById('dailyGoalWrap');
+  document.getElementById('goalBarFill').style.width = pct + '%';
+  document.getElementById('goalPct').textContent = '%' + pct;
+  document.getElementById('goalText').textContent = `${todayMins} / ${goal} dk${pct >= 100 ? '  ·  🎉 hedef tamamlandı!' : ''}`;
+  if (pct >= 100) wrap.classList.add('completed'); else wrap.classList.remove('completed');
+}
+function editDailyGoal() {
+  const curr = getDailyGoal();
+  const val = prompt('Günlük odak hedefi (dakika):', curr);
+  if (val && !isNaN(val) && parseInt(val) > 0) {
+    localStorage.setItem(LS_GOAL, parseInt(val));
+    renderDailyGoal();
+    toast('HEDEF GÜNCELLENDİ: ' + parseInt(val) + 'dk');
+  }
+}
+
 // TOAST & MODAL
 let toastTimer; function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 2800); }
 function showModal(task, mins, streak, newBadge) { document.getElementById('mSub').textContent=`"${task}" \n ${mins} dakika tamamlandı! 🔥 ${streak} günlük seri!`; const mb = document.getElementById('mBadge'); if (newBadge) { mb.classList.add('show'); document.getElementById('mBadgeName').textContent = newBadge.name; } else mb.classList.remove('show'); document.getElementById('modalBg').classList.add('show'); }
@@ -834,12 +893,43 @@ if ('serviceWorker' in navigator) {
 (function init() {
   const saved = localStorage.getItem(LS_THEME) || 'dark'; document.documentElement.dataset.theme = saved; applyThemeIcon(saved); initCanvasBG();
   document.getElementById('ringFill').style.strokeDasharray = CIRC_RING; document.getElementById('ringFill').style.strokeDashoffset = 0;
-  setDisplayMs(selectedMs); renderHomeData();
+  setDisplayMs(selectedMs); renderHomeData(); renderDailyGoal();
 
   document.getElementById('editHistInput').addEventListener('keydown', e => { if(e.key==='Enter') saveEditHistory(); if(e.key==='Escape') closeEditModal(); });
 
   // Devam Eden Görev Kurtarma
-  try { const r = localStorage.getItem(LS_TIMER); if(r) { const s = JSON.parse(r), rem = s.endTimestamp - Date.now(); if(rem > 200) { endTimestamp=s.endTimestamp; selectedMs=s.selectedMs; isRunning=true; document.getElementById('taskInput').value=s.task||''; startTick(); setUIState('run', s.task); } else localStorage.removeItem(LS_TIMER); } } catch(e){}
+  try {
+    const r = localStorage.getItem(LS_TIMER);
+    if (r) {
+      const s = JSON.parse(r);
+      if (s.pauseRemMs !== undefined) {
+        // Duraklatılmış oturum kurtarma
+        selectedMs = s.selectedMs;
+        endTimestamp = Date.now() + s.pauseRemMs;
+        pausedAt = Date.now();
+        isRunning = true; isPaused = true;
+        document.getElementById('taskInput').value = s.task || '';
+        startTick();
+        setDisplayMs(s.pauseRemMs); setRing(s.pauseRemMs);
+        setUIState('paused', s.task);
+        setTimeout(() => toast('⏸ DURAKLAMA NOKTASINDAN DEVAM'), 400);
+      } else {
+        const rem = s.endTimestamp - Date.now();
+        if (rem > 200) {
+          endTimestamp = s.endTimestamp; selectedMs = s.selectedMs; isRunning = true;
+          document.getElementById('taskInput').value = s.task || '';
+          startTick(); setUIState('run', s.task);
+          setTimeout(() => toast('▶ ZAMANLAYICI DEVAM EDİYOR'), 400);
+        } else {
+          // Tarayıcı kapalıyken bitti – otomatik tamamla
+          selectedMs = s.selectedMs;
+          document.getElementById('taskInput').value = s.task || '';
+          localStorage.removeItem(LS_TIMER);
+          onComplete();
+        }
+      }
+    }
+  } catch(e) {}
 })();
 </script>
 </body>
