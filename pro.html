@@ -8,13 +8,14 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
   :root {
-    --bg: #f3f4f6;
+    /* Hafif Krem Teması (Light Mode) */
+    --bg: #fdfbf7; 
     --card-bg: #ffffff;
     --accent: #3b82f6;
     --accent-hover: #2563eb;
     --text: #1e293b;
     --text-muted: #64748b;
-    --border: #e2e8f0;
+    --border: #e6e4df;
     --tag-bg: #eff6ff;
     --tag-text: #2563eb;
     --danger: #ef4444;
@@ -23,9 +24,28 @@
     --success: #10b981;
     --success-bg: #f0fdf4;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
     --radius: 16px;
+  }
+
+  /* Karanlık Mod (Dark Mode) Değişkenleri */
+  body.dark-mode {
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --accent: #60a5fa;
+    --accent-hover: #3b82f6;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #333333;
+    --tag-bg: #1e293b;
+    --tag-text: #93c5fd;
+    --danger: #ef4444;
+    --danger-bg: rgba(239, 68, 68, 0.15);
+    --warning: #fbbf24;
+    --success: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.15);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -37,6 +57,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: background-color 0.3s, color 0.3s;
   }
 
   /* LAYOUT BLOCKS */
@@ -56,6 +77,7 @@
     padding: 20px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
   }
 
   /* HEADER */
@@ -70,9 +92,11 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: var(--shadow-sm);
+    transition: background-color 0.3s, border-color 0.3s;
   }
   .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); }
   .logo span { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; display: block; margin-top: 4px; }
+  .header-actions { display: flex; gap: 8px; }
 
   /* MODE TABS */
   .mode-tabs {
@@ -86,8 +110,8 @@
   .mode-tab {
     padding: 10px 16px;
     border-radius: 99px;
-    border: none;
-    background: #e2e8f0;
+    border: 1px solid var(--border);
+    background: var(--bg);
     color: var(--text-muted);
     font-size: 0.85rem;
     font-weight: 600;
@@ -95,7 +119,8 @@
     white-space: nowrap;
     transition: all 0.2s;
   }
-  .mode-tab.active { background: var(--accent); color: white; box-shadow: var(--shadow-sm); }
+  .mode-tab.active { background: var(--accent); color: #fff; box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  body.dark-mode .mode-tab.active { color: #121212; }
   
   /* CONTROLS (Search & Filters) */
   .controls-flex {
@@ -106,6 +131,7 @@
   .controls-row {
     display: flex;
     gap: 12px;
+    flex-direction: column; /* Yan yana yerine alt alta */
   }
   .controls input, .controls select {
     flex: 1;
@@ -117,7 +143,7 @@
     font-size: 0.9rem;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
   }
   .controls input:focus, .controls select:focus { border-color: var(--accent); }
   
@@ -138,9 +164,10 @@
   }
   .btn:active { transform: scale(0.97); }
   .btn-primary { background: var(--accent); color: white; box-shadow: var(--shadow-sm); }
+  body.dark-mode .btn-primary { color: #121212; }
   .btn-primary:active { background: var(--accent-hover); }
   .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-  .btn-icon { padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text); font-size: 1.1rem; }
+  .btn-icon { padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text); font-size: 1.1rem; cursor: pointer;}
 
   /* CATEGORY PILLS */
   .cat-row {
@@ -192,12 +219,12 @@
     width: 100%;
     perspective: 1000px;
     margin: 20px 0;
-    cursor: pointer;
+    /* Kart swiping animasyonları touch event ile js üzerinden yönetilecek */
   }
   .card-inner {
     position: relative;
     width: 100%;
-    min-height: 320px;
+    min-height: 340px;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -213,16 +240,17 @@
     flex-direction: column;
     justify-content: center;
     box-shadow: var(--shadow-md);
-  }
-  .card-front-face {
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1px solid var(--border);
+    transition: background-color 0.3s, border-color 0.3s;
   }
+  body.dark-mode .card-face { background: #262626; border-color: #404040; }
+  
   .card-back-face {
-    background: #ffffff;
     border: 2px solid var(--success);
     transform: rotateY(180deg);
   }
+  body.dark-mode .card-back-face { border-color: var(--success); }
   
   .fav-btn {
     position: absolute;
@@ -307,12 +335,28 @@
     gap: 8px;
   }
   .nav-btn:active { transform: scale(0.96); }
-  .nav-btn.prev, .nav-btn.next { background: var(--bg); color: var(--text); }
-  .nav-btn.didnt { background: var(--danger-bg); color: var(--danger); }
-  .nav-btn.knew { background: var(--success-bg); color: var(--success); }
+  .nav-btn.prev, .nav-btn.next { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .nav-btn.didnt { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+  .nav-btn.knew { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
 
   /* NOTES AREA (Card specific) */
-  .note-input-area textarea {
+  .note-toggle-btn {
+    width: 100%;
+    margin-top: 12px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--text-muted);
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .note-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+  
+  .note-input-wrapper { display: none; margin-top: 12px; }
+  .note-input-wrapper textarea {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -324,8 +368,9 @@
     resize: vertical;
     outline: none;
     min-height: 80px;
+    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
   }
-  .note-input-area textarea:focus { border-color: var(--accent); }
+  .note-input-wrapper textarea:focus { border-color: var(--accent); }
 
   /* LIST VIEWS (Notes & Favs) */
   .list-area { display: none; flex-direction: column; gap: 16px; }
@@ -363,8 +408,8 @@
   .quiz-options { display: flex; flex-direction: column; gap: 12px; }
   .quiz-option { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; font-size: 0.95rem; text-align: left; transition: all 0.2s; font-weight: 500; color: var(--text); }
   .quiz-option:active:not(:disabled) { transform: scale(0.98); }
-  .quiz-option.correct { border-color: var(--success); background: var(--success-bg); color: #065f46; }
-  .quiz-option.wrong { border-color: var(--danger); background: var(--danger-bg); color: #991b1b; }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+  .quiz-option.wrong { border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
   .quiz-result-msg { text-align: center; font-weight: 600; min-height: 24px; margin-top: 8px; }
   .quiz-result-msg.ok { color: var(--success); }
   .quiz-result-msg.bad { color: var(--danger); }
@@ -376,6 +421,10 @@
   .heatmap-cell[data-level="2"] { background: #6ee7b7; }
   .heatmap-cell[data-level="3"] { background: #10b981; }
   .heatmap-cell[data-level="4"] { background: #059669; }
+  body.dark-mode .heatmap-cell[data-level="1"] { background: #064e3b; }
+  body.dark-mode .heatmap-cell[data-level="2"] { background: #065f46; }
+  body.dark-mode .heatmap-cell[data-level="3"] { background: #047857; }
+  body.dark-mode .heatmap-cell[data-level="4"] { background: #10b981; }
 
 </style>
 </head>
@@ -386,7 +435,10 @@
     📊 SPK Araçları 1
     <span>Paylar ve Pay Benzeri Menkul Kıymetler</span>
   </div>
-  <button class="btn-icon" onclick="shuffleCards()" title="Karıştır">🔀</button>
+  <div class="header-actions">
+    <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeBtn" title="Karanlık Mod">🌙</button>
+    <button class="btn-icon" onclick="shuffleCards()" title="Karıştır">🔀</button>
+  </div>
 </header>
 
 <div class="mode-tabs">
@@ -422,7 +474,7 @@
             <option value="katilma-intifa">Katılma İntifa</option>
           </select>
           <select id="statusFilter" onchange="filterCards()">
-            <option value="all">Tümü</option>
+            <option value="all">Tümü (Tüm Kartlar)</option>
             <option value="unseen">Görülmemiş</option>
             <option value="knew">Bilinenler</option>
             <option value="didnt">Bilinmeyenler</option>
@@ -436,7 +488,7 @@
       <div class="cat-row" id="catRow"></div>
     </div>
 
-    <div class="block">
+    <div class="block" style="overflow: hidden;">
       <div class="progress-info">
         <span id="cardCounter">Kart 1 / —</span>
         <span id="pct">0%</span>
@@ -445,14 +497,14 @@
         <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
       </div>
 
-      <div class="card-area" id="cardArea" onclick="flipCard()">
+      <div class="card-area" id="cardArea">
         <div class="card-inner" id="cardInner">
           <div class="card-face card-front-face" id="frontFace">
             <div class="fav-btn" id="favBtn" onclick="toggleFavorite(event)">☆</div>
             <div class="card-tag" id="cardTag">Kavram</div>
             <div class="card-number" id="cardNum">#1</div>
             <div class="card-question" id="cardQuestion">Kartlar yükleniyor...</div>
-            <div class="card-hint">👆 Çevirmek için dokun</div>
+            <div class="card-hint">👆 Çevirmek için dokun, <br>👉 Bildim için sağa, 👈 Bilmedim için sola kaydır</div>
           </div>
           <div class="card-face card-back-face" id="backFace">
             <div class="card-tag">Cevap ✓</div>
@@ -468,13 +520,14 @@
         <button class="nav-btn knew" onclick="markKnew()">✅ Bildim</button>
         <button class="nav-btn next" onclick="nextCard()">İleri ▶</button>
       </div>
+      
+      <button class="note-toggle-btn" onclick="toggleNoteArea()">📝 Bu karta not ekle / düzenle</button>
+      <div class="note-input-wrapper" id="noteAreaWrapper">
+        <textarea id="noteInput" placeholder="Bu karta özel notunuzu buraya ekleyin..."></textarea>
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;" onclick="saveCurrentNote()">💾 Notu Kaydet</button>
+      </div>
 
       <div class="sr-info" id="srInfo"></div>
-    </div>
-
-    <div class="block note-input-area" id="noteBlock">
-      <textarea id="noteInput" placeholder="Bu karta özel notunuzu buraya ekleyin..."></textarea>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveCurrentNote()">💾 Notu Kaydet</button>
     </div>
 
   </div>
@@ -547,7 +600,7 @@
 
 <script>
 // ─────────────────────────────────────────────
-// FLASH KART VERİTABANI – 320 Kart (Eksiksiz Kopyalanmıştır)
+// FLASH KART VERİTABANI – 320 Kart (Eksiksiz)
 // ─────────────────────────────────────────────
 const ALL_CARDS = [
   // ── KAVRAMSAL ÇERÇEVE ──────────────────────
@@ -827,11 +880,13 @@ let known = new Set();
 let didntKnow = new Set();
 let seen = new Set();
 let currentMode = 'study';
+let isDarkMode = false;
 
 const SR_KEY = 'paylar_sr_data';
 const HIST_KEY = 'paylar_history';
 const FAV_KEY = 'paylar_favorites';
 const NOTES_KEY = 'paylar_notes';
+const THEME_KEY = 'paylar_theme';
 
 let srData = {};
 let favorites = new Set();
@@ -841,12 +896,32 @@ function loadData() {
   try { srData = JSON.parse(localStorage.getItem(SR_KEY) || '{}'); } catch(e) { srData = {}; }
   try { favorites = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch(e) { favorites = new Set(); }
   try { cardNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch(e) { cardNotes = {}; }
+  
+  const themePref = localStorage.getItem(THEME_KEY);
+  if (themePref === 'dark') {
+    isDarkMode = true;
+    document.body.classList.add('dark-mode');
+    document.getElementById('darkModeBtn').textContent = '☀️';
+  }
 }
 
 function saveData() {
   localStorage.setItem(SR_KEY, JSON.stringify(srData));
   localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
   localStorage.setItem(NOTES_KEY, JSON.stringify(cardNotes));
+}
+
+function toggleDarkMode() {
+  isDarkMode = !isDarkMode;
+  if(isDarkMode) {
+    document.body.classList.add('dark-mode');
+    localStorage.setItem(THEME_KEY, 'dark');
+    document.getElementById('darkModeBtn').textContent = '☀️';
+  } else {
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem(THEME_KEY, 'light');
+    document.getElementById('darkModeBtn').textContent = '🌙';
+  }
 }
 
 // ── SPACED REPETITION (SM-2) ──────────
@@ -1180,8 +1255,10 @@ function showCard() {
     document.getElementById('srInfo').textContent = '';
     document.getElementById('noteInput').value = '';
     document.getElementById('favBtn').style.display = 'none';
+    document.getElementById('noteAreaWrapper').style.display = 'none';
     return;
   }
+  
   const c = deck[current];
   seen.add(c.id);
   recordStudied(1);
@@ -1193,6 +1270,7 @@ function showCard() {
     'sermaye-azaltimi': 'Sermaye Azaltımı', 'nominal-alti': 'Nominal Değer Altı',
     'ortak-hukumler': 'Ortak Hükümler', 'katilma-intifa': 'Katılma İntifa',
   };
+  
   document.getElementById('favBtn').style.display = 'block';
   updateFavBtn();
   document.getElementById('cardTag').textContent = catLabels[c.cat] || c.cat;
@@ -1207,6 +1285,7 @@ function showCard() {
   document.getElementById('pct').textContent = pct + '%';
   document.getElementById('progressBar').style.width = pct + '%';
   
+  document.getElementById('noteAreaWrapper').style.display = 'none';
   document.getElementById('noteInput').value = cardNotes[c.id] || '';
   renderSRInfo(c.id);
   updateStats();
@@ -1235,23 +1314,91 @@ function prevCard() {
   }
 }
 
-function markKnew() {
+// ── SWIPING LOGIC (Tinder Style) ──
+const cardArea = document.getElementById('cardArea');
+let startX = 0, startY = 0, currentX = 0, isDragging = false;
+let swipeThreshold = 100;
+
+cardArea.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  isDragging = true;
+  cardArea.style.transition = 'none';
+}, {passive: true});
+
+cardArea.addEventListener('touchmove', e => {
+  if (!isDragging) return;
+  currentX = e.touches[0].clientX;
+  const currentY = e.touches[0].clientY;
+  const deltaX = currentX - startX;
+  const deltaY = currentY - startY;
+
+  // Swipe işlemi yalnızca yatay hareket dikeyden daha baskınsa çalışsın
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+    e.preventDefault(); 
+    const rotate = deltaX * 0.05;
+    cardArea.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+  }
+}, {passive: false});
+
+cardArea.addEventListener('touchend', e => {
+  if (!isDragging) return;
+  isDragging = false;
+  const deltaX = currentX - startX;
+  const deltaY = e.changedTouches[0].clientY - startY;
+  
+  // Tıklama tespiti (küçük hareket)
+  if (Math.abs(deltaX) < 15 && Math.abs(deltaY) < 15) {
+    flipCard();
+    resetCardPosition(true);
+    return;
+  }
+
+  cardArea.style.transition = 'transform 0.3s ease-out';
+  if (deltaX > swipeThreshold) {
+    // Sağa kaydırma - Bildim
+    cardArea.style.transform = `translateX(${window.innerWidth}px) rotate(30deg)`;
+    setTimeout(() => { markKnew(true); }, 250);
+  } else if (deltaX < -swipeThreshold) {
+    // Sola kaydırma - Bilmedim
+    cardArea.style.transform = `translateX(-${window.innerWidth}px) rotate(-30deg)`;
+    setTimeout(() => { markDidnt(true); }, 250);
+  } else {
+    resetCardPosition();
+  }
+});
+
+function resetCardPosition(instant = false) {
+  if(instant) {
+    cardArea.style.transition = 'none';
+    cardArea.style.transform = `translateX(0) rotate(0deg)`;
+  } else {
+    cardArea.style.transition = 'transform 0.3s ease';
+    cardArea.style.transform = `translateX(0) rotate(0deg)`;
+  }
+}
+
+function markKnew(fromSwipe = false) {
   if (deck.length === 0) return;
   const c = deck[current];
   known.add(c.id);
   didntKnow.delete(c.id);
   updateSM2(c.id, 4);
   updateStats();
+  
+  if (fromSwipe) resetCardPosition(true);
   nextCard();
 }
 
-function markDidnt() {
+function markDidnt(fromSwipe = false) {
   if (deck.length === 0) return;
   const c = deck[current];
   didntKnow.add(c.id);
   known.delete(c.id);
   updateSM2(c.id, 1);
   updateStats();
+  
+  if (fromSwipe) resetCardPosition(true);
   nextCard();
 }
 
@@ -1283,7 +1430,7 @@ function renderSRInfo(id) {
 
 // ── FAVORITES & NOTES SYSTEM ──
 function toggleFavorite(e) {
-  e.stopPropagation(); // prevent flipping the card
+  e.stopPropagation(); 
   if (deck.length === 0) return;
   const id = deck[current].id;
   if (favorites.has(id)) {
@@ -1305,6 +1452,16 @@ function updateFavBtn() {
   } else {
     btn.innerHTML = '☆';
     btn.classList.remove('active');
+  }
+}
+
+function toggleNoteArea() {
+  const wrap = document.getElementById('noteAreaWrapper');
+  if(wrap.style.display === 'none' || wrap.style.display === '') {
+    wrap.style.display = 'block';
+    document.getElementById('noteInput').focus();
+  } else {
+    wrap.style.display = 'none';
   }
 }
 
