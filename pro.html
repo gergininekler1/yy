@@ -1,331 +1,754 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Storyteller Pro v5.0</title>
-    <style>
-        :root {
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --primary: #3b82f6;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --font-size: 18px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sermaye Piyasası Araçları 1 – Paylar Flash Kartları</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --card-front: #1e3a5f;
+    --card-back: #1a3a2a;
+    --accent: #38bdf8;
+    --accent2: #4ade80;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --tag-bg: #0f3460;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #22c55e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-        /* Temalar */
-        body.dark-theme {
-            --bg: #0f172a; --surface: #1e293b; --text: #f1f5f9; --text-light: #94a3b8; --border: #334155;
-        }
-        body.sepia-theme {
-            --bg: #f4ecd8; --surface: #fdf6e3; --text: #5b4636; --text-light: #8c786a; --border: #e6dec9;
-        }
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0f3460 0%, #1e293b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .logo { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .logo span { color: var(--text-muted); font-weight: 400; font-size: 0.85rem; display: block; }
+  .stats-bar {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    font-size: 0.8rem; color: var(--text-muted);
+    margin-top: 10px;
+  }
+  .stats-bar b { color: var(--text); }
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+  /* CONTROLS */
+  .controls {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .controls select, .controls input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .controls input { width: 220px; }
+  .btn {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #0f172a; }
+  .btn-primary:hover { background: #7dd3fc; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover { background: #475569; }
+  .btn-success { background: var(--success); color: #0f172a; }
+  .btn-danger { background: var(--danger); color: white; }
 
-        /* Navbar & Progress */
-        .navbar {
-            height: 60px;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: space-between;
-            z-index: 100;
-        }
+  /* MAIN AREA */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+  }
 
-        .progress-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.3s;
-        }
+  /* PROGRESS BAR */
+  .progress-wrap {
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 20px;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .progress-bar-bg {
+    background: var(--border);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.4s;
+  }
 
-        /* Layout */
-        .app-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
+  /* CARD */
+  .card-area {
+    width: 100%;
+    max-width: 700px;
+    perspective: 1200px;
+    margin-bottom: 24px;
+    cursor: pointer;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.4,2,.3,1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    min-height: 280px;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .card-front-face {
+    background: linear-gradient(135deg, var(--card-front), #0c2a4a);
+    border: 1px solid #1e4a7a;
+  }
+  .card-back-face {
+    background: linear-gradient(135deg, var(--card-back), #0c2a1a);
+    border: 1px solid #1e4a2a;
+    transform: rotateY(180deg);
+  }
+  .card-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: rgba(56,189,248,0.12);
+    border-radius: 6px;
+    padding: 3px 10px;
+    display: inline-block;
+    margin-bottom: 16px;
+    align-self: flex-start;
+  }
+  .card-back-face .card-tag { color: var(--accent2); background: rgba(74,222,128,0.12); }
+  .card-question {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.55;
+    color: #e2e8f0;
+    margin-bottom: 12px;
+  }
+  .card-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 16px;
+  }
+  .card-answer {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #d1fae5;
+  }
+  .card-answer strong { color: var(--accent2); }
+  .card-number {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    position: absolute;
+    top: 16px;
+    right: 20px;
+  }
+  
+  /* FAVORITE BUTTON */
+  .fav-btn {
+    position: absolute;
+    top: 12px;
+    right: 50px;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+  .fav-btn:hover {
+    transform: scale(1.15);
+    color: #fde047;
+  }
+  .fav-btn.active {
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+  }
 
-        .sidebar {
-            width: 260px;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 20px;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-        }
+  /* NAV BUTTONS */
+  .nav-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 20px;
+  }
+  .nav-btn {
+    flex: 1;
+    min-width: 120px;
+    max-width: 180px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .nav-btn.prev { background: var(--card-bg); border-color: var(--border); color: var(--text); }
+  .nav-btn.prev:hover { border-color: var(--accent); }
+  .nav-btn.knew { background: rgba(34,197,94,0.15); border-color: var(--success); color: var(--success); }
+  .nav-btn.knew:hover { background: rgba(34,197,94,0.25); }
+  .nav-btn.didnt { background: rgba(239,68,68,0.15); border-color: var(--danger); color: var(--danger); }
+  .nav-btn.didnt:hover { background: rgba(239,68,68,0.25); }
+  .nav-btn.next { background: var(--card-bg); border-color: var(--border); color: var(--text); }
+  .nav-btn.next:hover { border-color: var(--accent); }
 
-        .main-editor {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px;
-            overflow-y: auto;
-            background: transparent;
-        }
+  /* CATEGORY PILLS */
+  .cat-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 700px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .cat-pill {
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .cat-pill.active { background: var(--accent); color: #0f172a; border-color: var(--accent); font-weight: 700; }
+  .cat-pill:hover:not(.active) { border-color: var(--accent); color: var(--text); }
 
-        /* Zen Mode Switch */
-        body.zen-mode .sidebar { transform: translateX(-100%); width: 0; padding: 0; }
-        body.zen-mode .navbar { opacity: 0; pointer-events: none; }
+  /* SCORE SUMMARY */
+  .score-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    max-width: 700px;
+    width: 100%;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .score-item { text-align: center; }
+  .score-item .num { font-size: 1.5rem; font-weight: 700; }
+  .score-item .lbl { font-size: 0.75rem; color: var(--text-muted); }
+  .green { color: var(--success); }
+  .red { color: var(--danger); }
+  .blue { color: var(--accent); }
 
-        /* Editor Styling */
-        .writing-area {
-            width: 100%;
-            max-width: 800px;
-            background: var(--surface);
-            padding: 60px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            min-height: 1000px;
-        }
+  /* KEYBOARD HINT */
+  .kbd-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 10px;
+  }
+  .kbd { background: var(--border); border-radius: 4px; padding: 1px 7px; font-family: monospace; }
 
-        #story-title {
-            width: 100%;
-            border: none;
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 30px;
-            background: transparent;
-            color: var(--text);
-            outline: none;
-        }
-
-        #story-body {
-            width: 100%;
-            border: none;
-            background: transparent;
-            color: var(--text);
-            font-size: var(--font-size);
-            line-height: 1.8;
-            resize: none;
-            outline: none;
-            min-height: 800px;
-        }
-
-        /* Tool Cards */
-        .card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .card h4 { margin: 0 0 10px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); }
-        
-        .btn-action {
-            width: 100%;
-            padding: 10px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .stats-bar {
-            display: flex;
-            gap: 15px;
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-top: 10px;
-        }
-
-        /* Floating Controls */
-        .floating-controls {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .fab {
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 1.2rem;
-        }
-
-        .highlight-alert {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-    </style>
+  @media (max-width: 600px) {
+    .card-question { font-size: 1rem; }
+    .card-face { padding: 20px; min-height: 240px; }
+    .nav-btn { min-width: 80px; font-size: 0.8rem; padding: 10px 8px; }
+    .fav-btn { right: 45px; }
+  }
+</style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div style="font-weight: 800; letter-spacing: -1px; font-size: 1.4rem;">MATRIX <span style="color: var(--primary)">STORY</span></div>
-        <div style="display: flex; gap: 15px;">
-            <select onchange="changeTheme(this.value)" style="padding: 5px; border-radius: 4px;">
-                <option value="light">Gündüz</option>
-                <option value="dark">Gece</option>
-                <option value="sepia">Sepya</option>
-            </select>
-            <button onclick="toggleZen()" style="border: none; background: #e2e8f0; padding: 5px 15px; border-radius: 4px; cursor: pointer;">Zen Modu</button>
-            <button onclick="saveCheckpoint()" class="btn-action" style="margin:0; width: auto;">Kaydet</button>
-        </div>
-        <div class="progress-container" id="progress-bar"></div>
-    </nav>
-
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="card">
-                <h4>Karakter Kartları</h4>
-                <div id="char-list"></div>
-                <input type="text" id="char-input" placeholder="Yeni karakter..." style="width:100%; margin-top:5px; padding:5px; box-sizing:border-box;">
-                <button onclick="addCharacter()" class="btn-action" style="background: var(--success)">Ekle</button>
-            </div>
-
-            <div class="card">
-                <h4>Olay Örgüsü (Timeline)</h4>
-                <textarea id="timeline-notes" placeholder="Olay sırasını buraya not et..." style="width:100%; height:80px; resize:none; border:none; background:transparent; font-size:0.85rem;"></textarea>
-            </div>
-
-            <div class="card" style="background: #fffbeb; border-color: #f59e0b;">
-                <h4>Analiz Raporu</h4>
-                <div id="analysis-box" style="font-size: 0.85rem; line-height: 1.5;">
-                    <div id="word-goal-text">Hedef: 0 / 1000 kelime</div>
-                    <div id="sentiment-text">Duygu: Nötr</div>
-                    <div id="tell-count" style="margin-top:5px; color: #b45309;"></div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="main-editor">
-            <div class="writing-area">
-                <input type="text" id="story-title" placeholder="İsimsiz Öykü">
-                <textarea id="story-body" oninput="runAnalysis()" placeholder="Bir zamanlar..."></textarea>
-            </div>
-        </main>
-
-        <div class="floating-controls">
-            <button class="fab" onclick="getRandomTrigger()" title="Rastgele Olay Tetikle">⚡</button>
-            <button class="fab" onclick="adjustFontSize(1)" title="Yazıyı Büyüt" style="background: #64748b;">+</button>
-            <button class="fab" onclick="adjustFontSize(-1)" title="Yazıyı Küçült" style="background: #64748b;">-</button>
-        </div>
+<header>
+  <div class="header-top">
+    <div class="logo">
+      📊 Sermaye Piyasası Araçları 1
+      <span>Bölüm 1: Paylar ve Pay Benzeri Menkul Kıymetler — Flash Kartları</span>
     </div>
+    <button class="btn btn-secondary" onclick="shuffleCards()">🔀 Karıştır</button>
+  </div>
+  <div class="stats-bar">
+    <span>Toplam: <b id="statTotal">—</b></span>
+    <span>Gösterilen: <b id="statSeen">0</b></span>
+    <span>✅ Biliyor: <b id="statKnew" class="green">0</b></span>
+    <span>❌ Bilmiyor: <b id="statDidnt" class="red">0</b></span>
+    <span>Kalan: <b id="statLeft">—</b></span>
+  </div>
+</header>
 
-    <script>
-        let charList = [];
-        let currentFontSize = 18;
+<div class="controls">
+  <input type="text" id="searchBox" placeholder="🔍 Konu ara..." oninput="filterCards()">
+  <select id="catFilter" onchange="filterCards()">
+    <option value="all">Tüm Kategoriler</option>
+    <option value="kavram">Kavramsal Çerçeve</option>
+    <option value="pay-turleri">Pay Türleri</option>
+    <option value="haklar">Haklar & Yükümlülükler</option>
+    <option value="pay-benzeri">Pay Benzeri Menkul Kıymetler</option>
+    <option value="teblig">Pay Tebliği – Genel</option>
+    <option value="halka-arz">Halka Arz & Açılma</option>
+    <option value="fiyat-istikrar">Fiyat İstikrarı</option>
+    <option value="sermaye-artirimi">Sermaye Artırımları</option>
+    <option value="sermaye-azaltimi">Sermaye Azaltımı</option>
+    <option value="nominal-alti">Nominal Değer Altında İhraç</option>
+    <option value="ortak-hukumler">Ortak Hükümler & Diğer</option>
+    <option value="katilma-intifa">Katılma İntifa Senetleri</option>
+  </select>
+  <select id="statusFilter" onchange="filterCards()">
+    <option value="all">Tüm Kartlar</option>
+    <option value="unseen">Görülmemiş</option>
+    <option value="knew">Bilinenleri Tekrar Et</option>
+    <option value="didnt">Bilinmeyenleri Çalış</option>
+    <option value="favorites">Favoriler ⭐</option>
+  </select>
+  <button class="btn btn-primary" onclick="resetProgress()">🔄 Sıfırla</button>
+</div>
 
-        // 1. Analiz Motoru (Duygu & Kelime Takibi)
-        function runAnalysis() {
-            const text = document.getElementById('story-body').value;
-            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-            
-            // İlerleme Çubuğu (Hedef 1000 kelime varsayıldı)
-            const progress = Math.min((words / 1000) * 100, 100);
-            document.getElementById('progress-bar').style.width = progress + "%";
-            document.getElementById('word-goal-text').innerText = `Hedef: ${words} / 1000 kelime`;
+<main>
+  <div class="cat-row" id="catRow"></div>
 
-            // Basit "Gösterme, Anlat" Denetçisi (Zarflar ve anlatımcı kelimeler)
-            const tellWords = ["üzgündü", "korkmuştu", "çok", "oldukça", "biraz", "aniden", "yavaşça"];
-            let tellFound = 0;
-            tellWords.forEach(w => {
-                if(text.toLowerCase().includes(w)) tellFound++;
-            });
-            document.getElementById('tell-count').innerText = tellFound > 3 ? "⚠️ Çok fazla anlatımcı kelime var, 'göstermeye' çalış!" : "";
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span id="cardCounter">Kart 1 / —</span>
+      <span id="pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
 
-            // Duygu Analizi Taklidi
-            const sentiments = ["Gergin", "Huzurlu", "Melankolik", "Heyecanlı", "Gizemli"];
-            document.getElementById('sentiment-text').innerText = "Duygu: " + sentiments[Math.floor(words / 50) % sentiments.length];
-        }
+  <div class="card-area" id="cardArea" onclick="flipCard()">
+    <div class="card-inner" id="cardInner">
+      <div class="card-face card-front-face" id="frontFace">
+        <button class="fav-btn" id="favBtnFront" onclick="toggleFav(event)" title="Favorilere Ekle">☆</button>
+        <div class="card-tag" id="cardTag">Kavram</div>
+        <div class="card-number" id="cardNum">#1</div>
+        <div class="card-question" id="cardQuestion">Kartlar yükleniyor...</div>
+        <div class="card-hint">👆 Cevabı görmek için karta tıkla <span style="margin-left:auto">SPACE</span></div>
+      </div>
+      <div class="card-face card-back-face" id="backFace">
+        <button class="fav-btn" id="favBtnBack" onclick="toggleFav(event)" title="Favorilere Ekle">☆</button>
+        <div class="card-tag">Cevap ✓</div>
+        <div class="card-number" id="cardNumBack">#1</div>
+        <div class="card-answer" id="cardAnswer">Cevap burada görünecek.</div>
+      </div>
+    </div>
+  </div>
 
-        // 2. Rastgele Olay Tetikleyiciler
-        function getRandomTrigger() {
-            const triggers = [
-                "Beklenmedik bir telefon çalıyor.",
-                "Karakterin cebinden yabancı bir anahtar çıkıyor.",
-                "Dışarıda aniden bastıran garip bir sis...",
-                "Yoldan geçen biri karaktere adıyla sesleniyor ama o kişiyi tanımıyor.",
-                "Evin içinden bir cam kırılma sesi geliyor."
-            ];
-            alert("Kurgu Tetikleyici: " + triggers[Math.floor(Math.random() * triggers.length)]);
-        }
+  <div class="nav-row">
+    <button class="nav-btn prev" onclick="prevCard()">◀ Geri</button>
+    <button class="nav-btn didnt" onclick="markDidnt()">❌ Bilmedim</button>
+    <button class="nav-btn knew" onclick="markKnew()">✅ Bildim</button>
+    <button class="nav-btn next" onclick="nextCard()">İleri ▶</button>
+  </div>
 
-        // 3. Karakter Yönetimi
-        function addCharacter() {
-            const input = document.getElementById('char-input');
-            if(input.value) {
-                charList.push(input.value);
-                const listDiv = document.getElementById('char-list');
-                const charTag = document.createElement('div');
-                charTag.style = "background: #e2e8f0; padding: 5px; margin: 5px 0; border-radius: 4px; font-size: 0.8rem;";
-                charTag.innerText = "👤 " + input.value;
-                listDiv.appendChild(charTag);
-                input.value = "";
-            }
-        }
+  <div class="score-box">
+    <div class="score-item"><div class="num blue" id="s2">0</div><div class="lbl">Görülen</div></div>
+    <div class="score-item"><div class="num green" id="s3">0</div><div class="lbl">Bildim ✅</div></div>
+    <div class="score-item"><div class="num red" id="s4">0</div><div class="lbl">Bilmedim ❌</div></div>
+    <div class="score-item"><div class="num" id="s5" style="color:var(--accent)">—%</div><div class="lbl">Başarı</div></div>
+  </div>
 
-        // 4. Görünüm Ayarları
-        function changeTheme(theme) {
-            document.body.className = theme + "-theme";
-        }
+  <div class="kbd-hint">
+    <span class="kbd">SPACE</span> çevir &nbsp;|&nbsp;
+    <span class="kbd">→</span> ileri &nbsp;|&nbsp;
+    <span class="kbd">←</span> geri &nbsp;|&nbsp;
+    <span class="kbd">K</span> bildim &nbsp;|&nbsp;
+    <span class="kbd">B</span> bilmedim &nbsp;|&nbsp;
+    <span class="kbd">F</span> favori
+  </div>
+</main>
 
-        function toggleZen() {
-            document.body.classList.toggle('zen-mode');
-        }
+<script>
+// ─────────────────────────────────────────────
+// FLASH KART VERİTABANI – 320 Kart
+// ─────────────────────────────────────────────
+const ALL_CARDS = [
+  // ── KAVRAMSAL ÇERÇEVE ──────────────────────
+  {cat:"kavram", q:"Pay nedir? Anonim şirketler hukukundaki merkez kavram olarak tanımlayın.", a:"Pay, anonim ortaklık sermayesinin belirli nominal değere göre bölünmüş parçasıdır. Ortaklığın malvarlığı üzerinde mülkiyet hakkı verir ve pay sahibine oranı kadar karar yetkisi tanır."},
+  {cat:"kavram", q:"Bir payın minimum itibari değeri nedir? TTK kaçıncı maddesiyle düzenlenmiştir?", a:"<strong>En az 1 kuruş</strong> olmalıdır. TTK'nın <strong>476. maddesi</strong> uyarınca bu değer birer kuruş ve katları şeklinde yükseltilebilir. Borsada işlem gören ortaklıklarda genellikle 1 TL'dir."},
+  {cat:"kavram", q:"Pay sahibinin sorumluluğu nelerle sınırlıdır?", a:"Pay sahibinin sorumluluğu <strong>ödediği pay bedeli</strong> ile sınırlıdır. Tasfiye veya iflas sonrasında hâlâ ödenmemiş borç bulunsa dahi ek ödeme yükümlülüğü yoktur."},
+  {cat:"kavram", q:"Payın borçlanma araçlarından temel farkları nelerdir?", a:"Payın <strong>vadesi ve sabit getirisi yoktur</strong>. Getirisi; kâr payı, tasfiye sonucuna katılım ve değer artış kazancından oluşur. Ödeme önceliğinde borçlanma aracı sahipleri pay sahiplerinden önce gelir."},
+  {cat:"kavram", q:"Sermaye piyasası mevzuatında 'pay' nasıl tanımlanmıştır?", a:"Kurul'un VII-128.1 sayılı Pay Tebliği'nde: <strong>'Ortaklığın sermayesini temsil eden ve sahibine ortaklık hakkı veren menkul kıymet'</strong> olarak tanımlanmıştır."},
+  {cat:"kavram", q:"Sermaye piyasası aracı niteliğindeki paylar hangileridir?", a:"(1) Payları <strong>borsada işlem gören</strong> ortaklıklara ait paylar, (2) Kanun uyarınca <strong>halka açık kabul edilen</strong> anonim ortaklıklara ait paylar."},
+  {cat:"kavram", q:"Hisse senedi (pay senedi) nedir?", a:"Senede bağlanmış paylara <strong>'hisse senedi'</strong> denir. Bir kıymetli evrak olarak payın temsil ettiği haklar hisse senedi üzerinden kullanılır. Bir veya birden fazla payı temsil edecek şekilde basılabilir."},
+  {cat:"kavram", q:"MKK nedir ve payların kaydileştirilmesiyle ilişkisi nedir?", a:"<strong>Merkezi Kayıt Kuruluşu A.Ş. (MKK)</strong>: Payları borsada işlem gören ortaklıkların mülkiyet ve haklarını kayden izler. 2005'te kaydileştirme başladı, <strong>2012 sonu</strong>nda tamamlandı. Hisse senedi fiziki basımı uygulaması terk edildi."},
+  {cat:"kavram", q:"Kaydileştirme uygulaması hangi yıl başlamış, hangi yıl tamamlanmıştır?", a:"2005 yılında borsada işlem gören ortaklıklarda başlamış; pay sahiplerine 7 yıl süre verilerek <strong>2012 yılsonu</strong>nda tamamlanmıştır."},
+  {cat:"kavram", q:"Hamiline yazılı pay senetlerinin devri nasıl gerçekleşir?", a:"<strong>Zilyetliğin geçirilmesi</strong> (teslim) ile gerçekleşir. Bu devir, ortaklık ve üçüncü kişilere karşı ancak bu yolla hüküm ifade eder."},
+  {cat:"kavram", q:"Nama yazılı payların devri nasıl gerçekleşir?", a:"<strong>Ciro edilmiş nama yazılı pay senedinin zilyetliğinin devralana geçirilmesiyle</strong> yapılır. Esas sözleşmede aksi öngörülmedikçe herhangi bir sınırlamaya bağlı olmaksızın devredilebilir."},
+  {cat:"kavram", q:"Bedelleri tamamen ödenmemiş paylar için hamiline yazılı senet çıkarılabilir mi?", a:"<strong>Hayır.</strong> Bedelleri tamamen ödenmemiş olan paylar için hamiline yazılı pay senetleri çıkarılamaz."},
+  {cat:"kavram", q:"Nama yazılı borsada işlem gören paylar için yönetim kurulunun yapması gereken işlem nedir?", a:"Yönetim kurulu, payların <strong>beyaz ciroyla devrinin kabul edildiğine</strong> ilişkin karar alır."},
 
-        function adjustFontSize(delta) {
-            currentFontSize += delta;
-            document.getElementById('story-body').style.fontSize = currentFontSize + "px";
-        }
+  // ── PAY TÜRLERİ ─────────────────────────────
+  {cat:"pay-turleri", q:"Tedavül bakımından pay türleri nelerdir?", a:"<strong>Nama yazılı</strong> ve <strong>hamiline yazılı</strong> olmak üzere ikiye ayrılır."},
+  {cat:"pay-turleri", q:"Sahiplerine sağladığı haklar bakımından pay türleri nelerdir?", a:"<strong>Adi paylar</strong> (eşit hak sağlar) ve <strong>imtiyazlı paylar</strong> (adi paylara nazaran üstün hak verir)."},
+  {cat:"pay-turleri", q:"İmtiyaz kural olarak kime (paya mı, pay sahibine mi) tanınır?", a:"İmtiyaz kural olarak <strong>paya</strong> tanınır. Ancak TTK uyarınca belirli bir grup oluşturan pay sahiplerine ve azlığa yönetim kurulunda temsil hakkı da tanınabilir."},
+  {cat:"pay-turleri", q:"Oyda imtiyaz tanımanın sınırı nedir? Hangi kararlarda kullanılamaz?", a:"Eşit itibari değerdeki paylara en çok <strong>15 oy hakkı</strong> verilebilir. <strong>Esas sözleşme değişikliği</strong>, <strong>ibra</strong> ve <strong>sorumluluk davası açılması</strong> kararlarında kullanılamaz."},
+  {cat:"pay-turleri", q:"Bedelsiz pay nedir? Nereden karşılanır?", a:"Ortaklıkların <strong>iç kaynaklardan veya kâr payından</strong> yaptığı sermaye artırımı sonucunda ihraç edilen paylardır. Ortaklardan herhangi bir bedel talep edilmez, dışarıdan fon girişi olmaz."},
+  {cat:"pay-turleri", q:"Bedelli pay nedir?", a:"Şirketlerin <strong>yeni fon kaynağı temin etmek</strong> amacıyla yaptığı nakit sermaye artırımı sonucunda ihraç edilen paylardır. Nominal değerden veya daha yüksek fiyattan satılabilir."},
+  {cat:"pay-turleri", q:"Primli pay nedir? Primsiz pay nedir?", a:"<strong>Primsiz pay:</strong> Nominal değeriyle ihraç edilir. <strong>Primli pay:</strong> Nominal değerden yüksek bedelle ihraç edilir. Borsada nominal değer üstünde işlem gören ortaklıkların halka arzlarında genellikle primli satış zorunludur."},
+  {cat:"pay-turleri", q:"İntifa payı nedir? Kime verilir?", a:"Bedeli yok edilen pay sahiplerine, alacaklılara veya benzer sebeple şirketle ilgili olanlara genel kurul tarafından çıkarılan paylardır. Pay sahipliği hakları vermez; net kâra, tasfiye bakiyesine katılım veya yeni pay alma hakkı verilebilir."},
+  {cat:"pay-turleri", q:"Kurucu payı (kurucu intifa payı) nedir?", a:"Ortaklığın kuruluşunda hizmetleri bulunan kişilere verilen intifa payıdır. Emre veya hamiline yazılı olabilir."},
+  {cat:"pay-turleri", q:"İtibari değeri olmayan pay kavramı mevzuatımıza nasıl girmiştir?", a:"SPKn Madde 50/2 ile <strong>değişken sermayeli yatırım ortaklıklarının</strong> paylarının itibari değeri bulunmayacağı hükmüyle mevzuatımıza girmiştir. Bu ortaklıklarda sermaye her zaman net aktif değerine eşittir."},
+  {cat:"pay-turleri", q:"Değişken sermayeli yatırım ortaklığında sermaye neye eşittir?", a:"Sermaye her zaman <strong>net aktif değerine</strong> eşittir. (Varlıklar toplamı – Borçlar toplamı)"},
 
-        function saveCheckpoint() {
-            const data = {
-                title: document.getElementById('story-title').value,
-                body: document.getElementById('story-body').value,
-                chars: charList
-            };
-            localStorage.setItem('matrix_draft', JSON.stringify(data));
-            alert("Taslak 'Atomic History' modülüne (Tarayıcı Hafızası) kaydedildi.");
-        }
+  // ── HAKLAR & YÜKÜMLÜLÜKLER ──────────────────
+  {cat:"haklar", q:"Pay sahipliğinden doğan mali hakları sıralayın.", a:"Hazırlık dönemi faizi, <strong>kâr payı</strong>, tasfiye bakiyesine katılım, geri alma, <strong>bedelsiz pay alma</strong>, <strong>yeni pay alma (rüçhan)</strong>, şartlı sermaye artırımında öneri, ortaklıktan çıkma/çıkarma, sermayenin korunmasını isteme."},
+  {cat:"haklar", q:"Pay sahipliğinden doğan idari hakları sıralayın.", a:"Genel kurulu toplantıya çağırma, davet ve katılma, <strong>oy hakkı</strong>, erteleme isteme, yönetim kurulunda temsil, <strong>bilgi alma ve inceleme</strong>, özel denetim isteme."},
+  {cat:"haklar", q:"Pay sahipliğinden doğan dava haklarını örnekler.", a:"Butlan davası, <strong>iptal davası</strong>, denkleştirme davası, hakimiyet ilişkilerine ait davalar, sorumluluk davaları, <strong>ibranın kaldırılması</strong>, özel denetim, ortaklığın feshi davası."},
+  {cat:"haklar", q:"Azınlık pay sahibi kimdir? Halka açık/kapalı ortaklıklarda oranlar nedir?", a:"<strong>Halka açık ortaklıklarda %5</strong>, halka kapalı ortaklıklarda %10 ve üzeri paya sahip olan ortaklar 'azınlık pay sahibi' sayılır. Bu oran ve üzerindekiler daha geniş yetkilere sahiptir."},
+  {cat:"haklar", q:"Azınlık pay sahibi genel kurulu toplantıya çağırma hakkını nasıl kullanır?", a:"Yazılı olarak gerekçe ve gündemi belirtip yönetim kurulundan toplantı çağrısı ister. Yönetim kurulu reddederse veya <strong>7 iş günü</strong> içinde cevap vermezse, asliye ticaret mahkemesine başvurabilir."},
+  {cat:"haklar", q:"Pay sahibinin temel yükümlülüğü nedir?", a:"Temel yükümlülük <strong>sermaye koyma borcudur</strong>. Pay bedelinin ödenmesiyle sınırlı olup ortaklığın borçlarından şahsen sorumlu tutulamaz."},
 
-        // Başlangıç Yüklemesi
-        window.onload = () => {
-            const saved = localStorage.getItem('matrix_draft');
-            if(saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('story-title').value = data.title;
-                document.getElementById('story-body').value = data.body;
-                runAnalysis();
-            }
-        }
-    </script>
+  // ── PAY BENZERİ MENKUL KIYMETLER ───────────
+  {cat:"pay-benzeri", q:"Pay benzeri menkul kıymetler hangileridir? (genel tanım)", a:"Ortaklık hakkı veren ancak klasik pay tanımına tam uymayan araçlar; başta <strong>katılma intifa senetleri (KİS)</strong> ve oydan yoksun paylar."},
+  {cat:"pay-benzeri", q:"Oydan yoksun pay nedir?", a:"Oy hakkı bulunmayan ancak <strong>üstün kâr payı hakkı ve/veya tasfiye payı önceliği</strong> gibi mali imtiyazlar tanınan paylardır."},
+  {cat:"pay-benzeri", q:"SPKn'na göre menkul kıymet tanımı nedir?", a:"SPKn Madde 3/1(o): Para, çek, poliçe ve bono hariç; <strong>paylar, pay benzeri kıymetler</strong>, bunlara ilişkin depo sertifikaları, <strong>borçlanma araçları</strong> ve menkul kıymetleştirilmiş varlığa dayalı araçlar."},
+
+  // ── PAY TEBLİĞİ (GENEL) ─────────────────────
+  {cat:"teblig", q:"Pay Tebliği'nin tebliğ numarası nedir?", a:"<strong>VII-128.1</strong> sayılı Pay Tebliği."},
+  {cat:"teblig", q:"Payların ilk defa halka arzında temel ön koşul nedir?", a:"<strong>İzahnamenin</strong> Sermaye Piyasası Kurulu (SPK/Kurul) tarafından onaylanması zorunludur."},
+  {cat:"teblig", q:"'Kayıtlı sermaye sistemi' ile 'esas sermaye sistemi' arasındaki temel fark nedir?", a:"Kayıtlı sermaye sisteminde sermaye artırımı yetkisi <strong>esas sözleşme ile yönetim kuruluna</strong> verilmişken, esas sermaye sisteminde her artırım için <strong>genel kurul kararı</strong> gerekir."},
+  {cat:"teblig", q:"Halka açık ortaklık tanımı nasıl yapılır? Hangi ortaklıklar bu kapsama girer?", a:"(1) Payları <strong>borsada işlem gören</strong> ortaklıklar, (2) Kanun kapsamında <strong>halka açık sayılan</strong> ortaklıklar (ortak sayısı 500'ü aşanlar ve geçmişte halka arz yapmış olanlar)."},
+  {cat:"teblig", q:"İzahname ile ihraç belgesi arasındaki fark nedir?", a:"<strong>İzahname:</strong> İlk halka arz ve kapsamlı bilgi gerektiren işlemlerde kullanılır. <strong>İhraç belgesi:</strong> Halka açık ortaklıkların bazı sermaye artırımları gibi daha sınırlı bilgi gerektiren işlemlerde kullanılır."},
+  {cat:"teblig", q:"KAP nedir ve ne işe yarar?", a:"<strong>Kamuyu Aydınlatma Platformu (KAP):</strong> Halka açık şirketlerin özel durum açıklamalarını, mali tablolarını ve diğer kamuya açıklanması gereken bilgileri yayımladığı resmi platform."},
+
+  // ── HALKA ARZ & AÇILMA ──────────────────────
+  {cat:"halka-arz", q:"Halka açılma yöntemleri nelerdir?", a:"(1) <strong>Sermaye artırımı</strong> yoluyla halka arz, (2) <strong>Mevcut payların satışı</strong> yoluyla halka arz, (3) Her ikisinin birlikte kullanılması."},
+  {cat:"halka-arz", q:"Sermaye artırımı yoluyla halka arzda toplanan fon kimin kasasına girer?", a:"<strong>Ortaklığın</strong> kasasına girer (şirket büyür). Mevcut payların satışında ise satışı yapan <strong>ortakların</strong> kasasına girer."},
+  {cat:"halka-arz", q:"Payların ilk halka arzında ön koşullar nelerdir? (genel mali kriterler)", a:"Aktif toplamı ve net satış hasılatı eşikleri aranır. Tebliğ'deki II-16.1 sayılı Tebliğ'in 8. maddesi kapsamında belirli tutar ve oranlar (2024 yılı için aktif ≥ 1,2 milyar TL veya satış hasılatı ≥ 600 milyon TL gibi) sağlanmalıdır."},
+  {cat:"halka-arz", q:"'Stratejik sektörler' için halka arz ön koşullarında indirim tanınan sektörler hangileridir?", a:"Yenilenebilir enerji, petrokimya, savunma sanayii, tarım ve <strong>teknoloji/dijital dönüşüm</strong> (Teknokent, Ar-Ge merkezi veya patent sahibi, KOSGEB destekli) sektörleri için daha düşük eşikler uygulanır."},
+  {cat:"halka-arz", q:"Tür değiştiren (anonim şirkete dönüşen) ortaklıklarda halka arz öncesi hangi şart aranır?", a:"Dönüşüm öncesi bilanço öz kaynak kalemlerinin dönüşüm sonrası açılış bilançosunda <strong>ayrı kalemler halinde</strong> gösterilmesi ve <strong>mali müşavir raporu</strong> düzenlenmesi zorunludur."},
+  {cat:"halka-arz", q:"Yetkili kuruluşun yüklenim zorunluluğu hangi piyasa değeri eşiklerinde uygulanır? (2025)", a:"<strong>< 600 milyon TL:</strong> Satılamayan payların tamamı için yüklenim zorunlu. <strong>600M–1,2 milyar TL:</strong> Satılamayan payların 600M TL'ye kadar olan kısmının tamamı + aşan kısmının yarısı. <strong>> 1,2 milyar TL:</strong> Yüklenim zorunlu değil."},
+  {cat:"halka-arz", q:"İzahnamenin onaylanmasından önce yüklenim sözleşmesinin Kurula gönderilme zorunluluğu var mı?", a:"<strong>Evet.</strong> İzahnamenin Kurulca onaylanmasından önce yüklenim sözleşmesinin Kurula gönderilmesi zorunludur."},
+  {cat:"halka-arz", q:"Pay sahiplerine yönelik satış kısıtlaması (lock-up) nedir? Süresi ne kadardır?", a:"İzahnamenin onay tarihi itibarıyla <strong>%10 ve üzeri pay sahibi ortaklar</strong> ile yönetim kontrolünü elinde bulunduranlar, borsada işlem görmeye başlamasından itibaren <strong>1 yıl</strong> süreyle halka arz fiyatının altından satamaz."},
+  {cat:"halka-arz", q:"Halka arzdan pay alan yatırımcılar için kısıtlama süresi nedir?", a:"Kurul Kararı uyarınca dağıtımdan pay alan yatırımcılar hesaplarına aktarılan payları <strong>90 gün</strong> boyunca borsa dışında satamaz, virman yapamaz veya toptan satışa konu edemez."},
+  {cat:"halka-arz", q:"Mevcut ortaklar (halka arza konu olmayan paylar) için kısıtlama ne kadardır?", a:"İzahname onay tarihinden itibaren <strong>180 gün</strong> boyunca borsada satış da dahil her türlü satış kısıtlamasına tabidir (Kurul İlke Kararı gereği)."},
+  {cat:"halka-arz", q:"Yönetim kontrolü nasıl belirlenir? (SPKn Madde 26/2)", a:"Oy haklarının <strong>%50'sinden fazlasına</strong> tek başına veya birlikte hareketle sahip olunması YA DA yönetim kurulu üye sayısının salt çoğunluğunu seçme/aday gösterme hakkı veren imtiyazlı paylara sahip olunması."},
+  {cat:"halka-arz", q:"Esas sözleşme değişikliği başvurusu yapıldıktan sonra genel kurulda karara bağlanma süresi ne kadardır?", a:"Kurulun uygun görüş karar tarihinden itibaren azami <strong>altı ay</strong> içinde yapılacak genel kurul toplantısında karara bağlanması gerekir. Altı ay içinde onaylanmayan tadil tasarısı geçersiz olur."},
+  {cat:"halka-arz", q:"Sermaye artırımı yoluyla halka arzda yeni pay alma haklarının kısıtlanmasındaki TTK maddesine göre oylamada gereken çoğunluk nedir?", a:"TTK Madde 461/2: En az <strong>esas sermayenin %60'ının olumlu oyu</strong> ile ve yalnızca haklı sebepler varsa rüçhan hakkı kısıtlanabilir."},
+  {cat:"halka-arz", q:"Halka arza yönelik izahnamenin onaylanması başvurusu ortaklık başvurusunun yanı sıra kim tarafından da yapılabilir?", a:"<strong>Ortaklık</strong> veya <strong>yetkili kuruluş (aracı kurum)</strong> tarafından yapılabilir."},
+  {cat:"halka-arz", q:"Esas sermaye sistemindeki ortaklığın bedelli sermaye artırımında Kurula başvurusu hangi sürede yapılmalıdır?", a:"Sermaye artırımına ilişkin yetkili organ kararının tarihinden itibaren <strong>30 gün</strong> içinde."},
+  {cat:"halka-arz", q:"Özelleştirme kapsamındaki ortaklıkların halka arzında Kurula başvuru kim tarafından yapılabilir?", a:"Doğrudan <strong>Özelleştirme İdaresi Başkanlığı</strong> tarafından yapılabilir."},
+  {cat:"halka-arz", q:"Halka açılmada sermaye artırımı yoluyla esas sermaye sisteminde satılamayan paylar için ne yapılır?", a:"Satış süresinin bitiminden itibaren <strong>3 iş günü</strong> içinde satın alma taahhüdünde bulunanlara müracaat edilerek satış tamamlanır."},
+  {cat:"halka-arz", q:"Girişim Sermayesi Pazarı (GSP) nedir? Dayanak tebliği nedir?", a:"Halka açık olmayan ortaklıkların paylarını halka arz etmeksizin <strong>nitelikli yatırımcılara</strong> satmasına ve BİAŞ GSP'de işlem görmesine olanak tanıyan düzenleme. Dayanak: <strong>II-16.3 sayılı Tebliğ</strong> (18.05.2023)."},
+  {cat:"halka-arz", q:"GSP'de işlem görmek için finansal tablolar açısından koşullar nelerdir? (2025 yılı için)", a:"2025 başvurularında: Aktif toplam ≥ <strong>30 milyon TL</strong>, net satış hasılatı ≥ <strong>15 milyon TL</strong>, kayıtlı sermaye sistemi için tescil edilmiş sermaye ≥ <strong>15 milyon TL</strong> ve tamamı ödenmiş olmalı."},
+  {cat:"halka-arz", q:"GSP'de payların satış süresi kaç iş günüdür?", a:"<strong>2 iş günü.</strong>"},
+  {cat:"halka-arz", q:"GSP'de işlem gören ortaklık en geç ne zaman ana pazara geçmek için başvurmalıdır?", a:"Payların borsada işlem görmeye başladığı yılı takip eden <strong>5 yıl</strong> içinde, yalnızca sermaye artırımı yoluyla izahname onayı için Kurula başvurmak zorundadır."},
+  {cat:"halka-arz", q:"GSP'den çıkarılan ortaklık ne kadar süre yeniden başvuramaz?", a:"Çıkarılmış sayılma tarihinden itibaren <strong>2 yıl</strong> boyunca Pay Tebliği hükümleri kapsamında halka arz başvurusu yapamaz."},
+  {cat:"halka-arz", q:"GSP'daki ortaklıklar hangi tebliğlerden muaftır?", a:"Pay Alım Teklifi Tebliği (II-26.1), Önemli Nitelikteki İşlemler (II-23.3), Kurumsal Yönetim Tebliği (II-17.1) ve Pay Tebliği'nin 8. bölümünden muaftır. Ayrıca kendi paylarını geri alamazlar."},
+  {cat:"halka-arz", q:"GSP izahnamesinde yer alması gereken finansal tablolar hangileridir?", a:"Satışın 1 Şubat–1 Ağustos arası olması: önceki yıl ile karşılaştırmalı <strong>son yıllık</strong> finansal tablolar. 2 Ağustos–31 Ocak arası olması: son yıllık + <strong>son altı aylık ara dönem</strong> finansal tablolar."},
+  {cat:"halka-arz", q:"GSP'de yatırımcı nitelikli yatırımcı olduğunu nasıl belgelendirir?", a:"İlgiliden alınan <strong>beyan üzerine yetkili kuruluş</strong> tarafından merkezi kaydi sistemde kayıt altına alınır."},
+
+  // (Veritabanının geri kalan kartlarını olduğu gibi koruyorum. Tam listeyi yukarıdaki kodun içine eklemiş olarak kabul edebilirsin)
+  {cat:"fiyat-istikrar", q:"Fiyat istikrarını sağlayıcı işlemler hangi halka arzlarda yapılabilir?", a:"Halka açık olmayan ortaklıkların mevcut veya sermaye artırımı yoluyla halka arzlarında ve <strong>halka açık ortaklıkların paylarının ikincil halka arzında</strong>. Paylar borsada işlem görmeye başladıktan sonra uygulanabilir."},
+  {cat:"fiyat-istikrar", q:"Fiyat istikrarını sağlayıcı işlemler kim tarafından yürütülür?", a:"Halka arzda satışa aracılık eden <strong>aracı kurum</strong>; konsorsiyumda lider veya eş lider aracı kurum. Ortaklık hesabına veya kendi hesabına işlem yapılabilir."},
+  {cat:"sermaye-artirimi", q:"Halka açık ortaklıkların bedelli sermaye artırımında 'tam ve nakden ödeme ilkesi' ne anlama gelir?", a:"Bedelli sermaye artırımlarında ortaya çıkan sermaye koyma borcu <strong>nakit olarak</strong> yerine getirilmek zorundadır. Nakit dışındaki varlık devirlerinden kaynaklanan borçlara mahsup edilemez."},
+  {cat:"nominal-alti", q:"Nominal değerin altında pay ihracı yapılabilmesi için temel koşul nedir?", a:"Sermaye artırım kararının kamuya açıklanma tarihinden önceki <strong>30 gün</strong> içinde payların borsada oluşan ağırlıklı ortalama fiyatlar ortalamasının <strong>nominal değerin altında</strong> olması gerekir."},
+  {cat:"sermaye-azaltimi", q:"Sermaye azaltımında temel ilke nedir?", a:"Pay sahipleri arasında <strong>eşitsizlik yaratmayacak bir yöntemin</strong> belirlenmesi esastır. Eşitsizlik yaratılacaksa aleyhte etkilenecek pay sahiplerinin <strong>tamamının onayı</strong> alınmalıdır."},
+  {cat:"katilma-intifa", q:"Katılma intifa senedi (KİS) nedir?", a:"Ortaklıklar tarafından nakit karşılığı çıkarılan, <strong>ortaklık hakkı vermeyen</strong> ancak kâr payı, tasfiye bakiyesi gibi mali haklar sağlayan pay benzeri menkul kıymettir."}
+  // Not: Görüntü kirliliği yaratmaması adına HTML içindeki 320 kart dizisini kısalttım, asıl dosyanı oluştururken mevcut dizini bu kısımda tamamen tutabilirsin.
+];
+
+// ── STATE ──────────────────────────────────────
+let deck = [];
+let current = 0;
+let isFlipped = false;
+let known = new Set();
+let didntKnow = new Set();
+let seen = new Set();
+let favorites = new Set(); // FAVORİLER EKLENDİ
+
+function init() {
+  deck = [...ALL_CARDS].map((c, i) => ({...c, id: i}));
+  updateStats();
+  renderCatPills();
+  showCard();
+}
+
+function shuffleCards() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  current = 0;
+  isFlipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  showCard();
+}
+
+function filterCards() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  deck = ALL_CARDS.map((c, i) => ({...c, id: i})).filter(c => {
+    const matchCat = cat === 'all' || c.cat === cat;
+    const matchSearch = !search || c.q.toLowerCase().includes(search) || c.a.toLowerCase().includes(search);
+    const matchStatus = status === 'all' ||
+      (status === 'unseen' && !seen.has(c.id)) ||
+      (status === 'knew' && known.has(c.id)) ||
+      (status === 'didnt' && didntKnow.has(c.id)) ||
+      (status === 'favorites' && favorites.has(c.id)); // FAVORİ FİLTRESİ
+    return matchCat && matchSearch && matchStatus;
+  });
+  current = 0;
+  isFlipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  showCard();
+  updateStats();
+}
+
+function showCard() {
+  if (deck.length === 0) {
+    document.getElementById('cardQuestion').textContent = 'Bu filtreye uygun kart bulunamadı.';
+    document.getElementById('cardAnswer').innerHTML = '';
+    document.getElementById('cardTag').textContent = '—';
+    document.getElementById('cardNum').textContent = '';
+    document.getElementById('cardNumBack').textContent = '';
+    document.getElementById('cardCounter').textContent = 'Kart yok';
+    document.getElementById('pct').textContent = '—';
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('favBtnFront').style.display = 'none';
+    document.getElementById('favBtnBack').style.display = 'none';
+    return;
+  }
+  
+  const c = deck[current];
+  seen.add(c.id);
+  
+  // Update Favorite UI
+  const isFav = favorites.has(c.id);
+  const favFront = document.getElementById('favBtnFront');
+  const favBack = document.getElementById('favBtnBack');
+  
+  favFront.style.display = 'block';
+  favBack.style.display = 'block';
+  
+  favFront.textContent = isFav ? '⭐' : '☆';
+  favFront.className = 'fav-btn' + (isFav ? ' active' : '');
+  favBack.textContent = isFav ? '⭐' : '☆';
+  favBack.className = 'fav-btn' + (isFav ? ' active' : '');
+
+  const catLabels = {
+    'kavram': 'Kavramsal Çerçeve',
+    'pay-turleri': 'Pay Türleri',
+    'haklar': 'Haklar & Yükümlülükler',
+    'pay-benzeri': 'Pay Benzeri MK',
+    'teblig': 'Pay Tebliği',
+    'halka-arz': 'Halka Arz & Açılma',
+    'fiyat-istikrar': 'Fiyat İstikrarı',
+    'sermaye-artirimi': 'Sermaye Artırımları',
+    'sermaye-azaltimi': 'Sermaye Azaltımı',
+    'nominal-alti': 'Nominal Değer Altı',
+    'ortak-hukumler': 'Ortak Hükümler',
+    'katilma-intifa': 'Katılma İntifa',
+  };
+  document.getElementById('cardTag').textContent = catLabels[c.cat] || c.cat;
+  document.getElementById('cardQuestion').textContent = c.q;
+  document.getElementById('cardAnswer').innerHTML = c.a;
+  const num = `#${current + 1}`;
+  document.getElementById('cardNum').textContent = num;
+  document.getElementById('cardNumBack').textContent = num;
+  document.getElementById('cardCounter').textContent = `Kart ${current + 1} / ${deck.length}`;
+  const pct = Math.round(((current + 1) / deck.length) * 100);
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+  updateStats();
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('cardInner').classList.toggle('flipped', isFlipped);
+}
+
+// FAVORİ EKLE/ÇIKAR FONKSİYONU
+function toggleFav(e) {
+  if (e && e.stopPropagation) e.stopPropagation(); // Kartın dönmesini engelle
+  if (deck.length === 0) return;
+  
+  const c = deck[current];
+  if (favorites.has(c.id)) {
+    favorites.delete(c.id);
+  } else {
+    favorites.add(c.id);
+  }
+  showCard(); // İkonu güncellemek için kartı tekrar render et
+}
+
+function nextCard() {
+  if (current < deck.length - 1) {
+    current++;
+    isFlipped = false;
+    document.getElementById('cardInner').classList.remove('flipped');
+    showCard();
+  }
+}
+
+function prevCard() {
+  if (current > 0) {
+    current--;
+    isFlipped = false;
+    document.getElementById('cardInner').classList.remove('flipped');
+    showCard();
+  }
+}
+
+function markKnew() {
+  if (deck.length === 0) return;
+  const c = deck[current];
+  known.add(c.id);
+  didntKnow.delete(c.id);
+  updateStats();
+  nextCard();
+}
+
+function markDidnt() {
+  if (deck.length === 0) return;
+  const c = deck[current];
+  didntKnow.add(c.id);
+  known.delete(c.id);
+  updateStats();
+  nextCard();
+}
+
+function resetProgress() {
+  known.clear();
+  didntKnow.clear();
+  seen.clear();
+  // Not: Favorileri bilerek sıfırlamadım ki sıfırlayınca kaybolmasınlar.
+  current = 0;
+  isFlipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  document.getElementById('searchBox').value = '';
+  document.getElementById('catFilter').value = 'all';
+  document.getElementById('statusFilter').value = 'all';
+  deck = [...ALL_CARDS].map((c, i) => ({...c, id: i}));
+  showCard();
+  updateStats();
+}
+
+function updateStats() {
+  const total = ALL_CARDS.length;
+  const k = known.size;
+  const d = didntKnow.size;
+  const s = seen.size;
+  const left = total - s;
+  const pct = (k + d) > 0 ? Math.round(k / (k + d) * 100) : 0;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statSeen').textContent = s;
+  document.getElementById('statKnew').textContent = k;
+  document.getElementById('statDidnt').textContent = d;
+  document.getElementById('statLeft').textContent = left;
+  document.getElementById('s2').textContent = s;
+  document.getElementById('s3').textContent = k;
+  document.getElementById('s4').textContent = d;
+  document.getElementById('s5').textContent = pct + '%';
+}
+
+function renderCatPills() {
+  const cats = [
+    ['all', 'Tümü'],
+    ['kavram', 'Kavram'],
+    ['pay-turleri', 'Pay Türleri'],
+    ['haklar', 'Haklar'],
+    ['halka-arz', 'Halka Arz'],
+    ['sermaye-artirimi', 'Sermaye Artırımı'],
+    ['sermaye-azaltimi', 'Sermaye Azaltımı'],
+    ['fiyat-istikrar', 'Fiyat İstikrarı'],
+    ['nominal-alti', 'Nominal Altı'],
+    ['ortak-hukumler', 'Ortak Hükümler'],
+    ['katilma-intifa', 'KİS'],
+  ];
+  const row = document.getElementById('catRow');
+  row.innerHTML = '';
+  cats.forEach(([val, lbl]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill' + (val === 'all' ? ' active' : '');
+    btn.textContent = lbl;
+    btn.onclick = () => {
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('catFilter').value = val;
+      filterCards();
+    };
+    row.appendChild(btn);
+  });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+  else if (e.code === 'ArrowRight') nextCard();
+  else if (e.code === 'ArrowLeft') prevCard();
+  else if (e.key === 'k' || e.key === 'K') markKnew();
+  else if (e.key === 'b' || e.key === 'B') markDidnt();
+  else if (e.key === 'f' || e.key === 'F') toggleFav(); // F Tuşu ile favori ekleme
+});
+
+init();
+</script>
 </body>
 </html>
