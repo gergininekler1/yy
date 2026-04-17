@@ -85,9 +85,6 @@
     background: var(--card-bg);
     border-bottom: 1px solid var(--border);
     padding: 16px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 50;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -303,38 +300,149 @@
     color: var(--text-muted);
   }
 
-  /* NOTES AREA (Card specific) */
-  .note-toggle-btn {
-    width: 100%;
-    margin-top: 12px;
-    background: transparent;
-    border: 1px dashed var(--border);
-    color: var(--text-muted);
-    padding: 10px;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 600;
+  /* NOTES FAB BUTTON */
+  .note-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(59,130,246,0.35);
+    z-index: 200;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   }
-  .note-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
-  
-  .note-input-wrapper { display: none; margin-top: 12px; }
-  .note-input-wrapper textarea {
+  body.dark-mode .note-fab { color: #121212; box-shadow: 0 4px 16px rgba(96,165,250,0.3); }
+  .note-fab:active { transform: scale(0.93); }
+  .note-fab.has-note { background: var(--warning); box-shadow: 0 4px 16px rgba(245,158,11,0.35); }
+
+  /* NOTE MODAL OVERLAY */
+  .note-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 300;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .note-modal-overlay.open { display: flex; }
+  .note-modal {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 700px;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+    animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1);
+    border: 1px solid var(--border);
+    border-bottom: none;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .note-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .note-modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .note-modal-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: background 0.2s;
+  }
+  .note-modal-question {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 14px;
+    line-height: 1.5;
+    border: 1px solid var(--border);
+  }
+  .note-modal textarea {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 14px;
+    padding: 14px;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text);
-    resize: vertical;
+    resize: none;
     outline: none;
-    min-height: 80px;
-    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+    min-height: 110px;
+    transition: border-color 0.2s, background-color 0.3s;
+    line-height: 1.6;
   }
-  .note-input-wrapper textarea:focus { border-color: var(--accent); }
+  .note-modal textarea:focus { border-color: var(--accent); }
+  .note-modal-actions { display: flex; gap: 10px; }
+  .note-save-btn {
+    flex: 1;
+    padding: 13px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, transform 0.1s;
+  }
+  body.dark-mode .note-save-btn { color: #121212; }
+  .note-save-btn:active { transform: scale(0.98); background: var(--accent-hover); }
+  .note-delete-btn {
+    padding: 13px 18px;
+    background: var(--danger-bg);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+    display: none;
+  }
+  .note-delete-btn.visible { display: block; }
+  .note-saved-indicator {
+    display: none;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--success);
+    font-weight: 600;
+  }
+  .note-saved-indicator.show { display: block; }
 
   /* LIST VIEWS (Notes & Favs) */
   .list-area { display: none; flex-direction: column; gap: 16px; }
@@ -479,12 +587,6 @@
         </div>
       </div>
       
-      <button class="note-toggle-btn" onclick="toggleNoteArea()">📝 Bu karta not ekle / düzenle</button>
-      <div class="note-input-wrapper" id="noteAreaWrapper">
-        <textarea id="noteInput" placeholder="Bu karta özel notunuzu buraya ekleyin..."></textarea>
-        <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;" onclick="saveCurrentNote()">💾 Notu Kaydet</button>
-      </div>
-
       <div class="sr-info" id="srInfo"></div>
     </div>
 
@@ -555,6 +657,26 @@
   </div>
 
 </main>
+
+<!-- NOT EKLEME FAB -->
+<button class="note-fab" id="noteFab" onclick="openNoteModal()" title="Bu karta not ekle" style="display:none;">📝</button>
+
+<!-- NOT EKLEME MODAL -->
+<div class="note-modal-overlay" id="noteModalOverlay" onclick="handleOverlayClick(event)">
+  <div class="note-modal">
+    <div class="note-modal-header">
+      <div class="note-modal-title">📝 Kart Notu</div>
+      <button class="note-modal-close" onclick="closeNoteModal()">✕</button>
+    </div>
+    <div class="note-modal-question" id="noteModalQuestion"></div>
+    <textarea id="noteInput" placeholder="Bu karta özel notunuzu buraya yazın..."></textarea>
+    <div class="note-modal-actions">
+      <button class="note-delete-btn" id="noteDeleteBtn" onclick="deleteCurrentNote()">🗑 Sil</button>
+      <button class="note-save-btn" onclick="saveCurrentNote()">💾 Kaydet</button>
+    </div>
+    <div class="note-saved-indicator" id="noteSavedIndicator">✅ Not kaydedildi!</div>
+  </div>
+</div>
 
 <script>
 // ─────────────────────────────────────────────
@@ -1050,24 +1172,33 @@ function switchMode(mode) {
   document.getElementById('favArea').classList.remove('active');
   document.getElementById('statsFooter').style.display = 'none';
 
+  // FAB sadece çalışma ve tekrar modunda görünür
+  const fab = document.getElementById('noteFab');
+
   if (mode === 'study') {
     document.getElementById('studyArea').style.display = 'flex';
     document.getElementById('statsFooter').style.display = 'block';
+    fab.style.display = deck.length > 0 ? 'flex' : 'none';
   } else if (mode === 'sr') {
     document.getElementById('studyArea').style.display = 'flex';
     document.getElementById('statsFooter').style.display = 'block';
+    fab.style.display = 'none';
     loadSRMode();
   } else if (mode === 'quiz') {
     document.getElementById('quizArea').classList.add('active');
+    fab.style.display = 'none';
     loadQuizQuestion();
   } else if (mode === 'history') {
     document.getElementById('historyArea').classList.add('active');
+    fab.style.display = 'none';
     renderHistory();
   } else if (mode === 'notes') {
     document.getElementById('notesArea').classList.add('active');
+    fab.style.display = 'none';
     renderNotesTab();
   } else if (mode === 'favs') {
     document.getElementById('favArea').classList.add('active');
+    fab.style.display = 'none';
     renderFavsTab();
   }
 }
@@ -1286,7 +1417,8 @@ function showCard() {
   document.getElementById('pct').textContent = pct + '%';
   document.getElementById('progressBar').style.width = pct + '%';
   
-  document.getElementById('noteAreaWrapper').style.display = 'none';
+  document.getElementById('noteFab').style.display = 'flex';
+  updateNoteFab();
   document.getElementById('noteInput').value = cardNotes[c.id] || '';
   renderSRInfo(c.id);
   updateStats();
@@ -1455,14 +1587,37 @@ function updateFavBtn() {
   }
 }
 
-function toggleNoteArea() {
-  const wrap = document.getElementById('noteAreaWrapper');
-  if(wrap.style.display === 'none' || wrap.style.display === '') {
-    wrap.style.display = 'block';
-    document.getElementById('noteInput').focus();
+function openNoteModal() {
+  if (deck.length === 0) return;
+  const c = deck[current];
+  document.getElementById('noteModalQuestion').textContent = c.q;
+  document.getElementById('noteInput').value = cardNotes[c.id] || '';
+  const deleteBtn = document.getElementById('noteDeleteBtn');
+  if (cardNotes[c.id]) {
+    deleteBtn.classList.add('visible');
   } else {
-    wrap.style.display = 'none';
+    deleteBtn.classList.remove('visible');
   }
+  document.getElementById('noteSavedIndicator').classList.remove('show');
+  document.getElementById('noteModalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('noteInput').focus(), 300);
+}
+
+function closeNoteModal() {
+  document.getElementById('noteModalOverlay').classList.remove('open');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('noteModalOverlay')) closeNoteModal();
+}
+
+function deleteCurrentNote() {
+  if (deck.length === 0) return;
+  const id = deck[current].id;
+  delete cardNotes[id];
+  saveData();
+  updateNoteFab();
+  closeNoteModal();
 }
 
 function saveCurrentNote() {
@@ -1471,11 +1626,29 @@ function saveCurrentNote() {
   const text = document.getElementById('noteInput').value.trim();
   if(text) {
     cardNotes[id] = text;
-    alert('Notunuz başarıyla kaydedildi!');
+    document.getElementById('noteDeleteBtn').classList.add('visible');
   } else {
     delete cardNotes[id];
+    document.getElementById('noteDeleteBtn').classList.remove('visible');
   }
   saveData();
+  updateNoteFab();
+  const indicator = document.getElementById('noteSavedIndicator');
+  indicator.classList.add('show');
+  setTimeout(() => { indicator.classList.remove('show'); closeNoteModal(); }, 1200);
+}
+
+function updateNoteFab() {
+  if (deck.length === 0) return;
+  const id = deck[current].id;
+  const fab = document.getElementById('noteFab');
+  if (cardNotes[id]) {
+    fab.classList.add('has-note');
+    fab.title = 'Notu düzenle';
+  } else {
+    fab.classList.remove('has-note');
+    fab.title = 'Bu karta not ekle';
+  }
 }
 
 function renderNotesTab() {
@@ -1525,13 +1698,16 @@ function renderCatPills() {
     ['nominal-alti', 'Nominal Altı'],
     ['ortak-hukumler', 'Ortak Hükümler'],
     ['katilma-intifa', 'KİS'],
+    ['pay-benzeri', 'Pay Benzeri'],
+    ['teblig', 'Tebliğ'],
   ];
   const row = document.getElementById('catRow');
   row.innerHTML = '';
   cats.forEach(([val, lbl]) => {
+    const count = val === 'all' ? ALL_CARDS.length : ALL_CARDS.filter(c => c.cat === val).length;
     const btn = document.createElement('button');
     btn.className = 'cat-pill' + (val === 'all' ? ' active' : '');
-    btn.textContent = lbl;
+    btn.textContent = `${lbl} (${count})`;
     btn.onclick = () => {
       document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
