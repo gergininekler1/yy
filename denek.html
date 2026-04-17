@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Anlık Görev</title>
-<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Anlık Görev&quot;,&quot;short_name&quot;:&quot;Anlık&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%230a0a0a&quot;,&quot;theme_color&quot;:&quot;%23f5c800&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a'/><text y='.9em' font-size='80'>⏱</text></svg>&quot;,&quot;sizes&quot;:&quot;any&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
 <meta name="theme-color" content="#f5c800">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,228 +13,273 @@
 <style>
   :root {
     --black: #0a0a0a; --black2: #111111; --black3: #1a1a1a; --black4: #242424;
-    --yellow: #f5c800; --yellow-dim: rgba(245,200,0,0.12); --yellow-mid: rgba(245,200,0,0.35);
-    --white: #f0f0f0; --white-dim: rgba(240,240,240,0.45); --white-faint: rgba(240,240,240,0.12);
+    --yellow: #f5c800; --yellow-dim: rgba(245,200,0,0.10); --yellow-mid: rgba(245,200,0,0.30);
+    --white: #f0f0f0; --white-dim: rgba(240,240,240,0.45); --white-faint: rgba(240,240,240,0.10);
     --red: #e63946; --green: #2ec27e;
-    --nav-h: 72px; --safe-b: env(safe-area-inset-bottom, 0px);
+    --nav-h: 68px; --safe-b: env(safe-area-inset-bottom, 0px);
+    --radius: 6px;
   }
-
   :root[data-theme="light"] {
-    --black: #f8f9fa; --black2: #ffffff; --black3: #e9ecef; --black4: #dee2e6;
-    --yellow: #0d6efd; --yellow-dim: rgba(13,110,253,0.12); --yellow-mid: rgba(13,110,253,0.35);
-    --white: #212529; --white-dim: #6c757d; --white-faint: #ced4da;
+    --black: #f4f4f5; --black2: #ffffff; --black3: #e4e4e7; --black4: #d4d4d8;
+    --yellow: #0d6efd; --yellow-dim: rgba(13,110,253,0.10); --yellow-mid: rgba(13,110,253,0.30);
+    --white: #18181b; --white-dim: #71717a; --white-faint: #d4d4d8;
   }
-
   :root[data-theme="hacker"] {
     --black: #050505; --black2: #0a0a0a; --black3: #111111; --black4: #1a1a1a;
-    --yellow: #33ff00; --yellow-dim: rgba(51,255,0,0.12); --yellow-mid: rgba(51,255,0,0.35);
-    --white: #33ff00; --white-dim: #1e9900; --white-faint: #114d00;
+    --yellow: #33ff00; --yellow-dim: rgba(51,255,0,0.10); --yellow-mid: rgba(51,255,0,0.30);
+    --white: #33ff00; --white-dim: #1e9900; --white-faint: #0d3d00;
   }
 
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: smooth; }
   body { font-family: 'Space Grotesk', sans-serif; background: transparent; color: var(--white); min-height: 100dvh; overflow-x: hidden; }
-  
-  /* CANLI ARKA PLAN */
   #bgCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: var(--black); transition: background 0.3s; }
-
   ::-webkit-scrollbar { width: 0; }
+
   .app { max-width: 480px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; position: relative; }
-  .screen { display: none; flex: 1; padding: 0 20px calc(var(--nav-h) + var(--safe-b) + 20px); animation: fadeIn .22s ease; }
+  .screen { display: none; flex: 1; padding: 0 18px calc(var(--nav-h) + var(--safe-b) + 24px); animation: fadeIn .2s ease; }
   .screen.active { display: flex; flex-direction: column; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-  .header { display: flex; align-items: center; justify-content: space-between; padding: 52px 0 12px; border-bottom: 2px solid var(--white-faint); margin-bottom: 24px; }
-  .header h1 { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; text-transform: lowercase; }
+  /* HEADER */
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 52px 0 14px; border-bottom: 1px solid var(--white-faint); margin-bottom: 22px; }
+  .header h1 { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; text-transform: lowercase; }
   .header h1 .accent { color: var(--yellow); }
-  .icon-btn { width: 40px; height: 40px; border: 2px solid var(--white-faint); border-radius: 4px; background: var(--black2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; color: var(--white-dim); }
-  .icon-btn:active { transform: scale(.88); background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+  .icon-btn { width: 38px; height: 38px; border: 1.5px solid var(--white-faint); border-radius: var(--radius); background: var(--black2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; color: var(--white-dim); }
+  .icon-btn:active, .icon-btn:hover { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
 
-  .field-label { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--white-dim); margin-bottom: 6px; }
-  .home-section-title { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--yellow); margin-top: 30px; margin-bottom: 12px; letter-spacing: 1px; text-transform: lowercase; border-bottom: 1px dashed var(--black4); padding-bottom: 6px; }
+  .field-label { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--white-dim); margin-bottom: 6px; }
+  .section-title { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--yellow); margin-top: 26px; margin-bottom: 10px; letter-spacing: 0.5px; text-transform: lowercase; display: flex; align-items: center; gap: 6px; }
+  .section-title svg { opacity: 0.7; }
 
-  /* MİNİMAL YAN YANA GİRİŞ ALANI */
-  .action-row { display: flex; gap: 10px; align-items: stretch; margin-bottom: 10px; }
-  .task-input { flex: 1; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 0 16px; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 500; color: var(--white); outline: none; transition: border-color .15s; min-width: 0; }
+  /* INPUTS */
+  .action-row { display: flex; gap: 8px; align-items: stretch; margin-bottom: 10px; }
+  .task-input { flex: 1; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 0 14px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 500; color: var(--white); outline: none; transition: border-color .15s; min-width: 0; height: 50px; }
   .task-input:focus { border-color: var(--yellow); }
   .task-input::placeholder { color: var(--white-dim); }
-  
-  .compact-times { display: flex; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; overflow: hidden; height: 52px; flex-shrink: 0; }
-  .c-time { background: transparent; border: none; color: var(--white-dim); font-family: 'Space Mono', monospace; font-weight: 700; font-size: 14px; padding: 0 14px; cursor: pointer; transition: 0.2s; border-right: 1px solid var(--black4); }
+
+  .compact-times { display: flex; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); overflow: hidden; height: 50px; flex-shrink: 0; }
+  .c-time { background: transparent; border: none; color: var(--white-dim); font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; padding: 0 12px; cursor: pointer; transition: 0.15s; border-right: 1px solid var(--black4); }
   .c-time:last-child { border-right: none; }
   .c-time.active { background: var(--yellow-dim); color: var(--yellow); }
-  
-  .custom-wrap { display: none; gap: 10px; align-items: center; margin-bottom: 14px; background: var(--black2); padding: 10px; border-radius: 4px; border: 1px dashed var(--black4); }
-  .custom-wrap.open { display: flex; animation: fadeIn .2s; }
-  .custom-wrap label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); white-space: nowrap; letter-spacing: 1px; }
-  .custom-input { flex: 1; background: var(--black); border: 2px solid var(--black4); border-radius: 4px; padding: 8px 12px; font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--yellow); outline: none; text-align: center; }
 
-  /* ZAMANLAYICI */
-  .timer-section { display: flex; flex-direction: column; align-items: center; margin-top: 10px; }
-  .ring-wrap { position: relative; width: 218px; height: 218px; }
+  .custom-wrap { display: none; gap: 10px; align-items: center; margin-bottom: 12px; background: var(--black2); padding: 10px 12px; border-radius: var(--radius); border: 1px dashed var(--black4); }
+  .custom-wrap.open { display: flex; animation: fadeIn .2s; }
+  .custom-wrap label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); white-space: nowrap; letter-spacing: 1px; }
+  .custom-input { flex: 1; background: var(--black); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 8px 12px; font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--yellow); outline: none; text-align: center; }
+
+  /* TIMER */
+  .timer-section { display: flex; flex-direction: column; align-items: center; margin-top: 8px; }
+  .ring-wrap { position: relative; width: 210px; height: 210px; }
   .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .ring-track { fill: none; stroke: var(--black3); stroke-width: 10; }
-  .ring-fill { fill: none; stroke: var(--yellow); stroke-width: 10; stroke-linecap: square; stroke-dasharray: 596; stroke-dashoffset: 0; transition: stroke-dashoffset .5s linear; filter: drop-shadow(0 0 8px var(--yellow-mid)); }
+  .ring-track { fill: none; stroke: var(--black3); stroke-width: 8; }
+  .ring-fill { fill: none; stroke: var(--yellow); stroke-width: 8; stroke-linecap: square; stroke-dasharray: 596; stroke-dashoffset: 0; transition: stroke-dashoffset .5s linear; filter: drop-shadow(0 0 6px var(--yellow-mid)); }
   .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
-  .t-display { font-family: 'Space Mono', monospace; font-size: 44px; font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; }
-  .t-name { font-size: 11px; color: var(--white-dim); margin-top: 6px; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-  .t-badge { display: inline-block; margin-top: 8px; padding: 3px 10px; border: 1.5px solid currentColor; border-radius: 2px; font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .t-display { font-family: 'Space Mono', monospace; font-size: 42px; font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; }
+  .t-name { font-size: 11px; color: var(--white-dim); margin-top: 5px; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+  .t-badge { display: inline-block; margin-top: 7px; padding: 2px 9px; border: 1.5px solid currentColor; border-radius: 2px; font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
   .t-badge.idle { color: var(--white-dim); border-color: var(--white-faint); }
   .t-badge.run { color: var(--yellow); border-color: var(--yellow); }
   .t-badge.paused { color: var(--white-dim); border-color: var(--white-faint); }
 
-  .controls { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 20px; width: 100%; }
-  .btn-main { background: var(--yellow); color: var(--black); border: none; border-radius: 4px; padding: 0 36px; height: 52px; min-width: 148px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; }
-  .btn-main:active { transform: scale(.96); opacity: .8; }
-  .btn-main.secondary { background: var(--black2); color: var(--white); border: 2px solid var(--black4); }
-  .btn-sq { width: 52px; height: 52px; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; color: var(--white-dim); }
-  .btn-sq:active { transform: scale(.88); border-color: var(--yellow); color: var(--yellow); }
-  .btn-sq.danger:active { border-color: var(--red); color: var(--red); }
+  .controls { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 18px; width: 100%; }
+  .btn-main { background: var(--yellow); color: var(--black); border: none; border-radius: var(--radius); padding: 0 32px; height: 50px; min-width: 140px; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .15s; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-main:active { transform: scale(.96); opacity: .85; }
+  .btn-main.secondary { background: var(--black2); color: var(--white); border: 1.5px solid var(--black4); }
+  .btn-sq { width: 50px; height: 50px; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; color: var(--white-dim); }
+  .btn-sq:active, .btn-sq:hover { border-color: var(--yellow); color: var(--yellow); }
+  .btn-sq.danger:active, .btn-sq.danger:hover { border-color: var(--red); color: var(--red); }
 
-  /* HAFTALIK GÖRÜNÜM */
-  .week-mini-boxes { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 12px; }
-  .w-box { flex: 1; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 8px 0; text-align: center; font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); font-weight: 700; text-transform: uppercase; transition: all .2s; cursor: pointer; }
+  /* HAFTALIK */
+  .week-mini-boxes { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 10px; }
+  .w-box { flex: 1; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 7px 0; text-align: center; font-family: 'Space Mono', monospace; font-size: 8px; color: var(--white-dim); font-weight: 700; text-transform: uppercase; transition: all .15s; cursor: pointer; position: relative; }
   .w-box:hover { border-color: var(--white-faint); }
-  .w-box.active { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); transform: scale(1.05); }
-  
-  .today-grouped { background: var(--black2); border: 1px solid var(--black4); border-radius: 4px; padding: 12px; font-family: 'Space Mono', monospace; font-size: 11px; min-height: 44px;}
-  .g-row { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--white); }
+  .w-box.active { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+  .w-mins { font-size: 7px; color: var(--yellow); margin-top: 2px; display: block; opacity: 0.8; }
+
+  .today-grouped { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 12px 14px; font-family: 'Space Mono', monospace; font-size: 11px; min-height: 40px; }
+  .g-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
   .g-row:last-child { margin-bottom: 0; }
-  .g-count { color: var(--yellow); font-weight: 700; width: 28px; flex-shrink: 0; }
+  .g-count { color: var(--yellow); font-weight: 700; width: 26px; flex-shrink: 0; }
   .g-task { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--white-dim); }
 
-  /* TERMİNAL */
-  .terminal-box { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 12px; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; }
-  .term-line { display: flex; gap: 8px; margin-bottom: 8px; line-height: 1.4; }
-  .term-time { color: var(--yellow); }
-  .term-task { flex: 1; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .term-pag { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--black4); margin-top: 10px; padding-top: 10px; }
-  .term-btn { background: none; border: none; color: var(--yellow); cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 700; }
-  .term-btn:disabled { color: var(--white-faint); cursor: not-allowed; }
+  /* GÜNLÜK HEDEF */
+  .daily-goal-wrap { margin-top: 14px; cursor: pointer; padding: 11px 14px; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); transition: border-color .2s; }
+  .daily-goal-wrap:hover { border-color: var(--yellow-mid); }
+  .daily-goal-wrap.completed { border-color: var(--yellow); box-shadow: 0 0 12px var(--yellow-dim); }
+  .goal-bar-bg { width: 100%; height: 4px; background: var(--black4); border-radius: 2px; overflow: hidden; margin: 7px 0 5px; }
+  .goal-bar-fill { height: 100%; background: var(--yellow); border-radius: 2px; transition: width .8s cubic-bezier(.34,1.56,.64,1); }
+  .goal-row { display: flex; justify-content: space-between; align-items: center; }
+  .goal-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); letter-spacing: 0.3px; }
+  .goal-pct { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--yellow); }
 
-  /* İSTATİSTİK & RPG */
-  .rpg-card { background: var(--black2); border: 2px solid var(--yellow); border-radius: 4px; padding: 16px; margin-bottom: 14px; text-align: center; }
-  .rpg-lvl { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; }
-  .rpg-title { font-size: 11px; color: var(--white-dim); margin-top: 4px; margin-bottom: 12px; }
-  .xp-bar-bg { width: 100%; height: 6px; background: var(--black4); border-radius: 3px; overflow: hidden; }
-  .xp-bar-fill { height: 100%; background: var(--yellow); transition: width 1s ease; }
-  .xp-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); margin-top: 6px; display: block; }
-
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .s-card { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 18px 16px; }
-  .s-card.wide { grid-column: 1 / -1; }
-  .s-val { font-family: 'Space Mono', monospace; font-size: 38px; font-weight: 700; color: var(--yellow); line-height: 1; }
-  .s-lbl { font-size: 10px; color: var(--white-dim); margin-top: 5px; letter-spacing: 0.3px; }
-  
-  .sunday-btn { width: 100%; background: #E1306C; color: white; border: none; border-radius: 4px; padding: 14px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 12px; margin-top: 14px; cursor: pointer; display: none; text-transform: uppercase; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3); }
-
-  /* LİSTELER (Gelecek & Rozet) */
-  .hist-list { display: flex; flex-direction: column; gap: 8px; }
-  .hist-item { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; }
-  .hist-item:hover { border-color: var(--yellow); }
-  .hist-info { flex: 1; min-width: 0; }
-  .hist-task { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  
-  .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .b-card { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 18px 8px; text-align: center; position: relative; }
-  .b-card.earned { border-color: var(--yellow); background: var(--yellow-dim); }
-  .b-card.locked { opacity: .28; filter: grayscale(1); }
-  .b-icon { font-size: 28px; display: block; margin-bottom: 8px; }
-  .b-name { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--white); text-transform: uppercase; }
-  .b-card.earned .b-name { color: var(--yellow); }
-
-  /* GÖREV ÖNERİ DROPDOWN */
+  /* SUGGEST DROPDOWN */
   .suggest-wrap { position: relative; flex: 1; }
-  .suggest-drop { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--black2); border: 2px solid var(--yellow); border-radius: 4px; z-index: 50; display: none; flex-direction: column; overflow: hidden; }
+  .suggest-drop { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--black2); border: 1.5px solid var(--yellow); border-radius: var(--radius); z-index: 50; display: none; flex-direction: column; overflow: hidden; }
   .suggest-drop.open { display: flex; animation: fadeIn .15s; }
-  .suggest-item { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--white); cursor: pointer; border-bottom: 1px solid var(--black4); transition: background .1s; }
+  .suggest-item { padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--white); cursor: pointer; border-bottom: 1px solid var(--black4); transition: background .1s; }
   .suggest-item:last-child { border-bottom: none; }
   .suggest-item:hover { background: var(--yellow-dim); color: var(--yellow); }
 
-  /* GÜNLÜK TOPLAM SÜRE – hafta kutuları */
-  .w-box { position: relative; }
-  .w-mins { font-size: 8px; color: var(--yellow); margin-top: 3px; display: block; }
+  /* NOTE QUICK INPUT */
+  .note-quick { margin-top: 14px; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); overflow: hidden; transition: border-color .15s; }
+  .note-quick:focus-within { border-color: var(--yellow); }
+  .note-quick-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 0; }
+  .note-quick-label { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--yellow); letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+  .note-title-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--black4); padding: 7px 12px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--white); outline: none; }
+  .note-title-input::placeholder { color: var(--white-dim); font-weight: 400; }
+  .note-body-input { width: 100%; background: transparent; border: none; padding: 8px 12px 10px; font-family: 'Space Grotesk', sans-serif; font-size: 12px; color: var(--white-dim); outline: none; resize: none; min-height: 60px; line-height: 1.5; }
+  .note-body-input::placeholder { color: var(--white-faint); }
+  .note-quick-footer { display: flex; align-items: center; gap: 6px; padding: 0 10px 8px; flex-wrap: wrap; }
+  .tag-chip { font-family: 'Space Mono', monospace; font-size: 9px; padding: 3px 8px; border-radius: 2px; border: 1px solid var(--black4); color: var(--white-dim); background: var(--black3); cursor: pointer; transition: .15s; }
+  .tag-chip:hover, .tag-chip.sel { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
+  .note-save-btn { margin-left: auto; background: var(--yellow); color: var(--black); border: none; border-radius: 4px; padding: 5px 14px; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: opacity .15s; }
+  .note-save-btn:active { opacity: .8; }
 
-  /* HAFTALIK TREND ÇUBUK GRAFİK */
-  .weekly-chart { background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; padding: 14px 16px; margin-bottom: 14px; }
-  .wchart-title { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
-  .wchart-bars { display: flex; align-items: flex-end; gap: 6px; height: 64px; }
-  .wchart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-  .wchart-bar { width: 100%; background: var(--yellow-dim); border: 1px solid var(--yellow-mid); border-radius: 2px; min-height: 2px; transition: height .6s cubic-bezier(.34,1.56,.64,1); position: relative; }
-  .wchart-bar.today { background: var(--yellow-mid); border-color: var(--yellow); box-shadow: 0 0 6px var(--yellow-mid); }
-  .wchart-day { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--white-dim); text-transform: uppercase; margin-top: 4px; }
-  .wchart-val { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--yellow); }
+  /* VERİ SEKMESİ */
+  .rpg-card { background: var(--black2); border: 1.5px solid var(--yellow); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .rpg-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .rpg-lvl { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--yellow); }
+  .rpg-title { font-size: 11px; color: var(--white-dim); }
+  .xp-bar-bg { width: 100%; height: 5px; background: var(--black4); border-radius: 3px; overflow: hidden; }
+  .xp-bar-fill { height: 100%; background: var(--yellow); transition: width 1s ease; }
+  .xp-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); margin-top: 5px; display: block; }
 
-  /* ROZET YENİ TASARIM */
-  .badge-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .b-card { background: var(--black2); border: 2px solid var(--black4); border-radius: 6px; padding: 16px 12px; display: flex; align-items: center; gap: 12px; position: relative; cursor: pointer; transition: all .2s; }
-  .b-card.earned { border-color: var(--yellow); background: var(--yellow-dim); }
-  .b-card.locked { opacity: .35; filter: grayscale(1); }
-  .b-card.earned:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--yellow-dim); }
-  .b-icon-wrap { width: 44px; height: 44px; border-radius: 50%; background: var(--black3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; border: 2px solid var(--black4); }
-  .b-card.earned .b-icon-wrap { border-color: var(--yellow); background: var(--yellow-dim); }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .s-card { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 16px 14px; display: flex; align-items: flex-start; gap: 10px; }
+  .s-card-ico { color: var(--yellow); opacity: 0.7; margin-top: 2px; flex-shrink: 0; }
+  .s-val { font-family: 'Space Mono', monospace; font-size: 34px; font-weight: 700; color: var(--yellow); line-height: 1; }
+  .s-lbl { font-size: 10px; color: var(--white-dim); margin-top: 4px; }
+
+  /* TERMİNAL */
+  .terminal-box { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 12px 14px; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--white-dim); }
+  .term-line { display: flex; gap: 8px; margin-bottom: 7px; line-height: 1.4; align-items: center; }
+  .term-line:last-child { margin-bottom: 0; }
+  .term-time { color: var(--yellow); flex-shrink: 0; }
+  .term-task { flex: 1; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .term-task:hover { color: var(--yellow); }
+  .term-dur { color: var(--white-faint); flex-shrink: 0; }
+  .term-restart { background: none; border: none; color: var(--white-faint); cursor: pointer; padding: 0 3px; transition: color .15s; flex-shrink: 0; display: flex; align-items: center; }
+  .term-restart:hover { color: var(--yellow); }
+  .term-pag { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--black4); margin-top: 10px; padding-top: 8px; }
+  .term-btn { background: none; border: none; color: var(--yellow); cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; }
+  .term-btn:disabled { color: var(--white-faint); cursor: not-allowed; }
+
+  /* BADGE */
+  .badge-list { display: flex; flex-direction: column; gap: 6px; }
+  .b-row { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 12px; transition: .15s; }
+  .b-row.earned { border-color: var(--yellow); background: var(--yellow-dim); }
+  .b-row.locked { opacity: .3; }
+  .b-icon-wrap { width: 36px; height: 36px; border-radius: 50%; background: var(--black3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid var(--black4); color: var(--white-dim); }
+  .b-row.earned .b-icon-wrap { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
   .b-info { flex: 1; min-width: 0; }
   .b-name { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 0.5px; }
-  .b-card.earned .b-name { color: var(--yellow); }
-  .b-desc { font-size: 10px; color: var(--white-dim); margin-top: 3px; line-height: 1.3; }
-  .b-card.earned .b-desc { color: var(--white-dim); }
-  .b-earned-mark { position: absolute; top: 8px; right: 10px; font-size: 10px; color: var(--yellow); font-family: 'Space Mono', monospace; font-weight: 700; opacity: 0; }
-  .b-card.earned .b-earned-mark { opacity: 1; }
+  .b-row.earned .b-name { color: var(--yellow); }
+  .b-desc { font-size: 10px; color: var(--white-dim); margin-top: 2px; }
+  .b-check { color: var(--yellow); flex-shrink: 0; }
 
-  /* GEÇMİŞ DÜZENLEME MODAL */
-  .edit-modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; display: none; align-items: center; justify-content: center; }
-  .edit-modal-bg.show { display: flex; }
-  .edit-modal { background: var(--black2); border: 2px solid var(--yellow); border-radius: 4px; padding: 28px 24px; width: 90%; max-width: 320px; animation: popIn .25s; }
-  .edit-modal h3 { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--yellow); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
-  .edit-input { width: 100%; background: var(--black); border: 2px solid var(--black4); border-radius: 4px; padding: 10px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: var(--white); outline: none; margin-bottom: 14px; }
-  .edit-input:focus { border-color: var(--yellow); }
-  .edit-actions { display: flex; gap: 10px; }
+  /* HAFTALIK CHART */
+  .weekly-chart { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+  .wchart-title { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--yellow); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+  .wchart-bars { display: flex; align-items: flex-end; gap: 5px; height: 60px; }
+  .wchart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; justify-content: flex-end; }
+  .wchart-bar { width: 100%; background: var(--yellow-dim); border: 1px solid var(--yellow-mid); border-radius: 2px 2px 0 0; min-height: 2px; transition: height .6s cubic-bezier(.34,1.56,.64,1); }
+  .wchart-bar.today { background: var(--yellow-mid); border-color: var(--yellow); box-shadow: 0 0 5px var(--yellow-mid); }
+  .wchart-day { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--white-dim); text-transform: uppercase; margin-top: 3px; }
+  .wchart-val { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--yellow); }
 
   /* ODAK SKORU */
-  .focus-score-card { background: var(--black2); border: 2px solid var(--yellow); border-radius: 4px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-  .fs-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1.5px; }
-  .fs-val { font-family: 'Space Mono', monospace; font-size: 32px; font-weight: 700; color: var(--yellow); line-height: 1; }
-  .fs-grade { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; color: var(--yellow); opacity: .6; }
+  .focus-score-card { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .fs-left { display: flex; align-items: center; gap: 10px; }
+  .fs-ico { color: var(--yellow); opacity: 0.7; }
+  .fs-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .fs-val { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--yellow); line-height: 1; }
+  .fs-grade { font-family: 'Space Mono', monospace; font-size: 26px; font-weight: 700; color: var(--yellow); opacity: .5; }
 
-  /* GELECEKTEKİ TARİH BADGE */
+  /* NOTLAR SEKMESİ */
+  .notes-toolbar { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .filter-chip { font-family: 'Space Mono', monospace; font-size: 9px; padding: 4px 10px; border-radius: 2px; border: 1px solid var(--black4); color: var(--white-dim); background: var(--black2); cursor: pointer; transition: .15s; text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-chip:hover, .filter-chip.active { border-color: var(--yellow); color: var(--yellow); background: var(--yellow-dim); }
+
+  /* YENİ: Arama Çubuğu ve Etkileşimli Görev Linki */
+  .note-search { width: 100%; background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 8px 12px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--white); outline: none; margin-bottom: 12px; transition: border-color .15s; }
+  .note-search:focus { border-color: var(--yellow); }
+  .note-task-ref { cursor: pointer; transition: color .15s; font-family: 'Space Mono', monospace; font-size: 8px; color: var(--white-dim); display: flex; align-items: center; gap: 3px; }
+  .note-task-ref:hover { color: var(--yellow); }
+
+  .note-card { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+  .note-card:hover { border-color: var(--white-faint); }
+  .note-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+  .note-card-title { font-size: 13px; font-weight: 600; color: var(--white); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-card-body { font-size: 11px; color: var(--white-dim); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; }
+  .note-card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .note-tag { font-family: 'Space Mono', monospace; font-size: 8px; padding: 2px 7px; border-radius: 2px; border: 1px solid var(--yellow-mid); color: var(--yellow); background: var(--yellow-dim); text-transform: uppercase; letter-spacing: 0.3px; }
+  .note-meta { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--white-dim); margin-left: auto; }
+  .note-del-btn { background: none; border: none; color: var(--white-faint); cursor: pointer; padding: 0; transition: color .15s; display: flex; align-items: center; flex-shrink: 0; }
+  .note-del-btn:hover { color: var(--red); }
+
+  /* NOTE MODAL */
+  .note-modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+  .note-modal-bg.show { display: flex; }
+  .note-modal { background: var(--black2); border: 1.5px solid var(--black4); border-top: 2px solid var(--yellow); border-radius: var(--radius) var(--radius) 0 0; padding: 24px 20px 32px; width: 100%; max-width: 480px; animation: slideUp .25s ease; max-height: 85dvh; overflow-y: auto; }
+  @keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  .note-modal-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--yellow); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: space-between; }
+  .note-modal-input { width: 100%; background: var(--black3); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 10px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--white); outline: none; margin-bottom: 10px; }
+  .note-modal-input:focus { border-color: var(--yellow); }
+  .note-modal-textarea { width: 100%; background: var(--black3); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 10px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--white); outline: none; resize: none; min-height: 100px; line-height: 1.6; margin-bottom: 12px; }
+  .note-modal-textarea:focus { border-color: var(--yellow); }
+  .note-modal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .note-modal-actions { display: flex; gap: 8px; }
+
+  /* GELECEK */
+  .hist-list { display: flex; flex-direction: column; gap: 6px; }
+  .hist-item { background: var(--black2); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .hist-item:hover { border-color: var(--white-faint); }
+  .hist-info { flex: 1; min-width: 0; cursor: pointer; }
+  .hist-task { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .future-date-badge { font-family: 'Space Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 2px; border: 1px solid var(--yellow-mid); color: var(--yellow); background: var(--yellow-dim); white-space: nowrap; flex-shrink: 0; }
   .future-date-badge.overdue { border-color: rgba(230,57,70,0.4); color: var(--red); background: rgba(230,57,70,0.08); }
   .future-date-badge.today { border-color: var(--yellow); animation: pulse 1.8s infinite; }
 
-  /* TERMİNAL TEKRAR BAŞLAT */
-  .term-restart { background: none; border: none; color: var(--white-faint); cursor: pointer; font-size: 13px; padding: 0 4px; transition: color .15s; flex-shrink: 0; }
-  .term-restart:hover { color: var(--yellow); }
-
-  /* NAV & MODAL */
-  .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--nav-h) + var(--safe-b)); background: var(--black); border-top: 2px solid var(--black4); display: flex; align-items: flex-start; justify-content: space-around; padding: 0 8px; padding-bottom: var(--safe-b); z-index: 100; }
-  .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 12px 4px; color: var(--white-dim); }
-  .nav-tab.active { color: var(--yellow); }
-  .nav-tab svg { width: 20px; height: 20px; stroke-width: 2; }
-  .nav-lbl { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; text-transform: uppercase; }
-
-  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px); background: var(--yellow); color: var(--black); padding: 10px 22px; border-radius: 2px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; z-index: 999; transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+  /* MODALS */
+  .edit-modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; display: none; align-items: center; justify-content: center; }
+  .edit-modal-bg.show { display: flex; }
+  .edit-modal { background: var(--black2); border: 1.5px solid var(--yellow); border-radius: var(--radius); padding: 26px 22px; width: 90%; max-width: 320px; animation: popIn .25s; }
+  .edit-modal h3 { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--yellow); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+  .edit-input { width: 100%; background: var(--black); border: 1.5px solid var(--black4); border-radius: var(--radius); padding: 10px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: var(--white); outline: none; margin-bottom: 12px; }
+  .edit-input:focus { border-color: var(--yellow); }
+  .edit-actions { display: flex; gap: 8px; }
 
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; display: none; align-items: center; justify-content: center; }
   .modal-bg.show { display: flex; }
-  .modal { background: var(--black2); border: 3px solid var(--yellow); border-radius: 4px; padding: 36px 28px; text-align: center; max-width: 320px; width: 90%; animation: popIn .3s; }
-  /* GÜNLÜK HEDEF */
-  .daily-goal-wrap { margin-top: 14px; cursor: pointer; padding: 12px 14px; background: var(--black2); border: 2px solid var(--black4); border-radius: 4px; transition: border-color .2s; }
-  .daily-goal-wrap:hover { border-color: var(--yellow-mid); }
-  .daily-goal-wrap.completed { border-color: var(--yellow); box-shadow: 0 0 10px var(--yellow-dim); }
-  .goal-bar-bg { width: 100%; height: 5px; background: var(--black4); border-radius: 3px; overflow: hidden; margin: 7px 0 5px; }
-  .goal-bar-fill { height: 100%; background: var(--yellow); border-radius: 3px; transition: width .8s cubic-bezier(.34,1.56,.64,1); }
-  .goal-row { display: flex; justify-content: space-between; align-items: center; }
-  .goal-text { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--white-dim); letter-spacing: 0.5px; }
-  .goal-pct { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: var(--yellow); }
+  .modal { background: var(--black2); border: 2px solid var(--yellow); border-radius: var(--radius); padding: 32px 26px; text-align: center; max-width: 320px; width: 90%; animation: popIn .3s; }
+  .modal-icon { width: 52px; height: 52px; background: var(--yellow-dim); border: 1.5px solid var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--yellow); }
 
-  @keyframes popIn { from { transform: scale(.8); opacity:0; } to { transform: scale(1); opacity:1; } }
+  /* NAV */
+  .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--nav-h) + var(--safe-b)); background: var(--black); border-top: 1px solid var(--black4); display: flex; align-items: flex-start; justify-content: space-around; padding: 0 6px; padding-bottom: var(--safe-b); z-index: 100; }
+  .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 11px 4px; color: var(--white-dim); transition: color .15s; }
+  .nav-tab.active { color: var(--yellow); }
+  .nav-tab svg { width: 19px; height: 19px; stroke-width: 1.8; }
+  .nav-lbl { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; text-transform: uppercase; }
+
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px); background: var(--yellow); color: var(--black); padding: 8px 20px; border-radius: 3px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; z-index: 999; transition: transform .35s cubic-bezier(.34,1.56,.64,1); letter-spacing: 0.5px; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .sunday-btn { width: 100%; background: #E1306C; color: white; border: none; border-radius: var(--radius); padding: 13px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 11px; margin-top: 12px; cursor: pointer; display: none; text-transform: uppercase; align-items: center; justify-content: center; gap: 8px; }
+
+  @keyframes popIn { from { transform: scale(.85); opacity:0; } to { transform: scale(1); opacity:1; } }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
   .pulsing .t-display { animation: pulse 1.8s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.45} }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--white-dim); font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.8; }
+  .empty-state svg { opacity: 0.2; margin-bottom: 12px; }
+
+  /* SCROLL DIVIDER */
+  .veri-section { margin-bottom: 6px; }
 </style>
 </head>
 <body>
-
 <canvas id="bgCanvas"></canvas>
 
 <div class="app">
@@ -243,39 +287,79 @@
 
   <div class="modal-bg" id="modalBg">
     <div class="modal">
-      <span style="font-size:54px;display:block;margin-bottom:14px" id="mEmoji">🎉</span>
-      <h2 style="font-family:'Space Mono'; color:var(--yellow); font-size:20px; margin-bottom:10px;">TAMAMLANDI!</h2>
-      <p style="font-size:13px; color:var(--white-dim); margin-bottom:22px; white-space:pre-line;" id="mSub"></p>
-      <div id="mBadge" style="background:var(--yellow-dim); border:2px solid var(--yellow); padding:10px; margin-bottom:18px; border-radius:4px; display:none;">
-        <p style="font-family:'Space Mono'; font-size:11px; color:var(--yellow); font-weight:700;">🏅 YENİ ROZET: <span id="mBadgeName"></span></p>
+      <div class="modal-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       </div>
-      <button class="btn-main" style="width:100%" onclick="closeModal()">DEVAM ET →</button>
+      <h2 style="font-family:'Space Mono'; color:var(--yellow); font-size:18px; margin-bottom:8px;">TAMAMLANDI</h2>
+      <p style="font-size:12px; color:var(--white-dim); margin-bottom:20px; white-space:pre-line; line-height:1.6;" id="mSub"></p>
+      <div id="mBadge" style="background:var(--yellow-dim); border:1.5px solid var(--yellow); padding:10px 12px; margin-bottom:16px; border-radius:var(--radius); display:none; text-align:left;">
+        <p style="font-family:'Space Mono'; font-size:10px; color:var(--yellow); font-weight:700; display:flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          YENİ ROZET: <span id="mBadgeName"></span>
+        </p>
+      </div>
+      <button class="btn-main" style="width:100%" onclick="closeModal()">DEVAM ET</button>
+    </div>
+  </div>
+
+  <div class="edit-modal-bg" id="editModalBg">
+    <div class="edit-modal">
+      <h3>// görev_düzenle</h3>
+      <input class="edit-input" id="editHistInput" type="text" maxlength="60" placeholder="Görev adı..." />
+      <div class="edit-actions">
+        <button class="btn-main secondary" style="flex:1;height:44px;font-size:11px;" onclick="closeEditModal()">İPTAL</button>
+        <button class="btn-main" style="flex:1;height:44px;font-size:11px;" onclick="saveEditHistory()">KAYDET</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-modal-bg" id="noteModalBg" onclick="closeNoteModal(event)">
+    <div class="note-modal">
+      <div class="note-modal-title">
+        <span id="noteModalHeading">// not_ekle</span>
+        <button onclick="closeNoteModal(null)" style="background:none;border:none;color:var(--white-dim);cursor:pointer;display:flex;align-items:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <input class="note-modal-input" id="noteModalTitle" type="text" placeholder="Başlık (opsiyonel)..." maxlength="80" />
+      <textarea class="note-modal-textarea" id="noteModalBody" placeholder="Notunu yaz..."></textarea>
+      <div class="note-modal-tags" id="noteModalTags"></div>
+      <div class="note-modal-actions">
+        <button class="btn-main secondary" style="flex:1;height:44px;font-size:11px;" onclick="closeNoteModal(null)">İPTAL</button>
+        <button class="btn-main" style="flex:1;height:44px;font-size:11px;" onclick="saveNoteModal()">KAYDET</button>
+      </div>
     </div>
   </div>
 
   <div class="screen active" id="screen-timer">
     <div class="header">
       <h1>anlık<span class="accent">_</span>görev</h1>
-      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Tema Değiştir">
-        <svg id="themeIco" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></svg>
-      </button>
+      <div style="display:flex;gap:6px;">
+        <button class="icon-btn" onclick="openNoteModal(null)" title="Yeni Not">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Tema Değiştir">
+          <svg id="themeIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        </button>
+      </div>
     </div>
 
     <div class="field-label">// görev ve süre</div>
     <div class="action-row">
       <div class="suggest-wrap">
-        <input class="task-input" id="taskInput" type="text" placeholder="ne yapacaksın?" maxlength="60" style="width:100%;height:100%;" />
+        <input class="task-input" id="taskInput" type="text" placeholder="ne yapacaksın?" maxlength="60" style="width:100%;" />
         <div class="suggest-drop" id="suggestDrop"></div>
       </div>
       <div class="compact-times">
         <button class="c-time active" data-min="5" onclick="pickTime(this, 5)">5</button>
         <button class="c-time" data-min="15" onclick="pickTime(this, 15)">15</button>
         <button class="c-time" data-min="25" onclick="pickTime(this, 25)">25</button>
-        <button class="c-time" data-min="0" onclick="pickTime(this, 0)">✎</button>
+        <button class="c-time" data-min="0" onclick="pickTime(this, 0)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
       </div>
     </div>
 
-    
     <div class="custom-wrap" id="customWrap">
       <label>ÖZEL DK:</label>
       <input class="custom-input" id="customMin" type="number" min="1" max="180" value="30" />
@@ -285,7 +369,7 @@
       <div class="ring-wrap">
         <svg class="ring-svg" viewBox="0 0 200 200">
           <circle class="ring-track" cx="100" cy="100" r="82"/>
-          <circle class="ring-fill"  cx="100" cy="100" r="82" id="ringFill"/>
+          <circle class="ring-fill" cx="100" cy="100" r="82" id="ringFill"/>
         </svg>
         <div class="ring-center">
           <div class="t-display" id="tDisp">05:00</div>
@@ -294,130 +378,209 @@
         </div>
       </div>
       <div class="controls">
-        <button class="btn-sq danger" onclick="resetTimer()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-        <button class="btn-main" id="startBtn" onclick="handleStart()">BAŞLAT</button>
-        <button class="btn-sq" id="pauseBtn" onclick="togglePause()" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="pauseIco"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+        <button class="btn-sq danger" onclick="resetTimer()" title="Sıfırla">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+        <button class="btn-main" id="startBtn" onclick="handleStart()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          BAŞLAT
+        </button>
+        <button class="btn-sq" id="pauseBtn" onclick="togglePause()" style="display:none">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="pauseIco"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="note-quick" id="noteQuick">
+      <div class="note-quick-header">
+        <span class="note-quick-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          hızlı_not
+        </span>
+      </div>
+      <input class="note-title-input" id="quickNoteTitle" type="text" placeholder="Başlık..." maxlength="80" />
+      <textarea class="note-body-input" id="quickNoteBody" placeholder="Aklına geleni yaz..." rows="2"></textarea>
+      <div class="note-quick-footer">
+        <div id="quickTagsWrap" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
+        <button class="note-save-btn" onclick="saveQuickNote()">KAYDET</button>
       </div>
     </div>
 
     <div class="daily-goal-wrap" id="dailyGoalWrap" onclick="editDailyGoal()" title="Günlük hedefi düzenle">
       <div class="goal-row">
-        <div class="field-label" style="margin:0;">// günlük_hedef</div>
+        <div class="field-label" style="margin:0;display:flex;align-items:center;gap:5px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          günlük_hedef
+        </div>
         <div class="goal-pct" id="goalPct">%0</div>
       </div>
       <div class="goal-bar-bg"><div class="goal-bar-fill" id="goalBarFill" style="width:0%"></div></div>
       <div class="goal-text" id="goalText">0 / 60 dk · hedefe ulaşmak için tıkla</div>
     </div>
 
-    <div class="home-section-title">// <span id="lblWeek">bu_hafta</span></div>
+    <div class="section-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      // <span id="lblWeek">bu_hafta</span>
+    </div>
     <div class="week-mini-boxes" id="homeDays"></div>
     <div class="today-grouped" id="homeGroupedTasks"></div>
-
-    <div class="home-section-title">// terminal_geçmişi</div>
-    <div class="terminal-box">
-      <div id="termLines"></div>
-      <div class="term-pag">
-        <button class="term-btn" id="termPrev" onclick="changeTermPage(-1)">&lt; GERİ</button>
-        <span id="termPgStr" style="font-weight:700;">1/1</span>
-        <button class="term-btn" id="termNext" onclick="changeTermPage(1)">İLERİ &gt;</button>
-      </div>
-    </div>
   </div>
 
   <div class="screen" id="screen-stats">
-    <div class="header"><h1>istatistik<span class="accent">_</span></h1></div>
-    
+    <div class="header"><h1>veri<span class="accent">_</span></h1></div>
+
     <div class="rpg-card">
-      <div class="rpg-lvl" id="rpgLevelText">Seviye 1</div>
-      <div class="rpg-title" id="rpgTitleText">Acemi Odaklayıcı</div>
+      <div class="rpg-top">
+        <div>
+          <div class="rpg-lvl" id="rpgLevelText">Seviye 1</div>
+          <div class="rpg-title" id="rpgTitleText">Acemi</div>
+        </div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.5" opacity="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
       <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpBarFill" style="width: 0%"></div></div>
-      <span class="xp-text" id="xpProgressText">0 / 30 XP (Dakika)</span>
+      <span class="xp-text" id="xpProgressText">0 / 30 XP</span>
     </div>
 
     <div class="weekly-chart">
-      <div class="wchart-title">// son_7_gün (dakika)</div>
+      <div class="wchart-title">// son_7_gün (dk)</div>
       <div class="wchart-bars" id="wchartBars"></div>
     </div>
 
     <div class="focus-score-card">
-      <div>
-        <div class="fs-label">// odak_skoru</div>
-        <div class="fs-val" id="focusScoreVal">—</div>
-        <div class="fs-label" style="margin-top:4px;" id="focusScoreDesc">henüz veri yok</div>
+      <div class="fs-left">
+        <svg class="fs-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <div>
+          <div class="fs-label">odak_skoru</div>
+          <div class="fs-val" id="focusScoreVal">—</div>
+          <div class="fs-label" style="margin-top:3px;" id="focusScoreDesc">henüz veri yok</div>
+        </div>
       </div>
       <div class="fs-grade" id="focusScoreGrade"></div>
     </div>
 
-    <div class="stats-grid">
-      <div class="s-card"><span class="s-icon">🔥</span><div class="s-val" id="sStreak">0</div><div class="s-lbl">Günlük Seri</div></div>
-      <div class="s-card"><span class="s-icon">📋</span><div class="s-val" id="sTotal">0</div><div class="s-lbl">Toplam Görev</div></div>
-      <div class="s-card"><span class="s-icon">⏱️</span><div class="s-val" id="sMins">0</div><div class="s-lbl">Toplam DK (XP)</div></div>
-      <div class="s-card"><span class="s-icon">✅</span><div class="s-val" id="sToday">0</div><div class="s-lbl">Bugün</div></div>
+    <div class="stats-grid" style="margin-bottom:10px;">
+      <div class="s-card">
+        <svg class="s-card-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <div><div class="s-val" id="sStreak">0</div><div class="s-lbl">Günlük Seri</div></div>
+      </div>
+      <div class="s-card">
+        <svg class="s-card-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <div><div class="s-val" id="sTotal">0</div><div class="s-lbl">Toplam Görev</div></div>
+      </div>
+      <div class="s-card">
+        <svg class="s-card-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div><div class="s-val" id="sMins">0</div><div class="s-lbl">Toplam DK</div></div>
+      </div>
+      <div class="s-card">
+        <svg class="s-card-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div><div class="s-val" id="sToday">0</div><div class="s-lbl">Bugün</div></div>
+      </div>
     </div>
-    
+
+    <div class="section-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      // terminal_geçmişi
+    </div>
+    <div class="terminal-box veri-section">
+      <div id="termLines"></div>
+      <div class="term-pag">
+        <button class="term-btn" id="termPrev" onclick="changeTermPage(-1)">← geri</button>
+        <span id="termPgStr" style="font-family:'Space Mono';font-size:10px;color:var(--white-dim);">1/1</span>
+        <button class="term-btn" id="termNext" onclick="changeTermPage(1)">ileri →</button>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      // rozetler
+    </div>
+    <div class="badge-list veri-section" id="badgeGrid"></div>
+
     <button class="sunday-btn" id="sundayShareBtn" onclick="generateSundayImage()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-      Haftalık Özeti İndir / Paylaş
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      Haftalık Özeti İndir
     </button>
   </div>
 
   <div class="screen" id="screen-future">
     <div class="header"><h1>gelecek<span class="accent">_</span></h1></div>
     <div class="field-label">// sonraya sakla</div>
-    <div style="display:flex; gap:10px; margin-bottom:8px;">
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
       <input class="task-input" id="futureInput" type="text" placeholder="aklındaki görev..." maxlength="60" style="height:48px;">
-      <button class="btn-sq" onclick="addFuture()" style="background:var(--yellow); color:var(--black); border-color:var(--yellow);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <button class="btn-sq" onclick="addFuture()" style="background:var(--yellow); color:var(--black); border-color:var(--yellow);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
     </div>
-    <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center;">
-      <input type="date" id="futureDateInput" style="flex:1; background:var(--black2); border:2px solid var(--black4); border-radius:4px; padding:8px 12px; font-family:'Space Mono',monospace; font-size:11px; color:var(--white-dim); outline:none; cursor:pointer;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--black4)'">
-      <button onclick="pickRandomFuture()" style="background:var(--black2); border:2px solid var(--black4); border-radius:4px; padding:8px 14px; font-family:'Space Mono',monospace; font-size:11px; color:var(--white-dim); cursor:pointer; white-space:nowrap; transition:.15s;" onmouseover="this.style.borderColor='var(--yellow)';this.style.color='var(--yellow)'" onmouseout="this.style.borderColor='var(--black4)';this.style.color='var(--white-dim)'">🎲 rastgele</button>
+    <div style="display:flex; gap:8px; margin-bottom:16px; align-items:center;">
+      <input type="date" id="futureDateInput" style="flex:1; background:var(--black2); border:1.5px solid var(--black4); border-radius:var(--radius); padding:8px 12px; font-family:'Space Mono',monospace; font-size:11px; color:var(--white-dim); outline:none; cursor:pointer; height:40px;" onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='var(--black4)'">
+      <button onclick="pickRandomFuture()" style="background:var(--black2); border:1.5px solid var(--black4); border-radius:var(--radius); padding:8px 14px; font-family:'Space Mono',monospace; font-size:10px; color:var(--white-dim); cursor:pointer; white-space:nowrap; transition:.15s; height:40px; display:flex; align-items:center; gap:6px;" onmouseover="this.style.borderColor='var(--yellow)';this.style.color='var(--yellow)'" onmouseout="this.style.borderColor='var(--black4)';this.style.color='var(--white-dim)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        rastgele
+      </button>
     </div>
     <div class="hist-list" id="futureList"></div>
   </div>
 
-  <div class="screen" id="screen-badges">
-    <div class="header"><h1>rozetler<span class="accent">_</span></h1></div>
-    <div class="badge-grid" id="badgeGrid"></div>
+  <div class="screen" id="screen-notes">
+    <div class="header">
+      <h1>notlar<span class="accent">_</span></h1>
+      <button class="icon-btn" onclick="openNoteModal(null)" title="Yeni Not" style="background:var(--yellow-dim); border-color:var(--yellow); color:var(--yellow);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <input type="text" class="note-search" id="noteSearch" placeholder="Notlarda ara..." oninput="renderNotes()">
+
+    <div class="notes-toolbar" id="notesToolbar"></div>
+
+    <div id="notesList"></div>
   </div>
 
   <nav class="nav">
-    <div class="nav-tab active" onclick="goTo('timer')" id="nav-timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="nav-lbl">Görev</span></div>
-    <div class="nav-tab" onclick="goTo('stats')" id="nav-stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="nav-lbl">Veri</span></div>
-    <div class="nav-tab" onclick="goTo('future')" id="nav-future"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg><span class="nav-lbl">Gelecek</span></div>
-    <div class="nav-tab" onclick="goTo('badges')" id="nav-badges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg><span class="nav-lbl">Rozet</span></div>
-  </nav>
-  <!-- GEÇMİŞ DÜZENLEME MODAL -->
-  <div class="edit-modal-bg" id="editModalBg">
-    <div class="edit-modal">
-      <h3>// görev_düzenle</h3>
-      <input class="edit-input" id="editHistInput" type="text" maxlength="60" placeholder="Görev adı..." />
-      <div class="edit-actions">
-        <button class="btn-main secondary" style="flex:1;height:44px;font-size:12px;" onclick="closeEditModal()">İPTAL</button>
-        <button class="btn-main" style="flex:1;height:44px;font-size:12px;" onclick="saveEditHistory()">KAYDET</button>
-      </div>
+    <div class="nav-tab active" onclick="goTo('timer')" id="nav-timer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="nav-lbl">Görev</span>
     </div>
-  </div>
-
+    <div class="nav-tab" onclick="goTo('stats')" id="nav-stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="nav-lbl">Veri</span>
+    </div>
+    <div class="nav-tab" onclick="goTo('future')" id="nav-future">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      <span class="nav-lbl">Gelecek</span>
+    </div>
+    <div class="nav-tab" onclick="goTo('notes')" id="nav-notes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <span class="nav-lbl">Notlar</span>
+    </div>
+  </nav>
 </div>
+
 <script>
 const CIRC_RING = 2 * Math.PI * 82;
 let selectedMs = 5 * 60 * 1000, endTimestamp = null, pausedAt = null, tickId = null;
 let isRunning = false, isPaused = false, termCurrentPage = 0;
 let viewingDateStr = new Date().toISOString().split('T')[0];
+let activeNoteFilter = 'all';
+let editingNoteId = null;
 
-const LS_DATA = 'agData_v3', LS_TIMER = 'agTimer_v3', LS_THEME = 'agTheme_v3';
+const LS_DATA = 'agData_v3', LS_TIMER = 'agTimer_v3', LS_THEME = 'agTheme_v3', LS_GOAL = 'agGoal_v3';
 
 // SESLER
-let actx = null; const audio = () => actx || (actx = new (window.AudioContext || window.webkitAudioContext)());
+let actx = null;
+const audio = () => actx || (actx = new (window.AudioContext || window.webkitAudioContext)());
 function tone(f, d, t='square', v=0.1) { try { const a=audio(), o=a.createOscillator(), g=a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value=f; o.type=t; g.gain.setValueAtTime(v,a.currentTime); g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d); o.start(); o.stop(a.currentTime+d); } catch(e){} }
 const sfxStart = () => { tone(220,.06); setTimeout(()=>tone(440,.1),60); };
 const sfxComplete = () => [330,440,550,660].forEach((f,i)=>setTimeout(()=>tone(f,.3,'square',.12),i*120));
 
-// VERİ OKU/YAZ (Local Storage)
-function getData() { return JSON.parse(localStorage.getItem(LS_DATA) || '{"history":[],"future":[],"streak":0,"totalMins":0,"weekly":{},"badges":[]}'); }
+// VERİ
+function getData() {
+  const def = { history:[], future:[], streak:0, totalMins:0, weekly:{}, badges:[], notes:[], tags: ['fikir','görev','önemli','sonra'] };
+  try { return { ...def, ...JSON.parse(localStorage.getItem(LS_DATA) || '{}') }; } catch(e) { return def; }
+}
 function saveData(d) { localStorage.setItem(LS_DATA, JSON.stringify(d)); }
 
-// BİLDİRİM İZNİ
+// BİLDİRİM
 function requestNotification() {
   if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
 }
@@ -437,28 +600,18 @@ function tick() {
   const rem = endTimestamp - Date.now();
   if (rem <= 0) { onComplete(); return; }
   setDisplayMs(rem); setRing(rem);
-  // Sekme başlığı güncelle
   const s = Math.max(0, Math.ceil(rem/1000)), m = Math.floor(s/60), sec = s%60;
   const task = document.getElementById('taskInput').value.trim() || 'Görev';
-  document.title = `⏱ ${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')} — ${task}`;
+  document.title = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')} — ${task}`;
 }
 function togglePause() {
   if (!isRunning) return;
   if (!isPaused) {
     pausedAt = Date.now(); isPaused = true; setUIState('paused');
-    try {
-      const s = JSON.parse(localStorage.getItem(LS_TIMER) || '{}');
-      s.pauseRemMs = endTimestamp - pausedAt;
-      localStorage.setItem(LS_TIMER, JSON.stringify(s));
-    } catch(e) {}
+    try { const s = JSON.parse(localStorage.getItem(LS_TIMER)||'{}'); s.pauseRemMs = endTimestamp - pausedAt; localStorage.setItem(LS_TIMER, JSON.stringify(s)); } catch(e) {}
   } else {
     endTimestamp += (Date.now() - pausedAt); pausedAt = null; isPaused = false; setUIState('run');
-    try {
-      const s = JSON.parse(localStorage.getItem(LS_TIMER) || '{}');
-      s.endTimestamp = endTimestamp;
-      delete s.pauseRemMs;
-      localStorage.setItem(LS_TIMER, JSON.stringify(s));
-    } catch(e) {}
+    try { const s = JSON.parse(localStorage.getItem(LS_TIMER)||'{}'); s.endTimestamp = endTimestamp; delete s.pauseRemMs; localStorage.setItem(LS_TIMER, JSON.stringify(s)); } catch(e) {}
   }
 }
 function resetTimer() { clearInterval(tickId); isRunning = false; isPaused = false; endTimestamp = null; localStorage.removeItem(LS_TIMER); setDisplayMs(selectedMs); setRing(selectedMs); setUIState('idle'); document.title = 'Anlık Görev'; }
@@ -468,465 +621,546 @@ function onComplete() {
   const task = document.getElementById('taskInput').value.trim() || 'Görev';
   const durMins = Math.round(selectedMs / 60000);
   const d = getData(), now = new Date(), dayStr = now.toDateString(), key = now.toISOString().split('T')[0];
-
   d.history.unshift({ task, duration: durMins, at: now.toISOString(), dateKey: key });
   if (d.history.length > 300) d.history.pop();
-
   if (d.lastDayStr !== dayStr) {
     const yest = new Date(now - 86400000).toDateString();
     d.streak = (d.lastDayStr === yest) ? d.streak + 1 : 1; d.lastDayStr = dayStr;
   }
   d.totalMins += durMins; d.weekly[key] = (d.weekly[key] || 0) + 1;
-  
-  // Rozet kontrolü
   const newBadge = evalBadges(d);
   saveData(d);
-
   isRunning = false; isPaused = false; endTimestamp = null;
   setDisplayMs(selectedMs); setRing(selectedMs); setUIState('idle'); sfxComplete(); document.title = 'Anlık Görev';
-  
   if ("Notification" in window && Notification.permission === "granted") {
-    new Notification("GÖREV TAMAMLANDI!", { body: `"${task}" bitti. Harika iş çıkardın! +${durMins} XP` });
+    new Notification("GÖREV TAMAMLANDI!", { body: `"${task}" bitti. +${durMins} XP` });
   }
-
   viewingDateStr = key; renderHomeData(); renderDailyGoal(); showModal(task, durMins, d.streak, newBadge);
 }
 
-// UI YARDIMCILARI
-function setDisplayMs(ms) { const s = Math.max(0, Math.ceil(ms/1000)), m = Math.floor(s/60), sec = s%60; document.getElementById('tDisp').textContent = String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0'); }
-function setRing(remMs) { document.getElementById('ringFill').style.strokeDashoffset = CIRC_RING * (1 - Math.max(0, Math.min(1, remMs/selectedMs))); }
+function setDisplayMs(ms) { const s=Math.max(0,Math.ceil(ms/1000)), m=Math.floor(s/60), sec=s%60; document.getElementById('tDisp').textContent=String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+function setRing(remMs) { document.getElementById('ringFill').style.strokeDashoffset = CIRC_RING*(1-Math.max(0,Math.min(1,remMs/selectedMs))); }
 function setUIState(state, task) {
-  const sb = document.getElementById('startBtn'), pb = document.getElementById('pauseBtn'), ts = document.getElementById('tState'), tn = document.getElementById('tName'), sec = document.getElementById('timerSection');
-  if (state === 'run') { sb.style.display='none'; pb.style.display='flex'; document.getElementById('pauseIco').innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'; ts.className='t-badge run'; ts.textContent='çalışıyor'; if(task) tn.textContent=task; sec.classList.remove('pulsing'); }
-  else if (state === 'paused') { document.getElementById('pauseIco').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>'; ts.className='t-badge paused'; ts.textContent='duraklatıldı'; sec.classList.add('pulsing'); }
-  else { sb.style.display=''; pb.style.display='none'; ts.className='t-badge idle'; ts.textContent='bekliyor'; tn.textContent='Hazır'; sec.classList.remove('pulsing'); }
+  const sb=document.getElementById('startBtn'), pb=document.getElementById('pauseBtn'), ts=document.getElementById('tState'), tn=document.getElementById('tName'), sec=document.getElementById('timerSection');
+  if (state==='run') {
+    sb.style.display='none'; pb.style.display='flex';
+    document.getElementById('pauseIco').innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    ts.className='t-badge run'; ts.textContent='çalışıyor'; if(task) tn.textContent=task; sec.classList.remove('pulsing');
+  } else if (state==='paused') {
+    document.getElementById('pauseIco').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';
+    ts.className='t-badge paused'; ts.textContent='duraklatıldı'; sec.classList.add('pulsing');
+  } else {
+    sb.style.display=''; pb.style.display='none';
+    sb.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> BAŞLAT';
+    ts.className='t-badge idle'; ts.textContent='bekliyor'; tn.textContent='Hazır'; sec.classList.remove('pulsing');
+  }
 }
 
-// KOMPAKT ZAMAN SEÇİMİ
+// ZAMAN SEÇİMİ
 function pickTime(el, min) {
   if (isRunning) return;
   document.querySelectorAll('.c-time').forEach(b => b.classList.remove('active')); el.classList.add('active');
   const cw = document.getElementById('customWrap');
-  if (min === 0) { cw.classList.add('open'); selectedMs = (parseInt(document.getElementById('customMin').value) || 30) * 60000; }
-  else { cw.classList.remove('open'); selectedMs = min * 60000; }
+  if (min===0) { cw.classList.add('open'); selectedMs=(parseInt(document.getElementById('customMin').value)||30)*60000; }
+  else { cw.classList.remove('open'); selectedMs=min*60000; }
   setDisplayMs(selectedMs); setRing(selectedMs);
 }
-document.getElementById('customMin').addEventListener('input', function() { selectedMs = Math.max(1, Math.min(180, parseInt(this.value)||1)) * 60000; setDisplayMs(selectedMs); setRing(selectedMs); });
+document.getElementById('customMin').addEventListener('input', function() { selectedMs=Math.max(1,Math.min(180,parseInt(this.value)||1))*60000; setDisplayMs(selectedMs); setRing(selectedMs); });
 
-// TEMA & CANLI ARKA PLAN
-const THEMES = ['dark', 'light', 'hacker'];
+// TEMA
+const THEMES = ['dark','light','hacker'];
 function toggleTheme() {
   let curr = document.documentElement.dataset.theme || 'dark';
-  let next = THEMES[(THEMES.indexOf(curr) + 1) % THEMES.length];
+  let next = THEMES[(THEMES.indexOf(curr)+1)%THEMES.length];
   document.documentElement.dataset.theme = next; localStorage.setItem(LS_THEME, next);
   applyThemeIcon(next); initCanvasBG();
 }
 function applyThemeIcon(th) {
   const ico = document.getElementById('themeIco');
-  if(th === 'light') ico.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-  else if(th === 'hacker') ico.innerHTML = '<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>';
-  else ico.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>';
+  if(th==='light') ico.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  else if(th==='hacker') ico.innerHTML='<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>';
+  else ico.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>';
 }
 
-// CANVAS ANİMASYON SİSTEMİ
+// CANVAS
 let animFrame;
 function initCanvasBG() {
   cancelAnimationFrame(animFrame);
-  const cvs = document.getElementById('bgCanvas'), ctx = cvs.getContext('2d');
-  cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-  const th = document.documentElement.dataset.theme || 'dark';
-  
-  if (th === 'hacker') {
-    const chars = "01".split(""), font_size = 14, columns = cvs.width/font_size;
-    const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, cvs.width, cvs.height);
-      ctx.fillStyle = "#1e9900"; ctx.font = font_size + "px Space Mono";
-      for(let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random()*chars.length)];
-        ctx.fillText(text, i*font_size, drops[i]*font_size);
-        if(drops[i]*font_size > cvs.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-      }
-      animFrame = requestAnimationFrame(drawMatrix);
-    }
+  const cvs=document.getElementById('bgCanvas'), ctx=cvs.getContext('2d');
+  cvs.width=window.innerWidth; cvs.height=window.innerHeight;
+  const th=document.documentElement.dataset.theme||'dark';
+  if (th==='hacker') {
+    const chars="01".split(""), font_size=14, columns=cvs.width/font_size, drops=[];
+    for(let x=0;x<columns;x++) drops[x]=1;
+    function drawMatrix() { ctx.fillStyle="rgba(5,5,5,0.05)"; ctx.fillRect(0,0,cvs.width,cvs.height); ctx.fillStyle="#1e9900"; ctx.font=font_size+"px Space Mono"; for(let i=0;i<drops.length;i++){const text=chars[Math.floor(Math.random()*chars.length)]; ctx.fillText(text,i*font_size,drops[i]*font_size); if(drops[i]*font_size>cvs.height&&Math.random()>0.975)drops[i]=0; drops[i]++;} animFrame=requestAnimationFrame(drawMatrix); }
     drawMatrix();
-  } else if (th === 'dark') {
-    let particles = Array.from({length:30}, ()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, s:Math.random()*2, v:Math.random()*0.5+0.1}));
-    function drawDark() {
-      ctx.clearRect(0,0,cvs.width,cvs.height);
-      ctx.fillStyle = "rgba(245, 200, 0, 0.15)";
-      particles.forEach(p => {
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-        p.y -= p.v; if(p.y < 0) p.y = cvs.height;
-      });
-      animFrame = requestAnimationFrame(drawDark);
-    }
+  } else if (th==='dark') {
+    let particles=Array.from({length:25},()=>({x:Math.random()*cvs.width, y:Math.random()*cvs.height, s:Math.random()*1.5, v:Math.random()*0.4+0.1}));
+    function drawDark() { ctx.clearRect(0,0,cvs.width,cvs.height); ctx.fillStyle="rgba(245,200,0,0.12)"; particles.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.s,0,Math.PI*2); ctx.fill(); p.y-=p.v; if(p.y<0)p.y=cvs.height; }); animFrame=requestAnimationFrame(drawDark); }
     drawDark();
-  } else { ctx.clearRect(0,0,cvs.width,cvs.height); } // Light modda düz renk
+  } else { ctx.clearRect(0,0,cvs.width,cvs.height); }
 }
 window.addEventListener('resize', initCanvasBG);
 
-// NAVİGASYON & EKRANLAR
+// NAVİGASYON
 function goTo(id) {
-  ['timer','stats','future','badges'].forEach(s => { document.getElementById('screen-'+s).classList.toggle('active', s===id); document.getElementById('nav-'+s).classList.toggle('active', s===id); });
-  if (id==='stats') { renderStats(); }
+  ['timer','stats','future','notes'].forEach(s => {
+    document.getElementById('screen-'+s).classList.toggle('active', s===id);
+    document.getElementById('nav-'+s).classList.toggle('active', s===id);
+  });
+  if (id==='stats') { renderStats(); renderTerminal(); renderBadges(); }
   if (id==='future') renderFuture();
-  if (id==='badges') renderBadges();
-  if (id==='timer') { viewingDateStr = new Date().toISOString().split('T')[0]; renderHomeData(); }
+  if (id==='notes') renderNotes();
+  if (id==='timer') { viewingDateStr=new Date().toISOString().split('T')[0]; renderHomeData(); }
 }
 
-// ANA SAYFA HAFTALIK & TERMİNAL GÖRÜNÜMÜ
+// ANA SAYFA
 function renderHomeData() {
-  const d = getData(), today = new Date();
+  const d=getData(), today=new Date();
   renderDailyGoal();
-  
-  // Gün Seçici Kutular (Son 7 gün)
-  const days = Array.from({length:7}, (_,i) => { const dt = new Date(today); dt.setDate(today.getDate() - 6 + i); return dt; });
-  const trShort = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
-  
-  document.getElementById('homeDays').innerHTML = days.map(dt => {
-    const key = dt.toISOString().split('T')[0];
-    const isSel = key === viewingDateStr;
-    const dayMins = d.history.filter(h => h.dateKey === key).reduce((s, h) => s + h.duration, 0);
-    const minsLabel = dayMins > 0 ? `<span class="w-mins">${dayMins}dk</span>` : '';
+  const days=Array.from({length:7},(_,i)=>{ const dt=new Date(today); dt.setDate(today.getDate()-6+i); return dt; });
+  const trShort=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+  document.getElementById('homeDays').innerHTML=days.map(dt=>{
+    const key=dt.toISOString().split('T')[0], isSel=key===viewingDateStr;
+    const dayMins=d.history.filter(h=>h.dateKey===key).reduce((s,h)=>s+h.duration,0);
+    const minsLabel=dayMins>0?`<span class="w-mins">${dayMins}dk</span>`:'';
     return `<div class="w-box ${isSel?'active':''}" onclick="changeViewingDay('${key}')">${trShort[dt.getDay()]}${minsLabel}</div>`;
   }).join('');
+  document.getElementById('lblWeek').textContent=(viewingDateStr===today.toISOString().split('T')[0])?"bugün":viewingDateStr.split('-').slice(1).join('/');
+  const dayTasks=d.history.filter(h=>h.dateKey===viewingDateStr);
+  const groups={}; dayTasks.forEach(t=>{ groups[t.task]=(groups[t.task]||0)+1; });
+  const gWrap=document.getElementById('homeGroupedTasks');
+  if(Object.keys(groups).length>0){
+    gWrap.innerHTML=Object.keys(groups).map(k=>`<div class="g-row"><span class="g-count">${groups[k]}x</span><span class="g-task">${k}</span></div>`).join('');
+  } else { gWrap.innerHTML=`<div class="g-row" style="color:var(--white-dim);justify-content:center;font-size:11px;font-family:'Space Mono'">// boş</div>`; }
+}
+function changeViewingDay(key) { viewingDateStr=key; renderHomeData(); }
 
-  document.getElementById('lblWeek').textContent = (viewingDateStr === today.toISOString().split('T')[0]) ? "bugün" : viewingDateStr.split('-').slice(1).join('/');
-
-  // Seçili günün gruplanmış görevleri
-  const dayTasks = d.history.filter(h => h.dateKey === viewingDateStr);
-  const groups = {}; dayTasks.forEach(t => { groups[t.task] = (groups[t.task] || 0) + 1; });
-  const gWrap = document.getElementById('homeGroupedTasks');
-  if (Object.keys(groups).length > 0) {
-    gWrap.innerHTML = Object.keys(groups).map(k => `<div class="g-row"><span class="g-count">${groups[k]}x</span><span class="g-task">${k}</span></div>`).join('');
-  } else { gWrap.innerHTML = `<div class="g-row" style="color:var(--white-dim); justify-content:center;">Bu tarihte görev yok.</div>`; }
-
-  // Terminal (Tüm Geçmiş)
-  const total = d.history.length, pages = Math.max(1, Math.ceil(total/5));
-  if (termCurrentPage >= pages) termCurrentPage = pages - 1; if (termCurrentPage < 0) termCurrentPage = 0;
-  const slice = d.history.slice(termCurrentPage * 5, (termCurrentPage * 5) + 5);
-  const tWrap = document.getElementById('termLines');
-  
-  if (slice.length > 0) {
-    tWrap.innerHTML = slice.map((h, i) => {
-      const absIdx = termCurrentPage * 5 + i;
-      return `<div class="term-line" style="cursor:pointer;">
-        <span class="term-time" onclick="openEditHistory(${absIdx})">[${new Date(h.at).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}]</span>
+// TERMİNAL (Veri sekmesi)
+function renderTerminal() {
+  const d=getData();
+  const total=d.history.length, pages=Math.max(1,Math.ceil(total/6));
+  if(termCurrentPage>=pages) termCurrentPage=pages-1;
+  if(termCurrentPage<0) termCurrentPage=0;
+  const slice=d.history.slice(termCurrentPage*6, (termCurrentPage*6)+6);
+  const tWrap=document.getElementById('termLines');
+  if(slice.length>0){
+    tWrap.innerHTML=slice.map((h,i)=>{
+      const absIdx=termCurrentPage*6+i;
+      return `<div class="term-line">
+        <span class="term-time">[${new Date(h.at).toLocaleString('tr-TR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}]</span>
         <span class="term-task" onclick="openEditHistory(${absIdx})" title="Düzenle">${h.task}</span>
-        <span style="color:var(--white-faint)">${h.duration}m</span>
-        <button class="term-restart" onclick="restartFromHistory('${h.task.replace(/'/g,"\\'")}', ${h.duration})" title="Tekrar başlat">↺</button>
+        <span class="term-dur">${h.duration}m</span>
+        <button class="term-restart" onclick="restartFromHistory('${h.task.replace(/'/g,"\\'")}',${h.duration})" title="Tekrar başlat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
       </div>`;
     }).join('');
-  } else { tWrap.innerHTML = `<div class="term-line" style="color:var(--white-faint)">-- sistem boş --</div>`; }
-
-  document.getElementById('termPgStr').textContent = `${termCurrentPage + 1}/${pages}`;
-  document.getElementById('termPrev').disabled = (termCurrentPage === 0); document.getElementById('termNext').disabled = (termCurrentPage === pages - 1);
+  } else { tWrap.innerHTML=`<div class="term-line" style="color:var(--white-faint)">-- sistem boş --</div>`; }
+  document.getElementById('termPgStr').textContent=`${termCurrentPage+1}/${pages}`;
+  document.getElementById('termPrev').disabled=(termCurrentPage===0);
+  document.getElementById('termNext').disabled=(termCurrentPage===pages-1);
 }
-function changeViewingDay(key) { viewingDateStr = key; renderHomeData(); }
-function changeTermPage(dir) { termCurrentPage += dir; renderHomeData(); }
+function changeTermPage(dir) { termCurrentPage+=dir; renderTerminal(); }
 
-// GELECEK
-function addFuture() { const v = document.getElementById('futureInput').value.trim(); if(!v) return; const dateVal = document.getElementById('futureDateInput').value; const d = getData(); d.future.unshift({task:v, date: dateVal||null}); saveData(d); document.getElementById('futureInput').value=''; document.getElementById('futureDateInput').value=''; toast('EKLENDİ'); renderFuture(); }
+// GELECEKTEKİ
+function addFuture() { const v=document.getElementById('futureInput').value.trim(); if(!v)return; const dateVal=document.getElementById('futureDateInput').value; const d=getData(); d.future.unshift({task:v,date:dateVal||null}); saveData(d); document.getElementById('futureInput').value=''; document.getElementById('futureDateInput').value=''; toast('EKLENDİ'); renderFuture(); }
 function renderFuture() {
-  const d = getData(), list = document.getElementById('futureList');
-  if(!d.future.length) { list.innerHTML = `<div style="text-align:center; padding:40px; color:var(--white-dim); font-size:11px; font-family:'Space Mono'">// Liste boş.</div>`; return; }
-  const todayKey = new Date().toISOString().split('T')[0];
-  list.innerHTML = d.future.map((f,i) => {
-    let dateBadge = '';
-    if (f.date) {
-      const isToday = f.date === todayKey;
-      const isOverdue = f.date < todayKey;
-      const label = isToday ? 'bugün' : isOverdue ? 'geçti' : f.date.slice(5).replace('-','/');
-      dateBadge = `<span class="future-date-badge ${isToday?'today':''} ${isOverdue?'overdue':''}">${label}</span>`;
-    }
+  const d=getData(), list=document.getElementById('futureList');
+  if(!d.future.length){ list.innerHTML=`<div class="empty-state"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg><br>Liste boş.</div>`; return; }
+  const todayKey=new Date().toISOString().split('T')[0];
+  list.innerHTML=d.future.map((f,i)=>{
+    let dateBadge='';
+    if(f.date){ const isToday=f.date===todayKey, isOverdue=f.date<todayKey; const label=isToday?'bugün':isOverdue?'geçti':f.date.slice(5).replace('-','/'); dateBadge=`<span class="future-date-badge ${isToday?'today':''} ${isOverdue?'overdue':''}">${label}</span>`; }
     return `<div class="hist-item">
-      <div class="hist-info" onclick="startFuture(${i})" style="cursor:pointer"><div class="hist-task">${f.task}</div></div>
+      <div class="hist-info" onclick="startFuture(${i})"><div class="hist-task">${f.task}</div></div>
       ${dateBadge}
-      <button onclick="deleteFuture(${i})" style="background:none;border:none;color:var(--white-faint);cursor:pointer;font-size:14px;padding:4px 6px;transition:.15s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--white-faint)'">✕</button>
-      <span style="color:var(--yellow); font-size:18px; cursor:pointer;" onclick="startFuture(${i})">+</span>
+      <button onclick="deleteFuture(${i})" style="background:none;border:none;color:var(--white-faint);cursor:pointer;padding:4px;transition:.15s;display:flex;align-items:center;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--white-faint)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button onclick="startFuture(${i})" style="background:var(--yellow-dim);border:1px solid var(--yellow);color:var(--yellow);border-radius:4px;cursor:pointer;padding:5px 10px;font-family:'Space Mono';font-size:10px;font-weight:700;transition:.15s;">SEÇ</button>
     </div>`;
   }).join('');
 }
-function pickRandomFuture() {
-  const d = getData();
-  if (!d.future.length) { toast('LİSTE BOŞ'); return; }
-  const idx = Math.floor(Math.random() * d.future.length);
-  const item = document.querySelectorAll('#futureList .hist-item')[idx];
-  if (item) { item.style.border = '2px solid var(--yellow)'; setTimeout(() => item.style.border = '', 1200); }
-  toast(`🎲 "${d.future[idx].task}"`);
+function pickRandomFuture() { const d=getData(); if(!d.future.length){toast('LİSTE BOŞ');return;} const idx=Math.floor(Math.random()*d.future.length); const items=document.querySelectorAll('#futureList .hist-item'); if(items[idx]){items[idx].style.border='1.5px solid var(--yellow)'; setTimeout(()=>items[idx].style.border='',1200);} toast(`"${d.future[idx].task}"`); }
+function startFuture(idx) { const d=getData(), t=d.future[idx].task; d.future.splice(idx,1); saveData(d); document.getElementById('taskInput').value=t; goTo('timer'); toast('GÖREV SEÇİLDİ'); }
+function deleteFuture(idx) { const d=getData(); d.future.splice(idx,1); saveData(d); toast('SİLİNDİ'); renderFuture(); }
+
+// NOT SİSTEMİ
+function getNotes() { const d=getData(); return d.notes||[]; }
+function saveNotes(notes) { const d=getData(); d.notes=notes; saveData(d); }
+
+// GÖREV LİNKİNDEN BAŞLATMA
+function startTaskFromNote(taskName) {
+  if(isRunning) { toast('ÖNCE AKTİF GÖREVİ DURDUR'); return; }
+  document.getElementById('taskInput').value = taskName;
+  goTo('timer');
+  toast(`"${taskName}" HAZIR`);
 }
-function startFuture(idx) { const d = getData(), t = d.future[idx].task; d.future.splice(idx,1); saveData(d); document.getElementById('taskInput').value = t; goTo('timer'); toast('GÖREV SEÇİLDİ'); }
 
-// İSTATİSTİK & RPG SİSTEMİ
-const RPG_LEVELS = [0, 30, 100, 250, 500, 1000, 2000, 4000, 8000];
-const RPG_TITLES = ["Acemi", "Çırak", "Kalfa", "Usta", "Odak Ustası", "Zaman Bükücü", "Efsane", "Mistik", "Zamanın Efendisi"];
+// ETİKET SİSTEMİ (Özel Etiket Ekleme)
+function renderTagsUI() {
+  const d = getData();
+  if(!d.tags) { d.tags = ['fikir','görev','önemli','sonra']; saveData(d); }
+  const tags = d.tags;
 
+  const qWrap = document.getElementById('quickTagsWrap');
+  if(qWrap) qWrap.innerHTML = tags.map(t=>`<span class="tag-chip" data-tag="${t}" onclick="toggleQuickTag(this)">${t}</span>`).join('') + `<span class="tag-chip" onclick="addNewTag()" style="border-style:dashed" title="Yeni Etiket">+</span>`;
+
+  const tb = document.getElementById('notesToolbar');
+  if(tb) tb.innerHTML = `<span class="filter-chip ${activeNoteFilter==='all'?'active':''}" data-filter="all" onclick="setNoteFilter(this,'all')">tümü</span>` + 
+    tags.map(t=>`<span class="filter-chip ${activeNoteFilter===t?'active':''}" data-filter="${t}" onclick="setNoteFilter(this,'${t}')">${t}</span>`).join('') + 
+    `<span class="filter-chip" onclick="addNewTag()" style="border-style:dashed">+</span>`;
+}
+
+function addNewTag() {
+  const t = prompt('Yeni Etiket Adı (maksimum 15 karakter):');
+  if(!t) return;
+  const clean = t.trim().toLowerCase().slice(0,15);
+  if(!clean) return;
+  const d = getData();
+  if(!d.tags) d.tags = ['fikir','görev','önemli','sonra'];
+  if(!d.tags.includes(clean)) { d.tags.push(clean); saveData(d); }
+  
+  renderTagsUI();
+  if(document.getElementById('screen-notes').classList.contains('active')) renderNotes();
+
+  // Eğer modal açıksa içindeki etiketleri de güncelle
+  if(document.getElementById('noteModalBg').classList.contains('show')) {
+    const tagContainer = document.getElementById('noteModalTags');
+    const selTags = [...tagContainer.querySelectorAll('.tag-chip.sel')].map(el=>el.dataset.tag);
+    tagContainer.innerHTML = d.tags.map(tag => `<span class="tag-chip ${selTags.includes(tag)?'sel':''}" data-tag="${tag}" onclick="this.classList.toggle('sel')">${tag}</span>`).join('') + `<span class="tag-chip" onclick="addNewTag()" style="border-style:dashed">+</span>`;
+  }
+}
+
+function toggleQuickTag(el) { el.classList.toggle('sel'); }
+
+function saveQuickNote() {
+  const title=document.getElementById('quickNoteTitle').value.trim();
+  const body=document.getElementById('quickNoteBody').value.trim();
+  if(!title && !body) { toast('NOT BOŞ'); return; }
+  const tags=[...document.getElementById('quickTagsWrap').querySelectorAll('.tag-chip.sel')].map(el=>el.dataset.tag);
+  const task=document.getElementById('taskInput').value.trim()||null;
+  const note={ id: Date.now().toString(), title, body, tags, taskRef: task, at: new Date().toISOString() };
+  const d=getData(); if(!d.notes) d.notes=[]; d.notes.unshift(note); saveData(d);
+  document.getElementById('quickNoteTitle').value='';
+  document.getElementById('quickNoteBody').value='';
+  document.getElementById('quickTagsWrap').querySelectorAll('.tag-chip.sel').forEach(el=>el.classList.remove('sel'));
+  toast('NOT KAYDEDİLDİ');
+  if(document.getElementById('screen-notes').classList.contains('active')) renderNotes();
+}
+
+function openNoteModal(noteId) {
+  editingNoteId = noteId;
+  const heading = document.getElementById('noteModalHeading');
+  const tagContainer = document.getElementById('noteModalTags');
+  const d = getData();
+  const tags = d.tags || ['fikir','görev','önemli','sonra'];
+  tagContainer.innerHTML = tags.map(tag => `<span class="tag-chip" data-tag="${tag}" onclick="this.classList.toggle('sel')">${tag}</span>`).join('') + `<span class="tag-chip" onclick="addNewTag()" style="border-style:dashed">+</span>`;
+
+  if (noteId) {
+    heading.textContent = '// not_düzenle';
+    const notes=getNotes(), note=notes.find(n=>n.id===noteId);
+    if (!note) return;
+    document.getElementById('noteModalTitle').value=note.title||'';
+    document.getElementById('noteModalBody').value=note.body||'';
+    tagContainer.querySelectorAll('.tag-chip').forEach(chip=>{ if(note.tags && note.tags.includes(chip.dataset.tag)) chip.classList.add('sel'); });
+  } else {
+    heading.textContent = '// not_ekle';
+    document.getElementById('noteModalTitle').value='';
+    document.getElementById('noteModalBody').value='';
+  }
+  document.getElementById('noteModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('noteModalBody').focus(), 100);
+}
+
+function closeNoteModal(e) {
+  if (e && e.target !== document.getElementById('noteModalBg')) return;
+  document.getElementById('noteModalBg').classList.remove('show');
+  editingNoteId=null;
+}
+
+function saveNoteModal() {
+  const title=document.getElementById('noteModalTitle').value.trim();
+  const body=document.getElementById('noteModalBody').value.trim();
+  if(!title && !body) { toast('NOT BOŞ'); return; }
+  const tags=[...document.getElementById('noteModalTags').querySelectorAll('.tag-chip.sel')].map(el=>el.dataset.tag);
+  const task=document.getElementById('taskInput').value.trim()||null;
+  const notes=getNotes();
+  if (editingNoteId) {
+    const idx=notes.findIndex(n=>n.id===editingNoteId);
+    if(idx>-1) { notes[idx]={...notes[idx], title, body, tags, updatedAt: new Date().toISOString()}; }
+  } else {
+    notes.unshift({ id: Date.now().toString(), title, body, tags, taskRef: task, at: new Date().toISOString() });
+  }
+  saveNotes(notes);
+  document.getElementById('noteModalBg').classList.remove('show');
+  editingNoteId=null;
+  toast(editingNoteId ? 'NOT GÜNCELLENDİ' : 'NOT KAYDEDİLDİ');
+  if(document.getElementById('screen-notes').classList.contains('active')) renderNotes();
+}
+
+function deleteNote(id) {
+  const notes=getNotes().filter(n=>n.id!==id);
+  saveNotes(notes); renderNotes(); toast('NOT SİLİNDİ');
+}
+
+function setNoteFilter(el, filter) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); activeNoteFilter=filter; renderNotes();
+}
+
+function renderNotes() {
+  const notes=getNotes();
+  const searchQ = (document.getElementById('noteSearch') ? document.getElementById('noteSearch').value.toLowerCase() : '');
+  
+  const filtered = notes.filter(n => {
+    const matchFilter = activeNoteFilter === 'all' || (n.tags && n.tags.includes(activeNoteFilter));
+    const matchSearch = !searchQ || (n.title && n.title.toLowerCase().includes(searchQ)) || (n.body && n.body.toLowerCase().includes(searchQ));
+    return matchFilter && matchSearch;
+  });
+
+  const container=document.getElementById('notesList');
+  if(!filtered.length){
+    container.innerHTML=`<div class="empty-state"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><br>${activeNoteFilter==='all' && !searchQ ? 'Henüz not yok.' : 'Bunu içeren not bulunamadı.'}</div>`;
+    return;
+  }
+  
+  container.innerHTML=filtered.map(note=>{
+    const dateStr=new Date(note.at).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+    const tagsHtml=(note.tags||[]).map(t=>`<span class="note-tag">${t}</span>`).join('');
+    
+    // GÖREV LİNKİ GÜNCELLEMESİ: Görev refersansına tıklandığında direkt zamanlayıcıyı hazırlar
+    const taskRef=note.taskRef?`<span class="note-task-ref" onclick="event.stopPropagation();startTaskFromNote('${note.taskRef.replace(/'/g,"\\'")}')" title="Bu göreve geç"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${note.taskRef}</span>`:'';
+    
+    return `<div class="note-card" onclick="openNoteModal('${note.id}')">
+      <div class="note-card-header">
+        <div class="note-card-title">${note.title||'(başlıksız)'}</div>
+        <button class="note-del-btn" onclick="event.stopPropagation();deleteNote('${note.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>
+      </div>
+      ${note.body?`<div class="note-card-body">${note.body}</div>`:''}
+      <div class="note-card-footer">${tagsHtml}${taskRef}<span class="note-meta">${dateStr}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// İSTATİSTİK & RPG
+const RPG_LEVELS=[0,30,100,250,500,1000,2000,4000,8000];
+const RPG_TITLES=["Acemi","Çırak","Kalfa","Usta","Odak Ustası","Zaman Bükücü","Efsane","Mistik","Zamanın Efendisi"];
 function renderStats() {
-  const d = getData();
-  document.getElementById('sStreak').textContent = d.streak; document.getElementById('sTotal').textContent = d.history.length;
-  document.getElementById('sMins').textContent = d.totalMins; 
-  document.getElementById('sToday').textContent = d.history.filter(h => h.dateKey === new Date().toISOString().split('T')[0]).length;
-  
-  // RPG Hesaplama
-  let lvl = 1; for(let i=0; i<RPG_LEVELS.length; i++) { if(d.totalMins >= RPG_LEVELS[i]) lvl = i+1; else break; }
-  let nextXP = RPG_LEVELS[lvl] || RPG_LEVELS[RPG_LEVELS.length-1];
-  let currentBase = RPG_LEVELS[lvl-1];
-  let progress = Math.min(100, ((d.totalMins - currentBase) / (nextXP - currentBase)) * 100);
-  
-  document.getElementById('rpgLevelText').textContent = `Seviye ${lvl}`;
-  document.getElementById('rpgTitleText').textContent = RPG_TITLES[lvl-1];
-  document.getElementById('xpProgressText').textContent = `${d.totalMins} / ${nextXP} XP`;
-  document.getElementById('xpBarFill').style.width = `${progress}%`;
-
-  // Odak Skoru
+  const d=getData();
+  document.getElementById('sStreak').textContent=d.streak;
+  document.getElementById('sTotal').textContent=d.history.length;
+  document.getElementById('sMins').textContent=d.totalMins;
+  document.getElementById('sToday').textContent=d.history.filter(h=>h.dateKey===new Date().toISOString().split('T')[0]).length;
+  let lvl=1; for(let i=0;i<RPG_LEVELS.length;i++){if(d.totalMins>=RPG_LEVELS[i])lvl=i+1;else break;}
+  let nextXP=RPG_LEVELS[lvl]||RPG_LEVELS[RPG_LEVELS.length-1];
+  let currentBase=RPG_LEVELS[lvl-1];
+  let progress=Math.min(100,((d.totalMins-currentBase)/(nextXP-currentBase))*100);
+  document.getElementById('rpgLevelText').textContent=`Seviye ${lvl}`;
+  document.getElementById('rpgTitleText').textContent=RPG_TITLES[lvl-1];
+  document.getElementById('xpProgressText').textContent=`${d.totalMins} / ${nextXP} XP`;
+  document.getElementById('xpBarFill').style.width=`${progress}%`;
   calcFocusScore(d);
-
-  // Pazar Günü Kontrolü
-  if(new Date().getDay() === 0) document.getElementById('sundayShareBtn').style.display = 'flex';
-  else document.getElementById('sundayShareBtn').style.display = 'none';
-
-function calcFocusScore(d) {
-  if (!d.history.length) return;
-  // Uzun oturumlar daha fazla puan: dur * sqrt(dur) mantığı
-  const totalScore = d.history.reduce((sum, h) => sum + h.duration * Math.sqrt(h.duration), 0);
-  const avgScore = totalScore / d.history.length;
-  const normalized = Math.min(100, Math.round(avgScore / 5));
-  let grade = normalized >= 85 ? 'S' : normalized >= 70 ? 'A' : normalized >= 50 ? 'B' : normalized >= 30 ? 'C' : 'D';
-  document.getElementById('focusScoreVal').textContent = normalized;
-  document.getElementById('focusScoreGrade').textContent = grade;
-  document.getElementById('focusScoreDesc').textContent = grade === 'S' ? 'olağanüstü odak' : grade === 'A' ? 'güçlü performans' : grade === 'B' ? 'iyi gidiyorsun' : grade === 'C' ? 'geliştirebilirsin' : 'daha uzun oturumlar dene';
-}
-
-  // Haftalık Trend Grafiği
+  if(new Date().getDay()===0) document.getElementById('sundayShareBtn').style.display='flex';
+  else document.getElementById('sundayShareBtn').style.display='none';
   renderWeeklyChart(d);
 }
 
+function calcFocusScore(d) {
+  if(!d.history.length) return;
+  const totalScore=d.history.reduce((sum,h)=>sum+h.duration*Math.sqrt(h.duration),0);
+  const avgScore=totalScore/d.history.length;
+  const normalized=Math.min(100,Math.round(avgScore/5));
+  let grade=normalized>=85?'S':normalized>=70?'A':normalized>=50?'B':normalized>=30?'C':'D';
+  document.getElementById('focusScoreVal').textContent=normalized;
+  document.getElementById('focusScoreGrade').textContent=grade;
+  document.getElementById('focusScoreDesc').textContent=grade==='S'?'olağanüstü':grade==='A'?'güçlü':grade==='B'?'iyi gidiyorsun':grade==='C'?'geliştirebilirsin':'daha uzun oturumlar';
+}
+
 function renderWeeklyChart(d) {
-  const trShort = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
-  const today = new Date();
-  const days = Array.from({length:7}, (_,i) => { const dt = new Date(today); dt.setDate(today.getDate() - 6 + i); return dt; });
-  const vals = days.map(dt => {
-    const key = dt.toISOString().split('T')[0];
-    return d.history.filter(h => h.dateKey === key).reduce((s, h) => s + h.duration, 0);
-  });
-  const maxVal = Math.max(...vals, 1);
-  const todayKey = today.toISOString().split('T')[0];
-  document.getElementById('wchartBars').innerHTML = days.map((dt, i) => {
-    const key = dt.toISOString().split('T')[0];
-    const isToday = key === todayKey;
-    const pct = Math.round((vals[i] / maxVal) * 100);
+  const trShort=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'], today=new Date();
+  const days=Array.from({length:7},(_,i)=>{ const dt=new Date(today); dt.setDate(today.getDate()-6+i); return dt; });
+  const vals=days.map(dt=>d.history.filter(h=>h.dateKey===dt.toISOString().split('T')[0]).reduce((s,h)=>s+h.duration,0));
+  const maxVal=Math.max(...vals,1), todayKey=today.toISOString().split('T')[0];
+  document.getElementById('wchartBars').innerHTML=days.map((dt,i)=>{
+    const key=dt.toISOString().split('T')[0], isToday=key===todayKey, pct=Math.round((vals[i]/maxVal)*100);
     return `<div class="wchart-col">
-      ${vals[i] > 0 ? `<div class="wchart-val">${vals[i]}</div>` : '<div class="wchart-val" style="opacity:0">0</div>'}
+      ${vals[i]>0?`<div class="wchart-val">${vals[i]}</div>`:'<div class="wchart-val" style="opacity:0">0</div>'}
       <div class="wchart-bar ${isToday?'today':''}" style="height:${Math.max(pct,2)}%"></div>
       <div class="wchart-day">${trShort[dt.getDay()]}</div>
     </div>`;
   }).join('');
 }
 
-function deleteFuture(idx) { const d = getData(); d.future.splice(idx, 1); saveData(d); toast('SİLİNDİ'); renderFuture(); }
-
-// PAZAR GÜNÜ SOSYAL MEDYA ÇIKTISI
-function generateSundayImage() {
-  const d = getData();
-  const cvs = document.createElement('canvas'); cvs.width = 1080; cvs.height = 1080;
-  const ctx = cvs.getContext('2d');
-  
-  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,1080,1080);
-  ctx.fillStyle = '#111111'; ctx.fillRect(80,80,920,920);
-  ctx.strokeStyle = '#f5c800'; ctx.lineWidth = 4; ctx.strokeRect(80,80,920,920);
-  
-  ctx.fillStyle = '#f5c800'; ctx.font = 'bold 80px monospace'; ctx.textAlign = 'center';
-  ctx.fillText('HAFTALIK ÖZET', 540, 240);
-  
-  ctx.fillStyle = '#f0f0f0'; ctx.font = 'bold 120px sans-serif';
-  ctx.fillText(`🔥 ${d.streak} Gün`, 540, 450);
-  
-  ctx.font = 'bold 80px sans-serif'; ctx.fillStyle = '#f5c800';
-  ctx.fillText(`${d.totalMins} DK ODAKLANMA`, 540, 620);
-  
-  ctx.fillStyle = '#6c757d'; ctx.font = '40px monospace';
-  ctx.fillText(`Seviye: ${document.getElementById('rpgLevelText').textContent}`, 540, 780);
-  ctx.fillText('anlik_gorev', 540, 920);
-
-  const link = document.createElement('a');
-  link.download = `haftalik-ozet-${new Date().toISOString().split('T')[0]}.png`;
-  link.href = cvs.toDataURL('image/png'); link.click();
-  toast("GÖRSEL İNDİRİLDİ!");
-}
-
 // ROZETLER
 const BADGES = [
-  {id:'b1',icon:'🌱',name:'İlk Adım',desc:'İlk görevini tamamla',ok:d=>d.history.length>=1},
-  {id:'b2',icon:'⭐',name:'Beşli',desc:'5 görev tamamla',ok:d=>d.history.length>=5},
-  {id:'b3',icon:'🏆',name:'Onlu',desc:'10 görev tamamla',ok:d=>d.history.length>=10},
-  {id:'b5',icon:'🔥',name:'Ateş',desc:'3 günlük seri yap',ok:d=>d.streak>=3},
-  {id:'b6',icon:'⚡',name:'Haftalık',desc:'7 günlük seri yap',ok:d=>d.streak>=7},
-  {id:'b8',icon:'⏱️',name:'Saatçi',desc:'60 dakika odaklan',ok:d=>d.totalMins>=60},
-  {id:'b9',icon:'🚀',name:'Maraton',desc:'500 dakika odaklan',ok:d=>d.totalMins>=500},
-  {id:'b11',icon:'🎯',name:'Nişancı',desc:'25 dk. Pomodoro tamamla',ok:d=>d.history.some(h=>h.duration===25)}
+  {id:'b1', name:'İlk Adım', desc:'İlk görevini tamamla', ok:d=>d.history.length>=1,
+    icon:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'},
+  {id:'b2', name:'Beşli', desc:'5 görev tamamla', ok:d=>d.history.length>=5,
+    icon:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'},
+  {id:'b3', name:'Onlu', desc:'10 görev tamamla', ok:d=>d.history.length>=10,
+    icon:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>'},
+  {id:'b5', name:'Ateş', desc:'3 günlük seri yap', ok:d=>d.streak>=3,
+    icon:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'},
+  {id:'b6', name:'Haftalık', desc:'7 günlük seri yap', ok:d=>d.streak>=7,
+    icon:'<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>'},
+  {id:'b8', name:'Saatçi', desc:'60 dakika odaklan', ok:d=>d.totalMins>=60,
+    icon:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'},
+  {id:'b9', name:'Maraton', desc:'500 dakika odaklan', ok:d=>d.totalMins>=500,
+    icon:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>'},
+  {id:'b11', name:'Nişancı', desc:'25 dk Pomodoro tamamla', ok:d=>d.history.some(h=>h.duration===25),
+    icon:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'},
 ];
+
 function evalBadges(d) {
-  if(!d.badges) d.badges = [];
-  for (const b of BADGES) { if (!d.badges.includes(b.id) && b.ok(d)) { d.badges.push(b.id); return b; } } return null;
+  if(!d.badges) d.badges=[];
+  for(const b of BADGES){ if(!d.badges.includes(b.id)&&b.ok(d)){d.badges.push(b.id);return b;} } return null;
 }
+
 function renderBadges() {
-  const d = getData(); if(!d.badges) d.badges = [];
-  document.getElementById('badgeGrid').innerHTML = BADGES.map(b => {
-    const got = d.badges.includes(b.id);
-    return `<div class="b-card ${got?'earned':'locked'}">
-      <div class="b-icon-wrap">${got ? b.icon : '🔒'}</div>
+  const d=getData(); if(!d.badges) d.badges=[];
+  document.getElementById('badgeGrid').innerHTML=BADGES.map(b=>{
+    const got=d.badges.includes(b.id);
+    return `<div class="b-row ${got?'earned':'locked'}">
+      <div class="b-icon-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${got?b.icon:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'}</svg>
+      </div>
       <div class="b-info">
         <div class="b-name">${b.name}</div>
-        <div class="b-desc">${got ? b.desc : b.desc}</div>
+        <div class="b-desc">${b.desc}</div>
       </div>
-      <span class="b-earned-mark">✓</span>
+      ${got?`<svg class="b-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`:''}
     </div>`;
   }).join('');
 }
 
 // GÜNLÜK HEDEF
-const LS_GOAL = 'agGoal_v3';
-function getDailyGoal() { return parseInt(localStorage.getItem(LS_GOAL) || '60'); }
+function getDailyGoal() { return parseInt(localStorage.getItem(LS_GOAL)||'60'); }
 function renderDailyGoal() {
-  const d = getData();
-  const goal = getDailyGoal();
-  const key = new Date().toISOString().split('T')[0];
-  const todayMins = d.history.filter(h => h.dateKey === key).reduce((s, h) => s + h.duration, 0);
-  const pct = Math.min(100, Math.round((todayMins / goal) * 100));
-  const wrap = document.getElementById('dailyGoalWrap');
-  document.getElementById('goalBarFill').style.width = pct + '%';
-  document.getElementById('goalPct').textContent = '%' + pct;
-  document.getElementById('goalText').textContent = `${todayMins} / ${goal} dk${pct >= 100 ? '  ·  🎉 hedef tamamlandı!' : ''}`;
-  if (pct >= 100) wrap.classList.add('completed'); else wrap.classList.remove('completed');
+  const d=getData(), goal=getDailyGoal(), key=new Date().toISOString().split('T')[0];
+  const todayMins=d.history.filter(h=>h.dateKey===key).reduce((s,h)=>s+h.duration,0);
+  const pct=Math.min(100,Math.round((todayMins/goal)*100));
+  const wrap=document.getElementById('dailyGoalWrap');
+  document.getElementById('goalBarFill').style.width=pct+'%';
+  document.getElementById('goalPct').textContent='%'+pct;
+  document.getElementById('goalText').textContent=`${todayMins} / ${goal} dk${pct>=100?' · hedef tamamlandı!':''}`;
+  if(pct>=100) wrap.classList.add('completed'); else wrap.classList.remove('completed');
 }
 function editDailyGoal() {
-  const curr = getDailyGoal();
-  const val = prompt('Günlük odak hedefi (dakika):', curr);
-  if (val && !isNaN(val) && parseInt(val) > 0) {
-    localStorage.setItem(LS_GOAL, parseInt(val));
-    renderDailyGoal();
-    toast('HEDEF GÜNCELLENDİ: ' + parseInt(val) + 'dk');
-  }
+  const curr=getDailyGoal(), val=prompt('Günlük odak hedefi (dakika):',curr);
+  if(val&&!isNaN(val)&&parseInt(val)>0){ localStorage.setItem(LS_GOAL,parseInt(val)); renderDailyGoal(); toast('HEDEF: '+parseInt(val)+'dk'); }
+}
+
+// GEÇMİŞ DÜZENLEME
+let editingHistIdx=null;
+function openEditHistory(idx) {
+  const d=getData(); if(!d.history[idx])return;
+  editingHistIdx=idx; document.getElementById('editHistInput').value=d.history[idx].task;
+  document.getElementById('editModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('editHistInput').focus(),100);
+}
+function saveEditHistory() {
+  const val=document.getElementById('editHistInput').value.trim();
+  if(!val||editingHistIdx===null) return closeEditModal();
+  const d=getData(); d.history[editingHistIdx].task=val; saveData(d); closeEditModal(); renderTerminal(); toast('GÜNCELLENDİ');
+}
+function closeEditModal() { document.getElementById('editModalBg').classList.remove('show'); editingHistIdx=null; }
+
+function restartFromHistory(task, duration) {
+  if(isRunning){toast('ÖNCE AKTİF GÖREVİ DURDUR');return;}
+  document.getElementById('taskInput').value=task;
+  const mins=duration, preset=[5,15,25].includes(mins)?mins:0;
+  document.querySelectorAll('.c-time').forEach(b=>b.classList.remove('active'));
+  if(preset){ const btn=document.querySelector(`.c-time[data-min="${preset}"]`); if(btn){btn.classList.add('active');selectedMs=mins*60000;} }
+  else { const cb=document.querySelector('.c-time[data-min="0"]'); if(cb) cb.classList.add('active'); document.getElementById('customWrap').classList.add('open'); document.getElementById('customMin').value=mins; selectedMs=mins*60000; }
+  setDisplayMs(selectedMs); setRing(selectedMs); goTo('timer'); toast(`"${task}" hazır`);
 }
 
 // TOAST & MODAL
-let toastTimer; function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 2800); }
-function showModal(task, mins, streak, newBadge) { document.getElementById('mSub').textContent=`"${task}" \n ${mins} dakika tamamlandı! 🔥 ${streak} günlük seri!`; const mb = document.getElementById('mBadge'); if (newBadge) { mb.classList.add('show'); document.getElementById('mBadgeName').textContent = newBadge.name; } else mb.classList.remove('show'); document.getElementById('modalBg').classList.add('show'); }
-function closeModal() { document.getElementById('modalBg').classList.remove('show'); document.getElementById('taskInput').value = ''; }
+let toastTimer;
+function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2600); }
+function showModal(task, mins, streak, newBadge) {
+  document.getElementById('mSub').textContent=`"${task}"\n${mins} dakika tamamlandı — ${streak} günlük seri`;
+  const mb=document.getElementById('mBadge');
+  if(newBadge){mb.style.display='block'; document.getElementById('mBadgeName').textContent=newBadge.name; }
+  else mb.style.display='none';
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); document.getElementById('taskInput').value=''; }
 
-// ENTER TUŞU İLE BAŞLAT
-document.getElementById('taskInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { document.getElementById('suggestDrop').classList.remove('open'); handleStart(); }
-});
-
-// GÖREV ÖNERİ DROPDOWN (Son kullanılanlar)
-document.getElementById('taskInput').addEventListener('focus', function() {
-  const d = getData();
-  const recent = [...new Set(d.history.map(h => h.task))].slice(0, 3);
-  const drop = document.getElementById('suggestDrop');
-  if (recent.length === 0) return;
-  drop.innerHTML = recent.map(t => `<div class="suggest-item" onmousedown="pickSuggest('${t.replace(/'/g,"\\'")}')"> ${t}</div>`).join('');
+// SUGGESTION
+document.getElementById('taskInput').addEventListener('keydown', function(e){ if(e.key==='Enter'){ document.getElementById('suggestDrop').classList.remove('open'); handleStart(); } });
+document.getElementById('taskInput').addEventListener('focus', function(){
+  const d=getData(); const recent=[...new Set(d.history.map(h=>h.task))].slice(0,3);
+  const drop=document.getElementById('suggestDrop');
+  if(!recent.length)return;
+  drop.innerHTML=recent.map(t=>`<div class="suggest-item" onmousedown="pickSuggest('${t.replace(/'/g,"\\'")}')">  ${t}</div>`).join('');
   drop.classList.add('open');
 });
-document.getElementById('taskInput').addEventListener('blur', function() {
-  setTimeout(() => document.getElementById('suggestDrop').classList.remove('open'), 150);
-});
-document.getElementById('taskInput').addEventListener('input', function() {
-  if (!this.value) document.getElementById('suggestDrop').classList.remove('open');
-});
-function pickSuggest(t) { document.getElementById('taskInput').value = t; document.getElementById('suggestDrop').classList.remove('open'); }
+document.getElementById('taskInput').addEventListener('blur', function(){ setTimeout(()=>document.getElementById('suggestDrop').classList.remove('open'),150); });
+document.getElementById('taskInput').addEventListener('input', function(){ if(!this.value) document.getElementById('suggestDrop').classList.remove('open'); });
+function pickSuggest(t) { document.getElementById('taskInput').value=t; document.getElementById('suggestDrop').classList.remove('open'); }
 
-// GEÇMİŞ DÜZENLEME
-let editingHistIdx = null;
-function openEditHistory(idx) {
-  const d = getData();
-  if (!d.history[idx]) return;
-  editingHistIdx = idx;
-  document.getElementById('editHistInput').value = d.history[idx].task;
-  document.getElementById('editModalBg').classList.add('show');
-  setTimeout(() => document.getElementById('editHistInput').focus(), 100);
-}
-function saveEditHistory() {
-  const val = document.getElementById('editHistInput').value.trim();
-  if (!val || editingHistIdx === null) return closeEditModal();
-  const d = getData();
-  d.history[editingHistIdx].task = val;
-  saveData(d); closeEditModal(); renderHomeData(); toast('GÜNCELLENDI');
-}
-function closeEditModal() { document.getElementById('editModalBg').classList.remove('show'); editingHistIdx = null; }
-function restartFromHistory(task, duration) {
-  if (isRunning) { toast('ÖNCE AKTİF GÖREVİ DURDUR'); return; }
-  document.getElementById('taskInput').value = task;
-  // Süreye en yakın butonu seç
-  const mins = duration;
-  const preset = [5,15,25].includes(mins) ? mins : 0;
-  document.querySelectorAll('.c-time').forEach(b => b.classList.remove('active'));
-  if (preset) {
-    const btn = document.querySelector(`.c-time[data-min="${preset}"]`);
-    if (btn) { btn.classList.add('active'); selectedMs = mins * 60000; }
-  } else {
-    const customBtn = document.querySelector('.c-time[data-min="0"]');
-    if (customBtn) { customBtn.classList.add('active'); }
-    document.getElementById('customWrap').classList.add('open');
-    document.getElementById('customMin').value = mins;
-    selectedMs = mins * 60000;
-  }
-  setDisplayMs(selectedMs); setRing(selectedMs);
-  goTo('timer'); toast(`↺ "${task}" hazır`);
+// PAZAR ÖZET
+function generateSundayImage() {
+  const d=getData();
+  const cvs=document.createElement('canvas'); cvs.width=1080; cvs.height=1080;
+  const ctx=cvs.getContext('2d');
+  ctx.fillStyle='#0a0a0a'; ctx.fillRect(0,0,1080,1080);
+  ctx.fillStyle='#111111'; ctx.fillRect(80,80,920,920);
+  ctx.strokeStyle='#f5c800'; ctx.lineWidth=3; ctx.strokeRect(80,80,920,920);
+  ctx.fillStyle='#f5c800'; ctx.font='bold 72px monospace'; ctx.textAlign='center';
+  ctx.fillText('HAFTALIK ÖZET', 540, 230);
+  ctx.fillStyle='#f0f0f0'; ctx.font='bold 100px sans-serif';
+  ctx.fillText(`${d.streak} Günlük Seri`, 540, 420);
+  ctx.font='bold 70px sans-serif'; ctx.fillStyle='#f5c800';
+  ctx.fillText(`${d.totalMins} DK ODAKLANMA`, 540, 580);
+  ctx.fillStyle='#6c757d'; ctx.font='38px monospace';
+  ctx.fillText(`Seviye: ${document.getElementById('rpgLevelText').textContent}`, 540, 740);
+  ctx.fillText('anlik_gorev', 540, 900);
+  const link=document.createElement('a'); link.download=`haftalik-ozet-${new Date().toISOString().split('T')[0]}.png`; link.href=cvs.toDataURL('image/png'); link.click();
+  toast('GÖRSEL İNDİRİLDİ');
 }
 
-// PWA SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE = 'anlik-gorev-v1';
-    self.addEventListener('install', e => { self.skipWaiting(); });
-    self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
-  `;
-  const blob = new Blob([swCode], {type: 'application/javascript'});
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(() => {});
+// PWA
+if('serviceWorker' in navigator){
+  const swCode=`const CACHE='anlik-gorev-v3'; self.addEventListener('install',e=>{self.skipWaiting();}); self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});`;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
 
 // BAŞLAT
 (function init() {
-  const saved = localStorage.getItem(LS_THEME) || 'dark'; document.documentElement.dataset.theme = saved; applyThemeIcon(saved); initCanvasBG();
-  document.getElementById('ringFill').style.strokeDasharray = CIRC_RING; document.getElementById('ringFill').style.strokeDashoffset = 0;
+  const saved=localStorage.getItem(LS_THEME)||'dark';
+  document.documentElement.dataset.theme=saved; applyThemeIcon(saved); initCanvasBG();
+  document.getElementById('ringFill').style.strokeDasharray=CIRC_RING;
+  document.getElementById('ringFill').style.strokeDashoffset=0;
+  
+  // Etiketleri dinamik olarak renderla
+  renderTagsUI();
+
   setDisplayMs(selectedMs); renderHomeData(); renderDailyGoal();
 
-  document.getElementById('editHistInput').addEventListener('keydown', e => { if(e.key==='Enter') saveEditHistory(); if(e.key==='Escape') closeEditModal(); });
+  document.getElementById('editHistInput').addEventListener('keydown', e=>{if(e.key==='Enter')saveEditHistory();if(e.key==='Escape')closeEditModal();});
 
-  // Devam Eden Görev Kurtarma
+  // Timer kurtarma
   try {
-    const r = localStorage.getItem(LS_TIMER);
-    if (r) {
-      const s = JSON.parse(r);
-      if (s.pauseRemMs !== undefined) {
-        // Duraklatılmış oturum kurtarma
-        selectedMs = s.selectedMs;
-        endTimestamp = Date.now() + s.pauseRemMs;
-        pausedAt = Date.now();
-        isRunning = true; isPaused = true;
-        document.getElementById('taskInput').value = s.task || '';
-        startTick();
-        setDisplayMs(s.pauseRemMs); setRing(s.pauseRemMs);
-        setUIState('paused', s.task);
-        setTimeout(() => toast('⏸ DURAKLAMA NOKTASINDAN DEVAM'), 400);
+    const r=localStorage.getItem(LS_TIMER);
+    if(r){
+      const s=JSON.parse(r);
+      if(s.pauseRemMs!==undefined){
+        selectedMs=s.selectedMs; endTimestamp=Date.now()+s.pauseRemMs; pausedAt=Date.now();
+        isRunning=true; isPaused=true;
+        document.getElementById('taskInput').value=s.task||'';
+        startTick(); setDisplayMs(s.pauseRemMs); setRing(s.pauseRemMs); setUIState('paused',s.task);
+        setTimeout(()=>toast('DURAKLATILAN OTURUM GERİ YÜKLENDİ'),400);
       } else {
-        const rem = s.endTimestamp - Date.now();
-        if (rem > 200) {
-          endTimestamp = s.endTimestamp; selectedMs = s.selectedMs; isRunning = true;
-          document.getElementById('taskInput').value = s.task || '';
-          startTick(); setUIState('run', s.task);
-          setTimeout(() => toast('▶ ZAMANLAYICI DEVAM EDİYOR'), 400);
-        } else {
-          // Tarayıcı kapalıyken bitti – otomatik tamamla
-          selectedMs = s.selectedMs;
-          document.getElementById('taskInput').value = s.task || '';
-          localStorage.removeItem(LS_TIMER);
-          onComplete();
-        }
+        const rem=s.endTimestamp-Date.now();
+        if(rem>200){ endTimestamp=s.endTimestamp; selectedMs=s.selectedMs; isRunning=true; document.getElementById('taskInput').value=s.task||''; startTick(); setUIState('run',s.task); setTimeout(()=>toast('ZAMANLAYICI DEVAM EDİYOR'),400); }
+        else { selectedMs=s.selectedMs; document.getElementById('taskInput').value=s.task||''; localStorage.removeItem(LS_TIMER); onComplete(); }
       }
     }
   } catch(e) {}
