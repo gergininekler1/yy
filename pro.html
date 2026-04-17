@@ -2,27 +2,36 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sermaye Piyasası Araçları 1 – Paylar Flash Kartları</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
   :root {
-    --bg: #0f172a;
-    --card-bg: #1e293b;
-    --card-front: #1e3a5f;
-    --card-back: #1a3a2a;
-    --accent: #38bdf8;
-    --accent2: #4ade80;
-    --text: #e2e8f0;
-    --text-muted: #94a3b8;
-    --border: #334155;
-    --tag-bg: #0f3460;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --tag-bg: #eff6ff;
+    --tag-text: #2563eb;
     --danger: #ef4444;
+    --danger-bg: #fef2f2;
     --warning: #f59e0b;
-    --success: #22c55e;
+    --success: #10b981;
+    --success-bg: #f0fdf4;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius: 16px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
   body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -30,559 +39,404 @@
     flex-direction: column;
   }
 
+  /* LAYOUT BLOCKS */
+  .container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .block {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+  }
+
   /* HEADER */
   header {
-    background: linear-gradient(135deg, #0f3460 0%, #1e293b 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
-  }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .logo { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-  .logo span { color: var(--text-muted); font-weight: 400; font-size: 0.85rem; display: block; }
-  .stats-bar {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    font-size: 0.8rem; color: var(--text-muted);
-    margin-top: 10px;
-  }
-  .stats-bar b { color: var(--text); }
-
-  /* CONTROLS */
-  .controls {
     background: var(--card-bg);
     border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
+    box-shadow: var(--shadow-sm);
   }
-  .controls select, .controls input {
+  .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .logo span { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; display: block; margin-top: 4px; }
+
+  /* MODE TABS */
+  .mode-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 16px 20px 0 20px;
+    scrollbar-width: none;
+  }
+  .mode-tabs::-webkit-scrollbar { display: none; }
+  .mode-tab {
+    padding: 10px 16px;
+    border-radius: 99px;
+    border: none;
+    background: #e2e8f0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mode-tab.active { background: var(--accent); color: white; box-shadow: var(--shadow-sm); }
+  
+  /* CONTROLS (Search & Filters) */
+  .controls-flex {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+  }
+  .controls-row {
+    display: flex;
+    gap: 12px;
+  }
+  .controls input, .controls select {
+    flex: 1;
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 7px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
   }
-  .controls input { width: 220px; }
+  .controls input:focus, .controls select:focus { border-color: var(--accent); }
+  
+  /* BUTTONS */
   .btn {
-    padding: 7px 16px;
-    border-radius: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
     border: none;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: 0.2s;
-  }
-  .btn-primary { background: var(--accent); color: #0f172a; }
-  .btn-primary:hover { background: #7dd3fc; }
-  .btn-secondary { background: var(--border); color: var(--text); }
-  .btn-secondary:hover { background: #475569; }
-  .btn-success { background: var(--success); color: #0f172a; }
-  .btn-danger { background: var(--danger); color: white; }
-
-  /* MAIN AREA */
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px 20px;
-  }
-
-  /* PROGRESS BAR */
-  .progress-wrap {
-    width: 100%;
-    max-width: 700px;
-    margin-bottom: 20px;
-  }
-  .progress-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-  }
-  .progress-bar-bg {
-    background: var(--border);
-    border-radius: 99px;
-    height: 8px;
-    overflow: hidden;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 99px;
-    transition: width 0.4s;
-  }
-
-  /* CARD */
-  .card-area {
-    width: 100%;
-    max-width: 700px;
-    perspective: 1200px;
-    margin-bottom: 24px;
-    cursor: pointer;
-  }
-  .card-inner {
-    position: relative;
-    width: 100%;
-    min-height: 280px;
-    transform-style: preserve-3d;
-    transition: transform 0.55s cubic-bezier(.4,2,.3,1);
-  }
-  .card-inner.flipped { transform: rotateY(180deg); }
-  .card-face {
-    position: absolute;
-    width: 100%;
-    min-height: 280px;
-    backface-visibility: hidden;
-    border-radius: 16px;
-    padding: 28px 32px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .card-front-face {
-    background: linear-gradient(135deg, var(--card-front), #0c2a4a);
-    border: 1px solid #1e4a7a;
-  }
-  .card-back-face {
-    background: linear-gradient(135deg, var(--card-back), #0c2a1a);
-    border: 1px solid #1e4a2a;
-    transform: rotateY(180deg);
-  }
-  .card-tag {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    background: rgba(56,189,248,0.12);
-    border-radius: 6px;
-    padding: 3px 10px;
-    display: inline-block;
-    margin-bottom: 16px;
-    align-self: flex-start;
-  }
-  .card-back-face .card-tag { color: var(--accent2); background: rgba(74,222,128,0.12); }
-  .card-question {
-    font-size: 1.15rem;
-    font-weight: 600;
-    line-height: 1.55;
-    color: #e2e8f0;
-    margin-bottom: 12px;
-  }
-  .card-hint {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: auto;
-    padding-top: 16px;
-  }
-  .card-answer {
-    font-size: 1rem;
-    line-height: 1.65;
-    color: #d1fae5;
-  }
-  .card-answer strong { color: var(--accent2); }
-  .card-number {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    position: absolute;
-    top: 16px;
-    right: 20px;
-  }
-
-  /* NAV BUTTONS */
-  .nav-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 100%;
-    max-width: 700px;
-    margin-bottom: 20px;
-  }
-  .nav-btn {
-    flex: 1;
-    min-width: 120px;
-    max-width: 180px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 2px solid transparent;
     font-size: 0.9rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
+    font-family: inherit;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
   }
-  .nav-btn.prev { background: var(--card-bg); border-color: var(--border); color: var(--text); }
-  .nav-btn.prev:hover { border-color: var(--accent); }
-  .nav-btn.knew { background: rgba(34,197,94,0.15); border-color: var(--success); color: var(--success); }
-  .nav-btn.knew:hover { background: rgba(34,197,94,0.25); }
-  .nav-btn.didnt { background: rgba(239,68,68,0.15); border-color: var(--danger); color: var(--danger); }
-  .nav-btn.didnt:hover { background: rgba(239,68,68,0.25); }
-  .nav-btn.next { background: var(--card-bg); border-color: var(--border); color: var(--text); }
-  .nav-btn.next:hover { border-color: var(--accent); }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: white; box-shadow: var(--shadow-sm); }
+  .btn-primary:active { background: var(--accent-hover); }
+  .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .btn-icon { padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text); font-size: 1.1rem; }
 
   /* CATEGORY PILLS */
   .cat-row {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 700px;
-    width: 100%;
-    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
   }
+  .cat-row::-webkit-scrollbar { display: none; }
   .cat-pill {
-    padding: 5px 14px;
+    padding: 8px 16px;
     border-radius: 99px;
     border: 1px solid var(--border);
     background: var(--card-bg);
     color: var(--text-muted);
-    font-size: 0.78rem;
+    font-size: 0.85rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: 0.2s;
+    white-space: nowrap;
+    transition: all 0.2s;
   }
-  .cat-pill.active { background: var(--accent); color: #0f172a; border-color: var(--accent); font-weight: 700; }
-  .cat-pill:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+  .cat-pill.active { background: var(--tag-bg); color: var(--accent); border-color: var(--accent); font-weight: 600; }
 
-  /* SCORE SUMMARY */
-  .score-box {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 24px;
-    max-width: 700px;
+  /* PROGRESS BAR */
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .progress-bar-bg {
+    background: var(--border);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  /* CARD */
+  .card-area {
     width: 100%;
+    perspective: 1000px;
+    margin: 20px 0;
+    cursor: pointer;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: var(--radius);
+    padding: 32px 24px;
     display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .score-item { text-align: center; }
-  .score-item .num { font-size: 1.5rem; font-weight: 700; }
-  .score-item .lbl { font-size: 0.75rem; color: var(--text-muted); }
-  .green { color: var(--success); }
-  .red { color: var(--danger); }
-  .blue { color: var(--accent); }
-
-  /* KEYBOARD HINT */
-  .kbd-hint {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-align: center;
-    margin-top: 10px;
-  }
-  .kbd { background: var(--border); border-radius: 4px; padding: 1px 7px; font-family: monospace; }
-
-  /* FINISH SCREEN */
-  .finish-screen {
-    display: none;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    max-width: 500px;
-    text-align: center;
-  }
-  .finish-screen.show { display: flex; }
-  .finish-icon { font-size: 4rem; }
-  .finish-title { font-size: 1.6rem; font-weight: 700; }
-
-  /* MODE TABS */
-  .mode-tabs {
-    display: flex;
-    gap: 6px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 20px;
-    flex-wrap: wrap;
-  }
-  .mode-tab {
-    padding: 7px 18px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card-bg);
-    color: var(--text-muted);
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .mode-tab.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
-  .mode-tab:hover:not(.active) { border-color: var(--accent); color: var(--text); }
-
-  /* DIFFICULTY BUTTONS */
-  .diff-row {
-    display: flex;
-    gap: 8px;
     justify-content: center;
-    margin-top: 8px;
-    flex-wrap: wrap;
+    box-shadow: var(--shadow-md);
   }
-  .diff-btn {
-    padding: 6px 18px;
-    border-radius: 8px;
-    border: 2px solid transparent;
-    font-size: 0.82rem;
-    font-weight: 700;
+  .card-front-face {
+    background: #ffffff;
+    border: 1px solid var(--border);
+  }
+  .card-back-face {
+    background: #ffffff;
+    border: 2px solid var(--success);
+    transform: rotateY(180deg);
+  }
+  
+  .fav-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 1.5rem;
+    color: var(--border);
     cursor: pointer;
-    transition: 0.2s;
+    z-index: 10;
+    transition: color 0.2s;
   }
-  .diff-btn.easy { background: rgba(34,197,94,0.15); border-color: var(--success); color: var(--success); }
-  .diff-btn.easy:hover { background: rgba(34,197,94,0.3); }
-  .diff-btn.medium { background: rgba(245,158,11,0.15); border-color: var(--warning); color: var(--warning); }
-  .diff-btn.medium:hover { background: rgba(245,158,11,0.3); }
-  .diff-btn.hard { background: rgba(239,68,68,0.15); border-color: var(--danger); color: var(--danger); }
-  .diff-btn.hard:hover { background: rgba(239,68,68,0.3); }
-  .diff-badge {
-    font-size: 0.65rem;
+  .fav-btn.active { color: var(--warning); }
+  
+  .card-tag {
+    font-size: 0.75rem;
     font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 99px;
-    margin-left: 6px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    color: var(--tag-text);
+    background: var(--tag-bg);
+    border-radius: 8px;
+    padding: 4px 12px;
+    display: inline-block;
+    align-self: center;
+    margin-bottom: 24px;
   }
-  .diff-badge.easy { background: rgba(34,197,94,0.18); color: var(--success); }
-  .diff-badge.medium { background: rgba(245,158,11,0.18); color: var(--warning); }
-  .diff-badge.hard { background: rgba(239,68,68,0.18); color: var(--danger); }
+  .card-back-face .card-tag { color: var(--success); background: var(--success-bg); }
+  
+  .card-question {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+    text-align: center;
+  }
+  .card-answer {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text);
+    text-align: center;
+  }
+  .card-answer strong { color: var(--accent); font-weight: 700; }
+  
+  .card-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  
+  .card-number {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  /* NAV BUTTONS */
+  .nav-row {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 14px 12px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .nav-btn:active { transform: scale(0.96); }
+  .nav-btn.prev, .nav-btn.next { background: var(--bg); color: var(--text); }
+  .nav-btn.didnt { background: var(--danger-bg); color: var(--danger); }
+  .nav-btn.knew { background: var(--success-bg); color: var(--success); }
+
+  /* NOTES AREA (Card specific) */
+  .note-input-area textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    min-height: 80px;
+  }
+  .note-input-area textarea:focus { border-color: var(--accent); }
+
+  /* LIST VIEWS (Notes & Favs) */
+  .list-area { display: none; flex-direction: column; gap: 16px; }
+  .list-area.active { display: flex; }
+  .list-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .list-item { display: flex; flex-direction: column; gap: 8px; }
+  .list-q { font-weight: 600; font-size: 1.05rem; color: var(--text); }
+  .list-a { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+  .list-n { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 0.9rem; color: var(--accent); font-weight: 500; background: var(--tag-bg); padding: 12px; border-radius: 8px; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-weight: 500; }
+
+  /* STATS (Footer) */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    text-align: center;
+  }
+  .stat-box { display: flex; flex-direction: column; gap: 4px; }
+  .stat-num { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+  .stat-lbl { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-num.green { color: var(--success); }
+  .stat-num.red { color: var(--danger); }
+  .stat-num.blue { color: var(--accent); }
 
   /* SR INFO */
-  .sr-info {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-align: center;
-    margin-top: 4px;
-  }
+  .sr-info { font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 12px; font-weight: 500; }
   .sr-info span { color: var(--accent); font-weight: 600; }
 
-  /* QUIZ MODE */
-  .quiz-area {
-    display: none;
-    width: 100%;
-    max-width: 700px;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .quiz-area.active { display: flex; }
-  .quiz-question-box {
-    background: linear-gradient(135deg, var(--card-front), #0c2a4a);
-    border: 1px solid #1e4a7a;
-    border-radius: 16px;
-    padding: 28px 32px;
-    font-size: 1.08rem;
-    font-weight: 600;
-    line-height: 1.55;
-  }
-  .quiz-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .quiz-option {
-    background: var(--card-bg);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 20px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    transition: 0.2s;
-    text-align: left;
-    color: var(--text);
-  }
-  .quiz-option:hover:not(:disabled) { border-color: var(--accent); background: rgba(56,189,248,0.07); }
-  .quiz-option.correct { border-color: var(--success); background: rgba(34,197,94,0.12); color: #d1fae5; }
-  .quiz-option.wrong { border-color: var(--danger); background: rgba(239,68,68,0.12); color: #fecaca; }
-  .quiz-option:disabled { cursor: default; }
-  .quiz-loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-  }
-  .quiz-score-bar {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 24px;
-  }
-  .quiz-score-item { text-align: center; }
-  .quiz-score-item .qnum { font-size: 1.4rem; font-weight: 700; }
-  .quiz-score-item .qlbl { font-size: 0.72rem; color: var(--text-muted); }
-  .quiz-nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .quiz-tag { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); background: rgba(56,189,248,0.12); border-radius: 6px; padding: 3px 10px; display: inline-block; margin-bottom: 12px; }
-  .quiz-result-msg { text-align: center; font-size: 0.9rem; margin-top: 4px; min-height: 20px; }
+  /* QUIZ & HISTORY */
+  .quiz-area, .history-panel { display: none; flex-direction: column; gap: 16px; }
+  .quiz-area.active, .history-panel.active { display: flex; }
+  .quiz-score-bar { display: flex; justify-content: space-around; padding: 16px; }
+  .quiz-question-box { font-size: 1.1rem; font-weight: 600; line-height: 1.5; margin-bottom: 20px; text-align: center; }
+  .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+  .quiz-option { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; font-size: 0.95rem; text-align: left; transition: all 0.2s; font-weight: 500; color: var(--text); }
+  .quiz-option:active:not(:disabled) { transform: scale(0.98); }
+  .quiz-option.correct { border-color: var(--success); background: var(--success-bg); color: #065f46; }
+  .quiz-option.wrong { border-color: var(--danger); background: var(--danger-bg); color: #991b1b; }
+  .quiz-result-msg { text-align: center; font-weight: 600; min-height: 24px; margin-top: 8px; }
   .quiz-result-msg.ok { color: var(--success); }
   .quiz-result-msg.bad { color: var(--danger); }
+  .heatmap-wrap { overflow-x: auto; padding-bottom: 8px; }
+  .heatmap-grid { display: flex; gap: 4px; flex-wrap: wrap; width: fit-content; }
+  .heatmap-cell { width: 14px; height: 14px; border-radius: 4px; background: var(--border); }
+  .heatmap-cell[data-count="0"] { background: var(--bg); }
+  .heatmap-cell[data-level="1"] { background: #d1fae5; }
+  .heatmap-cell[data-level="2"] { background: #6ee7b7; }
+  .heatmap-cell[data-level="3"] { background: #10b981; }
+  .heatmap-cell[data-level="4"] { background: #059669; }
 
-  /* HISTORY / HEATMAP */
-  .history-panel {
-    display: none;
-    width: 100%;
-    max-width: 700px;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .history-panel.active { display: flex; }
-  .heatmap-wrap {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .heatmap-title { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.08em; }
-  .heatmap-grid {
-    display: flex;
-    gap: 3px;
-    flex-wrap: wrap;
-  }
-  .heatmap-cell {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    background: #1e293b;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.1s;
-  }
-  .heatmap-cell:hover { transform: scale(1.4); z-index: 1; }
-  .heatmap-cell[data-count="0"] { background: #1e293b; }
-  .heatmap-cell[data-level="1"] { background: #0d3b2e; }
-  .heatmap-cell[data-level="2"] { background: #166534; }
-  .heatmap-cell[data-level="3"] { background: #16a34a; }
-  .heatmap-cell[data-level="4"] { background: #4ade80; }
-  .heatmap-legend { display: flex; gap: 6px; align-items: center; margin-top: 10px; font-size: 0.72rem; color: var(--text-muted); }
-  .heatmap-legend-cell { width: 12px; height: 12px; border-radius: 2px; }
-  .history-stats {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .hstat {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 22px;
-    text-align: center;
-    flex: 1;
-    min-width: 120px;
-  }
-  .hstat .hn { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
-  .hstat .hl { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-  .heatmap-tooltip {
-    display: none;
-    position: fixed;
-    background: #0f172a;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    color: var(--text);
-    z-index: 100;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-
-  /* SR queue info */
-  .sr-queue-badge {
-    font-size: 0.72rem;
-    color: var(--accent);
-    background: rgba(56,189,248,0.1);
-    border: 1px solid rgba(56,189,248,0.2);
-    border-radius: 6px;
-    padding: 3px 10px;
-    display: inline-block;
-    margin-left: 8px;
-  }
-
-  @media (max-width: 600px) {
-    .card-question { font-size: 1rem; }
-    .card-face { padding: 20px; min-height: 240px; }
-    .nav-btn { min-width: 80px; font-size: 0.8rem; padding: 10px 8px; }
-    .heatmap-cell { width: 11px; height: 11px; }
-  }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-top">
-    <div class="logo">
-      📊 Sermaye Piyasası Araçları 1
-      <span>Bölüm 1: Paylar ve Pay Benzeri Menkul Kıymetler — Flash Kartları</span>
-    </div>
-    <button class="btn btn-secondary" onclick="shuffleCards()">🔀 Karıştır</button>
+  <div class="logo">
+    📊 SPK Araçları 1
+    <span>Paylar ve Pay Benzeri Menkul Kıymetler</span>
   </div>
-  <div class="stats-bar">
-    <span>Toplam: <b id="statTotal">—</b></span>
-    <span>Gösterilen: <b id="statSeen">0</b></span>
-    <span>✅ Biliyor: <b id="statKnew" class="green">0</b></span>
-    <span>❌ Bilmiyor: <b id="statDidnt" class="red">0</b></span>
-    <span>Kalan: <b id="statLeft">—</b></span>
-    <span id="srQueueInfo" style="display:none">🔁 SR Sırası: <b id="srQueueCount" class="blue">0</b></span>
-  </div>
+  <button class="btn-icon" onclick="shuffleCards()" title="Karıştır">🔀</button>
 </header>
 
 <div class="mode-tabs">
   <button class="mode-tab active" id="tab-study" onclick="switchMode('study')">📖 Çalışma</button>
-  <button class="mode-tab" id="tab-sr" onclick="switchMode('sr')">🔁 Aralıklı Tekrar</button>
-  <button class="mode-tab" id="tab-quiz" onclick="switchMode('quiz')">📝 Quiz Modu</button>
+  <button class="mode-tab" id="tab-sr" onclick="switchMode('sr')">🔁 Tekrar</button>
+  <button class="mode-tab" id="tab-quiz" onclick="switchMode('quiz')">📝 Quiz</button>
+  <button class="mode-tab" id="tab-favs" onclick="switchMode('favs')">⭐ Favoriler</button>
+  <button class="mode-tab" id="tab-notes" onclick="switchMode('notes')">📝 Notlarım</button>
   <button class="mode-tab" id="tab-history" onclick="switchMode('history')">📊 Geçmiş</button>
 </div>
 
-<div class="controls">
-  <input type="text" id="searchBox" placeholder="🔍 Konu ara..." oninput="filterCards()">
-  <select id="catFilter" onchange="filterCards()">
-    <option value="all">Tüm Kategoriler</option>
-    <option value="kavram">Kavramsal Çerçeve</option>
-    <option value="pay-turleri">Pay Türleri</option>
-    <option value="haklar">Haklar & Yükümlülükler</option>
-    <option value="pay-benzeri">Pay Benzeri Menkul Kıymetler</option>
-    <option value="teblig">Pay Tebliği – Genel</option>
-    <option value="halka-arz">Halka Arz & Açılma</option>
-    <option value="fiyat-istikrar">Fiyat İstikrarı</option>
-    <option value="sermaye-artirimi">Sermaye Artırımları</option>
-    <option value="sermaye-azaltimi">Sermaye Azaltımı</option>
-    <option value="nominal-alti">Nominal Değer Altında İhraç</option>
-    <option value="ortak-hukumler">Ortak Hükümler & Diğer</option>
-    <option value="katilma-intifa">Katılma İntifa Senetleri</option>
-  </select>
-  <select id="statusFilter" onchange="filterCards()">
-    <option value="all">Tüm Kartlar</option>
-    <option value="unseen">Görülmemiş</option>
-    <option value="knew">Bilinenleri Tekrar Et</option>
-    <option value="didnt">Bilinmeyenleri Çalış</option>
-  </select>
-  <button class="btn btn-primary" onclick="resetProgress()">🔄 Sıfırla</button>
-</div>
+<main class="container">
 
-<main>
-  <!-- ── STUDY MODE ── -->
-  <div id="studyArea" style="display:flex;flex-direction:column;align-items:center;width:100%;">
-    <div class="cat-row" id="catRow"></div>
+  <div id="studyArea" style="display:flex;flex-direction:column;gap:16px;width:100%;">
+    
+    <div class="block controls" id="controlsBlock">
+      <div class="controls-flex">
+        <input type="text" id="searchBox" placeholder="🔍 Kartlarda ara..." oninput="filterCards()">
+        <div class="controls-row">
+          <select id="catFilter" onchange="filterCards()">
+            <option value="all">Tüm Konular</option>
+            <option value="kavram">Kavramsal Çerçeve</option>
+            <option value="pay-turleri">Pay Türleri</option>
+            <option value="haklar">Haklar & Yükümlülükler</option>
+            <option value="pay-benzeri">Pay Benzeri MK</option>
+            <option value="teblig">Pay Tebliği</option>
+            <option value="halka-arz">Halka Arz</option>
+            <option value="fiyat-istikrar">Fiyat İstikrarı</option>
+            <option value="sermaye-artirimi">Sermaye Artırımı</option>
+            <option value="sermaye-azaltimi">Sermaye Azaltımı</option>
+            <option value="nominal-alti">Nominal Değer Altı</option>
+            <option value="ortak-hukumler">Ortak Hükümler</option>
+            <option value="katilma-intifa">Katılma İntifa</option>
+          </select>
+          <select id="statusFilter" onchange="filterCards()">
+            <option value="all">Tümü</option>
+            <option value="unseen">Görülmemiş</option>
+            <option value="knew">Bilinenler</option>
+            <option value="didnt">Bilinmeyenler</option>
+            <option value="due">Tekrar Edilecekler</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-    <div class="progress-wrap">
+    <div class="block" id="catBlock">
+      <div class="cat-row" id="catRow"></div>
+    </div>
+
+    <div class="block">
       <div class="progress-info">
         <span id="cardCounter">Kart 1 / —</span>
         <span id="pct">0%</span>
@@ -590,117 +444,110 @@
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
       </div>
-    </div>
 
-    <!-- CARD -->
-    <div class="card-area" id="cardArea" onclick="flipCard()">
-      <div class="card-inner" id="cardInner">
-        <div class="card-face card-front-face" id="frontFace">
-          <div class="card-tag" id="cardTag">Kavram</div>
-          <div class="card-number" id="cardNum">#1</div>
-          <span id="cardDiffBadge"></span>
-          <div class="card-question" id="cardQuestion">Kartlar yükleniyor...</div>
-          <div class="card-hint">👆 Cevabı görmek için karta tıkla <span style="margin-left:auto">SPACE</span></div>
-        </div>
-        <div class="card-face card-back-face" id="backFace">
-          <div class="card-tag">Cevap ✓</div>
-          <div class="card-number" id="cardNumBack">#1</div>
-          <div class="card-answer" id="cardAnswer">Cevap burada görünecek.</div>
+      <div class="card-area" id="cardArea" onclick="flipCard()">
+        <div class="card-inner" id="cardInner">
+          <div class="card-face card-front-face" id="frontFace">
+            <div class="fav-btn" id="favBtn" onclick="toggleFavorite(event)">☆</div>
+            <div class="card-tag" id="cardTag">Kavram</div>
+            <div class="card-number" id="cardNum">#1</div>
+            <div class="card-question" id="cardQuestion">Kartlar yükleniyor...</div>
+            <div class="card-hint">👆 Çevirmek için dokun</div>
+          </div>
+          <div class="card-face card-back-face" id="backFace">
+            <div class="card-tag">Cevap ✓</div>
+            <div class="card-number" id="cardNumBack">#1</div>
+            <div class="card-answer" id="cardAnswer">Cevap burada görünecek.</div>
+          </div>
         </div>
       </div>
+
+      <div class="nav-row">
+        <button class="nav-btn prev" onclick="prevCard()">◀ Geri</button>
+        <button class="nav-btn didnt" onclick="markDidnt()">❌ Bilmedim</button>
+        <button class="nav-btn knew" onclick="markKnew()">✅ Bildim</button>
+        <button class="nav-btn next" onclick="nextCard()">İleri ▶</button>
+      </div>
+
+      <div class="sr-info" id="srInfo"></div>
     </div>
 
-    <div class="nav-row">
-      <button class="nav-btn prev" onclick="prevCard()">◀ Geri</button>
-      <button class="nav-btn didnt" onclick="markDidnt()">❌ Bilmedim</button>
-      <button class="nav-btn knew" onclick="markKnew()">✅ Bildim</button>
-      <button class="nav-btn next" onclick="nextCard()">İleri ▶</button>
+    <div class="block note-input-area" id="noteBlock">
+      <textarea id="noteInput" placeholder="Bu karta özel notunuzu buraya ekleyin..."></textarea>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 12px;" onclick="saveCurrentNote()">💾 Notu Kaydet</button>
     </div>
 
-    <!-- DIFFICULTY -->
-    <div class="diff-row">
-      <span style="font-size:0.78rem;color:var(--text-muted);align-self:center;">Zorluk:</span>
-      <button class="diff-btn easy" onclick="setDifficulty('easy')">😊 Kolay</button>
-      <button class="diff-btn medium" onclick="setDifficulty('medium')">🤔 Orta</button>
-      <button class="diff-btn hard" onclick="setDifficulty('hard')">🔥 Zor</button>
-    </div>
-    <div class="sr-info" id="srInfo" style="margin-top:6px;"></div>
-
-    <div class="score-box" style="margin-top:16px;">
-      <div class="score-item"><div class="num blue" id="s2">0</div><div class="lbl">Görülen</div></div>
-      <div class="score-item"><div class="num green" id="s3">0</div><div class="lbl">Bildim ✅</div></div>
-      <div class="score-item"><div class="num red" id="s4">0</div><div class="lbl">Bilmedim ❌</div></div>
-      <div class="score-item"><div class="num" id="s5" style="color:var(--accent)">—%</div><div class="lbl">Başarı</div></div>
-    </div>
-
-    <div class="kbd-hint">
-      <span class="kbd">SPACE</span> çevir &nbsp;|&nbsp;
-      <span class="kbd">→</span> ileri &nbsp;|&nbsp;
-      <span class="kbd">←</span> geri &nbsp;|&nbsp;
-      <span class="kbd">K</span> bildim &nbsp;|&nbsp;
-      <span class="kbd">B</span> bilmedim &nbsp;|&nbsp;
-      <span class="kbd">1</span> kolay &nbsp;|&nbsp;
-      <span class="kbd">2</span> orta &nbsp;|&nbsp;
-      <span class="kbd">3</span> zor
-    </div>
   </div>
 
-  <!-- ── QUIZ MODE ── -->
+  <div id="favArea" class="list-area">
+    <div class="list-header">⭐ Favori Kartlarım</div>
+    <div id="favList"></div>
+  </div>
+
+  <div id="notesArea" class="list-area">
+    <div class="list-header">📝 Aldığım Notlar</div>
+    <div id="notesList"></div>
+  </div>
+
   <div id="quizArea" class="quiz-area">
-    <div class="quiz-score-bar">
-      <div class="quiz-score-item"><div class="qnum green" id="qCorrect">0</div><div class="qlbl">Doğru</div></div>
-      <div class="quiz-score-item"><div class="qnum red" id="qWrong">0</div><div class="qlbl">Yanlış</div></div>
-      <div class="quiz-score-item"><div class="qnum blue" id="qTotal">0</div><div class="qlbl">Toplam</div></div>
-      <div class="quiz-score-item"><div class="qnum" id="qPct" style="color:var(--accent)">—%</div><div class="qlbl">Başarı</div></div>
+    <div class="block">
+      <div class="quiz-score-bar">
+        <div class="stat-box"><div class="stat-num green" id="qCorrect">0</div><div class="stat-lbl">Doğru</div></div>
+        <div class="stat-box"><div class="stat-num red" id="qWrong">0</div><div class="stat-lbl">Yanlış</div></div>
+        <div class="stat-box"><div class="stat-num blue" id="qPct">0%</div><div class="stat-lbl">Başarı</div></div>
+      </div>
     </div>
-    <div id="quizCard" style="width:100%;">
-      <div class="quiz-loading" id="quizLoading">⏳ Soru hazırlanıyor...</div>
+    
+    <div class="block" id="quizCard">
+      <div class="empty-state" id="quizLoading">⏳ Soru hazırlanıyor...</div>
       <div id="quizContent" style="display:none;">
-        <div class="quiz-question-box">
-          <div class="quiz-tag" id="quizTag">Kategori</div>
-          <div id="quizQuestion"></div>
+        <div style="text-align:center; margin-bottom:12px;">
+          <span class="card-tag" id="quizTag" style="margin-bottom:0; background:var(--tag-bg); color:var(--accent);">Kategori</span>
         </div>
+        <div class="quiz-question-box" id="quizQuestion"></div>
         <div class="quiz-options" id="quizOptions"></div>
         <div class="quiz-result-msg" id="quizResultMsg"></div>
       </div>
     </div>
-    <div class="quiz-nav">
-      <button class="btn btn-primary" id="quizNextBtn" onclick="loadQuizQuestion()" style="display:none;">Sonraki Soru ▶</button>
-      <button class="btn btn-secondary" onclick="switchMode('study')">← Çalışmaya Dön</button>
+    
+    <button class="btn btn-primary" id="quizNextBtn" onclick="loadQuizQuestion()" style="display:none;">Sonraki Soru ▶</button>
+  </div>
+
+  <div id="historyArea" class="history-panel">
+    <div class="block">
+      <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap:20px;">
+        <div class="stat-box"><div class="stat-num" id="hToday">0</div><div class="stat-lbl">Bugün</div></div>
+        <div class="stat-box"><div class="stat-num blue" id="hWeek">0</div><div class="stat-lbl">Bu Hafta</div></div>
+        <div class="stat-box"><div class="stat-num" id="hTotal">0</div><div class="stat-lbl">Toplam</div></div>
+        <div class="stat-box"><div class="stat-num green" id="hStreak">0</div><div class="stat-lbl">🔥 Seri (Gün)</div></div>
+      </div>
+    </div>
+    <div class="block">
+      <div class="list-header" style="font-size: 1rem; margin-bottom: 16px;">📅 Aktivite Haritası (Son 16 Hafta)</div>
+      <div class="heatmap-wrap">
+        <div class="heatmap-grid" id="heatmapGrid"></div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="clearHistory()">🗑 Geçmişi Temizle</button>
+  </div>
+
+  <div class="block" id="statsFooter" style="margin-bottom: 20px;">
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num blue" id="s2">0</div><div class="stat-lbl">Görülen</div></div>
+      <div class="stat-box"><div class="stat-num green" id="s3">0</div><div class="stat-lbl">Bilinen</div></div>
+      <div class="stat-box"><div class="stat-num red" id="s4">0</div><div class="stat-lbl">Bilinmeyen</div></div>
+    </div>
+    <div style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-muted); font-weight:500;">
+      Genel Başarı: <span id="s5" style="color:var(--accent); font-weight:700;">0%</span> &nbsp;|&nbsp; 
+      Kalan Kart: <span id="statLeft" style="font-weight:700;">0</span>
     </div>
   </div>
 
-  <!-- ── HISTORY MODE ── -->
-  <div id="historyArea" class="history-panel">
-    <div class="history-stats">
-      <div class="hstat"><div class="hn" id="hToday">0</div><div class="hl">Bugün</div></div>
-      <div class="hstat"><div class="hn" id="hWeek">0</div><div class="hl">Bu Hafta</div></div>
-      <div class="hstat"><div class="hn" id="hTotal">0</div><div class="hl">Toplam</div></div>
-      <div class="hstat"><div class="hn" id="hStreak">0</div><div class="hl">🔥 Seri (gün)</div></div>
-    </div>
-    <div class="heatmap-wrap">
-      <div class="heatmap-title">📅 Son 16 Hafta — Günlük Çalışma Haritası</div>
-      <div class="heatmap-grid" id="heatmapGrid"></div>
-      <div class="heatmap-legend">
-        Az
-        <div class="heatmap-legend-cell" style="background:#1e293b"></div>
-        <div class="heatmap-legend-cell" style="background:#0d3b2e"></div>
-        <div class="heatmap-legend-cell" style="background:#166534"></div>
-        <div class="heatmap-legend-cell" style="background:#16a34a"></div>
-        <div class="heatmap-legend-cell" style="background:#4ade80"></div>
-        Çok
-      </div>
-    </div>
-    <div style="text-align:center;">
-      <button class="btn btn-secondary" onclick="clearHistory()">🗑 Geçmişi Temizle</button>
-    </div>
-  </div>
 </main>
-<div class="heatmap-tooltip" id="hmTooltip"></div>
 
 <script>
 // ─────────────────────────────────────────────
-// FLASH KART VERİTABANI – 320 Kart
+// FLASH KART VERİTABANI – 320 Kart (Eksiksiz Kopyalanmıştır)
 // ─────────────────────────────────────────────
 const ALL_CARDS = [
   // ── KAVRAMSAL ÇERÇEVE ──────────────────────
@@ -822,7 +669,7 @@ const ALL_CARDS = [
   {cat:"sermaye-artirimi", q:"İç kaynaklardan sermaye artırımı yapılabilmesi için aranan iki temel koşul nedir?", a:"(1) Sermayeye eklenmesinde ilgili mevzuat açısından <strong>herhangi bir sakınca bulunmaması</strong>, (2) İç kaynak tutarlarının ortaklığın <strong>kanuni defter ve kayıtlarında karşılığının bulunması.</strong>"},
   {cat:"sermaye-artirimi", q:"Hangi kalemler sermayeye eklenemez?", a:"(1) Gerçeğe uygun değer artış fonları ve benzeri fonlar, (2) <strong>Ara dönemde oluşan dönem kârları</strong>, (3) İlgili mevzuat uyarınca eklenmesine izin verilmeyen fonlar ve yedek akçeler."},
   {cat:"sermaye-artirimi", q:"İç kaynaklardan sermaye artırımında geçmiş yıl zararının etkisi nedir?", a:"Kanuni defterlerdeki geçmiş yıl zararları ile son finansal tablolardaki geçmiş yıl zararlarından <strong>düşük olanı</strong>, iç kaynaklardan mahsup edilerek kapatılmadan veya kapatılacağına ilişkin yönetim kurulu kararı Kurula ibraz edilmeden iç kaynaklardan sermaye artırımı yapılamaz."},
-  {cat:"sermaye-artirimi", q:"Dönem kârı hariç iç kaynaklardan sermaye artırımı başvurularında hangi hesaplama yapılır?", a:"Sermaye artırım kararının kamuya açıklanmasından önceki <strong>30 gün</strong> içinde borsada oluşan ağırlıklı ortalama fiyatlar ortalamasına göre <strong>düzeltilmiş borsa fiyatının 2 TL'nin altına düşmesine</strong> yol açacak başvurular işleme alınmaz."},
+  {cat:"sermaye-artirimi", q:"Dönem kârı hariç iç kaynaklardan sermaye artırımında başvurularında hangi hesaplama yapılır?", a:"Sermaye artırım kararının kamuya açıklanmasından önceki <strong>30 gün</strong> içinde borsada oluşan ağırlıklı ortalama fiyatlar ortalamasına göre <strong>düzeltilmiş borsa fiyatının 2 TL'nin altına düşmesine</strong> yol açacak başvurular işleme alınmaz."},
   {cat:"sermaye-artirimi", q:"TTK Madde 462/3 halka açık ortaklıklara uygulanır mı?", a:"<strong>Hayır.</strong> SPKn Madde 12/6 uyarınca halka açık ve halka açılmak üzere Kurula başvuran ortaklıklara bu madde uygulanmaz. Dolayısıyla sermayeye eklenebilir fonları eklemeden nakit sermaye artırımı yapabilirler."},
   {cat:"sermaye-artirimi", q:"Kâr payından sermaye artırımında kayıtlı sermaye sisteminde başvuru süresi nedir?", a:"Yetkili organ kararının tarihinden itibaren <strong>30 gün</strong> içinde Kurula başvurulur."},
   {cat:"sermaye-artirimi", q:"Kâr payından sermaye artırımında esas sermaye sisteminde genel kurul toplantısı ne zamana kadar yapılmalıdır?", a:"Kurulun uygun görüş tarihinden itibaren <strong>1 ay</strong> içinde."},
@@ -954,7 +801,7 @@ const ALL_CARDS = [
   {cat:"halka-arz", q:"Halka arz öncesinde yüklenici aracı kurum satılamayan payları kaç ay boyunca halka arz fiyatının altında satamazlar?", a:"Halka arzda portföylerine aldıkları payları, borsada işlem görmeye başlamasından itibaren <strong>6 ay</strong> süreyle halka arz fiyatının altında borsada satamazlar."},
   {cat:"halka-arz", q:"İzahnamenin onaylanmasından önce satın alma taahhütnamesi sunulması hangi sermaye sisteminde zorunludur?", a:"<strong>Esas sermaye sisteminde</strong> bulunan ortaklıkların Kurula yapacakları başvuruda satın alma taahhütnamesi sunması zorunludur."},
   {cat:"teblig", q:"GSP'de payların satış fiyatı nominal değerden yüksekse hangi belge KAP'ta ilan edilmelidir?", a:"Satışın yapılacağı tarihten en az <strong>2 gün önce fiyat tespit raporu</strong> KAP'ta ilan edilmeli. İlişkili taraf söz konusuysa raporu başka bir yetkili kuruluş hazırlar."},
-  {cat:"teblig", q:"GSP'deki satış sonucuna ilişkin dağıtım listesi hangi sürede KAP'ta açıklanmalıdır?", a:"Dağıtım listesinin kesinleştiği günü takip eden <strong>2 iş günü</strong> içinde ihracın nihai tutarı, yatırımcı sayısı ve %5'ten fazla pay alanlar (isim belirtilmeksizin) kamuya açıklanır."},
+  {cat:"teblig", q:"GSP'de satış sonucuna ilişkin dağıtım listesi hangi sürede KAP'ta açıklanmalıdır?", a:"Dağıtım listesinin kesinleştiği günü takip eden <strong>2 iş günü</strong> içinde ihracın nihai tutarı, yatırımcı sayısı ve %5'ten fazla pay alanlar (isim belirtilmeksizin) kamuya açıklanır."},
   {cat:"ortak-hukumler", q:"GSP'de işlem gören ortaklık paylarının başka pazarlara geçişi için izahname onayı başvurusu ne zamana kadar yapılmalıdır?", a:"Payların borsada işlem görmeye başladığı yılı takip eden <strong>5 yılı aşmamak üzere</strong> Kurula başvuruda bulunmak zorundadır."},
   {cat:"halka-arz", q:"Halka açılmada girişim sermayesi yatırım ortaklıklarının 1 yıllık satış yasağı ne zaman başlar?", a:"Payları elde ettikleri en <strong>son tarihte</strong> başlar (genel kuraldan farklı). Ancak ilk halka arzdan önceki 1 yıl içinde dönüşüm yoluyla GSYO statüsü kazananlar için genel kural uygulanır."},
   {cat:"ortak-hukumler", q:"Halka açık ortaklıklarda azınlık pay sahiplerinin ek yetkileri nelerdir? (örnekler)", a:"Genel kurul gündemine madde ekletme, <strong>yönetim kurulunun ibrasını geri bırakma</strong>, genel kurulun ertelenmesini isteme, denetçi değişikliği talebi ve haklı sebeplerle fesih davası açma."},
@@ -971,7 +818,7 @@ const ALL_CARDS = [
 ];
 
 // ─────────────────────────────────────────────
-// STATE
+// STATE & LOCAL STORAGE
 // ─────────────────────────────────────────────
 let deck = [];
 let current = 0;
@@ -981,26 +828,33 @@ let didntKnow = new Set();
 let seen = new Set();
 let currentMode = 'study';
 
-// ── SPACED REPETITION (SM-2 benzeri) ──────────
-// srData[cardId] = { interval, ef, dueDate, reps, difficulty }
-let srData = {};
 const SR_KEY = 'paylar_sr_data';
 const HIST_KEY = 'paylar_history';
-const DIFF_KEY = 'paylar_difficulty';
+const FAV_KEY = 'paylar_favorites';
+const NOTES_KEY = 'paylar_notes';
 
-function loadSR() {
+let srData = {};
+let favorites = new Set();
+let cardNotes = {};
+
+function loadData() {
   try { srData = JSON.parse(localStorage.getItem(SR_KEY) || '{}'); } catch(e) { srData = {}; }
-}
-function saveSR() {
-  localStorage.setItem(SR_KEY, JSON.stringify(srData));
+  try { favorites = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch(e) { favorites = new Set(); }
+  try { cardNotes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch(e) { cardNotes = {}; }
 }
 
+function saveData() {
+  localStorage.setItem(SR_KEY, JSON.stringify(srData));
+  localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+  localStorage.setItem(NOTES_KEY, JSON.stringify(cardNotes));
+}
+
+// ── SPACED REPETITION (SM-2) ──────────
 function getSR(id) {
-  if (!srData[id]) srData[id] = { interval: 1, ef: 2.5, dueDate: 0, reps: 0, difficulty: null };
+  if (!srData[id]) srData[id] = { interval: 1, ef: 2.5, dueDate: 0, reps: 0 };
   return srData[id];
 }
 
-// SM-2 update: quality 0-5 (5=perfect, 3=correct, 1=hard, 0=blackout)
 function updateSM2(id, quality) {
   const s = getSR(id);
   if (quality >= 3) {
@@ -1013,9 +867,8 @@ function updateSM2(id, quality) {
     s.interval = 1;
   }
   s.ef = Math.max(1.3, s.ef + 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-  const now = Date.now();
-  s.dueDate = now + s.interval * 24 * 60 * 60 * 1000;
-  saveSR();
+  s.dueDate = Date.now() + s.interval * 24 * 60 * 60 * 1000;
+  saveData();
 }
 
 function getDueSRCards() {
@@ -1024,57 +877,6 @@ function getDueSRCards() {
     const s = getSR(c.id);
     return s.dueDate <= now || s.dueDate === 0;
   }).sort((a, b) => getSR(a.id).dueDate - getSR(b.id).dueDate);
-}
-
-// ── DIFFICULTY ────────────────────────────────
-let cardDifficulty = {};
-function loadDiff() {
-  try { cardDifficulty = JSON.parse(localStorage.getItem(DIFF_KEY) || '{}'); } catch(e) { cardDifficulty = {}; }
-}
-function saveDiff() {
-  localStorage.setItem(DIFF_KEY, JSON.stringify(cardDifficulty));
-}
-
-function setDifficulty(level) {
-  if (deck.length === 0) return;
-  const id = deck[current].id;
-  cardDifficulty[id] = level;
-  saveDiff();
-  // Also affect SM-2: easy=5, medium=3, hard=1
-  const qMap = { easy: 5, medium: 3, hard: 1 };
-  updateSM2(id, qMap[level]);
-  renderDiffBadge(id);
-  renderSRInfo(id);
-  updateSRQueueBadge();
-}
-
-function renderDiffBadge(id) {
-  const d = cardDifficulty[id];
-  const badge = document.getElementById('cardDiffBadge');
-  if (!badge) return;
-  if (!d) { badge.textContent = ''; badge.className = ''; return; }
-  const labels = { easy: '😊 Kolay', medium: '🤔 Orta', hard: '🔥 Zor' };
-  badge.textContent = labels[d];
-  badge.className = `diff-badge ${d}`;
-}
-
-function renderSRInfo(id) {
-  const el = document.getElementById('srInfo');
-  if (!el) return;
-  const s = getSR(id);
-  if (!s || s.dueDate === 0) { el.textContent = ''; return; }
-  const days = Math.round((s.dueDate - Date.now()) / 86400000);
-  if (days <= 0) el.innerHTML = `🔁 Bu kart <span>bugün</span> tekrar için hazır`;
-  else if (days === 1) el.innerHTML = `⏳ Sonraki tekrar: <span>yarın</span>`;
-  else el.innerHTML = `⏳ Sonraki tekrar: <span>${days} gün sonra</span>`;
-}
-
-function updateSRQueueBadge() {
-  const n = getDueSRCards().length;
-  const el = document.getElementById('srQueueCount');
-  const wrap = document.getElementById('srQueueInfo');
-  if (el) el.textContent = n;
-  if (wrap) wrap.style.display = n > 0 ? '' : 'none';
 }
 
 // ── HISTORY ───────────────────────────────────
@@ -1086,9 +888,7 @@ function getTodayKey() {
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem(HIST_KEY) || '{}'); } catch(e) { return {}; }
 }
-function saveHistory(h) {
-  localStorage.setItem(HIST_KEY, JSON.stringify(h));
-}
+function saveHistory(h) { localStorage.setItem(HIST_KEY, JSON.stringify(h)); }
 
 function recordStudied(n = 1) {
   const h = loadHistory();
@@ -1124,7 +924,6 @@ function renderHistory() {
   const totalCards = allVals.reduce((a, b) => a + b, 0);
   const todayCards = h[todayKey] || 0;
 
-  // Week total
   let weekTotal = 0;
   for (let i = 0; i < 7; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
@@ -1137,12 +936,10 @@ function renderHistory() {
   document.getElementById('hTotal').textContent = totalCards;
   document.getElementById('hStreak').textContent = getStreak();
 
-  // Heatmap: 16 weeks = 112 days
   const grid = document.getElementById('heatmapGrid');
   grid.innerHTML = '';
   const maxVal = Math.max(...Object.values(h), 1);
   const days = 112;
-  const tooltip = document.getElementById('hmTooltip');
 
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
@@ -1160,14 +957,6 @@ function renderHistory() {
     cell.className = 'heatmap-cell';
     cell.setAttribute('data-count', cnt);
     if (cnt > 0) cell.setAttribute('data-level', level);
-    cell.addEventListener('mousemove', (e) => {
-      const dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
-      tooltip.textContent = `${dateStr}: ${cnt} kart`;
-      tooltip.style.display = 'block';
-      tooltip.style.left = (e.clientX + 12) + 'px';
-      tooltip.style.top = (e.clientY - 28) + 'px';
-    });
-    cell.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
     grid.appendChild(cell);
   }
 }
@@ -1181,14 +970,16 @@ function switchMode(mode) {
   document.getElementById('studyArea').style.display = 'none';
   document.getElementById('quizArea').classList.remove('active');
   document.getElementById('historyArea').classList.remove('active');
-
-  // Hide controls/catrow for non-study modes
-  document.querySelector('.controls').style.display = mode === 'study' ? '' : 'none';
+  document.getElementById('notesArea').classList.remove('active');
+  document.getElementById('favArea').classList.remove('active');
+  document.getElementById('statsFooter').style.display = 'none';
 
   if (mode === 'study') {
     document.getElementById('studyArea').style.display = 'flex';
+    document.getElementById('statsFooter').style.display = 'block';
   } else if (mode === 'sr') {
     document.getElementById('studyArea').style.display = 'flex';
+    document.getElementById('statsFooter').style.display = 'block';
     loadSRMode();
   } else if (mode === 'quiz') {
     document.getElementById('quizArea').classList.add('active');
@@ -1196,13 +987,19 @@ function switchMode(mode) {
   } else if (mode === 'history') {
     document.getElementById('historyArea').classList.add('active');
     renderHistory();
+  } else if (mode === 'notes') {
+    document.getElementById('notesArea').classList.add('active');
+    renderNotesTab();
+  } else if (mode === 'favs') {
+    document.getElementById('favArea').classList.add('active');
+    renderFavsTab();
   }
 }
 
 function loadSRMode() {
   const srDeck = getDueSRCards();
   if (srDeck.length === 0) {
-    document.getElementById('cardQuestion').textContent = '🎉 Bugünlük tüm tekrarları tamamladınız! Yarın gelin.';
+    document.getElementById('cardQuestion').textContent = '🎉 Bugünlük tüm tekrarları tamamladınız!';
     document.getElementById('cardAnswer').innerHTML = '';
     document.getElementById('cardTag').textContent = '—';
     document.getElementById('cardNum').textContent = '';
@@ -1210,8 +1007,10 @@ function loadSRMode() {
     document.getElementById('cardCounter').textContent = 'Bekleyen kart yok';
     document.getElementById('pct').textContent = '—';
     document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('favBtn').style.display = 'none';
     return;
   }
+  document.getElementById('favBtn').style.display = 'block';
   deck = srDeck;
   current = 0;
   isFlipped = false;
@@ -1220,8 +1019,6 @@ function loadSRMode() {
 }
 
 // ── QUIZ MODE ─────────────────────────────────
-let quizQueue = [];
-let quizIndex = 0;
 let quizCorrect = 0;
 let quizWrong = 0;
 
@@ -1231,7 +1028,6 @@ function loadQuizQuestion() {
   document.getElementById('quizContent').style.display = 'none';
   document.getElementById('quizResultMsg').textContent = '';
 
-  // Pick a random card
   const card = ALL_CARDS[Math.floor(Math.random() * ALL_CARDS.length)];
   generateQuizOptions(card);
 }
@@ -1240,13 +1036,12 @@ async function generateQuizOptions(card) {
   const catLabels = {
     'kavram': 'Kavramsal Çerçeve', 'pay-turleri': 'Pay Türleri',
     'haklar': 'Haklar & Yükümlülükler', 'pay-benzeri': 'Pay Benzeri MK',
-    'teblig': 'Pay Tebliği', 'halka-arz': 'Halka Arz & Açılma',
-    'fiyat-istikrar': 'Fiyat İstikrarı', 'sermaye-artirimi': 'Sermaye Artırımları',
+    'teblig': 'Pay Tebliği', 'halka-arz': 'Halka Arz',
+    'fiyat-istikrar': 'Fiyat İstikrarı', 'sermaye-artirimi': 'Sermaye Artırımı',
     'sermaye-azaltimi': 'Sermaye Azaltımı', 'nominal-alti': 'Nominal Değer Altı',
     'ortak-hukumler': 'Ortak Hükümler', 'katilma-intifa': 'Katılma İntifa',
   };
 
-  // Strip HTML tags from answer for display and for AI prompt
   const stripHtml = s => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   const correctAnswer = stripHtml(card.a);
 
@@ -1268,7 +1063,6 @@ async function generateQuizOptions(card) {
     const text = data.content.map(i => i.text || '').join('').replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(text);
 
-    // Shuffle options
     const opts = [
       { text: correctAnswer, correct: true },
       { text: parsed.wrong1, correct: false },
@@ -1277,7 +1071,6 @@ async function generateQuizOptions(card) {
 
     renderQuizQuestion(card, opts, catLabels);
   } catch(e) {
-    // Fallback: pick 2 random cards as wrong answers
     const others = ALL_CARDS.filter(c => c !== card).sort(() => Math.random() - 0.5).slice(0, 2);
     const opts = [
       { text: stripHtml(card.a), correct: true },
@@ -1306,7 +1099,6 @@ function renderQuizQuestion(card, opts, catLabels) {
 }
 
 function answerQuiz(btn, correct, card, opts) {
-  // Disable all
   document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
   if (correct) {
     btn.classList.add('correct');
@@ -1319,7 +1111,6 @@ function answerQuiz(btn, correct, card, opts) {
     quizWrong++;
     document.getElementById('quizResultMsg').textContent = '❌ Yanlış!';
     document.getElementById('quizResultMsg').className = 'quiz-result-msg bad';
-    // Show correct
     document.querySelectorAll('.quiz-option').forEach(b => {
       const matchOpt = opts.find(o => o.text === b.textContent);
       if (matchOpt && matchOpt.correct) b.classList.add('correct');
@@ -1331,21 +1122,17 @@ function answerQuiz(btn, correct, card, opts) {
   const total = quizCorrect + quizWrong;
   document.getElementById('qCorrect').textContent = quizCorrect;
   document.getElementById('qWrong').textContent = quizWrong;
-  document.getElementById('qTotal').textContent = total;
   document.getElementById('qPct').textContent = Math.round(quizCorrect / total * 100) + '%';
-  document.getElementById('quizNextBtn').style.display = '';
-  updateSRQueueBadge();
+  document.getElementById('quizNextBtn').style.display = 'block';
 }
 
 // ── CORE FLASHCARD LOGIC ──────────────────────
 function init() {
-  loadSR();
-  loadDiff();
+  loadData();
   deck = [...ALL_CARDS].map((c, i) => ({...c, id: i}));
   updateStats();
   renderCatPills();
   showCard();
-  updateSRQueueBadge();
 }
 
 function shuffleCards() {
@@ -1370,7 +1157,6 @@ function filterCards() {
       (status === 'unseen' && !seen.has(c.id)) ||
       (status === 'knew' && known.has(c.id)) ||
       (status === 'didnt' && didntKnow.has(c.id)) ||
-      (status === 'hard' && cardDifficulty[c.id] === 'hard') ||
       (status === 'due' && getSR(c.id).dueDate <= Date.now());
     return matchCat && matchSearch && matchStatus;
   });
@@ -1383,7 +1169,7 @@ function filterCards() {
 
 function showCard() {
   if (deck.length === 0) {
-    document.getElementById('cardQuestion').textContent = 'Bu filtreye uygun kart bulunamadı.';
+    document.getElementById('cardQuestion').textContent = 'Filtreye uygun kart bulunamadı.';
     document.getElementById('cardAnswer').innerHTML = '';
     document.getElementById('cardTag').textContent = '—';
     document.getElementById('cardNum').textContent = '';
@@ -1392,7 +1178,8 @@ function showCard() {
     document.getElementById('pct').textContent = '—';
     document.getElementById('progressBar').style.width = '0%';
     document.getElementById('srInfo').textContent = '';
-    const b = document.getElementById('cardDiffBadge'); if(b) {b.textContent='';b.className='';}
+    document.getElementById('noteInput').value = '';
+    document.getElementById('favBtn').style.display = 'none';
     return;
   }
   const c = deck[current];
@@ -1406,9 +1193,12 @@ function showCard() {
     'sermaye-azaltimi': 'Sermaye Azaltımı', 'nominal-alti': 'Nominal Değer Altı',
     'ortak-hukumler': 'Ortak Hükümler', 'katilma-intifa': 'Katılma İntifa',
   };
+  document.getElementById('favBtn').style.display = 'block';
+  updateFavBtn();
   document.getElementById('cardTag').textContent = catLabels[c.cat] || c.cat;
   document.getElementById('cardQuestion').textContent = c.q;
   document.getElementById('cardAnswer').innerHTML = c.a;
+  
   const num = `#${current + 1}`;
   document.getElementById('cardNum').textContent = num;
   document.getElementById('cardNumBack').textContent = num;
@@ -1416,7 +1206,8 @@ function showCard() {
   const pct = Math.round(((current + 1) / deck.length) * 100);
   document.getElementById('pct').textContent = pct + '%';
   document.getElementById('progressBar').style.width = pct + '%';
-  renderDiffBadge(c.id);
+  
+  document.getElementById('noteInput').value = cardNotes[c.id] || '';
   renderSRInfo(c.id);
   updateStats();
 }
@@ -1450,7 +1241,6 @@ function markKnew() {
   known.add(c.id);
   didntKnow.delete(c.id);
   updateSM2(c.id, 4);
-  updateSRQueueBadge();
   updateStats();
   nextCard();
 }
@@ -1461,29 +1251,8 @@ function markDidnt() {
   didntKnow.add(c.id);
   known.delete(c.id);
   updateSM2(c.id, 1);
-  updateSRQueueBadge();
   updateStats();
   nextCard();
-}
-
-function resetProgress() {
-  known.clear();
-  didntKnow.clear();
-  seen.clear();
-  srData = {};
-  cardDifficulty = {};
-  saveSR();
-  saveDiff();
-  current = 0;
-  isFlipped = false;
-  document.getElementById('cardInner').classList.remove('flipped');
-  document.getElementById('searchBox').value = '';
-  document.getElementById('catFilter').value = 'all';
-  document.getElementById('statusFilter').value = 'all';
-  deck = [...ALL_CARDS].map((c, i) => ({...c, id: i}));
-  showCard();
-  updateStats();
-  updateSRQueueBadge();
 }
 
 function updateStats() {
@@ -1493,27 +1262,109 @@ function updateStats() {
   const s = seen.size;
   const left = total - s;
   const pct = (k + d) > 0 ? Math.round(k / (k + d) * 100) : 0;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statSeen').textContent = s;
-  document.getElementById('statKnew').textContent = k;
-  document.getElementById('statDidnt').textContent = d;
-  document.getElementById('statLeft').textContent = left;
+
   document.getElementById('s2').textContent = s;
   document.getElementById('s3').textContent = k;
   document.getElementById('s4').textContent = d;
   document.getElementById('s5').textContent = pct + '%';
+  document.getElementById('statLeft').textContent = left;
+}
+
+function renderSRInfo(id) {
+  const el = document.getElementById('srInfo');
+  if (!el) return;
+  const s = getSR(id);
+  if (!s || s.dueDate === 0) { el.textContent = ''; return; }
+  const days = Math.round((s.dueDate - Date.now()) / 86400000);
+  if (days <= 0) el.innerHTML = `🔁 Tekrar için <span>hazır</span>`;
+  else if (days === 1) el.innerHTML = `⏳ Sonraki tekrar: <span>Yarın</span>`;
+  else el.innerHTML = `⏳ Sonraki tekrar: <span>${days} gün sonra</span>`;
+}
+
+// ── FAVORITES & NOTES SYSTEM ──
+function toggleFavorite(e) {
+  e.stopPropagation(); // prevent flipping the card
+  if (deck.length === 0) return;
+  const id = deck[current].id;
+  if (favorites.has(id)) {
+    favorites.delete(id);
+  } else {
+    favorites.add(id);
+  }
+  saveData();
+  updateFavBtn();
+}
+
+function updateFavBtn() {
+  if (deck.length === 0) return;
+  const id = deck[current].id;
+  const btn = document.getElementById('favBtn');
+  if (favorites.has(id)) {
+    btn.innerHTML = '★';
+    btn.classList.add('active');
+  } else {
+    btn.innerHTML = '☆';
+    btn.classList.remove('active');
+  }
+}
+
+function saveCurrentNote() {
+  if(deck.length === 0) return;
+  const id = deck[current].id;
+  const text = document.getElementById('noteInput').value.trim();
+  if(text) {
+    cardNotes[id] = text;
+    alert('Notunuz başarıyla kaydedildi!');
+  } else {
+    delete cardNotes[id];
+  }
+  saveData();
+}
+
+function renderNotesTab() {
+  const list = document.getElementById('notesList');
+  list.innerHTML = '';
+  let hasNotes = false;
+  ALL_CARDS.forEach((c, id) => {
+    if(cardNotes[id]) {
+      hasNotes = true;
+      list.innerHTML += `<div class="block list-item">
+          <div class="list-q">${c.q}</div>
+          <div class="list-a">${c.a}</div>
+          <div class="list-n"><strong>Notunuz:</strong><br>${cardNotes[id]}</div>
+      </div>`;
+    }
+  });
+  if(!hasNotes) list.innerHTML = '<div class="block empty-state">Henüz hiçbir karta not eklemediniz.</div>';
+}
+
+function renderFavsTab() {
+  const list = document.getElementById('favList');
+  list.innerHTML = '';
+  if(favorites.size === 0) {
+    list.innerHTML = '<div class="block empty-state">Henüz favorilere eklediğiniz bir kart yok.</div>';
+    return;
+  }
+  ALL_CARDS.forEach((c, id) => {
+    if(favorites.has(id)) {
+      list.innerHTML += `<div class="block list-item">
+          <div class="list-q">${c.q}</div>
+          <div class="list-a">${c.a}</div>
+      </div>`;
+    }
+  });
 }
 
 function renderCatPills() {
   const cats = [
     ['all', 'Tümü'],
-    ['kavram', 'Kavram'],
+    ['kavram', 'Kavramsal'],
     ['pay-turleri', 'Pay Türleri'],
     ['haklar', 'Haklar'],
     ['halka-arz', 'Halka Arz'],
-    ['sermaye-artirimi', 'Sermaye Artırımı'],
-    ['sermaye-azaltimi', 'Sermaye Azaltımı'],
-    ['fiyat-istikrar', 'Fiyat İstikrarı'],
+    ['sermaye-artirimi', 'S. Artırımı'],
+    ['sermaye-azaltimi', 'S. Azaltımı'],
+    ['fiyat-istikrar', 'Fiyat İst.'],
     ['nominal-alti', 'Nominal Altı'],
     ['ortak-hukumler', 'Ortak Hükümler'],
     ['katilma-intifa', 'KİS'],
@@ -1533,31 +1384,6 @@ function renderCatPills() {
     row.appendChild(btn);
   });
 }
-
-// Add "Zor Kartlar" and "Tekrar Edilecek" to status filter
-(function patchStatusFilter() {
-  const sel = document.getElementById('statusFilter');
-  const hardOpt = document.createElement('option');
-  hardOpt.value = 'hard'; hardOpt.textContent = '🔥 Zor Kartlar';
-  sel.appendChild(hardOpt);
-  const dueOpt = document.createElement('option');
-  dueOpt.value = 'due'; dueOpt.textContent = '🔁 Tekrar Edilecekler';
-  sel.appendChild(dueOpt);
-})();
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT') return;
-  if (currentMode !== 'study' && currentMode !== 'sr') return;
-  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
-  else if (e.code === 'ArrowRight') nextCard();
-  else if (e.code === 'ArrowLeft') prevCard();
-  else if (e.key === 'k' || e.key === 'K') markKnew();
-  else if (e.key === 'b' || e.key === 'B') markDidnt();
-  else if (e.key === '1') setDifficulty('easy');
-  else if (e.key === '2') setDifficulty('medium');
-  else if (e.key === '3') setDifficulty('hard');
-});
 
 init();
 </script>
