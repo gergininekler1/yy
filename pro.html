@@ -131,7 +131,7 @@
   .controls-row {
     display: flex;
     gap: 12px;
-    flex-direction: column; /* Yan yana yerine alt alta */
+    flex-direction: column;
   }
   .controls input, .controls select {
     flex: 1;
@@ -219,7 +219,7 @@
     width: 100%;
     perspective: 1000px;
     margin: 20px 0;
-    /* Kart swiping animasyonları touch event ile js üzerinden yönetilecek */
+    touch-action: pan-y;
   }
   .card-inner {
     position: relative;
@@ -294,17 +294,6 @@
   }
   .card-answer strong { color: var(--accent); font-weight: 700; }
   
-  .card-hint {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-  
   .card-number {
     position: absolute;
     top: 24px;
@@ -313,31 +302,6 @@
     font-weight: 600;
     color: var(--text-muted);
   }
-
-  /* NAV BUTTONS */
-  .nav-row {
-    display: flex;
-    gap: 12px;
-    justify-content: space-between;
-  }
-  .nav-btn {
-    flex: 1;
-    padding: 14px 12px;
-    border-radius: 12px;
-    border: none;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .nav-btn:active { transform: scale(0.96); }
-  .nav-btn.prev, .nav-btn.next { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-  .nav-btn.didnt { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-  .nav-btn.knew { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
 
   /* NOTES AREA (Card specific) */
   .note-toggle-btn {
@@ -436,6 +400,8 @@
     <span>Paylar ve Pay Benzeri Menkul Kıymetler</span>
   </div>
   <div class="header-actions">
+    <button class="btn-icon" onclick="importData()" title="Verileri Yükle">📥</button>
+    <button class="btn-icon" onclick="exportData()" title="Verileri İndir">📤</button>
     <button class="btn-icon" onclick="toggleDarkMode()" id="darkModeBtn" title="Karanlık Mod">🌙</button>
     <button class="btn-icon" onclick="shuffleCards()" title="Karıştır">🔀</button>
   </div>
@@ -504,7 +470,6 @@
             <div class="card-tag" id="cardTag">Kavram</div>
             <div class="card-number" id="cardNum">#1</div>
             <div class="card-question" id="cardQuestion">Kartlar yükleniyor...</div>
-            <div class="card-hint">👆 Çevirmek için dokun, <br>👉 Bildim için sağa, 👈 Bilmedim için sola kaydır</div>
           </div>
           <div class="card-face card-back-face" id="backFace">
             <div class="card-tag">Cevap ✓</div>
@@ -512,13 +477,6 @@
             <div class="card-answer" id="cardAnswer">Cevap burada görünecek.</div>
           </div>
         </div>
-      </div>
-
-      <div class="nav-row">
-        <button class="nav-btn prev" onclick="prevCard()">◀ Geri</button>
-        <button class="nav-btn didnt" onclick="markDidnt()">❌ Bilmedim</button>
-        <button class="nav-btn knew" onclick="markKnew()">✅ Bildim</button>
-        <button class="nav-btn next" onclick="nextCard()">İleri ▶</button>
       </div>
       
       <button class="note-toggle-btn" onclick="toggleNoteArea()">📝 Bu karta not ekle / düzenle</button>
@@ -909,6 +867,49 @@ function saveData() {
   localStorage.setItem(SR_KEY, JSON.stringify(srData));
   localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
   localStorage.setItem(NOTES_KEY, JSON.stringify(cardNotes));
+}
+
+// ── EXPORT / IMPORT DATA ──────────
+function exportData() {
+  const data = {
+    srData: JSON.parse(localStorage.getItem(SR_KEY) || '{}'),
+    favorites: JSON.parse(localStorage.getItem(FAV_KEY) || '[]'),
+    cardNotes: JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'),
+    history: JSON.parse(localStorage.getItem(HIST_KEY) || '{}')
+  };
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", "spk_flashkart_yedek.json");
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+}
+
+function importData() {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.json';
+  fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = event => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.srData) localStorage.setItem(SR_KEY, JSON.stringify(data.srData));
+        if (data.favorites) localStorage.setItem(FAV_KEY, JSON.stringify(data.favorites));
+        if (data.cardNotes) localStorage.setItem(NOTES_KEY, JSON.stringify(data.cardNotes));
+        if (data.history) localStorage.setItem(HIST_KEY, JSON.stringify(data.history));
+        alert('Verileriniz başarıyla yüklendi! Sistem yenileniyor...');
+        location.reload();
+      } catch (err) {
+        alert('Hata: Geçersiz dosya formatı. Lütfen doğru yedek dosyasını seçin.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  fileInput.click();
 }
 
 function toggleDarkMode() {
@@ -1305,24 +1306,16 @@ function nextCard() {
   }
 }
 
-function prevCard() {
-  if (current > 0) {
-    current--;
-    isFlipped = false;
-    document.getElementById('cardInner').classList.remove('flipped');
-    showCard();
-  }
-}
-
-// ── SWIPING LOGIC (Tinder Style) ──
+// ── YENİ: DOKUNMA VE KAYDIRMA MANTIĞI (TINDER STYLE) ──
 const cardArea = document.getElementById('cardArea');
-let startX = 0, startY = 0, currentX = 0, isDragging = false;
+let startX = 0, startY = 0, currentX = 0, isDragging = false, dragMoved = false;
 let swipeThreshold = 100;
 
 cardArea.addEventListener('touchstart', e => {
   startX = e.touches[0].clientX;
   startY = e.touches[0].clientY;
   isDragging = true;
+  dragMoved = false;
   cardArea.style.transition = 'none';
 }, {passive: true});
 
@@ -1333,7 +1326,12 @@ cardArea.addEventListener('touchmove', e => {
   const deltaX = currentX - startX;
   const deltaY = currentY - startY;
 
-  // Swipe işlemi yalnızca yatay hareket dikeyden daha baskınsa çalışsın
+  // Eğer parmak çok azıcık bile hareket ettiyse bunu bir kaydırma (swipe) olarak algıla
+  if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+    dragMoved = true;
+  }
+
+  // Yatay hareket dikeyden fazlaysa animasyonu işlet
   if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
     e.preventDefault(); 
     const rotate = deltaX * 0.05;
@@ -1344,17 +1342,18 @@ cardArea.addEventListener('touchmove', e => {
 cardArea.addEventListener('touchend', e => {
   if (!isDragging) return;
   isDragging = false;
-  const deltaX = currentX - startX;
-  const deltaY = e.changedTouches[0].clientY - startY;
   
-  // Tıklama tespiti (küçük hareket)
-  if (Math.abs(deltaX) < 15 && Math.abs(deltaY) < 15) {
+  // Eğere hiç kaydırma yapılmadıysa bu basit bir dokunmadır (TAP), o zaman çevir
+  if (!dragMoved) {
     flipCard();
     resetCardPosition(true);
     return;
   }
-
+  
+  // Kaydırma işlemi tamamlandıysa
+  const deltaX = currentX - startX;
   cardArea.style.transition = 'transform 0.3s ease-out';
+  
   if (deltaX > swipeThreshold) {
     // Sağa kaydırma - Bildim
     cardArea.style.transform = `translateX(${window.innerWidth}px) rotate(30deg)`;
@@ -1364,6 +1363,7 @@ cardArea.addEventListener('touchend', e => {
     cardArea.style.transform = `translateX(-${window.innerWidth}px) rotate(-30deg)`;
     setTimeout(() => { markDidnt(true); }, 250);
   } else {
+    // Yeterince kaydırılmadı, geri dönsün
     resetCardPosition();
   }
 });
