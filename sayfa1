@@ -1,0 +1,674 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Üç Adım | Taslak · Revize · Final</title>
+  <!-- Font Awesome (ikonlar için) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: #f4f7fc;
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    /* Başlık */
+    .app-header {
+      margin-bottom: 2rem;
+    }
+
+    .app-header h1 {
+      font-weight: 600;
+      font-size: 2.2rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .app-header h1 i {
+      color: #3b82f6;
+      background: white;
+      padding: 10px;
+      border-radius: 18px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.03);
+    }
+
+    .badge-container {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .stage-badge {
+      font-size: 0.9rem;
+      background: white;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      color: #334155;
+    }
+
+    .stage-badge i {
+      margin-right: 6px;
+    }
+
+    /* Yeni not ekleme kartı */
+    .add-note-card {
+      background: white;
+      border-radius: 28px;
+      padding: 1.5rem 1.8rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.5);
+      backdrop-filter: blur(2px);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 18px;
+    }
+
+    .input-group {
+      flex: 2 1 240px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .input-group input, .input-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: #fafcff;
+      resize: vertical;
+    }
+
+    .input-group textarea {
+      min-height: 70px;
+    }
+
+    .input-group input:focus, .input-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+      background: white;
+    }
+
+    .add-btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 18px rgba(59,130,246,0.25);
+      cursor: pointer;
+      transition: 0.15s;
+      border: 1px solid rgba(255,255,255,0.2);
+      flex: 0 0 auto;
+    }
+
+    .add-btn i {
+      font-size: 1.2rem;
+    }
+
+    .add-btn:hover {
+      background: #2563eb;
+      transform: scale(1.02);
+      box-shadow: 0 10px 22px rgba(37,99,235,0.3);
+    }
+
+    /* Board - 3 sütun */
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .column {
+      background: #f8fafd;
+      border-radius: 28px;
+      padding: 1.2rem 1rem 1.5rem;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.02), 0 8px 18px rgba(0,0,0,0.03);
+      border: 1px solid #eef2f6;
+      transition: box-shadow 0.2s;
+    }
+
+    .column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.3rem 0.8rem 0.3rem;
+      border-bottom: 3px solid;
+      margin-bottom: 1.2rem;
+    }
+
+    .col-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .col-count {
+      background: white;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    /* Sütun renkleri */
+    .col-taslak .column-header { border-color: #94a3b8; }
+    .col-taslak .col-title i { color: #64748b; }
+    .col-revize .column-header { border-color: #f59e0b; }
+    .col-revize .col-title i { color: #d97706; }
+    .col-final .column-header { border-color: #10b981; }
+    .col-final .col-title i { color: #059669; }
+
+    /* Not kartları */
+    .note-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 180px;
+    }
+
+    .note-card {
+      background: white;
+      border-radius: 22px;
+      padding: 1.2rem 1.2rem 1rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+      border: 1px solid #e9edf2;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .note-card:hover {
+      box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+      border-color: #cbd5e1;
+    }
+
+    .note-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+      color: #0f172a;
+      word-break: break-word;
+      padding-right: 30px; /* delete butonu için alan */
+    }
+
+    .note-content {
+      color: #334155;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-top: 1px dashed #dee6ed;
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+
+    .btn-icon {
+      background: #f1f5f9;
+      border: none;
+      border-radius: 30px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #1e293b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: 0.12s;
+      border: 1px solid transparent;
+    }
+
+    .btn-icon i {
+      font-size: 0.9rem;
+    }
+
+    .btn-icon:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-delete {
+      background: transparent;
+      color: #94a3b8;
+      padding: 6px 10px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .btn-delete:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .move-btn {
+      background: white;
+      border: 1px solid #d1d9e6;
+    }
+
+    .move-btn:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #94a3b8;
+      padding: 28px 12px;
+      font-style: italic;
+      background: #f1f5f9;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      text-align: right;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    /* mobil uyum */
+    @media (max-width: 800px) {
+      .board {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .app-header h1 {
+        font-size: 1.8rem;
+      }
+      .add-note-card {
+        padding: 1.2rem;
+      }
+      .badge-container {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  
+  <!-- Başlık -->
+  <div class="app-header">
+    <h1>
+      <i class="fas fa-pen-fancy"></i> 
+      Not Atölyesi
+      <span class="badge-container">
+        <span class="stage-badge"><i class="fas fa-pencil-alt"></i> Taslak</span>
+        <span class="stage-badge"><i class="fas fa-sync-alt"></i> Revize</span>
+        <span class="stage-badge"><i class="fas fa-check-circle"></i> Final</span>
+      </span>
+    </h1>
+  </div>
+
+  <!-- Yeni not ekleme alanı -->
+  <div class="add-note-card">
+    <div class="input-group">
+      <label><i class="far fa-sticky-note"></i> Başlık</label>
+      <input type="text" id="noteTitleInput" placeholder="Toplantı notları, fikir..." maxlength="50">
+    </div>
+    <div class="input-group">
+      <label><i class="far fa-file-alt"></i> İçerik</label>
+      <textarea id="noteContentInput" placeholder="Notunuzu yazın... (ilk adım Taslak olarak eklenecek)" rows="2"></textarea>
+    </div>
+    <button class="add-btn" id="addNoteBtn"><i class="fas fa-plus-circle"></i> Taslağa Ekle</button>
+  </div>
+
+  <!-- 3 Sütunlu Board -->
+  <div class="board">
+    <!-- Taslak Sütunu -->
+    <div class="column col-taslak" id="colTaslak">
+      <div class="column-header">
+        <span class="col-title"><i class="fas fa-pencil-alt fa-fw"></i> Taslak</span>
+        <span class="col-count" id="taslakCount">0</span>
+      </div>
+      <div class="note-list" id="taslakList"></div>
+    </div>
+
+    <!-- Revize Sütunu -->
+    <div class="column col-revize" id="colRevize">
+      <div class="column-header">
+        <span class="col-title"><i class="fas fa-rotate-right fa-fw"></i> Revize</span>
+        <span class="col-count" id="revizeCount">0</span>
+      </div>
+      <div class="note-list" id="revizeList"></div>
+    </div>
+
+    <!-- Final Sütunu -->
+    <div class="column col-final" id="colFinal">
+      <div class="column-header">
+        <span class="col-title"><i class="fas fa-check-double fa-fw"></i> Final</span>
+        <span class="col-count" id="finalCount">0</span>
+      </div>
+      <div class="note-list" id="finalList"></div>
+    </div>
+  </div>
+  <div class="footer-note">
+    <i class="far fa-save"></i> Notlarınız tarayıcıda otomatik saklanır
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- VERİ YAPISI ----------
+    let notes = [];
+
+    // localStorage anahtarı
+    const STORAGE_KEY = 'uc_adim_not_uygulamasi';
+
+    // DOM elemanları
+    const titleInput = document.getElementById('noteTitleInput');
+    const contentInput = document.getElementById('noteContentInput');
+    const addBtn = document.getElementById('addNoteBtn');
+
+    // Sütun listeleri ve sayaçlar
+    const taslakListEl = document.getElementById('taslakList');
+    const revizeListEl = document.getElementById('revizeList');
+    const finalListEl = document.getElementById('finalList');
+    const taslakCountEl = document.getElementById('taslakCount');
+    const revizeCountEl = document.getElementById('revizeCount');
+    const finalCountEl = document.getElementById('finalCount');
+
+    // ---------- YARDIMCI FONKSİYONLAR ----------
+    function generateId() {
+      return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+    }
+
+    // localStorage'dan yükle
+    function loadNotes() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          notes = JSON.parse(stored);
+        } catch (e) {
+          notes = [];
+        }
+      } else {
+        // Varsayılan birkaç not ile başlat (demo)
+        notes = [
+          {
+            id: generateId(),
+            title: 'Hoş geldin!',
+            content: 'Bu bir taslak not. "Revizeye Taşı" ile ikinci adıma geçirebilirsin.',
+            status: 'taslak'
+          },
+          {
+            id: generateId(),
+            title: 'Düzenleme aşaması',
+            content: 'Revize notu örneği. Üzerinde çalışıp final yapabilirsin.',
+            status: 'revize'
+          },
+          {
+            id: generateId(),
+            title: 'Tamamlanmış iş',
+            content: 'Final notu. Tebrikler! İstersen geri alabilir veya silebilirsin.',
+            status: 'final'
+          }
+        ];
+      }
+    }
+
+    // localStorage'a kaydet
+    function saveNotes() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    }
+
+    // Sayaçları güncelle
+    function updateCounts() {
+      const counts = { taslak: 0, revize: 0, final: 0 };
+      notes.forEach(n => { if (counts.hasOwnProperty(n.status)) counts[n.status]++; });
+      taslakCountEl.textContent = counts.taslak;
+      revizeCountEl.textContent = counts.revize;
+      finalCountEl.textContent = counts.final;
+    }
+
+    // Belirli bir duruma göre not kartı HTML'i oluştur
+    function createNoteCard(note) {
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'note-card';
+      cardDiv.dataset.id = note.id;
+      cardDiv.dataset.status = note.status;
+
+      // Başlık
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'note-title';
+      titleDiv.textContent = note.title || 'Başlıksız';
+      
+      // İçerik
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'note-content';
+      contentDiv.textContent = note.content || '...';
+
+      // Aksiyon butonları container
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'note-actions';
+
+      // Duruma göre hareket butonları
+      if (note.status === 'taslak') {
+        const moveBtn = document.createElement('button');
+        moveBtn.className = 'btn-icon move-btn';
+        moveBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Revizeye Taşı';
+        moveBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          changeNoteStatus(note.id, 'revize');
+        });
+        actionsDiv.appendChild(moveBtn);
+      } 
+      else if (note.status === 'revize') {
+        const toFinalBtn = document.createElement('button');
+        toFinalBtn.className = 'btn-icon move-btn';
+        toFinalBtn.innerHTML = '<i class="fas fa-check"></i> Final Yap';
+        toFinalBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          changeNoteStatus(note.id, 'final');
+        });
+        
+        const toTaslakBtn = document.createElement('button');
+        toTaslakBtn.className = 'btn-icon';
+        toTaslakBtn.innerHTML = '<i class="fas fa-undo-alt"></i> Taslağa Al';
+        toTaslakBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          changeNoteStatus(note.id, 'taslak');
+        });
+        
+        actionsDiv.appendChild(toFinalBtn);
+        actionsDiv.appendChild(toTaslakBtn);
+      } 
+      else if (note.status === 'final') {
+        const toRevizeBtn = document.createElement('button');
+        toRevizeBtn.className = 'btn-icon';
+        toRevizeBtn.innerHTML = '<i class="fas fa-pen"></i> Revizeye Geri Al';
+        toRevizeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          changeNoteStatus(note.id, 'revize');
+        });
+        
+        const toTaslakBtn = document.createElement('button');
+        toTaslakBtn.className = 'btn-icon';
+        toTaslakBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Taslağa Al';
+        toTaslakBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          changeNoteStatus(note.id, 'taslak');
+        });
+        
+        actionsDiv.appendChild(toRevizeBtn);
+        actionsDiv.appendChild(toTaslakBtn);
+      }
+
+      // Silme butonu (her durumda var)
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn-icon btn-delete';
+      deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+      deleteBtn.setAttribute('aria-label', 'Notu sil');
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteNoteById(note.id);
+      });
+
+      cardDiv.appendChild(deleteBtn);
+      cardDiv.appendChild(titleDiv);
+      cardDiv.appendChild(contentDiv);
+      cardDiv.appendChild(actionsDiv);
+
+      return cardDiv;
+    }
+
+    // Durum değiştir
+    function changeNoteStatus(noteId, newStatus) {
+      const note = notes.find(n => n.id === noteId);
+      if (note) {
+        note.status = newStatus;
+        saveNotes();
+        renderBoard();
+      }
+    }
+
+    // Not sil
+    function deleteNoteById(noteId) {
+      notes = notes.filter(n => n.id !== noteId);
+      saveNotes();
+      renderBoard();
+    }
+
+    // Yeni not ekle (her zaman Taslak)
+    function addNewNote() {
+      const title = titleInput.value.trim();
+      const content = contentInput.value.trim();
+      
+      if (!title && !content) {
+        alert('Lütfen en az başlık veya içerik girin.');
+        return;
+      }
+
+      const newNote = {
+        id: generateId(),
+        title: title || 'Yeni not',
+        content: content || '(içerik yok)',
+        status: 'taslak'
+      };
+
+      notes.push(newNote);
+      saveNotes();
+      
+      // Inputları temizle
+      titleInput.value = '';
+      contentInput.value = '';
+      
+      renderBoard();
+    }
+
+    // Board'u render et
+    function renderBoard() {
+      // Listeleri temizle
+      taslakListEl.innerHTML = '';
+      revizeListEl.innerHTML = '';
+      finalListEl.innerHTML = '';
+
+      // Notları filtrele
+      const taslakNotes = notes.filter(n => n.status === 'taslak');
+      const revizeNotes = notes.filter(n => n.status === 'revize');
+      const finalNotes = notes.filter(n => n.status === 'final');
+
+      // Boş mesajı fonksiyonu
+      const renderColumn = (noteArray, containerEl) => {
+        if (noteArray.length === 0) {
+          const emptyMsg = document.createElement('div');
+          emptyMsg.className = 'empty-message';
+          emptyMsg.innerHTML = '<i class="far fa-folder-open"></i> Henüz not yok';
+          containerEl.appendChild(emptyMsg);
+        } else {
+          noteArray.forEach(note => {
+            containerEl.appendChild(createNoteCard(note));
+          });
+        }
+      };
+
+      renderColumn(taslakNotes, taslakListEl);
+      renderColumn(revizeNotes, revizeListEl);
+      renderColumn(finalNotes, finalListEl);
+
+      updateCounts();
+    }
+
+    // ---------- OLAY DİNLEYİCİLERİ ----------
+    addBtn.addEventListener('click', addNewNote);
+
+    // Enter ile ekleme (opsiyonel)
+    titleInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addNewNote();
+      }
+    });
+    contentInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        addNewNote();
+      }
+    });
+
+    // ---------- BAŞLAT ----------
+    loadNotes();
+    renderBoard();
+
+    // Not: localStorage güncellemeleri her değişiklikte yapılıyor.
+    // Kullanıcıya bilgi: tarayıcıda kalıcı.
+  })();
+</script>
+</body>
+</html>
