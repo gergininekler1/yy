@@ -2,435 +2,367 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Notes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analog Not Terminali</title>
     <style>
-        /* Renk Paleti ve Değişkenler */
         :root {
-            --bg-color: #17100D; /* Ağır ciddi koyu kahve */
-            --card-bg: #241A14;  /* Biraz daha açık kahve tonu */
-            --text-cream: #D6C5B3; /* Koyu krem */
-            --accent-gold: #B8860B; /* Koyu altın sarısı */
-            --faint-red: rgba(200, 50, 50, 0.4); /* Solgun kırmızı */
-            --green-tick: #4CAF50;
-            --border-radius: 8px;
+            --bg-dark-brown: #241714;
+            --card-cream: #D6C7B3;
+            --accent-gold: #C09B42;
+            --text-dark: #1A100E;
+            --text-light: #EAE0D5;
+            --success-green: #4CAF50;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Consolas', 'Courier New', monospace; /* Terminal/Analog hissiyat */
+            font-family: 'Courier New', Courier, monospace; /* Terminal analog hissi */
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-cream);
-            padding: 20px 15px;
-            overflow-x: hidden;
+            background-color: var(--bg-dark-brown);
+            color: var(--text-light);
+            padding: 15px;
+            padding-bottom: 50px;
         }
 
-        /* Üst Bilgi ve İlerleme Çizgisi */
-        .progress-line {
-            height: 3px;
-            background-color: var(--faint-red);
-            width: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(214, 197, 179, 0.1);
-        }
-
-        .header-title {
-            font-size: 1.2rem;
+        h1 {
             color: var(--accent-gold);
-            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .header-meta {
-            font-size: 0.75rem;
-            text-align: right;
-            opacity: 0.8;
-        }
-
-        /* Butonlar */
-        button {
+        /* Giriş Formu */
+        .input-section {
             background-color: transparent;
-            color: var(--text-cream);
-            border: 1px solid var(--text-cream);
-            padding: 8px 12px;
-            border-radius: var(--border-radius);
+            border: 1px solid var(--accent-gold);
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background-color: var(--bg-dark-brown);
+            color: var(--text-light);
+            border: 1px solid #5A443A;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent-gold);
+        }
+
+        button {
+            background-color: var(--accent-gold);
+            color: var(--text-dark);
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
+            width: 100%;
+            font-size: 1rem;
         }
 
         button:active {
-            background-color: var(--text-cream);
-            color: var(--bg-color);
+            opacity: 0.8;
         }
 
-        button.gold-btn {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
-
-        button.gold-btn:active {
-            background-color: var(--accent-gold);
-            color: var(--bg-color);
-        }
-
-        /* Not Ekleme Alanı */
-        .input-section {
-            margin-bottom: 30px;
-        }
-        
-        .input-section textarea {
-            width: 100%;
-            background-color: var(--card-bg);
-            border: 1px solid rgba(214, 197, 179, 0.2);
-            color: var(--text-cream);
-            padding: 12px;
-            border-radius: var(--border-radius);
-            min-height: 80px;
-            margin-bottom: 10px;
-            resize: none;
-        }
-        
-        .input-section textarea:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-buttons button {
-            flex: 1;
-        }
-
-        /* Netflix Tarzı Yatay Kaydırma (Kart Sistemi) */
+        /* Netflix Tarzı Yatay Kart Kaydırma Sistemi */
         .section-title {
-            font-size: 0.9rem;
+            color: var(--card-cream);
             margin-bottom: 10px;
+            font-size: 1.2rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-left: 3px solid var(--accent-gold);
-            padding-left: 8px;
         }
 
-        .horizontal-scroll {
+        .netflix-row {
             display: flex;
             overflow-x: auto;
+            scroll-snap-type: x mandatory;
             gap: 15px;
             padding-bottom: 15px;
             margin-bottom: 25px;
-            scroll-snap-type: x mandatory;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        
-        .horizontal-scroll::-webkit-scrollbar {
-            display: none; /* Chrome, Safari */
         }
 
-        /* Kart Tasarımları (Aşamalara Göre Farklılaşmış) */
+        .netflix-row::-webkit-scrollbar {
+            height: 6px;
+        }
+        .netflix-row::-webkit-scrollbar-track {
+            background: #3a2823; 
+        }
+        .netflix-row::-webkit-scrollbar-thumb {
+            background: var(--accent-gold); 
+        }
+
+        /* Kart Tasarımı */
         .card {
-            min-width: 220px;
-            max-width: 220px;
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            scroll-snap-align: start;
+            background-color: var(--card-cream);
+            color: var(--text-dark);
+            min-width: 85%; /* Mobil ekranda bir kartın kaplayacağı alan */
+            max-width: 85%;
+            scroll-snap-align: center;
+            border-left: 5px solid var(--accent-gold);
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* Başlık Bloğu */
+        .card-header {
+            background-color: rgba(0,0,0,0.1);
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-bottom: 1px dashed var(--text-dark);
+        }
+
+        /* Künye (Metadata) Bloğu */
+        .card-meta {
+            background-color: rgba(0,0,0,0.05);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--text-dark);
+            display: flex;
             justify-content: space-between;
-            border: 1px solid rgba(214, 197, 179, 0.05);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        .card-content {
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            word-wrap: break-word;
+        /* İçerik Bloğu */
+        .card-body {
+            padding: 15px 10px;
+            flex-grow: 1;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
         }
 
-        .card-date {
-            font-size: 0.65rem;
-            opacity: 0.5;
-            margin-bottom: 8px;
+        /* Aksiyon Butonları */
+        .card-actions {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            background-color: rgba(0,0,0,0.1);
         }
 
-        /* Taslak Kartı */
-        .card.draft { border-left: 2px solid rgba(214, 197, 179, 0.3); }
-        
-        /* Revize Kartı */
-        .card.revise { border-left: 2px solid #5a8bb0; }
-        
-        /* Final Kartı */
-        .card.final { 
+        .card-actions button {
+            font-size: 0.8rem;
+            padding: 8px;
+            background-color: var(--bg-dark-brown);
+            color: var(--accent-gold);
             border: 1px solid var(--accent-gold);
-            background: linear-gradient(145deg, var(--card-bg), #1a140f);
         }
 
-        /* Geçmiş Kartı */
-        .card.history {
-            opacity: 0.7;
-            border: 1px dashed rgba(214, 197, 179, 0.2);
+        /* Geçmiş Bloğu */
+        .card-history {
+            background-color: #241714;
+            color: #C09B42;
+            padding: 10px;
+            font-size: 0.75rem;
+            display: none;
+            border-top: 2px solid var(--accent-gold);
         }
 
-        .green-tick {
-            color: var(--green-tick);
-            font-size: 1.2rem;
+        /* Tamamlanmış (Yeşil Tik) Durumu */
+        .completed-tick {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--success-green);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 5px;
-        }
-
-        /* Modal (Revize ve Künye için) */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(23, 16, 13, 0.95);
-            display: none;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
+            font-weight: bold;
+            font-size: 1rem;
         }
 
-        .modal-content {
-            background-color: var(--card-bg);
+        .edit-textarea {
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--accent-gold);
+            height: 100px;
+            background-color: var(--card-cream);
+            color: var(--text-dark);
+            border: 1px dashed var(--text-dark);
+            padding: 5px;
+            font-family: inherit;
+            margin-top: 10px;
         }
-
-        .modal-content textarea {
-            width: 100%;
-            height: 200px;
-            background-color: var(--bg-color);
-            color: var(--text-cream);
-            border: 1px solid rgba(214, 197, 179, 0.2);
-            padding: 10px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            resize: none;
-        }
-
     </style>
 </head>
 <body>
 
-    <div class="progress-line"></div>
-
-    <div class="header">
-        <div class="header-title">TERMINAL_NOTES</div>
-        <div class="header-meta">
-            <div>Kritik Görev: <span id="critical-counter">0</span></div>
-            <div style="font-size: 0.6rem; color: #888;">Otomatik Yedekleme: Açık</div>
-            <button onclick="openProfile()" style="padding: 2px 5px; margin-top: 5px; font-size: 0.6rem;">[Künye]</button>
-        </div>
-    </div>
+    <h1>[SİSTEM]_NOT_TERMİNALİ</h1>
 
     <div class="input-section">
-        <textarea id="new-note-text" placeholder="> Yeni bir fikir yaz..."></textarea>
-        <div class="action-buttons">
-            <button onclick="addNote('draft')">Taslak Ekle</button>
-            <button onclick="addNote('atomic')" class="gold-btn">Atomik Not Ekle</button>
-        </div>
+        <input type="text" id="noteTitle" placeholder="> Not Başlığı_">
+        <textarea id="noteContent" rows="4" placeholder="> Taslak metnini buraya gir_"></textarea>
+        <button onclick="createDraft()">Taslağa Kaydet</button>
     </div>
 
-    <div class="section-title">1. Taslaklar (Ham Fikirler)</div>
-    <div class="horizontal-scroll" id="drafts-container"></div>
+    <div class="section-title">01_Taslaklar</div>
+    <div class="netflix-row" id="draftRow"></div>
 
-    <div class="section-title">2. Revize (Geliştirme Masası)</div>
-    <div class="horizontal-scroll" id="revise-container"></div>
+    <div class="section-title">02_Revize_Bekleyenler</div>
+    <div class="netflix-row" id="reviseRow"></div>
 
-    <div class="section-title">3. Final (Tamamlanmaya Hazır)</div>
-    <div class="horizontal-scroll" id="finals-container"></div>
-
-    <div class="section-title">Geçmiş (Tamamlananlar)</div>
-    <div class="horizontal-scroll" id="history-container"></div>
-
-
-    <div class="modal-overlay" id="revise-modal">
-        <div class="modal-content">
-            <h3 style="color: var(--accent-gold);">[REVİZE MODU]</h3>
-            <p style="font-size: 0.7rem; opacity: 0.7; margin-top: 5px;">Notu burada detaylandır ve düzenle.</p>
-            <textarea id="revise-text"></textarea>
-            <input type="hidden" id="revise-id">
-            <div class="action-buttons">
-                <button onclick="closeModal()">İptal</button>
-                <button onclick="saveRevise()" class="gold-btn">Final'e Aktar</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-content">
-            <h3 style="color: var(--accent-gold);">[KÜNYE - AKTİF GÖREV TARİHLERİ]</h3>
-            <div id="profile-dates" style="margin: 20px 0; font-size: 0.85rem; line-height: 1.8;">
-                </div>
-            <button onclick="closeProfile()" style="width: 100%">Kapat</button>
-        </div>
-    </div>
+    <div class="section-title">03_Finaller</div>
+    <div class="netflix-row" id="finalRow"></div>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('terminal_notes')) || [];
+        let notes = [];
 
-        function saveNotes() {
-            localStorage.setItem('terminal_notes', JSON.stringify(notes));
-            renderAll();
+        function generateId() {
+            return '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        function addNote(type) {
-            const textInput = document.getElementById('new-note-text');
-            const text = textInput.value.trim();
-            if (!text) return;
+        function getTimestamp() {
+            const now = new Date();
+            return now.toLocaleDateString('tr-TR') + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+        }
 
-            const note = {
-                id: Date.now(),
-                text: type === 'atomic' ? `[ATOMİK] ${text}` : text,
-                stage: 'draft',
-                date: new Date().toLocaleDateString('tr-TR')
+        function createDraft() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            
+            if (!title || !content) {
+                alert("Terminal Uyarısı: Başlık ve içerik boş olamaz.");
+                return;
+            }
+
+            const newNote = {
+                id: generateId(),
+                title: title,
+                content: content,
+                stage: 'draft', // draft, revise, final
+                completed: false,
+                history: [`[${getTimestamp()}] Taslak olarak oluşturuldu.`]
             };
 
-            notes.push(note);
-            textInput.value = '';
-            saveNotes();
+            notes.push(newNote);
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            renderNotes();
         }
 
-        function changeStage(id, newStage) {
+        function moveToRevise(id) {
             const note = notes.find(n => n.id === id);
             if (note) {
-                note.stage = newStage;
-                saveNotes();
+                note.stage = 'revise';
+                note.history.push(`[${getTimestamp()}] Revize aşamasına aktarıldı.`);
+                renderNotes();
             }
         }
 
-        function openReviseModal(id) {
+        function enableEdit(id) {
             const note = notes.find(n => n.id === id);
-            if (note) {
-                document.getElementById('revise-text').value = note.text;
-                document.getElementById('revise-id').value = note.id;
-                document.getElementById('revise-modal').style.display = 'flex';
+            if (note && note.stage === 'revise') {
+                const bodyDiv = document.getElementById(`body-${id}`);
+                bodyDiv.innerHTML = `<textarea id="edit-${id}" class="edit-textarea">${note.content}</textarea>`;
+                
+                const actionsDiv = document.getElementById(`actions-${id}`);
+                actionsDiv.innerHTML = `<button onclick="saveRevision('${id}')">Revizeyi Kaydet</button>`;
             }
         }
 
-        function closeModal() {
-            document.getElementById('revise-modal').style.display = 'none';
+        function saveRevision(id) {
+            const note = notes.find(n => n.id === id);
+            const newContent = document.getElementById(`edit-${id}`).value;
+            if (note) {
+                note.content = newContent;
+                note.history.push(`[${getTimestamp()}] Metin revize edildi.`);
+                renderNotes();
+            }
         }
 
-        function saveRevise() {
-            const id = parseInt(document.getElementById('revise-id').value);
-            const newText = document.getElementById('revise-text').value;
+        function moveToFinal(id) {
             const note = notes.find(n => n.id === id);
-            
             if (note) {
-                note.text = newText;
                 note.stage = 'final';
-                closeModal();
-                saveNotes();
+                note.history.push(`[${getTimestamp()}] Final aşamasına aktarıldı.`);
+                renderNotes();
             }
         }
 
-        function openProfile() {
-            const activeNotes = notes.filter(n => n.stage !== 'history');
-            const datesDiv = document.getElementById('profile-dates');
-            
-            if(activeNotes.length === 0) {
-                datesDiv.innerHTML = "Aktif görev tarihi bulunmuyor.";
+        function markCompleted(id) {
+            const note = notes.find(n => n.id === id);
+            if (note) {
+                note.completed = true;
+                note.history.push(`[${getTimestamp()}] Sistemde tamamlandı olarak işaretlendi.`);
+                renderNotes();
+            }
+        }
+
+        function toggleHistory(id) {
+            const historyDiv = document.getElementById(`history-${id}`);
+            if (historyDiv.style.display === 'block') {
+                historyDiv.style.display = 'none';
             } else {
-                // Sadece tarihleri göster
-                datesDiv.innerHTML = activeNotes.map(n => `> ${n.date}`).join('<br>');
+                historyDiv.style.display = 'block';
             }
-            document.getElementById('profile-modal').style.display = 'flex';
         }
 
-        function closeProfile() {
-            document.getElementById('profile-modal').style.display = 'none';
-        }
+        function renderNotes() {
+            const draftRow = document.getElementById('draftRow');
+            const reviseRow = document.getElementById('reviseRow');
+            const finalRow = document.getElementById('finalRow');
 
-        function renderAll() {
-            const draftsContainer = document.getElementById('drafts-container');
-            const reviseContainer = document.getElementById('revise-container');
-            const finalsContainer = document.getElementById('finals-container');
-            const historyContainer = document.getElementById('history-container');
-
-            draftsContainer.innerHTML = '';
-            reviseContainer.innerHTML = '';
-            finalsContainer.innerHTML = '';
-            historyContainer.innerHTML = '';
-
-            let criticalCount = 0;
+            draftRow.innerHTML = '';
+            reviseRow.innerHTML = '';
+            finalRow.innerHTML = '';
 
             notes.forEach(note => {
                 const card = document.createElement('div');
-                card.className = `card ${note.stage}`;
-                
-                let buttonsHtml = '';
-                let statusHtml = '';
+                card.className = 'card';
 
+                let tickHtml = note.completed ? `<div class="completed-tick">✓</div>` : '';
+                
+                let actionsHtml = '';
                 if (note.stage === 'draft') {
-                    criticalCount++;
-                    buttonsHtml = `<button onclick="changeStage(${note.id}, 'revise')">Revizeye Gönder ➔</button>`;
-                } 
-                else if (note.stage === 'revise') {
-                    criticalCount++;
-                    buttonsHtml = `<button class="gold-btn" onclick="openReviseModal(${note.id})">[DÜZENLE]</button>`;
-                } 
-                else if (note.stage === 'final') {
-                    criticalCount++;
-                    buttonsHtml = `<button onclick="changeStage(${note.id}, 'history')">Tamamla ✓</button>`;
-                } 
-                else if (note.stage === 'history') {
-                    statusHtml = `<div class="green-tick">✅ Tamamlandı</div>`;
+                    actionsHtml = `<button onclick="moveToRevise('${note.id}')">Revizeye Gönder ➔</button>`;
+                } else if (note.stage === 'revise') {
+                    actionsHtml = `
+                        <button onclick="enableEdit('${note.id}')">Düzenle</button>
+                        <button onclick="moveToFinal('${note.id}')">Finale Gönder ➔</button>
+                    `;
+                } else if (note.stage === 'final' && !note.completed) {
+                    actionsHtml = `<button onclick="markCompleted('${note.id}')">Tamamlandı İşaretle ✓</button>`;
                 }
 
+                actionsHtml += `<button onclick="toggleHistory('${note.id}')">Geçmiş</button>`;
+
+                const historyHtml = note.history.map(h => `<div>> ${h}</div>`).join('');
+
                 card.innerHTML = `
-                    <div>
-                        <div class="card-date">${note.date}</div>
-                        <div class="card-content">${note.text.substring(0, 100)}${note.text.length > 100 ? '...' : ''}</div>
+                    ${tickHtml}
+                    <div class="card-header">${note.title}</div>
+                    <div class="card-meta">
+                        <span>Aşama: ${note.stage.toUpperCase()}</span>
+                        <span>[SİSTEM_KAYDI]</span>
                     </div>
-                    <div>
-                        ${statusHtml}
-                        ${buttonsHtml}
+                    <div class="card-body" id="body-${note.id}">${note.content}</div>
+                    <div class="card-actions" id="actions-${note.id}">
+                        ${actionsHtml}
+                    </div>
+                    <div class="card-history" id="history-${note.id}">
+                        ${historyHtml}
                     </div>
                 `;
 
-                if (note.stage === 'draft') draftsContainer.appendChild(card);
-                if (note.stage === 'revise') reviseContainer.appendChild(card);
-                if (note.stage === 'final') finalsContainer.appendChild(card);
-                if (note.stage === 'history') historyContainer.appendChild(card);
+                if (note.stage === 'draft') draftRow.appendChild(card);
+                else if (note.stage === 'revise') reviseRow.appendChild(card);
+                else if (note.stage === 'final') finalRow.appendChild(card);
             });
-
-            document.getElementById('critical-counter').innerText = criticalCount;
-
-            // Boş durum mesajları
-            if(draftsContainer.innerHTML === '') draftsContainer.innerHTML = '<div style="opacity:0.3; padding: 20px;">[BOŞ]</div>';
-            if(reviseContainer.innerHTML === '') reviseContainer.innerHTML = '<div style="opacity:0.3; padding: 20px;">[BOŞ]</div>';
-            if(finalsContainer.innerHTML === '') finalsContainer.innerHTML = '<div style="opacity:0.3; padding: 20px;">[BOŞ]</div>';
-            if(historyContainer.innerHTML === '') historyContainer.innerHTML = '<div style="opacity:0.3; padding: 20px;">[BOŞ]</div>';
         }
-
-        // İlk yükleme
-        renderAll();
     </script>
 </body>
 </html>
