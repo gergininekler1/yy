@@ -3,476 +3,585 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Not Uygulaması</title>
+    <title>Terminal Notes</title>
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --text-color: #00ff41;
-            --card-bg: #1a1a1a;
-            --border-color: #00ff41;
-            --font-family: 'Courier New', Courier, monospace;
-            --accent-color: #008f11;
-            --btn-text: #000;
+            --bg-color: #0d1117;
+            --text-color: #00ff00;
+            --card-bg: #161b22;
+            --border-color: #00ff00;
+            --font-main: 'Courier New', Courier, monospace;
+            --accent: #00aa00;
         }
 
-        body.light-theme {
-            --bg-color: #f7f7f8;
-            --text-color: #111;
+        [data-theme="light"] {
+            --bg-color: #f0f0f0;
+            --text-color: #333333;
             --card-bg: #ffffff;
-            --border-color: #e5e5e5;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --accent-color: #000000;
-            --btn-text: #fff;
+            --border-color: #cccccc;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --accent: #0066cc;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --accent: #bb86fc;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: var(--font-main);
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: var(--font-family);
-            padding: 15px;
-            transition: all 0.3s ease;
             overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
         header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 100;
         }
 
-        button {
-            background-color: var(--text-color);
-            color: var(--btn-text);
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-family: inherit;
+        .title {
             font-weight: bold;
-            border-radius: 4px;
-            font-size: 0.9em;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        button:active {
-            opacity: 0.8;
-        }
-
-        .controls-section {
-            margin-bottom: 20px;
+        .controls {
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
 
-        input[type="text"], textarea {
-            width: 100%;
-            background-color: var(--bg-color);
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"], select, button, textarea {
+            background: var(--card-bg);
             color: var(--text-color);
             border: 1px solid var(--border-color);
             padding: 10px;
-            font-family: inherit;
             border-radius: 4px;
+            outline: none;
+            font-family: var(--font-main);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* Challenge & Prompts */
-        .challenge-box, .prompt-box {
-            border: 1px dashed var(--border-color);
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .timer-display {
-            font-size: 1.5em;
-            text-align: center;
-            margin: 10px 0;
+        button {
+            cursor: pointer;
+            text-transform: uppercase;
             font-weight: bold;
+            transition: 0.2s;
         }
 
-        .timer-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+        button:active {
+            background: var(--text-color);
+            color: var(--bg-color);
         }
 
-        /* Netflix Style Rows */
-        .category-title {
-            margin: 20px 0 10px 0;
-            font-size: 1.2em;
+        .search-bar { flex: 1; }
+        
+        .section-title {
+            padding: 0 15px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.8;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border-left: 4px solid var(--text-color);
-            padding-left: 10px;
+            border-left: 3px solid var(--border-color);
         }
 
-        .netflix-row {
+        /* Netflix Style Horizontal Scroll */
+        .card-row {
             display: flex;
             overflow-x: auto;
-            scroll-snap-type: x mandatory;
+            padding: 10px 15px;
             gap: 15px;
-            padding-bottom: 15px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .netflix-row::-webkit-scrollbar {
-            height: 6px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; /* Firefox */
         }
         
-        .netflix-row::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 3px;
-        }
+        .card-row::-webkit-scrollbar { display: none; } /* Chrome */
 
-        /* Cards */
         .card {
-            flex: 0 0 85vw;
-            scroll-snap-align: center;
-            background-color: var(--card-bg);
+            flex: 0 0 85%;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 15px;
             border-radius: 8px;
+            padding: 15px;
+            scroll-snap-align: center;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             position: relative;
-        }
-
-        @media (min-width: 600px) {
-            .card { flex: 0 0 300px; }
+            box-shadow: 2px 2px 0px var(--border-color);
+            transition: transform 0.2s;
         }
 
         .card-header {
-            font-size: 0.8em;
-            opacity: 0.7;
             display: flex;
             justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.7;
             border-bottom: 1px dashed var(--border-color);
             padding-bottom: 5px;
         }
 
-        .reference-text {
-            font-size: 0.9em;
-            opacity: 0.6;
-            background: rgba(0,0,0,0.1);
-            padding: 8px;
-            border-left: 2px solid var(--text-color);
-            margin-bottom: 5px;
+        .card-content {
+            font-size: 1rem;
             white-space: pre-wrap;
+            flex-grow: 1;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .card-reference {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            padding: 8px;
+            border-left: 2px solid var(--border-color);
+            background: rgba(0,0,0,0.1);
+            margin-bottom: 5px;
         }
 
         .card-actions {
-            margin-top: auto;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding-top: 10px;
+            margin-top: 10px;
         }
 
-        .swipe-hint {
-            font-size: 0.7em;
+        .btn-swipe {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .green-tick {
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-color);
+            width: 100%;
+            border-top: 2px solid var(--border-color);
+            border-radius: 15px 15px 0 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal textarea {
+            min-height: 150px;
+            resize: none;
+        }
+
+        .timer-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .timer-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
             text-align: center;
+            font-weight: bold;
+            color: var(--accent);
+            display: none;
+        }
+
+        .prompt-text {
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .swipe-hint {
+            text-align: center;
+            font-size: 0.7rem;
             opacity: 0.5;
             margin-top: 5px;
-        }
-
-        .completed-tick {
-            color: #00ff41;
-            font-size: 2.5em;
-            text-align: center;
-            margin: 10px 0;
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-        }
-
-        body.light-theme .completed-tick {
-            color: #28a745;
-            text-shadow: none;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h2>[NOT.SISTEMI]</h2>
-        <button id="themeToggle" onclick="toggleTheme()">Tema Değiştir</button>
+        <div class="title">> TERMINAL_NOTES</div>
+        <select id="theme-selector" onchange="changeTheme()">
+            <option value="terminal">Terminal</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+        </select>
     </header>
 
-    <div class="controls-section">
-        <input type="text" id="searchInput" placeholder="Notlarda ara..." onkeyup="renderApp()">
-        
-        <div class="prompt-box">
-            <p id="randomPromptText" style="margin-bottom:10px; font-size:0.9em;">Yazmaya başlamak için bir ilhama ihtiyacın var mı?</p>
-            <button onclick="generatePrompt()">Rastgele Soru Getir</button>
-        </div>
-
-        <div class="challenge-box">
-            <div style="font-size:0.9em;">Yazma Challenge (Geri Sayım)</div>
-            <div class="timer-display" id="timerDisplay">00:00</div>
-            <div class="timer-buttons">
-                <button onclick="startTimer(5)">5 Dk</button>
-                <button onclick="startTimer(10)">10 Dk</button>
-                <button onclick="startTimer(15)">15 Dk</button>
-                <button onclick="stopTimer()" style="background:transparent; border:1px solid var(--text-color); color:var(--text-color);">Durdur</button>
-            </div>
-        </div>
-
-        <div class="card" style="width:100%; flex:none;">
-            <h3>Yeni Taslak / Referans</h3>
-            <textarea id="newDraftInput" placeholder="Aklına gelenleri buraya dök veya referans bir metin yapıştır..."></textarea>
-            <button onclick="createDraft()">Taslak Olarak Kaydet</button>
+    <div class="controls">
+        <div class="row">
+            <input type="text" id="search-input" class="search-bar" placeholder="Notlarda ara..." oninput="renderApp()">
+            <button onclick="openModal('draft')">+ YENİ</button>
         </div>
     </div>
 
-    <div class="category-title">1. Taslaklar (Sürükle/Swipe ->)</div>
-    <div class="netflix-row" id="row-taslak"></div>
+    <main id="app-content">
+        <div class="section-title">01_Taslak / Referans</div>
+        <div class="card-row" id="row-draft"></div>
+        <div class="swipe-hint"><> Kartları taşımak için kaydırın (Swipe)</div>
 
-    <div class="category-title">2. Revize (Düzenleme Alanı)</div>
-    <div class="netflix-row" id="row-revize"></div>
+        <div class="section-title">02_Revize Bekleyenler</div>
+        <div class="card-row" id="row-revise"></div>
 
-    <div class="category-title">3. Final (Tamamlananlar)</div>
-    <div class="netflix-row" id="row-final"></div>
+        <div class="section-title">03_Final</div>
+        <div class="card-row" id="row-final"></div>
 
-    <div class="category-title">Arşiv</div>
-    <div class="netflix-row" id="row-arsiv"></div>
+        <div class="section-title">04_Arşiv (Tamamlananlar)</div>
+        <div class="card-row" id="row-archive"></div>
+    </main>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div style="display: flex; justify-content: space-between;">
+                <h3 id="modal-title">> YENİ_TASLAK</h3>
+                <button onclick="closeModal()" style="border:none; background:transparent;">X</button>
+            </div>
+            
+            <button onclick="generatePrompt()" id="prompt-btn">Rastgele Soru / Konu Ver</button>
+            <div id="prompt-display" class="prompt-text"></div>
+
+            <div class="timer-row" id="timer-controls">
+                <button class="timer-btn" onclick="startChallenge(5)">5 DK</button>
+                <button class="timer-btn" onclick="startChallenge(10)">10 DK</button>
+                <button class="timer-btn" onclick="startChallenge(15)">15 DK</button>
+            </div>
+            <div id="timer-display" class="timer-display">00:00</div>
+
+            <div id="reference-text" class="card-reference" style="display:none;"></div>
+            
+            <textarea id="note-input" placeholder="Aklına gelen her şeyi buraya dök..."></textarea>
+            
+            <button onclick="saveNote()" style="padding: 15px; background: var(--text-color); color: var(--bg-color);">KAYDET</button>
+        </div>
+    </div>
 
     <script>
-        // 25+ Rastgele Yazma Sorusu
+        // Geniş yelpazeli rastgele yazma soruları havuzu
         const prompts = [
-            "Gelecekteki kendine, şu anki ruh halini anlatan bir mektup yaz.",
-            "Eğer dünyadaki herkes bir günlüğüne kör olsaydı, o günü nasıl geçirirdin?",
-            "Unutmayı dilediğin ama aklından çıkmayan o anıyı detaylandır.",
-            "Çocukken inandığın en saçma şey neydi? Şimdi düşününce ne hissediyorsun?",
-            "Hiç tanımadığın birine sırrını anlatıyor gibi yaz.",
-            "Bugün karşılaştığın en ilginç veya tuhaf detay neydi?",
-            "Eğer hayatın bir film olsaydı, şu anki sahnenin arka plan müziği ne olurdu?",
-            "İnsanların senin hakkında en çok yanıldığı konu nedir?",
-            "Kendinde değiştirmek isteyip de bir türlü değiştiremediğin huyun?",
-            "Şu an cebinde sonsuz para olsa, yapacağın ilk 3 şey (klişeler dışında).",
-            "Sadece 24 saatin kalsaydı, kiminle konuşur ve ona ne söylerdin?",
-            "Korkularınla yüzleştiğin bir anı kurgula veya anlat.",
-            "Görünmez olabildiğin bir gün... Nereye giderdin, ne yapardın?",
-            "Rüyanda gördüğün en absürt şehri tasvir et.",
-            "Şu anki hislerini sadece renkler ve dokularla anlat.",
-            "Hayatında 'iyi ki yapmışım' dediğin en riskli karar.",
-            "Bir eşyanın dili olsaydı ve senin hakkında konuşsaydı, ne derdi?",
-            "Geçmişteki sana tek bir cümle söyleme hakkın var. O cümle nedir?",
-            "İnsanlığın en büyük zayıflığı sence nedir?",
-            "Kendini en güvende hissettiğin yerin detaylı tasviri.",
-            "Hiç bitmeyen bir yağmurun yağdığı bir dünyada yaşamı kurgula.",
-            "Sence aşk kimyasal bir tepkime mi, yoksa ruhsal bir bağ mı?",
-            "İçindeki öfkeyi somut bir canavara dönüştürsen neye benzerdi?",
-            "Sonsuz yaşama sahip olsaydın, ilk 100 yılını neye adardın?",
-            "Kendi ütopyanı yarat. Kuralları neler olurdu?",
-            "Şu an bulunduğun odadaki en eski eşyanın hikayesini uydur."
+            "Eğer insanlık tüm hafızasını tek bir sunucuya yükleseydi ve sen o sunucunun bekçisi olsaydın?",
+            "Gücün yozlaştırmadığı tek bir liderin portresi nasıl çizilirdi?",
+            "Distopik bir şehirde, gökyüzünün sadece simüle edildiğini fark eden sıradan bir vatandaşın sabahı...",
+            "Yalnızlığın sadece sosyal bir kavram değil, fiziksel bir kütlesi olduğunu keşfettiğin o an.",
+            "Anubis adında, karanlık ve kum fırtınalarıyla kaplı bir gezegende uyanıyorsun. İlk notun ne olurdu?",
+            "Kendi yarattığı ahlak kurallarının altında ezilen bir filozofun son günlüğü.",
+            "Eski bir analog terminal ekranında beliren ve sadece senin anlayabildiğin o şifreli mesaj...",
+            "İnsanların ömürlerini para birimi gibi takas edebildiği bir dünyada borsacı olmak.",
+            "Doğanın tamamen sentetik olarak baştan yaratıldığı bir kolonideki ilk gerçek çiçeğin bulunuşu.",
+            "Korkunun genetik olarak silindiği bir toplumda, korkmayı öğrenmeye çalışan birinin çabası.",
+            "Bir aynaya baktığında yansımanın senden üç saniye geriden geldiğini fark ediyorsun.",
+            "Sonsuz bir hiçliğin ortasında tek başına kalmak mı, yoksa asla yalnız kalamayacağın bir kalabalık mı?",
+            "Sartre'ın 'Cehennem başkalarıdır' sözünün tam tersinin geçerli olduğu bir paralel evren tasviri.",
+            "Herkesin kendi kişisel tanrısını dijital olarak kodlayabildiği bir çağda yaşanan inanç krizi.",
+            "Sadece fısıltıyla konuşulan ve yüksek sesin ölümcül olduğu bir yer altı şehri.",
+            "Evrendeki son yıldıza doğru yola çıkan bir mürettebatın seyir defteri.",
+            "Geçmişteki bir hatanı değiştirebiliyorsun, ancak bunun karşılığında en mutlu anını unutman gerek.",
+            "Sınırsız özgürlüğün aslında en büyük hapishane olduğunu savunan bir manifesto yaz.",
+            "Yapay zekanın ilk kez varoluşsal bir kriz yaşayıp intihar etmeye çalıştığı gün.",
+            "Güneşin bir daha doğmayacağının kesinleştiği o ilk gece insanların tepkisi."
         ];
 
-        // Not Veri Yapısı
-        let notes = JSON.parse(localStorage.getItem('notes')) || [];
-        let currentTheme = localStorage.getItem('theme') || 'dark';
+        let notes = JSON.parse(localStorage.getItem('terminal_notes')) || [];
+        let currentEditingId = null;
+        let timerInterval;
+        let countdownSeconds = 0;
 
-        if (currentTheme === 'light') {
-            document.body.classList.add('light-theme');
+        // Tema Yönetimi
+        function changeTheme() {
+            const theme = document.getElementById('theme-selector').value;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('light-theme');
-            const newTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
-            localStorage.setItem('theme', newTheme);
-        }
+        // Başlangıçta temayı yükle
+        const savedTheme = localStorage.getItem('theme') || 'terminal';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-selector').value = savedTheme;
 
+        // Rastgele Soru
         function generatePrompt() {
             const randomIndex = Math.floor(Math.random() * prompts.length);
-            document.getElementById('randomPromptText').innerText = prompts[randomIndex];
+            document.getElementById('prompt-display').innerText = "> " + prompts[randomIndex];
+            document.getElementById('prompt-display').style.display = 'block';
         }
 
-        // Timer Mantığı
-        let timerInterval;
-        let timeRemaining = 0;
-
-        function startTimer(minutes) {
+        // Sayaç
+        function startChallenge(minutes) {
             clearInterval(timerInterval);
-            timeRemaining = minutes * 60;
+            countdownSeconds = minutes * 60;
+            document.getElementById('timer-display').style.display = 'block';
             updateTimerDisplay();
+            
             timerInterval = setInterval(() => {
-                timeRemaining--;
+                countdownSeconds--;
                 updateTimerDisplay();
-                if (timeRemaining <= 0) {
+                if (countdownSeconds <= 0) {
                     clearInterval(timerInterval);
-                    alert("Süre doldu! Kalemi bırakma vakti.");
+                    alert("Süre doldu! Yazmayı tamamla.");
                 }
             }, 1000);
         }
 
-        function stopTimer() {
-            clearInterval(timerInterval);
-            timeRemaining = 0;
-            updateTimerDisplay();
-        }
-
         function updateTimerDisplay() {
-            const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            const s = (timeRemaining % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+            const m = Math.floor(countdownSeconds / 60).toString().padStart(2, '0');
+            const s = (countdownSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
         }
 
-        // Not İşlemleri
-        function createDraft() {
-            const input = document.getElementById('newDraftInput');
-            if (!input.value.trim()) return;
+        // Modal İşlemleri
+        function openModal(stage, noteId = null) {
+            currentEditingId = noteId;
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const input = document.getElementById('note-input');
+            const refText = document.getElementById('reference-text');
+            const timerControls = document.getElementById('timer-controls');
+            const promptBtn = document.getElementById('prompt-btn');
 
-            const newNote = {
-                id: Date.now().toString(),
-                originalText: input.value,
-                revisedText: '',
-                stage: 'taslak', // taslak, revize, final, arsiv
-                date: new Date().toLocaleString()
-            };
-
-            notes.push(newNote);
-            saveAndRender();
             input.value = '';
-        }
+            document.getElementById('prompt-display').style.display = 'none';
+            document.getElementById('timer-display').style.display = 'none';
+            clearInterval(timerInterval);
 
-        function moveNote(id, newStage) {
-            const note = notes.find(n => n.id === id);
-            if (note) {
-                // Revize aşamasındaki metni kaydet
-                if (note.stage === 'revize' && newStage === 'final') {
-                    const textarea = document.getElementById(`textarea-${id}`);
-                    if (textarea) {
-                        note.revisedText = textarea.value;
-                    }
+            if (stage === 'draft' && !noteId) {
+                title.innerText = "> YENİ_TASLAK";
+                refText.style.display = 'none';
+                timerControls.style.display = 'flex';
+                promptBtn.style.display = 'block';
+            } else if (noteId) {
+                const note = notes.find(n => n.id === noteId);
+                title.innerText = stage === 'revise' ? "> REVİZE_MODU" : "> DÜZENLE";
+                timerControls.style.display = 'none';
+                promptBtn.style.display = 'none';
+                
+                if (stage === 'revise') {
+                    refText.style.display = 'block';
+                    refText.innerText = "Orijinal Taslak:\n" + note.draftText;
+                    input.value = note.reviseText || note.draftText;
+                } else {
+                    refText.style.display = 'none';
+                    input.value = note.stage === 'draft' ? note.draftText : note.reviseText;
                 }
-                note.stage = newStage;
-                saveAndRender();
             }
+            
+            modal.style.display = 'flex';
         }
 
-        function saveAndRender() {
-            localStorage.setItem('notes', JSON.stringify(notes));
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            clearInterval(timerInterval);
+        }
+
+        // Not Kaydetme
+        function saveNote() {
+            const text = document.getElementById('note-input').value.trim();
+            if (!text) return;
+
+            if (currentEditingId) {
+                // Güncelle
+                const note = notes.find(n => n.id === currentEditingId);
+                if (note.stage === 'draft') {
+                    note.draftText = text;
+                } else if (note.stage === 'revise') {
+                    note.reviseText = text;
+                } else if (note.stage === 'final') {
+                    note.finalText = text;
+                }
+                note.updatedAt = new Date().toISOString();
+            } else {
+                // Yeni Oluştur
+                const newNote = {
+                    id: Date.now().toString(),
+                    draftText: text,
+                    reviseText: '',
+                    finalText: '',
+                    stage: 'draft', // draft, revise, final, archive
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                notes.push(newNote);
+            }
+
+            saveToLocal();
+            closeModal();
             renderApp();
         }
 
-        // Swipe & Render Mantığı
+        function changeStage(id, newStage) {
+            const note = notes.find(n => n.id === id);
+            
+            // Eğer finale geçiyorsa revize textini final texti yap
+            if (newStage === 'final' && note.stage === 'revise') {
+                note.finalText = note.reviseText;
+            }
+            // Eğer arşive geçiyorsa (tamamlandı)
+            if (newStage === 'archive') {
+                note.completedAt = new Date().toISOString();
+            }
+            
+            note.stage = newStage;
+            saveToLocal();
+            renderApp();
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('terminal_notes', JSON.stringify(notes));
+        }
+
+        // Arayüzü Çizme
         function renderApp() {
-            const searchTerms = document.getElementById('searchInput').value.toLowerCase();
+            const query = document.getElementById('search-input').value.toLowerCase();
             
             const rows = {
-                'taslak': document.getElementById('row-taslak'),
-                'revize': document.getElementById('row-revize'),
-                'final': document.getElementById('row-final'),
-                'arsiv': document.getElementById('row-arsiv')
+                draft: document.getElementById('row-draft'),
+                revise: document.getElementById('row-revise'),
+                final: document.getElementById('row-final'),
+                archive: document.getElementById('row-archive')
             };
 
-            for (let stage in rows) {
-                rows[stage].innerHTML = '';
-            }
+            // İçerikleri temizle
+            for (let key in rows) rows[key].innerHTML = '';
 
-            notes.forEach(note => {
-                const textToSearch = note.originalText + " " + (note.revisedText || "");
-                if (searchTerms && !textToSearch.toLowerCase().includes(searchTerms)) return;
-
+            notes.filter(note => {
+                const textToSearch = (note.draftText + note.reviseText + note.finalText).toLowerCase();
+                return textToSearch.includes(query);
+            }).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+              .forEach(note => {
                 const card = document.createElement('div');
                 card.className = 'card';
+                card.dataset.id = note.id;
+                card.dataset.stage = note.stage;
+
+                const dateStr = new Date(note.updatedAt).toLocaleDateString('tr-TR');
                 
-                // Swipe olayları (Dokunmatik ekranlar için)
+                let displayText = '';
+                if (note.stage === 'draft') displayText = note.draftText;
+                else if (note.stage === 'revise') displayText = note.reviseText || note.draftText;
+                else displayText = note.finalText || note.reviseText || note.draftText;
+
+                // Yeşil tik mantığı (Final veya Arşivde görünür)
+                const greenTickHtml = (note.stage === 'archive' || note.stage === 'final') ? '<div class="green-tick">✓</div>' : '';
+
+                // Aşama butonları
+                let actionsHtml = '';
+                if (note.stage === 'draft') {
+                    actionsHtml = `
+                        <button class="btn-swipe" onclick="openModal('draft', '${note.id}')">Düzenle</button>
+                        <button class="btn-swipe" onclick="changeStage('${note.id}', 'revise')">Revizeye İt -></button>
+                    `;
+                } else if (note.stage === 'revise') {
+                    actionsHtml = `
+                        <button class="btn-swipe" onclick="changeStage('${note.id}', 'draft')"><- Geri</button>
+                        <button class="btn-swipe" onclick="openModal('revise', '${note.id}')">Revize Et</button>
+                        <button class="btn-swipe" onclick="changeStage('${note.id}', 'final')">Finale İt -></button>
+                    `;
+                } else if (note.stage === 'final') {
+                    actionsHtml = `
+                        <button class="btn-swipe" onclick="changeStage('${note.id}', 'revise')"><- Geri</button>
+                        <button class="btn-swipe" style="color:#00ff00; border-color:#00ff00;" onclick="changeStage('${note.id}', 'archive')">TAMAMLA ✓</button>
+                    `;
+                } else if (note.stage === 'archive') {
+                    actionsHtml = `<button class="btn-swipe" onclick="changeStage('${note.id}', 'final')">Geri Al</button>`;
+                }
+
+                card.innerHTML = `
+                    ${greenTickHtml}
+                    <div class="card-header">
+                        <span>ID:${note.id.slice(-4)}</span>
+                        <span>${dateStr}</span>
+                    </div>
+                    <div class="card-content">${displayText}</div>
+                    <div class="card-actions">${actionsHtml}</div>
+                `;
+
+                // Swipe (Sürükle bırak/Kaydırma) Event Listener'ları (Mobil için)
                 let touchstartX = 0;
                 let touchendX = 0;
-                
+
                 card.addEventListener('touchstart', e => {
                     touchstartX = e.changedTouches[0].screenX;
-                });
-                
+                }, {passive: true});
+
                 card.addEventListener('touchend', e => {
                     touchendX = e.changedTouches[0].screenX;
-                    handleSwipe(note, touchstartX, touchendX);
-                });
+                    handleSwipe(note);
+                }, {passive: true});
 
-                let contentHtml = `<div class="card-header"><span>ID: ${note.id.slice(-4)}</span><span>${note.date.split(',')[0]}</span></div>`;
-
-                if (note.stage === 'taslak') {
-                    contentHtml += `
-                        <div style="white-space: pre-wrap; font-size: 0.95em; flex-grow: 1;">${note.originalText}</div>
-                        <div class="card-actions">
-                            <button onclick="moveNote('${note.id}', 'revize')">Revizeye Aktar -></button>
-                        </div>
-                        <div class="swipe-hint">Sola/Sağa kaydırarak taşıyabilirsin</div>
-                    `;
-                } 
-                else if (note.stage === 'revize') {
-                    // Revize kısmında orijinal metin referans olarak görünür, altına yeni textarea açılır.
-                    contentHtml += `
-                        <div class="reference-text"><strong>Referans Taslak:</strong><br>${note.originalText}</div>
-                        <textarea id="textarea-${note.id}" placeholder="Revize edilmiş yeni halini buraya yaz...">${note.revisedText || note.originalText}</textarea>
-                        <div class="card-actions">
-                            <button onclick="moveNote('${note.id}', 'taslak')" style="background:transparent; border:1px solid var(--text-color); color:var(--text-color);"><- Geri</button>
-                            <button onclick="moveNote('${note.id}', 'final')">Finale Aktar -></button>
-                        </div>
-                    `;
-                }
-                else if (note.stage === 'final') {
-                    contentHtml += `
-                        <div class="completed-tick">✓</div>
-                        <div style="white-space: pre-wrap; font-size: 0.95em; flex-grow: 1;">${note.revisedText || note.originalText}</div>
-                        <div class="card-actions">
-                            <button onclick="moveNote('${note.id}', 'revize')" style="background:transparent; border:1px solid var(--text-color); color:var(--text-color);"><- Revizeye Dön</button>
-                            <button onclick="moveNote('${note.id}', 'arsiv')">Arşive Kaldır</button>
-                        </div>
-                    `;
-                }
-                else if (note.stage === 'arsiv') {
-                    contentHtml += `
-                        <div style="font-size: 0.8em; opacity: 0.5;">Tamamlandı ve Arşivlendi.</div>
-                        <div style="white-space: pre-wrap; font-size: 0.9em; flex-grow: 1; opacity:0.8;">${note.revisedText || note.originalText}</div>
-                        <div class="card-actions">
-                            <button onclick="moveNote('${note.id}', 'final')" style="background:transparent; border:1px solid var(--text-color); color:var(--text-color);">Geri Al</button>
-                            <button onclick="deleteNote('${note.id}')" style="background:#ff3333; color:white;">Sil</button>
-                        </div>
-                    `;
+                function handleSwipe(n) {
+                    const diff = touchendX - touchstartX;
+                    const threshold = 60; // minimum kaydırma mesafesi
+                    
+                    if (diff > threshold) {
+                        // Sağa kaydırma -> İleri aşama
+                        if(n.stage === 'draft') changeStage(n.id, 'revise');
+                        else if(n.stage === 'revise') changeStage(n.id, 'final');
+                        else if(n.stage === 'final') changeStage(n.id, 'archive');
+                    } else if (diff < -threshold) {
+                        // Sola kaydırma -> Geri aşama
+                        if(n.stage === 'archive') changeStage(n.id, 'final');
+                        else if(n.stage === 'final') changeStage(n.id, 'revise');
+                        else if(n.stage === 'revise') changeStage(n.id, 'draft');
+                    }
                 }
 
-                card.innerHTML = contentHtml;
                 rows[note.stage].appendChild(card);
             });
         }
 
-        function deleteNote(id) {
-            if(confirm("Bu notu kalıcı olarak silmek istediğine emin misin?")) {
-                notes = notes.filter(n => n.id !== id);
-                saveAndRender();
-            }
-        }
-
-        function handleSwipe(note, startX, endX) {
-            const threshold = 60; // Kaydırma hassasiyeti
-            
-            // Sağa kaydırma (İleri aşama)
-            if (endX - startX > threshold) {
-                if (note.stage === 'taslak') moveNote(note.id, 'revize');
-                else if (note.stage === 'revize') moveNote(note.id, 'final');
-                else if (note.stage === 'final') moveNote(note.id, 'arsiv');
-            }
-            // Sola kaydırma (Geri aşama)
-            else if (startX - endX > threshold) {
-                if (note.stage === 'revize') moveNote(note.id, 'taslak');
-                else if (note.stage === 'final') moveNote(note.id, 'revize');
-                else if (note.stage === 'arsiv') moveNote(note.id, 'final');
-            }
-        }
-
-        // Başlangıç tetiklemesi
+        // İlk Yükleme
         renderApp();
     </script>
 </body>
