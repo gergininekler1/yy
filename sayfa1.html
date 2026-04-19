@@ -1,309 +1,428 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3 Adım Notlar</title>
-    <style>
-        /* Temel Netflix Tarzı Karanlık Tema */
-        :root {
-            --bg: #141414;
-            --surface: #2b2b2b;
-            --text: #ffffff;
-            --text-muted: #b3b3b3;
-            --accent: #E50914; /* Netflix Kırmızısı */
-            --success: #2ecc71;
-            --card-radius: 8px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Netflix Style Note App</title>
+<style>
+  :root {
+    --bg: #141414;
+    --surface: #2b2b2b;
+    --surface-hover: #333;
+    --text: #ffffff;
+    --text-muted: #8c8c8c;
+    --accent: #E50914; /* Netflix Red */
+    --accent-hover: #f40612;
+    --success: #2ecc71;
+    --border: #333;
+    --radius: 8px;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
-        
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; -webkit-tap-highlight-color: transparent; }
+  /* HEADER */
+  header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border); }
+  .logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--accent); }
+  .delete-all { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; }
 
-        /* Üst Başlık */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; position: sticky; top: 0; background: var(--bg); z-index: 10; }
-        header h1 { font-size: 20px; font-weight: 700; letter-spacing: 1px; }
-        .delete-all-btn { background: transparent; border: none; color: var(--text-muted); font-size: 20px; padding: 5px; cursor: pointer; }
+  /* TABS (Single Line) */
+  .tabs-container { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,20,0.98); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 1; min-width: 70px; padding: 15px 5px; text-align: center; font-size: 11px; font-weight: bold; color: var(--text-muted); cursor: pointer; transition: 0.3s; border-top: 3px solid transparent; letter-spacing: 0.5px; }
+  .tab.active { color: var(--text); border-top-color: var(--accent); background: rgba(229, 9, 20, 0.05); }
 
-        /* Tek Satır Sekmeler (Alt Navigasyon) */
-        .tabs { display: flex; justify-content: space-around; position: fixed; bottom: 0; width: 100%; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #333; z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
-        .tab-btn { flex: 1; background: transparent; border: none; color: var(--text-muted); padding: 15px 0; font-size: 13px; font-weight: bold; cursor: pointer; border-top: 3px solid transparent; transition: 0.3s; }
-        .tab-btn.active { color: var(--text); border-top-color: var(--accent); }
+  /* SECTIONS */
+  .section { display: none; padding: 15px 20px; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* İçerik Konteynerleri */
-        .section { display: none; padding: 0 20px 20px 20px; }
-        .section.active { display: block; }
+  /* EXPANDING INPUT AREA */
+  .input-wrapper { background: var(--surface); border-radius: var(--radius); padding: 10px; margin-bottom: 20px; border: 1px solid var(--border); transition: 0.3s; display: flex; flex-direction: column; }
+  .input-wrapper.expanded { border-color: var(--accent); box-shadow: 0 0 15px rgba(229,9,20,0.1); }
+  .main-input { width: 100%; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; resize: none; height: 40px; transition: height 0.3s ease; }
+  .input-wrapper.expanded .main-input { height: 120px; }
+  .ref-input { display: none; width: 100%; background: rgba(0,0,0,0.2); border: 1px dashed var(--border); color: var(--text-muted); font-size: 12px; outline: none; resize: none; height: 50px; margin-bottom: 10px; padding: 8px; border-radius: 4px; }
+  .input-wrapper.expanded .ref-input { display: block; }
 
-        /* Taslak Giriş Alanı ve Challenge */
-        .input-card { background: var(--surface); padding: 15px; border-radius: var(--card-radius); margin-bottom: 20px; }
-        .input-card textarea { width: 100%; background: transparent; border: none; color: var(--text); font-size: 15px; outline: none; resize: none; min-height: 80px; }
-        
-        .challenge-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; border-bottom: 1px solid #444; margin-bottom: 10px;}
-        .challenge-row span { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-        .timer-btn { background: #444; border: none; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; }
-        .timer-btn.active-timer { background: var(--accent); animation: pulse 1.5s infinite; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+  .tools-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; overflow: hidden; height: 0; opacity: 0; transition: 0.3s; }
+  .input-wrapper.expanded .tools-row { height: auto; opacity: 1; padding-top: 10px; border-top: 1px solid var(--border); }
+  
+  .btn-group { display: flex; gap: 8px; }
+  .icon-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .save-btn { background: var(--accent); color: white; border: none; border-radius: 4px; padding: 6px 15px; font-size: 13px; font-weight: bold; cursor: pointer; }
 
-        .add-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 10px; }
+  /* CHALLENGE (Timer) */
+  .challenge-row { display: flex; gap: 5px; margin-bottom: 10px; display: none; }
+  .input-wrapper.expanded .challenge-row { display: flex; }
+  .timer-opt { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 6px; border-radius: 4px; text-align: center; cursor: pointer; }
+  .timer-opt.active { border-color: var(--accent); color: var(--accent); }
 
-        /* Kare Kart Izgarası (Yan yana ve ufak) */
-        .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        
-        .note-card { background: var(--surface); aspect-ratio: 1; border-radius: var(--card-radius); padding: 12px; display: flex; flex-direction: column; position: relative; cursor: pointer; overflow: hidden; }
-        .note-card p { flex: 1; font-size: 13px; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; word-break: break-word; color: #ddd; }
-        
-        .card-action-btn { background: #444; color: white; border: none; padding: 6px; border-radius: 4px; font-size: 11px; margin-top: 10px; font-weight: bold; width: 100%; cursor: pointer; }
-        .card-action-btn.green { background: var(--success); color: #000; }
+  /* SQUARE CARDS GRID */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .card { aspect-ratio: 1; background: var(--surface); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; position: relative; border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
+  .card-date { font-size: 9px; color: var(--text-muted); margin-bottom: 5px; }
+  .card-text { font-size: 12px; line-height: 1.4; color: #ddd; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word; }
+  .card-timer { position: absolute; top: 10px; right: 10px; font-size: 9px; color: var(--accent); background: rgba(229,9,20,0.1); padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+  
+  .card-action { background: var(--bg); border: none; color: white; padding: 6px; font-size: 10px; border-radius: 4px; margin-top: auto; cursor: pointer; font-weight: bold; width: 100%; border: 1px solid var(--border); }
+  .card.stage-draft { border-top: 2px solid var(--accent); }
+  .card.stage-revise { border-top: 2px solid #3498db; }
+  .card.stage-final { border-top: 2px solid var(--success); }
+  .card.completed { opacity: 0.6; border-color: var(--success); }
+  .card.completed .card-text { text-decoration: line-through; }
+  .check-mark { position: absolute; top: 8px; right: 8px; color: var(--success); font-size: 14px; font-weight: bold; }
 
-        /* Tamamlanmış (Final) Kart Stili */
-        .note-card.completed { border: 2px solid var(--success); background: rgba(46, 204, 113, 0.1); }
-        .check-icon { position: absolute; top: 8px; right: 8px; background: var(--success); color: #000; width: 20px; height: 20px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
-        .note-card.completed .check-icon { display: flex; }
-        .note-card.completed p { opacity: 0.6; text-decoration: line-through; }
+  /* ARCHIVE DESIGN */
+  .archive-list { display: flex; flex-direction: column; gap: 10px; }
+  .arch-card { background: var(--surface); border-radius: var(--radius); padding: 15px; border-left: 3px solid var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+  .arch-content { font-size: 12px; color: #aaa; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 70%; }
+  .restore-btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; }
 
-        /* Revize Modal (Düzenleme Ekranı) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 50; padding: 20px; flex-direction: column; }
-        .modal.active { display: flex; }
-        
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .close-modal { background: transparent; color: white; border: none; font-size: 24px; cursor: pointer; }
-        
-        .reference-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; max-height: 100px; overflow-y: auto; border-left: 3px solid #555; }
-        
-        .toolbar { display: flex; gap: 10px; margin-bottom: 10px; }
-        .tool-btn { flex: 1; background: #333; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; }
-        
-        #edit-textarea { flex: 1; background: var(--surface); color: white; border: none; padding: 15px; border-radius: var(--card-radius); outline: none; resize: none; font-size: 15px; margin-bottom: 15px; }
-        
-        .save-revize-btn { background: var(--accent); color: white; border: none; padding: 15px; border-radius: var(--card-radius); font-weight: bold; font-size: 16px; cursor: pointer; }
+  /* CALENDAR DESIGN */
+  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .cal-day-name { text-align: center; font-size: 10px; color: var(--text-muted); margin-bottom: 5px; }
+  .cal-day { aspect-ratio: 1; background: var(--surface); border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 12px; cursor: pointer; position: relative; }
+  .cal-day.today { background: var(--accent); color: white; font-weight: bold; }
+  .cal-day.has-note::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; background: var(--success); border-radius: 50%; }
 
-    </style>
+  /* MODAL FOR REVISE */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+  .modal-overlay.open { display: flex; }
+  .modal-content { background: var(--bg); width: 100%; max-height: 90vh; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; }
+  .modal-body { padding: 15px; overflow-y: auto; }
+  .ref-box { background: var(--surface); padding: 10px; border-radius: 4px; font-size: 11px; color: var(--text-muted); margin-bottom: 15px; border-left: 2px solid var(--border); font-style: italic; }
+  .edit-area { width: 100%; min-height: 150px; background: var(--surface); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 4px; resize: none; outline: none; margin-bottom: 15px; }
+</style>
 </head>
 <body>
 
-    <header>
-        <h1>📝 Notlar</h1>
-        <button class="delete-all-btn" onclick="clearAllNotes()">🗑️</button>
-    </header>
+  <header>
+    <div class="logo">N.</div>
+    <button class="delete-all" onclick="deleteAll()" title="Tüm Günün Notlarını Sil">🗑️</button>
+  </header>
 
-    <div id="taslak-sec" class="section active">
-        <div class="input-card">
-            <textarea id="draft-input" placeholder="Aklına geleni buraya dök veya alıntı yap..."></textarea>
-            
-            <div class="challenge-row">
-                <span>⏱️ Challenge:</span>
-                <button class="timer-btn" onclick="startTimer(5, this)">5 dk</button>
-                <button class="timer-btn" onclick="startTimer(10, this)">10 dk</button>
-                <button class="timer-btn" onclick="startTimer(15, this)">15 dk</button>
-                <span id="timer-display" style="margin-left: auto; font-weight: bold; color: var(--accent);"></span>
-            </div>
+  <div id="sec-taslak" class="section active">
+    
+    <div class="input-wrapper" id="inputWrapper">
+      <textarea id="refInput" class="ref-input" placeholder="Referans veya alıntı ekle..."></textarea>
+      <textarea id="mainInput" class="main-input" placeholder="Günün notunu veya taslağını yaz..."></textarea>
+      
+      <div class="challenge-row">
+        <div class="timer-opt active" onclick="setTimer(0, this)">Yok</div>
+        <div class="timer-opt" onclick="setTimer(5, this)">5 dk</div>
+        <div class="timer-opt" onclick="setTimer(10, this)">10 dk</div>
+        <div class="timer-opt" onclick="setTimer(15, this)">15 dk</div>
+      </div>
 
-            <button class="add-btn" onclick="addNote()">Taslağı Kaydet</button>
+      <div class="tools-row">
+        <div class="btn-group">
+          <button class="icon-btn" onclick="copyText()">📋</button>
+          <button class="icon-btn" onclick="addTime()">🕒</button>
         </div>
-        <div class="card-grid" id="taslak-grid"></div>
+        <button class="save-btn" onclick="saveDraft()">Kaydet</button>
+      </div>
     </div>
 
-    <div id="revize-sec" class="section">
-        <div class="card-grid" id="revize-grid"></div>
+    <div class="grid" id="grid-taslak"></div>
+  </div>
+
+  <div id="sec-revize" class="section">
+    <div class="grid" id="grid-revize"></div>
+  </div>
+
+  <div id="sec-final" class="section">
+    <div class="grid" id="grid-final"></div>
+  </div>
+
+  <div id="sec-arsiv" class="section">
+    <div class="archive-list" id="list-arsiv"></div>
+  </div>
+
+  <div id="sec-takvim" class="section">
+    <div class="cal-header">
+      <span id="cal-month"></span>
+      <span>Günlük Kayıtlar</span>
     </div>
-
-    <div id="final-sec" class="section">
-        <div class="card-grid" id="final-grid"></div>
+    <div class="cal-grid" id="cal-days-name">
+      <div class="cal-day-name">Pt</div><div class="cal-day-name">Sa</div><div class="cal-day-name">Ça</div>
+      <div class="cal-day-name">Pe</div><div class="cal-day-name">Cu</div><div class="cal-day-name">Ct</div><div class="cal-day-name">Pz</div>
     </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
 
-    <div class="modal" id="edit-modal">
-        <div class="modal-header">
-            <h3>Revize Et</h3>
-            <button class="close-modal" onclick="closeModal()">×</button>
-        </div>
-        
-        <div class="reference-box" id="modal-reference"></div>
-        
-        <div class="toolbar">
-            <button class="tool-btn" onclick="addTimestamp()">🕒 Saat Ekle</button>
-            <button class="tool-btn" onclick="copyText()">📋 Tümünü Kopyala</button>
-        </div>
-
-        <textarea id="edit-textarea" placeholder="Taslağı referans alarak son halini şekillendir..."></textarea>
-        <button class="save-revize-btn" onclick="saveRevize()">Değişiklikleri Kaydet</button>
-    </div>
-
+  <div class="tabs-container">
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('taslak')">TASLAK</button>
-        <button class="tab-btn" onclick="switchTab('revize')">REVİZE</button>
-        <button class="tab-btn" onclick="switchTab('final')">FİNAL</button>
+      <div class="tab active" onclick="switchTab('taslak')">TASLAK</div>
+      <div class="tab" onclick="switchTab('revize')">REVİZE</div>
+      <div class="tab" onclick="switchTab('final')">FİNAL</div>
+      <div class="tab" onclick="switchTab('arsiv')">ARŞİV</div>
+      <div class="tab" onclick="switchTab('takvim')">TAKVİM</div>
     </div>
+  </div>
 
-    <script>
-        // Veri Yapısı: stage (taslak, revize, final)
-        let notes = JSON.parse(localStorage.getItem('myNotes')) || [];
-        let currentEditId = null;
-        let countdown;
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle">Düzenle</span>
+        <button class="icon-btn" onclick="closeModal()" style="border:none; padding:4px;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalRef" class="ref-box"></div>
+        <textarea id="modalEdit" class="edit-area"></textarea>
+        <div style="display:flex; gap:10px;">
+          <button class="save-btn" style="flex:1; background:var(--surface);" onclick="saveModalEdit()">İçeriği Kaydet</button>
+          <button id="modalActionBtn" class="save-btn" style="flex:1;"></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        // Sekme Değiştirme
-        function switchTab(tabName) {
-            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(`${tabName}-sec`).classList.add('active');
-            event.currentTarget.classList.add('active');
-            renderNotes();
-        }
+<script>
+  let notes = JSON.parse(localStorage.getItem('netflix_notes')) || [];
+  let selectedTimer = 0;
+  let activeTimers = {};
+  let currentEditId = null;
 
-        // Not Ekleme
-        function addNote() {
-            const input = document.getElementById('draft-input');
-            const text = input.value.trim();
-            if(!text) return;
+  // Expanding Input Logic
+  const inputWrapper = document.getElementById('inputWrapper');
+  const mainInput = document.getElementById('mainInput');
+  
+  mainInput.addEventListener('focus', () => inputWrapper.classList.add('expanded'));
+  
+  // Tab Switching
+  function switchTab(tabName) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`sec-${tabName}`).classList.add('active');
+    event.currentTarget.classList.add('active');
+    renderAll();
+    if(tabName === 'takvim') renderCalendar();
+  }
 
-            const newNote = {
-                id: Date.now(),
-                originalText: text, // Referans olarak saklanacak
-                text: text,
-                stage: 'taslak',
-                completed: false
-            };
+  // Input Tools
+  function copyText() {
+    navigator.clipboard.writeText(mainInput.value).then(() => alert('Kopyalandı!'));
+  }
+  function addTime() {
+    const now = new Date();
+    const timeStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}] `;
+    mainInput.value += (mainInput.value ? '\n' : '') + timeStr;
+    mainInput.focus();
+  }
+  function setTimer(mins, btn) {
+    selectedTimer = mins;
+    document.querySelectorAll('.timer-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
 
-            notes.push(newNote);
-            input.value = '';
-            saveAndRender();
-        }
+  // Note Management
+  function saveDraft() {
+    const text = mainInput.value.trim();
+    if(!text) return;
+    
+    const note = {
+      id: Date.now(),
+      text: text,
+      ref: document.getElementById('refInput').value.trim(),
+      stage: 'taslak',
+      completed: false,
+      date: new Date().toLocaleDateString('tr-TR'),
+      timerEnd: selectedTimer > 0 ? Date.now() + (selectedTimer * 60000) : null
+    };
+    
+    notes.unshift(note);
+    mainInput.value = '';
+    document.getElementById('refInput').value = '';
+    inputWrapper.classList.remove('expanded');
+    setTimer(0, document.querySelector('.timer-opt'));
+    saveAndRender();
+  }
 
-        // Aşamalar Arası Aktarım
-        function moveNote(id, newStage) {
-            const note = notes.find(n => n.id === id);
-            if(note) {
-                note.stage = newStage;
-                saveAndRender();
-            }
-        }
+  function moveNote(id, newStage) {
+    const note = notes.find(n => n.id === id);
+    if(note) { note.stage = newStage; saveAndRender(); }
+  }
 
-        // Final Tamamlama (Yeşil Tik)
-        function toggleComplete(id) {
-            const note = notes.find(n => n.id === id);
-            if(note) {
-                note.completed = !note.completed;
-                saveAndRender();
-            }
-        }
+  function toggleComplete(id) {
+    const note = notes.find(n => n.id === id);
+    if(note) {
+      if(!note.completed) {
+        note.completed = true;
+        note.stage = 'arsiv'; // Finale tamamlanınca arşive gitsin
+      }
+      saveAndRender();
+    }
+  }
 
-        // Revize Modalını Açma
-        function openEditModal(id) {
-            const note = notes.find(n => n.id === id);
-            if(note) {
-                currentEditId = id;
-                document.getElementById('modal-reference').innerText = "📌 Referans: " + note.originalText;
-                document.getElementById('edit-textarea').value = note.text;
-                document.getElementById('edit-modal').classList.add('active');
-            }
-        }
+  function deleteAll() {
+    if(confirm("Bugünün tüm notlarını ve görevlerini silmek istediğine emin misin?")) {
+      const today = new Date().toLocaleDateString('tr-TR');
+      notes = notes.filter(n => n.date !== today);
+      saveAndRender();
+    }
+  }
 
-        function closeModal() {
-            document.getElementById('edit-modal').classList.remove('active');
-            currentEditId = null;
-        }
+  function restoreFromArchive(id) {
+    const note = notes.find(n => n.id === id);
+    if(note) {
+      note.stage = 'final';
+      note.completed = false;
+      saveAndRender();
+    }
+  }
 
-        // Revizeyi Kaydetme
-        function saveRevize() {
-            const newText = document.getElementById('edit-textarea').value;
-            const note = notes.find(n => n.id === currentEditId);
-            if(note) {
-                note.text = newText;
-                closeModal();
-                saveAndRender();
-            }
-        }
+  // Modals
+  function openEditModal(id) {
+    const note = notes.find(n => n.id === id);
+    if(!note) return;
+    currentEditId = id;
+    
+    const refBox = document.getElementById('modalRef');
+    if(note.ref) { refBox.style.display = 'block'; refBox.innerText = "Referans: " + note.ref; } 
+    else { refBox.style.display = 'none'; }
+    
+    document.getElementById('modalEdit').value = note.text;
+    document.getElementById('modalTitle').innerText = note.stage === 'taslak' ? 'Taslağı Düzenle' : 'Revize Et';
+    
+    const actionBtn = document.getElementById('modalActionBtn');
+    if(note.stage === 'taslak') {
+      actionBtn.innerText = "Revizeye Aktar ➡️";
+      actionBtn.onclick = () => { saveModalEdit(); moveNote(id, 'revize'); closeModal(); };
+    } else if(note.stage === 'revize') {
+      actionBtn.innerText = "Finale Aktar ➡️";
+      actionBtn.style.background = "var(--success)";
+      actionBtn.onclick = () => { saveModalEdit(); moveNote(id, 'final'); closeModal(); };
+    } else {
+      actionBtn.style.display = 'none';
+    }
 
-        // Pratik Araçlar
-        function addTimestamp() {
-            const textarea = document.getElementById('edit-textarea');
-            const now = new Date();
-            const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}] `;
-            textarea.value = textarea.value + "\n" + timeString;
-            textarea.focus();
-        }
+    document.getElementById('editModal').classList.add('open');
+  }
 
-        function copyText() {
-            const textarea = document.getElementById('edit-textarea');
-            navigator.clipboard.writeText(textarea.value).then(() => {
-                alert("Metin kopyalandı!");
-            });
-        }
+  function closeModal() {
+    document.getElementById('editModal').classList.remove('open');
+    currentEditId = null;
+    document.getElementById('modalActionBtn').style.display = 'block';
+    document.getElementById('modalActionBtn').style.background = "var(--accent)";
+  }
 
-        function clearAllNotes() {
-            if(confirm("Tüm notları (Taslak, Revize, Final) silmek istediğine emin misin?")) {
-                notes = [];
-                saveAndRender();
-            }
-        }
+  function saveModalEdit() {
+    const note = notes.find(n => n.id === currentEditId);
+    if(note) {
+      note.text = document.getElementById('modalEdit').value;
+      saveAndRender();
+    }
+  }
 
-        // Challenge Sayacı
-        function startTimer(minutes, btnElement) {
-            clearInterval(countdown);
-            document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active-timer'));
-            btnElement.classList.add('active-timer');
-            
-            let time = minutes * 60;
-            const display = document.getElementById('timer-display');
-            
-            countdown = setInterval(() => {
-                const m = Math.floor(time / 60);
-                const s = time % 60;
-                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                
-                if (time <= 0) {
-                    clearInterval(countdown);
-                    display.innerText = "Süre Bitti!";
-                    btnElement.classList.remove('active-timer');
-                    navigator.vibrate && navigator.vibrate([200, 100, 200]); // Süre bitimi titreşimi (Mobilde)
-                }
-                time--;
-            }, 1000);
-        }
+  // Rendering
+  function renderAll() {
+    const grids = { taslak: document.getElementById('grid-taslak'), revize: document.getElementById('grid-revize'), final: document.getElementById('grid-final') };
+    const archiveList = document.getElementById('list-arsiv');
+    
+    grids.taslak.innerHTML = ''; grids.revize.innerHTML = ''; grids.final.innerHTML = ''; archiveList.innerHTML = '';
 
-        // Arayüzü Çizme
-        function renderNotes() {
-            const grids = {
-                taslak: document.getElementById('taslak-grid'),
-                revize: document.getElementById('revize-grid'),
-                final: document.getElementById('final-grid')
-            };
+    notes.forEach(note => {
+      if(note.stage === 'arsiv') {
+        const d = document.createElement('div');
+        d.className = 'arch-card';
+        d.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:4px; max-width: 75%;">
+            <span style="font-size:9px; color:var(--text-muted);">${note.date}</span>
+            <span class="arch-content">${note.text}</span>
+          </div>
+          <button class="restore-btn" onclick="restoreFromArchive(${note.id})">Geri Al</button>
+        `;
+        archiveList.appendChild(d);
+        return;
+      }
 
-            grids.taslak.innerHTML = ''; grids.revize.innerHTML = ''; grids.final.innerHTML = '';
+      const card = document.createElement('div');
+      card.className = `card stage-${note.stage} ${note.completed ? 'completed' : ''}`;
+      
+      let timerHTML = '';
+      if(note.stage === 'taslak' && note.timerEnd) {
+        timerHTML = `<div class="card-timer" id="t-${note.id}">--:--</div>`;
+        startCardTimer(note);
+      }
 
-            notes.forEach(note => {
-                const card = document.createElement('div');
-                card.className = `note-card ${note.completed ? 'completed' : ''}`;
-                
-                let actionHTML = '';
-                if(note.stage === 'taslak') {
-                    actionHTML = `<button class="card-action-btn" onclick="moveNote(${note.id}, 'revize')">Revizeye Aktar ➡️</button>`;
-                } else if(note.stage === 'revize') {
-                    card.setAttribute('onclick', `if(event.target.tagName !== 'BUTTON') openEditModal(${note.id})`);
-                    actionHTML = `<button class="card-action-btn green" onclick="moveNote(${note.id}, 'final'); event.stopPropagation();">Finale Aktar ➡️</button>`;
-                } else if(note.stage === 'final') {
-                    actionHTML = `<button class="card-action-btn" onclick="toggleComplete(${note.id})">${note.completed ? 'Geri Al' : 'Tamamla ✓'}</button>`;
-                }
+      let btnText = note.stage === 'taslak' ? 'Revize ➡️' : (note.stage === 'revize' ? 'Final ➡️' : 'Tamamla ✓');
+      let btnAction = note.stage === 'taslak' ? `moveNote(${note.id}, 'revize')` : (note.stage === 'revize' ? `moveNote(${note.id}, 'final')` : `toggleComplete(${note.id})`);
+      
+      let clickAction = note.stage !== 'final' ? `onclick="if(event.target.tagName !== 'BUTTON') openEditModal(${note.id})"` : '';
 
-                card.innerHTML = `
-                    <div class="check-icon">✓</div>
-                    <p>${note.text}</p>
-                    <div style="margin-top: auto">
-                        ${actionHTML}
-                    </div>
-                `;
-                grids[note.stage].appendChild(card);
-            });
-        }
+      card.innerHTML = `
+        ${note.completed ? '<div class="check-mark">✓</div>' : ''}
+        ${timerHTML}
+        <div class="card-date">${note.date}</div>
+        <div class="card-text" ${clickAction}>${note.text}</div>
+        <button class="card-action" onclick="${btnAction}">${btnText}</button>
+      `;
+      grids[note.stage].appendChild(card);
+    });
+  }
 
-        function saveAndRender() {
-            localStorage.setItem('myNotes', JSON.stringify(notes));
-            renderNotes();
-        }
+  function startCardTimer(note) {
+    if(activeTimers[note.id]) clearInterval(activeTimers[note.id]);
+    activeTimers[note.id] = setInterval(() => {
+      const el = document.getElementById(`t-${note.id}`);
+      if(!el) { clearInterval(activeTimers[note.id]); return; }
+      
+      const left = Math.max(0, note.timerEnd - Date.now());
+      if(left === 0) {
+        el.innerText = 'Süre Bitti';
+        el.style.color = 'var(--text-muted)';
+        clearInterval(activeTimers[note.id]);
+      } else {
+        const m = Math.floor(left / 60000);
+        const s = Math.floor((left % 60000) / 1000);
+        el.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+      }
+    }, 1000);
+  }
 
-        // Başlangıçta Çalıştır
-        renderNotes();
-    </script>
+  // Calendar
+  function renderCalendar() {
+    const calGrid = document.getElementById('cal-grid');
+    calGrid.innerHTML = '';
+    
+    const now = new Date();
+    document.getElementById('cal-month').innerText = now.toLocaleString('tr-TR', { month: 'long', year: 'numeric' }).toUpperCase();
+    
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    
+    // Adjust for Monday start
+    let startOffset = firstDay === 0 ? 6 : firstDay - 1; 
+
+    for(let i=0; i<startOffset; i++) {
+      calGrid.innerHTML += `<div></div>`;
+    }
+
+    for(let day=1; day<=daysInMonth; day++) {
+      const dateStr = new Date(now.getFullYear(), now.getMonth(), day).toLocaleDateString('tr-TR');
+      const hasNote = notes.some(n => n.date === dateStr);
+      const isToday = day === now.getDate();
+      
+      calGrid.innerHTML += `<div class="cal-day ${isToday ? 'today' : ''} ${hasNote ? 'has-note' : ''}">${day}</div>`;
+    }
+  }
+
+  function saveAndRender() {
+    localStorage.setItem('netflix_notes', JSON.stringify(notes));
+    renderAll();
+  }
+
+  // Init
+  renderAll();
+
+  // Close modal when clicking outside
+  document.getElementById('editModal').addEventListener('click', function(e) {
+    if(e.target === this) closeModal();
+  });
+</script>
 </body>
 </html>
