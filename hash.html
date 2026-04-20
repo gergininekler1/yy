@@ -8,878 +8,622 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root[data-theme="dark"] {
-            --bg: #0d0d0f;
-            --bg2: #141416;
-            --card: #1a1a1e;
-            --card2: #222228;
+            --bg: #0d0d0f; --bg2: #141416;
+            --card: #1a1a1e; --card2: #222228;
             --border: rgba(255,255,255,0.07);
-            --text: #f0f0f0;
-            --muted: #6b6b7a;
-            --accent: #e5193a;
-            --accent2: #ff4d6b;
-            --success: #00d97e;
-            --warn: #f5a623;
-            --info: #3d9cff;
-            --theme-icon: "🌙";
+            --text: #f0f0f0; --muted: #6b6b7a;
+            --accent: #e5193a; --accent2: #ff4d6b;
+            --success: #00d97e; --warn: #f5a623; --info: #3d9cff;
         }
         :root[data-theme="light"] {
-            --bg: #f4f4f7;
-            --bg2: #ebebef;
-            --card: #ffffff;
-            --card2: #f0f0f5;
+            --bg: #f4f4f7; --bg2: #ebebef;
+            --card: #ffffff; --card2: #f0f0f5;
             --border: rgba(0,0,0,0.08);
-            --text: #131318;
-            --muted: #8888a0;
-            --accent: #e5193a;
-            --accent2: #ff4d6b;
-            --success: #00b865;
-            --warn: #d48a00;
-            --info: #1a7ef5;
+            --text: #131318; --muted: #8888a0;
+            --accent: #e5193a; --accent2: #ff4d6b;
+            --success: #00b865; --warn: #d48a00; --info: #1a7ef5;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
         body {
-            background: var(--bg);
-            color: var(--text);
+            background: var(--bg); color: var(--text);
             font-family: 'DM Sans', sans-serif;
-            padding-bottom: 90px;
-            min-height: 100vh;
+            padding-bottom: 90px; min-height: 100vh;
             transition: background 0.3s, color 0.3s;
         }
 
         /* ── HEADER ── */
         header {
             position: sticky; top: 0; z-index: 50;
-            background: var(--bg2);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-            padding: 14px 18px;
+            background: var(--bg2); border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px); padding: 14px 18px;
             display: flex; align-items: center; gap: 12px;
         }
-        .header-title {
-            font-family: 'Space Mono', monospace;
-            font-size: 17px; font-weight: 700;
-            letter-spacing: -0.5px;
-            flex: 1;
-        }
+        .header-title { font-family: 'Space Mono', monospace; font-size: 17px; font-weight: 700; flex: 1; }
         .header-title span { color: var(--accent); }
         .header-btn {
             background: var(--card2); border: 1px solid var(--border);
             color: var(--muted); width: 36px; height: 36px;
-            border-radius: 10px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
             font-size: 15px; transition: 0.2s;
         }
         .header-btn:hover { color: var(--text); border-color: var(--accent); }
-        .search-wrap {
-            flex: 1; position: relative;
-            display: none;
-        }
-        .search-wrap.open { display: flex; }
-        .search-wrap input {
-            width: 100%; background: var(--card2); border: 1px solid var(--border);
-            color: var(--text); padding: 8px 36px 8px 12px;
-            border-radius: 10px; font-size: 14px; outline: none;
-            font-family: 'DM Sans', sans-serif;
-            transition: border-color 0.2s;
-        }
-        .search-wrap input:focus { border-color: var(--accent); }
-        .search-wrap i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; }
-
+        
         /* ── STATS BAR ── */
         .stats-bar {
-            display: flex; gap: 1px; overflow: hidden;
-            margin: 16px 16px 0;
+            display: flex; gap: 1px; overflow: hidden; margin: 16px 16px 0;
             border-radius: 12px; border: 1px solid var(--border);
         }
-        .stat-item {
-            flex: 1; background: var(--card);
-            padding: 12px 10px; text-align: center;
-            cursor: pointer; transition: background 0.2s;
-        }
+        .stat-item { flex: 1; background: var(--card); padding: 12px 10px; text-align: center; cursor: pointer; }
         .stat-item:hover { background: var(--card2); }
-        .stat-num {
-            font-family: 'Space Mono', monospace;
-            font-size: 22px; font-weight: 700;
-            line-height: 1;
-        }
+        .stat-num { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1; }
         .stat-num.taslak-c { color: var(--info); }
         .stat-num.revize-c { color: var(--warn); }
         .stat-num.final-c  { color: var(--success); }
-        .stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; }
 
         /* ── CONTAINER ── */
         .container { padding: 16px; }
-
-        /* ── TAB CONTENT ── */
         .tab-content { display: none; animation: fadeUp 0.25s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ── INPUT GROUP ── */
-        .input-group {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px; padding: 14px;
-            margin-bottom: 20px;
-        }
-        .input-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .input-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.7px; }
-        .char-count { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
-
-        /* Color picker */
-        .color-picker { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+        /* ── TAGS & COLORS ── */
+        .color-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
         .color-dot {
-            width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
             border: 2px solid transparent; transition: 0.15s; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.9); font-weight: 700; font-size: 12px;
+            text-shadow: 0px 1px 2px rgba(0,0,0,0.5); text-transform: uppercase;
         }
-        .color-dot.selected { border-color: var(--text); transform: scale(1.15); }
-        .color-dot[title]:hover::after {
-            content: attr(title); position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
-            background: var(--card2); color: var(--text); font-size: 10px; padding: 3px 6px;
-            border-radius: 5px; white-space: nowrap; pointer-events: none;
-            border: 1px solid var(--border);
+        .color-dot.selected { border-color: var(--text); transform: scale(1.15); box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+        .btn-manage-tags {
+            background: transparent; border: 1px dashed var(--muted); color: var(--muted);
+            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 11px;
         }
+        .btn-manage-tags:hover { border-color: var(--text); color: var(--text); }
 
-        textarea {
-            width: 100%; background: transparent; border: none;
-            color: var(--text); font-size: 15px; resize: none; outline: none;
-            font-family: 'DM Sans', sans-serif; line-height: 1.6;
+        /* ── FORM ELEMENTS ── */
+        .input-group { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
+        .input-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        textarea, input[type="text"] {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text); font-size: 14px; padding: 12px; outline: none; font-family: 'DM Sans', sans-serif;
+            resize: none;
         }
-        textarea::placeholder { color: var(--muted); }
-
-        .timer-row {
-            display: flex; gap: 8px; align-items: center;
-            padding-top: 10px; margin-top: 10px;
-            border-top: 1px solid var(--border);
-        }
-        .timer-btn {
-            background: var(--card2); border: 1px solid var(--border);
-            color: var(--muted); padding: 5px 10px;
-            border-radius: 20px; font-size: 11px; cursor: pointer;
-            transition: 0.2s; font-family: 'Space Mono', monospace;
-        }
-        .timer-btn:hover, .timer-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        #timerDisplay {
-            font-family: 'Space Mono', monospace; font-size: 13px;
-            color: var(--accent); margin-left: auto;
-        }
-        #timerDisplay.done { color: var(--success); animation: pulse 0.5s 3; }
-        @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+        textarea:focus, input[type="text"]:focus { border-color: var(--accent); }
+        textarea.kaos-box { height: 120px; }
+        textarea.giris-box { height: 60px; margin-bottom: 10px; }
 
         .btn-save {
-            background: var(--accent); color: #fff;
-            border: none; width: 100%; padding: 12px;
-            border-radius: 10px; font-weight: 600;
-            font-size: 15px; margin-top: 12px; cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: background 0.2s, transform 0.1s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: var(--accent); color: #fff; border: none; width: 100%; padding: 12px;
+            border-radius: 10px; font-weight: 600; font-size: 14px; margin-top: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
         }
-        .btn-save:hover { background: var(--accent2); }
         .btn-save:active { transform: scale(0.98); }
 
-        /* ── REVIZE LAYOUT ── */
-        .revize-layout { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
-        .revize-source-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px; padding: 14px;
-        }
-        .revize-source-box .box-label {
-            font-size: 10px; text-transform: uppercase;
-            letter-spacing: 0.8px; color: var(--info);
-            margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-        }
-        .draft-preview-list { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; }
+        /* ── REVIZE 2-BLOCK LAYOUT ── */
+        .revize-draft-viewer { background: rgba(61,156,255,0.05); border: 1px solid var(--info); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
+        .revize-draft-viewer .text-content { font-size: 13px; color: var(--text); line-height: 1.6; margin-top: 8px; }
+        .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; color: var(--muted); }
+        .pagination button { background: var(--card2); border: none; color: var(--text); padding: 4px 10px; border-radius: 6px; cursor: pointer; }
         .draft-preview-item {
-            background: var(--card2); border-radius: 8px; padding: 8px 10px;
-            font-size: 13px; color: var(--muted); cursor: pointer;
-            transition: 0.15s; border: 1px solid transparent;
-            display: flex; align-items: flex-start; gap: 8px;
+            background: var(--card2); border-radius: 8px; padding: 10px; font-size: 13px; color: var(--muted); cursor: pointer;
+            margin-bottom: 6px; display: flex; align-items: flex-start; gap: 8px; border: 1px solid transparent;
         }
-        .draft-preview-item:hover { border-color: var(--info); color: var(--text); }
-        .draft-preview-item.selected { border-color: var(--info); color: var(--text); background: rgba(61,156,255,0.08); }
-        .draft-preview-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--info); margin-top: 5px; flex-shrink: 0; }
-        .draft-text-clip { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-
-        .revize-input-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px; padding: 14px;
-        }
-        .revize-input-box .box-label {
-            font-size: 10px; text-transform: uppercase;
-            letter-spacing: 0.8px; color: var(--warn);
-            margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-        }
-        #revizeInput { height: 120px; }
+        .draft-preview-item.selected { border-color: var(--info); color: var(--text); background: rgba(61,156,255,0.1); }
+        .draft-preview-item .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
 
         /* ── CARDS GRID ── */
-        .section-label {
-            font-size: 11px; color: var(--muted); text-transform: uppercase;
-            letter-spacing: 0.8px; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .section-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        
         .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px; padding: 13px;
-            aspect-ratio: 1 / 1;
-            display: flex; flex-direction: column;
-            position: relative; overflow: hidden;
-            transition: transform 0.15s, box-shadow 0.15s;
-            cursor: default;
+            background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+            display: flex; flex-direction: column; position: relative; overflow: hidden; height: 180px;
         }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-        .card.completed { opacity: 0.55; }
-        .card.completed .card-text { text-decoration: line-through; color: var(--muted); }
-
-        /* Color stripe */
-        .card-stripe {
-            position: absolute; top: 0; left: 0; right: 0;
-            height: 3px; border-radius: 12px 12px 0 0;
-        }
-
-        .card-meta {
-            font-size: 10px; color: var(--muted);
-            font-family: 'Space Mono', monospace;
-            margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
-        }
-        .card-text {
-            font-size: 13px; line-height: 1.5; flex-grow: 1; overflow: hidden;
-            display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
-            word-break: break-word;
-        }
-        .card-actions {
-            margin-top: 8px; display: flex;
-            justify-content: flex-end; gap: 7px;
-        }
+        .card-stripe { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .card-meta { font-size: 10px; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .card-cat { background: var(--card2); padding: 2px 6px; border-radius: 4px; font-size: 9px; color: var(--info); }
+        .card-text { font-size: 12px; line-height: 1.5; flex-grow: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; }
+        .card-actions { margin-top: 8px; display: flex; justify-content: flex-end; gap: 6px; }
         .action-btn {
-            background: rgba(255,255,255,0.06); border: none;
-            color: var(--muted); width: 28px; height: 28px;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 12px; transition: 0.15s;
+            background: var(--card2); border: none; color: var(--muted); width: 28px; height: 28px;
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px;
         }
-        .action-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
-        .action-btn.go   { color: var(--warn); background: rgba(245,166,35,0.1); }
-        .action-btn.go:hover { background: rgba(245,166,35,0.2); }
-        .action-btn.done { color: var(--success); background: rgba(0,217,126,0.1); }
-        .action-btn.done:hover { background: rgba(0,217,126,0.2); }
-        .action-btn.back { color: var(--info); background: rgba(61,156,255,0.1); }
-        .action-btn.back:hover { background: rgba(61,156,255,0.2); }
-        .action-btn.del  { color: var(--accent); background: rgba(229,25,58,0.1); }
-        .action-btn.del:hover { background: rgba(229,25,58,0.2); }
+        .action-btn:hover { color: var(--text); background: rgba(255,255,255,0.1); }
 
-        .completed-badge {
-            position: absolute; top: 9px; right: 9px;
-            color: var(--success); font-size: 16px; display: none;
+        /* ── FAB BUTTON ── */
+        .fab-btn {
+            position: fixed; bottom: 80px; right: 20px; width: 56px; height: 56px;
+            background: var(--info); color: #fff; border: none; border-radius: 50%;
+            font-size: 24px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(61,156,255,0.4); cursor: pointer; z-index: 90;
+            transition: 0.2s;
         }
-        .card.completed .completed-badge { display: block; }
+        .fab-btn:active { transform: scale(0.9); }
 
-        /* ── EMPTY STATE ── */
-        .empty-state {
-            text-align: center; padding: 50px 20px;
-            color: var(--muted);
-        }
-        .empty-icon {
-            font-size: 52px; margin-bottom: 14px;
-            line-height: 1; filter: grayscale(0.3) opacity(0.6);
-        }
-        .empty-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-        .empty-sub { font-size: 13px; line-height: 1.5; }
-
-        /* ── FILTER BAR ── */
-        .filter-bar {
-            display: flex; gap: 6px; margin-bottom: 16px;
-            overflow-x: auto; padding-bottom: 4px;
-            scrollbar-width: none;
-        }
-        .filter-bar::-webkit-scrollbar { display: none; }
+        /* ── FILTERS ── */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
         .filter-chip {
-            background: var(--card2); border: 1px solid var(--border);
-            color: var(--muted); padding: 5px 12px;
-            border-radius: 20px; font-size: 12px; cursor: pointer;
-            white-space: nowrap; transition: 0.15s;
-            display: flex; align-items: center; gap: 5px;
+            background: var(--card2); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px;
+            border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap;
         }
         .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .filter-chip .chip-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+        /* ── MODALS ── */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 200; align-items: flex-end; justify-content: center; padding: 16px;
+            backdrop-filter: blur(4px);
+        }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--card); width: 100%; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.25s ease; }
+        @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-title { font-size: 15px; font-weight: 600; color: var(--text); }
+        .close-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
+        
+        .tag-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--card2); border-radius: 8px; margin-bottom: 8px; }
 
         /* ── BOTTOM NAV ── */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%;
-            background: var(--bg2);
-            backdrop-filter: blur(14px);
-            border-top: 1px solid var(--border);
-            display: flex; z-index: 100;
+            position: fixed; bottom: 0; width: 100%; background: var(--bg2); border-top: 1px solid var(--border);
+            display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom);
         }
         .nav-item {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; gap: 4px;
-            color: var(--muted); padding: 12px 0;
-            cursor: pointer; transition: color 0.2s; position: relative;
-            font-size: 11px;
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: var(--muted); padding: 12px 0; cursor: pointer; font-size: 11px;
         }
-        .nav-item i { font-size: 19px; }
+        .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--text); }
         .nav-item.active i { color: var(--accent); }
-        .nav-item.active::before {
-            content: ''; position: absolute; top: 0; left: 25%; right: 25%;
-            height: 2px; background: var(--accent); border-radius: 0 0 3px 3px;
-        }
-        .nav-badge {
-            position: absolute; top: 8px; right: calc(50% - 14px);
-            background: var(--accent); color: #fff;
-            font-size: 9px; font-weight: 700;
-            min-width: 15px; height: 15px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            padding: 0 3px; font-family: 'Space Mono', monospace;
-        }
 
-        /* ── MODAL ── */
-        .modal {
-            display: none; position: fixed;
-            inset: 0; background: rgba(0,0,0,0.75);
-            z-index: 200; align-items: flex-end;
-            justify-content: center; padding: 16px;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--card); width: 100%;
-            border-radius: 16px; padding: 20px;
-            animation: slideUp 0.25s ease;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity:0; }
-            to   { transform: translateY(0); opacity:1; }
-        }
-        .modal-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted); }
-        .modal-content textarea { height: 160px; border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: var(--card2); }
-        .modal-content textarea:focus { border-color: var(--accent); outline: none; }
-        .modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-        .btn-ghost {
-            background: transparent; color: var(--muted); border: 1px solid var(--border);
-            width: 100%; padding: 11px; border-radius: 10px;
-            font-size: 14px; cursor: pointer; transition: 0.2s;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .btn-ghost:hover { color: var(--text); }
-
-        /* ── TOAST ── */
         .toast {
             position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: var(--card); border: 1px solid var(--border);
-            color: var(--text); padding: 10px 18px; border-radius: 50px;
-            font-size: 13px; z-index: 300; opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
-            pointer-events: none; white-space: nowrap;
-            display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 30px;
+            font-size: 13px; z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; font-weight: 500;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-title" id="headerTitleWrap">3 <span>Adım</span> Not</div>
-    <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" placeholder="Notlarda ara..." oninput="renderAll()">
-        <i class="fa-solid fa-magnifying-glass"></i>
-    </div>
-    <button class="header-btn" id="searchToggle" onclick="toggleSearch()" title="Ara"><i class="fa-solid fa-magnifying-glass"></i></button>
-    <button class="header-btn" id="themeToggle" onclick="toggleTheme()" title="Tema"><i class="fa-solid fa-moon"></i></button>
+    <div class="header-title">3 <span>Adım</span> Not</div>
+    <button class="header-btn" onclick="toggleTheme()"><i class="fa-regular fa-moon" id="themeIcon"></i></button>
 </header>
 
-<!-- Stats Bar -->
 <div class="stats-bar">
-    <div class="stat-item" onclick="switchTabById('taslak')">
-        <div class="stat-num taslak-c" id="statTaslak">0</div>
-        <div class="stat-label">Taslak</div>
+    <div class="stat-item" onclick="switchTab('taslak')">
+        <div class="stat-num taslak-c" id="sTaslak">0</div><div class="stat-label">Taslak</div>
     </div>
-    <div class="stat-item" onclick="switchTabById('revize')">
-        <div class="stat-num revize-c" id="statRevize">0</div>
-        <div class="stat-label">Revize</div>
+    <div class="stat-item" onclick="switchTab('revize')">
+        <div class="stat-num revize-c" id="sRevize">0</div><div class="stat-label">Revize</div>
     </div>
-    <div class="stat-item" onclick="switchTabById('final')">
-        <div class="stat-num final-c" id="statFinal">0</div>
-        <div class="stat-label">Final</div>
+    <div class="stat-item" onclick="switchTab('final')">
+        <div class="stat-num final-c" id="sFinal">0</div><div class="stat-label">Final</div>
     </div>
 </div>
 
 <div class="container">
-
-    <!-- TASLAK TAB -->
     <div id="taslak" class="tab-content active">
-        <div class="input-group">
-            <div class="input-header">
-                <span class="input-label"><i class="fa-solid fa-palette" style="margin-right:4px"></i>Renk Etiketi</span>
-                <span class="char-count" id="charCount">0 / 500</span>
-            </div>
-            <div class="color-picker" id="colorPicker">
-                <div class="color-dot selected" style="background:#3d9cff" data-color="#3d9cff" title="Genel" onclick="selectColor(this)"></div>
-                <div class="color-dot" style="background:#e5193a" data-color="#e5193a" title="Acil" onclick="selectColor(this)"></div>
-                <div class="color-dot" style="background:#f5a623" data-color="#f5a623" title="Önemli" onclick="selectColor(this)"></div>
-                <div class="color-dot" style="background:#00d97e" data-color="#00d97e" title="Fikir" onclick="selectColor(this)"></div>
-                <div class="color-dot" style="background:#b85cff" data-color="#b85cff" title="Kişisel" onclick="selectColor(this)"></div>
-                <div class="color-dot" style="background:#ff8c42" data-color="#ff8c42" title="Proje" onclick="selectColor(this)"></div>
-            </div>
-            <textarea id="draftInput" placeholder="Aklına gelenleri buraya dök, alıntı yap, karala..." maxlength="500" oninput="updateCharCount()"></textarea>
-            <div class="timer-row">
-                <i class="fa-regular fa-clock" style="color:var(--muted);font-size:13px"></i>
-                <button class="timer-btn" onclick="startTimer(5, this)">5 dk</button>
-                <button class="timer-btn" onclick="startTimer(10, this)">10 dk</button>
-                <button class="timer-btn" onclick="startTimer(15, this)">15 dk</button>
-                <div id="timerDisplay"></div>
-            </div>
-            <button class="btn-save" onclick="addNote()">
-                <i class="fa-solid fa-floppy-disk"></i> Taslak Olarak Kaydet
-            </button>
-        </div>
-
         <div class="filter-bar" id="taslakFilters"></div>
-        <div class="section-label">Taslaklar</div>
+        <div class="section-label"><i class="fa-regular fa-pen-to-square"></i> Taslaklarım</div>
         <div class="cards-grid" id="taslakGrid"></div>
+        <button class="fab-btn" onclick="openNewTaslak()"><i class="fa-solid fa-plus"></i></button>
     </div>
 
-    <!-- REVİZE TAB -->
     <div id="revize" class="tab-content">
-        <div class="revize-layout">
-            <div class="revize-source-box">
-                <div class="box-label">
-                    <i class="fa-solid fa-circle-dot"></i> Taslak Notlar (tıklayarak seç)
-                </div>
-                <div class="draft-preview-list" id="draftPreviewList">
-                    <div style="font-size:13px;color:var(--muted);text-align:center;padding:10px">
-                        Henüz taslak notunuz yok.
-                    </div>
-                </div>
+        <div class="input-group">
+            <span class="input-label"><i class="fa-regular fa-folder-open"></i> Taslak Seç (Sayfa <span id="draftPageNum">1</span>)</span>
+            <div id="draftPreviewList"></div>
+            <div class="pagination">
+                <button onclick="changeDraftPage(-1)"><i class="fa-solid fa-chevron-left"></i> Önceki</button>
+                <button onclick="changeDraftPage(1)">Sonraki <i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            <div class="revize-input-box">
-                <div class="box-label"><i class="fa-solid fa-hammer"></i> Revize Notu Yaz</div>
-                <div class="color-picker" id="revizeColorPicker">
-                    <div class="color-dot selected" style="background:#f5a623" data-color="#f5a623" title="Genel" onclick="selectRevizeColor(this)"></div>
-                    <div class="color-dot" style="background:#3d9cff" data-color="#3d9cff" title="Genel" onclick="selectRevizeColor(this)"></div>
-                    <div class="color-dot" style="background:#e5193a" data-color="#e5193a" title="Acil" onclick="selectRevizeColor(this)"></div>
-                    <div class="color-dot" style="background:#00d97e" data-color="#00d97e" title="Fikir" onclick="selectRevizeColor(this)"></div>
-                    <div class="color-dot" style="background:#b85cff" data-color="#b85cff" title="Kişisel" onclick="selectRevizeColor(this)"></div>
-                </div>
-                <textarea id="revizeInput" placeholder="Seçtiğin taslağı revize et veya yeni revize notu ekle..."></textarea>
-                <button class="btn-save" onclick="addRevizeNote()" style="background:var(--warn);">
-                    <i class="fa-solid fa-hammer"></i> Revize Olarak Kaydet
-                </button>
-            </div>
+        </div>
+
+        <div class="revize-draft-viewer" id="revizeViewer" style="display:none">
+            <span class="input-label" style="color:var(--info)"><i class="fa-regular fa-eye"></i> Seçili Taslak İçeriği</span>
+            <div class="text-content" id="selectedDraftText"></div>
+        </div>
+
+        <div class="input-group" id="revizeEditorBlock" style="display:none">
+            <span class="input-label" style="color:var(--warn)"><i class="fa-solid fa-hammer"></i> Yeni Revize Notu</span>
+            <div class="color-picker" id="revizeColorPicker"></div>
+            <textarea id="revizeInput" class="kaos-box" placeholder="Taslağı incele ve buraya yeni halini yaz..."></textarea>
+            <button class="btn-save" style="background:var(--warn)" onclick="saveRevize()"><i class="fa-solid fa-check-double"></i> Revizeyi Kaydet</button>
         </div>
 
         <div class="filter-bar" id="revizeFilters"></div>
-        <div class="section-label">Revize Edilenler</div>
+        <div class="section-label"><i class="fa-solid fa-hammer"></i> Revize Edilenler</div>
         <div class="cards-grid" id="revizeGrid"></div>
     </div>
 
-    <!-- FİNAL TAB -->
     <div id="final" class="tab-content">
-        <div class="filter-bar" id="finalFilters"></div>
-        <div class="section-label">Final Notlar</div>
+        <div class="filter-bar" id="finalCatFilters"></div>
+        <div class="section-label"><i class="fa-regular fa-flag"></i> Final Notlar</div>
         <div class="cards-grid" id="finalGrid"></div>
     </div>
-
 </div>
 
-<!-- Edit Modal -->
-<div class="modal" id="editModal">
+<div class="modal" id="taslakModal">
     <div class="modal-content">
-        <div class="modal-title">Notu Düzenle</div>
-        <div class="color-picker" id="editColorPicker">
-            <div class="color-dot" style="background:#3d9cff" data-color="#3d9cff" onclick="selectEditColor(this)"></div>
-            <div class="color-dot" style="background:#e5193a" data-color="#e5193a" onclick="selectEditColor(this)"></div>
-            <div class="color-dot" style="background:#f5a623" data-color="#f5a623" onclick="selectEditColor(this)"></div>
-            <div class="color-dot" style="background:#00d97e" data-color="#00d97e" onclick="selectEditColor(this)"></div>
-            <div class="color-dot" style="background:#b85cff" data-color="#b85cff" onclick="selectEditColor(this)"></div>
-            <div class="color-dot" style="background:#ff8c42" data-color="#ff8c42" onclick="selectEditColor(this)"></div>
+        <div class="modal-header">
+            <div class="modal-title">Yeni Taslak Ekle</div>
+            <button class="close-btn" onclick="closeModal('taslakModal')"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <textarea id="editInput"></textarea>
-        <div class="modal-actions">
-            <button class="btn-save" onclick="saveEdit()"><i class="fa-solid fa-check"></i> Kaydet</button>
-            <button class="btn-ghost" onclick="closeModal()">İptal</button>
+        <div class="color-picker" id="taslakColorPicker"></div>
+        <span class="input-label">Giriş Bölümü</span>
+        <textarea id="tGiris" class="giris-box" placeholder="Kısa bir özet veya başlık niteliğinde..."></textarea>
+        <span class="input-label">Kaos Bölümü</span>
+        <textarea id="tKaos" class="kaos-box" placeholder="Aklına ne geliyorsa buraya dök..."></textarea>
+        <button class="btn-save" onclick="saveTaslak()"><i class="fa-regular fa-floppy-disk"></i> Kaydet</button>
+    </div>
+</div>
+
+<div class="modal" id="tagModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Etiketleri Yönet</div>
+            <button class="close-btn" onclick="closeModal('tagModal'); renderAllPickers();"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="tagListArea"></div>
+        <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+            <span class="input-label">Yeni Etiket Ekle</span>
+            <div style="display:flex; gap:10px;">
+                <input type="color" id="newTagColor" value="#3d9cff" style="width:40px; height:40px; padding:0; border:none; background:transparent; cursor:pointer;">
+                <input type="text" id="newTagName" placeholder="Etiket Adı" style="flex:1;">
+                <button class="btn-save" style="width:auto; margin:0; padding:0 16px;" onclick="addNewTag()"><i class="fa-solid fa-plus"></i></button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Toast -->
+<div class="modal" id="viewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title" id="viewTitle">Not Detayı</div>
+            <button class="close-btn" onclick="closeModal('viewModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="color-picker" id="editColorPicker"></div>
+        <div id="categoryEditBlock" style="display:none; margin-bottom:12px;">
+            <span class="input-label">Kategori (Final Notları İçin)</span>
+            <input type="text" id="editCategory" placeholder="Örn: İş, Kişisel, Proje X...">
+        </div>
+        <textarea id="editTextGiris" class="giris-box" style="display:none;"></textarea>
+        <textarea id="editTextKaos" class="kaos-box"></textarea>
+        <button class="btn-save" onclick="saveEdit()"><i class="fa-regular fa-circle-check"></i> Güncelle</button>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" id="nav-taslak" onclick="switchTabById('taslak')">
-        <i class="fa-solid fa-pen-nib"></i>
-        <span>Taslak</span>
-        <span class="nav-badge" id="badge-taslak" style="display:none"></span>
-    </div>
-    <div class="nav-item" id="nav-revize" onclick="switchTabById('revize')">
-        <i class="fa-solid fa-hammer"></i>
-        <span>Revize</span>
-        <span class="nav-badge" id="badge-revize" style="display:none"></span>
-    </div>
-    <div class="nav-item" id="nav-final" onclick="switchTabById('final')">
-        <i class="fa-solid fa-flag-checkered"></i>
-        <span>Final</span>
-        <span class="nav-badge" id="badge-final" style="display:none"></span>
-    </div>
+    <div class="nav-item active" id="nav-taslak" onclick="switchTab('taslak')"><i class="fa-regular fa-pen-to-square"></i><span>Taslak</span></div>
+    <div class="nav-item" id="nav-revize" onclick="switchTab('revize')"><i class="fa-solid fa-hammer"></i><span>Revize</span></div>
+    <div class="nav-item" id="nav-final" onclick="switchTab('final')"><i class="fa-regular fa-flag"></i><span>Final</span></div>
 </nav>
 
 <script>
-// ── STATE ──────────────────────────────────────────
-let notes = JSON.parse(localStorage.getItem('3adim_notes') || '[]');
-let currentEditId = null;
-let timerInterval = null;
-let selectedColor = '#3d9cff';
-let selectedRevizeColor = '#f5a623';
-let selectedEditColor = '#3d9cff';
-let activeFilter = { taslak: 'all', revize: 'all', final: 'all' };
+// ── VERİ TABANI & STATE ──
+let defaultTags = [
+    { id: 1, name: 'Genel', color: '#3d9cff' },
+    { id: 2, name: 'Acil', color: '#e5193a' },
+    { id: 3, name: 'Önemli', color: '#f5a623' },
+    { id: 4, name: 'Fikir', color: '#00d97e' }
+];
+let tags = JSON.parse(localStorage.getItem('3a_tags')) || defaultTags;
+let notes = JSON.parse(localStorage.getItem('3a_notes')) || [];
+
+let activeTab = 'taslak';
+let selectedTagId = tags[0]?.id || null;
+let currentDraftPage = 1;
 let selectedDraftId = null;
-const tabs = ['taslak', 'revize', 'final'];
+let currentEditId = null;
+
+let filterTaslak = 'all';
+let filterFinalCat = 'all';
 
 function save() {
-    localStorage.setItem('3adim_notes', JSON.stringify(notes));
+    localStorage.setItem('3a_tags', JSON.stringify(tags));
+    localStorage.setItem('3a_notes', JSON.stringify(notes));
 }
 
-// ── COLOR PICKERS ──────────────────────────────────
-function selectColor(el) {
-    document.querySelectorAll('#colorPicker .color-dot').forEach(d => d.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedColor = el.dataset.color;
-}
-function selectRevizeColor(el) {
-    document.querySelectorAll('#revizeColorPicker .color-dot').forEach(d => d.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedRevizeColor = el.dataset.color;
-}
-function selectEditColor(el) {
-    document.querySelectorAll('#editColorPicker .color-dot').forEach(d => d.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedEditColor = el.dataset.color;
-}
-
-// ── CHAR COUNT ─────────────────────────────────────
-function updateCharCount() {
-    const v = document.getElementById('draftInput').value.length;
-    document.getElementById('charCount').textContent = `${v} / 500`;
-}
-
-// ── THEME ──────────────────────────────────────────
+// ── TEMA ──
 function toggleTheme() {
     const root = document.documentElement;
     const isDark = root.getAttribute('data-theme') === 'dark';
     root.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    document.getElementById('themeToggle').querySelector('i').className =
-        isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-    localStorage.setItem('3adim_theme', isDark ? 'light' : 'dark');
-}
-(function initTheme() {
-    const t = localStorage.getItem('3adim_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-    document.getElementById('themeToggle').querySelector('i').className =
-        t === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-})();
-
-// ── SEARCH ─────────────────────────────────────────
-function toggleSearch() {
-    const wrap = document.getElementById('searchWrap');
-    const titleWrap = document.getElementById('headerTitleWrap');
-    const isOpen = wrap.classList.contains('open');
-    wrap.classList.toggle('open', !isOpen);
-    titleWrap.style.display = isOpen ? '' : 'none';
-    if (!isOpen) { wrap.querySelector('input').focus(); }
-    else { document.getElementById('searchInput').value = ''; renderAll(); }
+    document.getElementById('themeIcon').className = isDark ? 'fa-regular fa-sun' : 'fa-regular fa-moon';
 }
 
-// ── TIMER ──────────────────────────────────────────
-function startTimer(minutes, btn) {
-    clearInterval(timerInterval);
-    document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    let time = minutes * 60;
-    const display = document.getElementById('timerDisplay');
-    display.classList.remove('done');
-    timerInterval = setInterval(() => {
-        const m = Math.floor(time / 60), s = time % 60;
-        display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-        if (time <= 0) {
-            clearInterval(timerInterval);
-            display.textContent = '✓ Süre Bitti!';
-            display.classList.add('done');
-            document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
-            setTimeout(() => { display.textContent = ''; display.classList.remove('done'); }, 3000);
-        }
-        time--;
-    }, 1000);
-}
-
-// ── ADD NOTE (TASLAK) ──────────────────────────────
-function addNote() {
-    const input = document.getElementById('draftInput');
-    const text = input.value.trim();
-    if (!text) { showToast('⚠️ Lütfen bir şeyler yaz!'); return; }
-    notes.push({
-        id: Date.now(), text,
-        stage: 'taslak', completed: false,
-        color: selectedColor,
-        createdAt: new Date().toISOString()
+// ── ETIKET SISTEMI ──
+function renderAllPickers() {
+    const pickers = ['taslakColorPicker', 'revizeColorPicker', 'editColorPicker'];
+    const html = tags.map(t => `
+        <div class="color-dot ${t.id === selectedTagId ? 'selected' : ''}" 
+             style="background:${t.color}; border-color:${t.color}" 
+             onclick="selectTag(${t.id}, this)" title="${t.name}">
+            ${t.name.charAt(0).toUpperCase()}
+        </div>
+    `).join('') + `<button class="btn-manage-tags" onclick="openTagManager()"><i class="fa-solid fa-gear"></i></button>`;
+    
+    pickers.forEach(p => {
+        const el = document.getElementById(p);
+        if(el) el.innerHTML = html;
     });
-    input.value = ''; updateCharCount();
-    save(); renderAll();
-    showToast('✅ Taslak kaydedildi');
 }
-
-// ── ADD REVIZE NOTE ────────────────────────────────
-function addRevizeNote() {
-    const text = document.getElementById('revizeInput').value.trim();
-    if (!text) { showToast('⚠️ Revize notu boş olamaz!'); return; }
-    notes.push({
-        id: Date.now(), text,
-        stage: 'revize', completed: false,
-        color: selectedRevizeColor,
-        createdAt: new Date().toISOString(),
-        sourceDraftId: selectedDraftId || null
-    });
-    document.getElementById('revizeInput').value = '';
-    selectedDraftId = null;
-    document.querySelectorAll('.draft-preview-item').forEach(i => i.classList.remove('selected'));
-    save(); renderAll();
-    showToast('🔨 Revize kaydedildi');
+function selectTag(id, el) {
+    selectedTagId = id;
+    const parent = el.parentElement;
+    parent.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
 }
-
-// ── MOVE ───────────────────────────────────────────
-function moveNote(id, newStage) {
-    const note = notes.find(n => n.id === id);
-    if (note) { note.stage = newStage; save(); renderAll(); showToast(stageEmoji(newStage) + ' ' + stageLabel(newStage) + "'e taşındı"); }
+function openTagManager() {
+    renderTagManagerList();
+    document.getElementById('tagModal').classList.add('active');
 }
-function stageLabel(s) { return s === 'taslak' ? 'Taslak' : s === 'revize' ? 'Revize' : 'Final'; }
-function stageEmoji(s) { return s === 'taslak' ? '✏️' : s === 'revize' ? '🔨' : '🏁'; }
-
-// ── DELETE ─────────────────────────────────────────
-function deleteNote(id) {
-    notes = notes.filter(n => n.id !== id);
-    save(); renderAll();
-    showToast('🗑️ Not silindi');
-}
-
-// ── COMPLETE ───────────────────────────────────────
-function toggleComplete(id) {
-    const note = notes.find(n => n.id === id);
-    if (note) { note.completed = !note.completed; save(); renderAll(); }
-}
-
-// ── EDIT ───────────────────────────────────────────
-function openEdit(id) {
-    const note = notes.find(n => n.id === id);
-    if (!note) return;
-    currentEditId = id;
-    selectedEditColor = note.color || '#3d9cff';
-    document.getElementById('editInput').value = note.text;
-    // Mark correct color dot
-    document.querySelectorAll('#editColorPicker .color-dot').forEach(d => {
-        d.classList.toggle('selected', d.dataset.color === selectedEditColor);
-    });
-    document.getElementById('editModal').classList.add('active');
-}
-function closeModal() {
-    document.getElementById('editModal').classList.remove('active');
-    currentEditId = null;
-}
-function saveEdit() {
-    const note = notes.find(n => n.id === currentEditId);
-    const txt = document.getElementById('editInput').value.trim();
-    if (!txt) return;
-    if (note) { note.text = txt; note.color = selectedEditColor; save(); closeModal(); renderAll(); showToast('✏️ Not güncellendi'); }
-}
-
-// ── FILTER ─────────────────────────────────────────
-const COLORS_MAP = {
-    '#3d9cff': 'Genel', '#e5193a': 'Acil', '#f5a623': 'Önemli',
-    '#00d97e': 'Fikir', '#b85cff': 'Kişisel', '#ff8c42': 'Proje'
-};
-function renderFilters(stage, containerId) {
-    const stageNotes = notes.filter(n => n.stage === stage);
-    const usedColors = [...new Set(stageNotes.map(n => n.color).filter(Boolean))];
-    const container = document.getElementById(containerId);
-    if (usedColors.length < 2) { container.innerHTML = ''; return; }
-    let html = `<div class="filter-chip ${activeFilter[stage]==='all'?'active':''}" onclick="setFilter('${stage}','all')">Tümü</div>`;
-    usedColors.forEach(c => {
-        html += `<div class="filter-chip ${activeFilter[stage]===c?'active':''}" onclick="setFilter('${stage}','${c}')">
-            <span class="chip-dot" style="background:${c}"></span>${COLORS_MAP[c]||''}
-        </div>`;
-    });
-    container.innerHTML = html;
-}
-function setFilter(stage, color) {
-    activeFilter[stage] = color;
-    renderAll();
-}
-
-// ── DRAFT PREVIEW (for Revize tab) ─────────────────
-function renderDraftPreview() {
-    const drafts = notes.filter(n => n.stage === 'taslak');
-    const container = document.getElementById('draftPreviewList');
-    if (!drafts.length) {
-        container.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:10px">Henüz taslak notunuz yok.</div>';
-        return;
-    }
-    container.innerHTML = drafts.map(n => `
-        <div class="draft-preview-item ${selectedDraftId===n.id?'selected':''}" onclick="selectDraft(${n.id})">
-            <span class="dot" style="background:${n.color||'#3d9cff'}"></span>
-            <span class="draft-text-clip">${n.text.replace(/\n/g,'<br>')}</span>
+function renderTagManagerList() {
+    const list = document.getElementById('tagListArea');
+    list.innerHTML = tags.map(t => `
+        <div class="tag-list-item">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="color-dot" style="background:${t.color}; width:20px; height:20px; font-size:10px;">${t.name.charAt(0).toUpperCase()}</div>
+                <span style="font-size:13px">${t.name}</span>
+            </div>
+            <button class="action-btn" onclick="deleteTag(${t.id})" style="color:var(--accent)"><i class="fa-solid fa-trash"></i></button>
         </div>
     `).join('');
 }
-function selectDraft(id) {
-    selectedDraftId = (selectedDraftId === id) ? null : id;
-    const note = notes.find(n => n.id === id);
-    if (note && selectedDraftId) {
-        document.getElementById('revizeInput').value = note.text;
-    }
-    renderDraftPreview();
+function addNewTag() {
+    const name = document.getElementById('newTagName').value.trim();
+    const color = document.getElementById('newTagColor').value;
+    if(!name) return;
+    tags.push({ id: Date.now(), name, color });
+    document.getElementById('newTagName').value = '';
+    save(); renderTagManagerList();
+}
+function deleteTag(id) {
+    tags = tags.filter(t => t.id !== id);
+    if(selectedTagId === id) selectedTagId = tags[0]?.id || null;
+    save(); renderTagManagerList();
 }
 
-// ── FORMAT DATE ────────────────────────────────────
-function fmtDate(iso) {
-    const d = new Date(iso);
-    const now = new Date();
-    const diff = now - d;
-    if (diff < 60000) return 'Az önce';
-    if (diff < 3600000) return Math.floor(diff/60000) + ' dk önce';
-    if (diff < 86400000) return Math.floor(diff/3600000) + ' sa önce';
-    return d.toLocaleDateString('tr-TR', {day:'numeric',month:'short'});
+// ── TASLAK ISLEMLERI ──
+function openNewTaslak() {
+    document.getElementById('tGiris').value = '';
+    document.getElementById('tKaos').value = '';
+    document.getElementById('taslakModal').classList.add('active');
 }
-
-// ── MAIN RENDER ────────────────────────────────────
-function renderAll() {
-    const query = (document.getElementById('searchInput').value || '').toLowerCase();
-    ['taslak','revize','final'].forEach(stage => {
-        const grid = document.getElementById(stage + 'Grid');
-        let filtered = notes.filter(n => n.stage === stage);
-        if (query) filtered = filtered.filter(n => n.text.toLowerCase().includes(query));
-        if (activeFilter[stage] !== 'all') filtered = filtered.filter(n => n.color === activeFilter[stage]);
-
-        if (!filtered.length) {
-            grid.innerHTML = buildEmpty(stage, !!query);
-        } else {
-            grid.innerHTML = filtered.map(n => buildCard(n)).join('');
-        }
+function saveTaslak() {
+    const g = document.getElementById('tGiris').value.trim();
+    const k = document.getElementById('tKaos').value.trim();
+    if(!g && !k) { showToast('Bir şeyler yazmalısın!'); return; }
+    
+    notes.push({
+        id: Date.now(), stage: 'taslak',
+        tagId: selectedTagId,
+        giris: g, kaos: k, text: k, // text alanı geriye dönük uyumluluk ve revize için
+        date: new Date().toISOString()
     });
-    renderFilters('taslak','taslakFilters');
-    renderFilters('revize','revizeFilters');
-    renderFilters('final','finalFilters');
-    renderDraftPreview();
+    save(); closeModal('taslakModal'); renderAll(); showToast('Taslak eklendi');
+}
+
+// ── REVIZE ISLEMLERI ──
+function renderDraftPagination() {
+    const drafts = notes.filter(n => n.stage === 'taslak');
+    const totalPages = Math.ceil(drafts.length / 5);
+    if(currentDraftPage > totalPages) currentDraftPage = totalPages || 1;
+    
+    document.getElementById('draftPageNum').innerText = currentDraftPage;
+    const start = (currentDraftPage - 1) * 5;
+    const items = drafts.slice(start, start + 5);
+    
+    const list = document.getElementById('draftPreviewList');
+    if(items.length === 0) { list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px">Taslak bulunamadı.</div>'; return; }
+    
+    list.innerHTML = items.map(n => {
+        const t = tags.find(x => x.id === n.tagId) || tags[0];
+        const previewText = n.giris ? `<b>${n.giris}</b> - ${n.kaos}` : n.text;
+        return `
+        <div class="draft-preview-item ${n.id === selectedDraftId ? 'selected' : ''}" onclick="selectDraftForRevize(${n.id})">
+            <div class="dot" style="background:${t?.color || '#ccc'}"></div>
+            <div style="overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${previewText}</div>
+        </div>`;
+    }).join('');
+}
+function changeDraftPage(dir) {
+    const drafts = notes.filter(n => n.stage === 'taslak');
+    const totalPages = Math.ceil(drafts.length / 5);
+    currentDraftPage += dir;
+    if(currentDraftPage < 1) currentDraftPage = 1;
+    if(currentDraftPage > totalPages) currentDraftPage = totalPages || 1;
+    renderDraftPagination();
+}
+function selectDraftForRevize(id) {
+    selectedDraftId = id;
+    const note = notes.find(n => n.id === id);
+    if(note) {
+        document.getElementById('revizeViewer').style.display = 'block';
+        document.getElementById('revizeEditorBlock').style.display = 'block';
+        document.getElementById('selectedDraftText').innerHTML = `
+            ${note.giris ? `<strong>${note.giris}</strong><br><br>` : ''}
+            ${(note.kaos || note.text || '').replace(/\n/g,'<br>')}
+        `;
+    }
+    renderDraftPagination();
+}
+function saveRevize() {
+    const text = document.getElementById('revizeInput').value.trim();
+    if(!text) return;
+    notes.push({
+        id: Date.now(), stage: 'revize', sourceId: selectedDraftId,
+        tagId: selectedTagId, text: text,
+        date: new Date().toISOString()
+    });
+    // Opsiyonel: Eski taslağı silmek istersen -> notes = notes.filter(n => n.id !== selectedDraftId);
+    document.getElementById('revizeInput').value = '';
+    document.getElementById('revizeViewer').style.display = 'none';
+    document.getElementById('revizeEditorBlock').style.display = 'none';
+    selectedDraftId = null;
+    save(); renderAll(); showToast('Revize kaydedildi');
+}
+
+// ── ORTAK KART RENDER ──
+function renderGrid(stage) {
+    const grid = document.getElementById(stage + 'Grid');
+    let items = notes.filter(n => n.stage === stage);
+    
+    // Filtreleme (Taslak için etiket, Final için Kategori)
+    if(stage === 'taslak' && filterTaslak !== 'all') items = items.filter(n => n.tagId === parseInt(filterTaslak));
+    if(stage === 'final' && filterFinalCat !== 'all') items = items.filter(n => n.category === filterFinalCat);
+
+    if(items.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px 10px;font-size:13px;">Burada gösterilecek not yok.</div>`;
+        return;
+    }
+
+    grid.innerHTML = items.map(n => {
+        const tag = tags.find(t => t.id === n.tagId) || { color:'#888', name:'' };
+        let displayTxt = '';
+        if(n.stage === 'taslak') {
+            displayTxt = n.giris ? `<b>${n.giris}</b><br>${n.kaos}` : n.text;
+        } else {
+            displayTxt = n.text;
+        }
+        
+        let nextStage = stage === 'taslak' ? 'revize' : (stage === 'revize' ? 'final' : null);
+        
+        return `
+        <div class="card" onclick="openViewModal(${n.id})">
+            <div class="card-stripe" style="background:${tag.color}"></div>
+            <div class="card-meta">
+                <span><i class="fa-regular fa-clock" style="font-size:10px"></i> ${new Date(n.date).toLocaleDateString('tr-TR')}</span>
+                ${n.stage === 'final' && n.category ? `<span class="card-cat">${n.category}</span>` : ''}
+            </div>
+            <div class="card-text">${displayTxt.replace(/\n/g,'<br>')}</div>
+            <div class="card-actions" onclick="event.stopPropagation()">
+                ${nextStage ? `<button class="action-btn" onclick="moveNote(${n.id}, '${nextStage}')"><i class="fa-solid fa-arrow-right"></i></button>` : ''}
+                <button class="action-btn" onclick="deleteNote(${n.id})"><i class="fa-regular fa-trash-can"></i></button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function moveNote(id, target) {
+    const note = notes.find(n => n.id === id);
+    if(note) {
+        note.stage = target;
+        if(target === 'final' && !note.category) note.category = 'Genel';
+        save(); renderAll(); showToast(`Not taşındı: ${target.toUpperCase()}`);
+    }
+}
+function deleteNote(id) { notes = notes.filter(n => n.id !== id); save(); renderAll(); }
+
+// ── OKUMA & DUZENLEME ──
+function openViewModal(id) {
+    const note = notes.find(n => n.id === id);
+    if(!note) return;
+    currentEditId = id;
+    selectedTagId = note.tagId;
+    renderAllPickers();
+    
+    document.getElementById('viewTitle').innerText = note.stage.toUpperCase() + ' Detayı';
+    
+    const isTaslak = note.stage === 'taslak';
+    document.getElementById('editTextGiris').style.display = isTaslak ? 'block' : 'none';
+    
+    if(isTaslak) {
+        document.getElementById('editTextGiris').value = note.giris || '';
+        document.getElementById('editTextKaos').value = note.kaos || note.text || '';
+    } else {
+        document.getElementById('editTextKaos').value = note.text || '';
+    }
+
+    const catBlock = document.getElementById('categoryEditBlock');
+    if(note.stage === 'final') {
+        catBlock.style.display = 'block';
+        document.getElementById('editCategory').value = note.category || '';
+    } else {
+        catBlock.style.display = 'none';
+    }
+
+    document.getElementById('viewModal').classList.add('active');
+}
+function saveEdit() {
+    const note = notes.find(n => n.id === currentEditId);
+    if(!note) return;
+    note.tagId = selectedTagId;
+    
+    if(note.stage === 'taslak') {
+        note.giris = document.getElementById('editTextGiris').value;
+        note.kaos = document.getElementById('editTextKaos').value;
+        note.text = note.kaos; 
+    } else {
+        note.text = document.getElementById('editTextKaos').value;
+    }
+    
+    if(note.stage === 'final') {
+        note.category = document.getElementById('editCategory').value.trim() || 'Genel';
+    }
+    
+    save(); closeModal('viewModal'); renderAll(); showToast('Güncellendi');
+}
+
+// ── FILTRELER (Final Kategorileri & Taslak Etiketleri) ──
+function renderFiltersUI() {
+    // Taslak Filters (Etiket bazlı)
+    const tContainer = document.getElementById('taslakFilters');
+    tContainer.innerHTML = `<div class="filter-chip ${filterTaslak === 'all' ? 'active':''}" onclick="filterTaslak='all';renderGrid('taslak');renderFiltersUI();">Tümü</div>` + 
+        tags.map(t => `<div class="filter-chip ${filterTaslak == t.id ? 'active':''}" onclick="filterTaslak='${t.id}';renderGrid('taslak');renderFiltersUI();">${t.name}</div>`).join('');
+
+    // Final Filters (Kategori bazlı)
+    const finals = notes.filter(n => n.stage === 'final' && n.category);
+    const cats = [...new Set(finals.map(n => n.category))];
+    const fContainer = document.getElementById('finalCatFilters');
+    fContainer.innerHTML = `<div class="filter-chip ${filterFinalCat === 'all' ? 'active':''}" onclick="filterFinalCat='all';renderGrid('final');renderFiltersUI();">Tümü</div>` + 
+        cats.map(c => `<div class="filter-chip ${filterFinalCat === c ? 'active':''}" onclick="filterFinalCat='${c}';renderGrid('final');renderFiltersUI();">${c}</div>`).join('');
+}
+
+// ── YARDIMCI FONKSİYONLAR ──
+function switchTab(tab) {
+    ['taslak', 'revize', 'final'].forEach(t => {
+        document.getElementById(t).classList.remove('active');
+        document.getElementById('nav-' + t).classList.remove('active');
+    });
+    document.getElementById(tab).classList.add('active');
+    document.getElementById('nav-' + tab).classList.add('active');
+    activeTab = tab;
+    renderAll();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+function updateStats() {
+    document.getElementById('sTaslak').innerText = notes.filter(n=>n.stage==='taslak').length;
+    document.getElementById('sRevize').innerText = notes.filter(n=>n.stage==='revize').length;
+    document.getElementById('sFinal').innerText = notes.filter(n=>n.stage==='final').length;
+}
+
+function renderAll() {
+    renderAllPickers();
+    renderDraftPagination();
+    renderFiltersUI();
+    renderGrid('taslak');
+    renderGrid('revize');
+    renderGrid('final');
     updateStats();
 }
 
-function buildCard(note) {
-    const c = note.color || '#3d9cff';
-    let actions = '';
-    if (note.stage === 'taslak') {
-        actions = `
-            <button class="action-btn" onclick="openEdit(${note.id})" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
-            <button class="action-btn go" onclick="moveNote(${note.id},'revize')" title="Revizeye Taşı"><i class="fa-solid fa-arrow-right"></i></button>
-            <button class="action-btn del" onclick="deleteNote(${note.id})" title="Sil"><i class="fa-solid fa-trash"></i></button>
-        `;
-    } else if (note.stage === 'revize') {
-        actions = `
-            <button class="action-btn back" onclick="moveNote(${note.id},'taslak')" title="Taslağa Geri Dön"><i class="fa-solid fa-arrow-left"></i></button>
-            <button class="action-btn" onclick="openEdit(${note.id})" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
-            <button class="action-btn go" onclick="moveNote(${note.id},'final')" title="Finale Taşı"><i class="fa-solid fa-flag-checkered"></i></button>
-            <button class="action-btn del" onclick="deleteNote(${note.id})" title="Sil"><i class="fa-solid fa-trash"></i></button>
-        `;
-    } else {
-        actions = `
-            <button class="action-btn back" onclick="moveNote(${note.id},'revize')" title="Revizeye Geri Dön"><i class="fa-solid fa-arrow-left"></i></button>
-            <button class="action-btn done ${note.completed?'':''}'" onclick="toggleComplete(${note.id})" title="Tamamla"><i class="fa-solid fa-check"></i></button>
-            <button class="action-btn del" onclick="deleteNote(${note.id})" title="Sil"><i class="fa-solid fa-trash"></i></button>
-        `;
-    }
-    return `
-        <div class="card ${note.completed?'completed':''}">
-            <div class="card-stripe" style="background:${c}"></div>
-            <i class="fa-solid fa-circle-check completed-badge"></i>
-            <div class="card-meta"><i class="fa-regular fa-clock" style="font-size:9px"></i> ${fmtDate(note.createdAt)}</div>
-            <div class="card-text">${note.text.replace(/\n/g,'<br>')}</div>
-            <div class="card-actions">${actions}</div>
-        </div>
-    `;
-}
-
-function buildEmpty(stage, isSearch) {
-    if (isSearch) return `<div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-icon">🔍</div>
-        <div class="empty-title">Sonuç bulunamadı</div>
-        <div class="empty-sub">Farklı bir arama terimi dene.</div>
-    </div>`;
-    const map = {
-        taslak: { icon:'✏️', title:'Henüz taslak yok', sub:'Yukarıdaki alana fikirlerini dökmeye başla.' },
-        revize:  { icon:'🔨', title:'Revize edilecek not yok', sub:'Taslak sekmesinden notları revizeye taşı.' },
-        final:   { icon:'🏁', title:'Final notun yok', sub:'Revize ettiğin notları buraya taşı.' }
-    };
-    const e = map[stage];
-    return `<div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-icon">${e.icon}</div>
-        <div class="empty-title">${e.title}</div>
-        <div class="empty-sub">${e.sub}</div>
-    </div>`;
-}
-
-// ── STATS ──────────────────────────────────────────
-function updateStats() {
-    const counts = { taslak:0, revize:0, final:0 };
-    notes.forEach(n => counts[n.stage]++);
-    document.getElementById('statTaslak').textContent = counts.taslak;
-    document.getElementById('statRevize').textContent = counts.revize;
-    document.getElementById('statFinal').textContent  = counts.final;
-    ['taslak','revize','final'].forEach(s => {
-        const badge = document.getElementById('badge-' + s);
-        if (counts[s] > 0) { badge.textContent = counts[s]; badge.style.display = ''; }
-        else badge.style.display = 'none';
-    });
-}
-
-// ── TAB SWITCH ─────────────────────────────────────
-function switchTabById(id) {
-    tabs.forEach(t => {
-        document.getElementById(t).classList.toggle('active', t === id);
-        document.getElementById('nav-' + t).classList.toggle('active', t === id);
-    });
-    renderAll();
-}
-
-// ── TOAST ──────────────────────────────────────────
-let toastTimer;
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ── INIT ───────────────────────────────────────────
+// INIT
 renderAll();
 </script>
 </body>
