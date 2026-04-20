@@ -3,127 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Netflix Style Note App</title>
+<title>Netflix Notlar - Pro Edition</title>
 <style>
   :root {
-    --bg: #141414;
-    --surface: #2b2b2b;
-    --surface-hover: #333;
+    --bg: #000000;
+    --surface: #141414;
+    --surface-light: #2b2b2b;
     --text: #ffffff;
-    --text-muted: #8c8c8c;
-    --accent: #E50914; /* Netflix Red */
-    --accent-hover: #f40612;
+    --text-muted: #808080;
+    --netflix-red: #E50914;
     --success: #2ecc71;
-    --border: #333;
-    --radius: 8px;
+    --border: #333333;
+    --radius: 6px;
+    --safe-bottom: env(safe-area-inset-bottom, 15px);
   }
-  
+
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+  body { background: var(--bg); color: var(--text); overflow-x: hidden; padding-top: 60px; padding-bottom: calc(70px + var(--safe-bottom)); }
 
   /* HEADER */
-  header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border); }
-  .logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--accent); }
-  .delete-all { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; }
+  header { position: fixed; top: 0; left: 0; right: 0; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid var(--border); }
+  .logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--netflix-red); }
+  .delete-all-btn { background: rgba(229, 9, 20, 0.1); color: var(--netflix-red); border: 1px solid rgba(229, 9, 20, 0.3); padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+  .delete-all-btn:active { transform: scale(0.95); background: var(--netflix-red); color: white; }
 
-  /* TABS (Single Line) */
-  .tabs-container { position: fixed; bottom: 0; width: 100%; background: rgba(20,20,20,0.98); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-  .tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab { flex: 1; min-width: 70px; padding: 15px 5px; text-align: center; font-size: 11px; font-weight: bold; color: var(--text-muted); cursor: pointer; transition: 0.3s; border-top: 3px solid transparent; letter-spacing: 0.5px; }
-  .tab.active { color: var(--text); border-top-color: var(--accent); background: rgba(229, 9, 20, 0.05); }
+  /* TABS (Single Line Compact) */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(20,20,20,0.95); backdrop-filter: blur(15px); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 100; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; color: var(--text-muted); font-size: 10px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; transition: 0.3s; border-top: 2px solid transparent; }
+  .nav-item.active { color: white; border-top-color: var(--netflix-red); background: linear-gradient(to bottom, rgba(229,9,20,0.1), transparent); }
 
   /* SECTIONS */
-  .section { display: none; padding: 15px 20px; animation: fadeIn 0.3s ease; }
+  .section { display: none; padding: 15px; animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
   .section.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* EXPANDING INPUT AREA */
-  .input-wrapper { background: var(--surface); border-radius: var(--radius); padding: 10px; margin-bottom: 20px; border: 1px solid var(--border); transition: 0.3s; display: flex; flex-direction: column; }
-  .input-wrapper.expanded { border-color: var(--accent); box-shadow: 0 0 15px rgba(229,9,20,0.1); }
-  .main-input { width: 100%; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; resize: none; height: 40px; transition: height 0.3s ease; }
-  .input-wrapper.expanded .main-input { height: 120px; }
-  .ref-input { display: none; width: 100%; background: rgba(0,0,0,0.2); border: 1px dashed var(--border); color: var(--text-muted); font-size: 12px; outline: none; resize: none; height: 50px; margin-bottom: 10px; padding: 8px; border-radius: 4px; }
-  .input-wrapper.expanded .ref-input { display: block; }
-
-  .tools-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; overflow: hidden; height: 0; opacity: 0; transition: 0.3s; }
-  .input-wrapper.expanded .tools-row { height: auto; opacity: 1; padding-top: 10px; border-top: 1px solid var(--border); }
+  /* SMART INPUT AREA */
+  .input-container { background: var(--surface-light); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; overflow: hidden; }
+  .input-container.expanded { border-color: var(--netflix-red); box-shadow: 0 4px 20px rgba(229, 9, 20, 0.15); }
   
-  .btn-group { display: flex; gap: 8px; }
-  .icon-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .save-btn { background: var(--accent); color: white; border: none; border-radius: 4px; padding: 6px 15px; font-size: 13px; font-weight: bold; cursor: pointer; }
+  .input-main-row { display: flex; align-items: flex-start; padding: 12px; gap: 10px; }
+  .smart-input { flex: 1; background: transparent; border: none; color: white; font-size: 14px; resize: none; height: 24px; outline: none; transition: height 0.3s; line-height: 1.4; }
+  .input-container.expanded .smart-input { height: 120px; }
+  
+  /* Right Side Tools */
+  .quick-tools { display: flex; flex-direction: column; gap: 8px; transition: 0.3s; opacity: 0; pointer-events: none; width: 0; }
+  .input-container.expanded .quick-tools { opacity: 1; pointer-events: all; width: 36px; }
+  .q-btn { width: 32px; height: 32px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+  .q-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
 
-  /* CHALLENGE (Timer) */
-  .challenge-row { display: flex; gap: 5px; margin-bottom: 10px; display: none; }
-  .input-wrapper.expanded .challenge-row { display: flex; }
-  .timer-opt { flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 6px; border-radius: 4px; text-align: center; cursor: pointer; }
-  .timer-opt.active { border-color: var(--accent); color: var(--accent); }
+  /* Expanded Extras (Challenge & Reference) */
+  .input-extras { padding: 0 12px; max-height: 0; opacity: 0; transition: all 0.3s; overflow: hidden; }
+  .input-container.expanded .input-extras { max-height: 150px; opacity: 1; padding-bottom: 12px; }
+  
+  .ref-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px dashed var(--border); color: var(--text-muted); font-size: 11px; padding: 8px; border-radius: 4px; margin-bottom: 10px; resize: none; height: 40px; outline: none; }
+  
+  .challenge-bar { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
+  .c-lbl { font-size: 10px; color: var(--text-muted); margin-right: 5px; }
+  .c-opt { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 6px 0; text-align: center; border-radius: 4px; cursor: pointer; font-weight: bold; }
+  .c-opt.active { background: rgba(229, 9, 20, 0.1); border-color: var(--netflix-red); color: var(--netflix-red); }
+  
+  .save-btn { width: 100%; background: var(--netflix-red); color: white; border: none; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
-  /* SQUARE CARDS GRID */
+  /* SQUARE CARDS (Netflix Style) */
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .card { aspect-ratio: 1; background: var(--surface); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; position: relative; border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
-  .card-date { font-size: 9px; color: var(--text-muted); margin-bottom: 5px; }
-  .card-text { font-size: 12px; line-height: 1.4; color: #ddd; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word; }
-  .card-timer { position: absolute; top: 10px; right: 10px; font-size: 9px; color: var(--accent); background: rgba(229,9,20,0.1); padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+  .card { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; position: relative; cursor: pointer; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); }
+  .card.stage-taslak::before { background: var(--netflix-red); }
+  .card.stage-revize::before { background: #3498db; }
+  .card.stage-final::before { background: var(--success); }
   
-  .card-action { background: var(--bg); border: none; color: white; padding: 6px; font-size: 10px; border-radius: 4px; margin-top: auto; cursor: pointer; font-weight: bold; width: 100%; border: 1px solid var(--border); }
-  .card.stage-draft { border-top: 2px solid var(--accent); }
-  .card.stage-revise { border-top: 2px solid #3498db; }
-  .card.stage-final { border-top: 2px solid var(--success); }
-  .card.completed { opacity: 0.6; border-color: var(--success); }
-  .card.completed .card-text { text-decoration: line-through; }
-  .check-mark { position: absolute; top: 8px; right: 8px; color: var(--success); font-size: 14px; font-weight: bold; }
+  .c-timer { position: absolute; top: 8px; right: 8px; background: rgba(229,9,20,0.15); color: var(--netflix-red); font-size: 9px; padding: 3px 6px; border-radius: 3px; font-weight: bold; letter-spacing: 0.5px; border: 1px solid rgba(229,9,20,0.3); }
+  .c-timer.expired { color: var(--text-muted); background: transparent; border-color: var(--border); }
+  
+  .c-text { flex: 1; font-size: 12px; line-height: 1.5; color: #ddd; margin-top: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word; }
+  .c-action { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; font-size: 10px; font-weight: bold; padding: 7px; border-radius: 4px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+  
+  .card.completed { opacity: 0.5; border-color: var(--success); }
+  .card.completed .c-text { text-decoration: line-through; }
 
-  /* ARCHIVE DESIGN */
-  .archive-list { display: flex; flex-direction: column; gap: 10px; }
-  .arch-card { background: var(--surface); border-radius: var(--radius); padding: 15px; border-left: 3px solid var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-  .arch-content { font-size: 12px; color: #aaa; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 70%; }
-  .restore-btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+  /* ARCHIVE (Redesigned) */
+  .arch-stats { display: flex; justify-content: space-between; background: var(--surface-light); padding: 15px; border-radius: var(--radius); margin-bottom: 15px; border: 1px solid var(--border); }
+  .a-stat { text-align: center; }
+  .a-val { font-size: 18px; font-weight: bold; color: var(--netflix-red); }
+  .a-lbl { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
+  
+  .arch-list { display: flex; flex-direction: column; gap: 10px; }
+  .arch-item { background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--border); }
+  .arch-info { flex: 1; overflow: hidden; }
+  .arch-date { font-size: 9px; color: var(--text-muted); margin-bottom: 4px; }
+  .arch-text { font-size: 12px; color: #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .restore-btn { background: transparent; border: 1px solid var(--border); color: white; font-size: 10px; padding: 5px 10px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
 
-  /* CALENDAR DESIGN */
-  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
+  /* CALENDAR (Compact & Functional) */
+  .cal-wrapper { background: var(--surface-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; }
+  .cal-head { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; margin-bottom: 15px; color: white; }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-  .cal-day-name { text-align: center; font-size: 10px; color: var(--text-muted); margin-bottom: 5px; }
-  .cal-day { aspect-ratio: 1; background: var(--surface); border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 12px; cursor: pointer; position: relative; }
-  .cal-day.today { background: var(--accent); color: white; font-weight: bold; }
-  .cal-day.has-note::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; background: var(--success); border-radius: 50%; }
+  .cal-day-name { text-align: center; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; font-weight: bold; }
+  .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 12px; background: var(--surface); border-radius: 4px; position: relative; border: 1px solid transparent; }
+  .cal-day.today { border-color: var(--netflix-red); color: var(--netflix-red); font-weight: bold; }
+  .cal-day.has-data::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--success); border-radius: 50%; }
 
-  /* MODAL FOR REVISE */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+  /* EDIT MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(5px); }
   .modal-overlay.open { display: flex; }
-  .modal-content { background: var(--bg); width: 100%; max-height: 90vh; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-  .modal-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; }
-  .modal-body { padding: 15px; overflow-y: auto; }
-  .ref-box { background: var(--surface); padding: 10px; border-radius: 4px; font-size: 11px; color: var(--text-muted); margin-bottom: 15px; border-left: 2px solid var(--border); font-style: italic; }
-  .edit-area { width: 100%; min-height: 150px; background: var(--surface); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 4px; resize: none; outline: none; margin-bottom: 15px; }
+  .modal-content { background: var(--surface-light); width: 100%; border-radius: 12px 12px 0 0; padding: 20px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid var(--border); }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+  .modal-title { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
+  .close-modal { background: transparent; border: none; color: var(--text-muted); font-size: 20px; }
+  
+  .modal-ref { background: var(--surface); padding: 10px; font-size: 11px; color: var(--text-muted); border-left: 2px solid var(--border); margin-bottom: 15px; font-style: italic; border-radius: 0 4px 4px 0; }
+  .modal-textarea { width: 100%; height: 150px; background: var(--surface); color: white; border: 1px solid var(--border); padding: 12px; border-radius: 4px; resize: none; outline: none; margin-bottom: 15px; font-size: 14px; }
+  
+  .modal-actions { display: flex; gap: 10px; }
+  .m-btn { flex: 1; padding: 12px; border-radius: 4px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
+  .btn-save { background: var(--surface); color: white; border: 1px solid var(--border); }
+  .btn-forward { background: var(--netflix-red); color: white; }
 </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">N.</div>
-    <button class="delete-all" onclick="deleteAll()" title="Tüm Günün Notlarını Sil">🗑️</button>
+    <div class="logo">N. TASLAK</div>
+    <button class="delete-all-btn" onclick="clearDay()">TÜMÜNÜ SİL</button>
   </header>
 
   <div id="sec-taslak" class="section active">
-    
-    <div class="input-wrapper" id="inputWrapper">
-      <textarea id="refInput" class="ref-input" placeholder="Referans veya alıntı ekle..."></textarea>
-      <textarea id="mainInput" class="main-input" placeholder="Günün notunu veya taslağını yaz..."></textarea>
-      
-      <div class="challenge-row">
-        <div class="timer-opt active" onclick="setTimer(0, this)">Yok</div>
-        <div class="timer-opt" onclick="setTimer(5, this)">5 dk</div>
-        <div class="timer-opt" onclick="setTimer(10, this)">10 dk</div>
-        <div class="timer-opt" onclick="setTimer(15, this)">15 dk</div>
-      </div>
-
-      <div class="tools-row">
-        <div class="btn-group">
-          <button class="icon-btn" onclick="copyText()">📋</button>
-          <button class="icon-btn" onclick="addTime()">🕒</button>
+    <div class="input-container" id="draftBox">
+      <div class="input-main-row">
+        <textarea id="mainDraft" class="smart-input" placeholder="Günün notunu veya aklındakileri dök..."></textarea>
+        <div class="quick-tools">
+          <button class="q-btn" onclick="copyDraft()" title="Tümünü Kopyala">📋</button>
+          <button class="q-btn" onclick="addTime()" title="Saat Ekle">🕒</button>
         </div>
-        <button class="save-btn" onclick="saveDraft()">Kaydet</button>
+      </div>
+      
+      <div class="input-extras">
+        <textarea id="refDraft" class="ref-input" placeholder="Alıntı veya referans linki..."></textarea>
+        <div class="challenge-bar">
+          <span class="c-lbl">Challenge:</span>
+          <div class="c-opt active" onclick="setTimer(0, this)">Yok</div>
+          <div class="c-opt" onclick="setTimer(5, this)">5 dk</div>
+          <div class="c-opt" onclick="setTimer(10, this)">10 dk</div>
+          <div class="c-opt" onclick="setTimer(15, this)">15 dk</div>
+        </div>
+        <button class="save-btn" onclick="saveNewDraft()">TASLAĞI KAYDET</button>
       </div>
     </div>
 
@@ -139,163 +164,177 @@
   </div>
 
   <div id="sec-arsiv" class="section">
-    <div class="archive-list" id="list-arsiv"></div>
+    <div class="arch-stats">
+      <div class="a-stat"><div class="a-val" id="stat-total">0</div><div class="a-lbl">TOPLAM</div></div>
+      <div class="a-stat"><div class="a-val" id="stat-done" style="color:var(--success)">0</div><div class="a-lbl">TAMAMLANAN</div></div>
+      <div class="a-stat"><div class="a-val" id="stat-revs" style="color:#3498db">0</div><div class="a-lbl">REVİZYON</div></div>
+    </div>
+    <div class="arch-list" id="list-arsiv"></div>
   </div>
 
   <div id="sec-takvim" class="section">
-    <div class="cal-header">
-      <span id="cal-month"></span>
-      <span>Günlük Kayıtlar</span>
+    <div class="cal-wrapper">
+      <div class="cal-head"><span id="calMonthStr"></span></div>
+      <div class="cal-grid">
+        <div class="cal-day-name">Pt</div><div class="cal-day-name">Sa</div><div class="cal-day-name">Ça</div>
+        <div class="cal-day-name">Pe</div><div class="cal-day-name">Cu</div><div class="cal-day-name">Ct</div><div class="cal-day-name">Pz</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
     </div>
-    <div class="cal-grid" id="cal-days-name">
-      <div class="cal-day-name">Pt</div><div class="cal-day-name">Sa</div><div class="cal-day-name">Ça</div>
-      <div class="cal-day-name">Pe</div><div class="cal-day-name">Cu</div><div class="cal-day-name">Ct</div><div class="cal-day-name">Pz</div>
-    </div>
-    <div class="cal-grid" id="cal-grid"></div>
   </div>
 
-  <div class="tabs-container">
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('taslak')">TASLAK</div>
-      <div class="tab" onclick="switchTab('revize')">REVİZE</div>
-      <div class="tab" onclick="switchTab('final')">FİNAL</div>
-      <div class="tab" onclick="switchTab('arsiv')">ARŞİV</div>
-      <div class="tab" onclick="switchTab('takvim')">TAKVİM</div>
-    </div>
-  </div>
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('taslak')">TASLAK</div>
+    <div class="nav-item" onclick="switchTab('revize')">REVİZE</div>
+    <div class="nav-item" onclick="switchTab('final')">FİNAL</div>
+    <div class="nav-item" onclick="switchTab('arsiv')">ARŞİV</div>
+    <div class="nav-item" onclick="switchTab('takvim')">TAKVİM</div>
+  </nav>
 
   <div class="modal-overlay" id="editModal">
     <div class="modal-content">
-      <div class="modal-header">
-        <span id="modalTitle">Düzenle</span>
-        <button class="icon-btn" onclick="closeModal()" style="border:none; padding:4px;">✕</button>
+      <div class="modal-head">
+        <span class="modal-title" id="mTitle">Düzenle</span>
+        <button class="close-modal" onclick="closeModal()">✕</button>
       </div>
-      <div class="modal-body">
-        <div id="modalRef" class="ref-box"></div>
-        <textarea id="modalEdit" class="edit-area"></textarea>
-        <div style="display:flex; gap:10px;">
-          <button class="save-btn" style="flex:1; background:var(--surface);" onclick="saveModalEdit()">İçeriği Kaydet</button>
-          <button id="modalActionBtn" class="save-btn" style="flex:1;"></button>
-        </div>
+      <div id="mRef" class="modal-ref"></div>
+      <textarea id="mText" class="modal-textarea"></textarea>
+      <div class="modal-actions">
+        <button class="m-btn btn-save" onclick="saveModal()">Kaydet</button>
+        <button id="mActionBtn" class="m-btn btn-forward"></button>
       </div>
     </div>
   </div>
 
 <script>
-  let notes = JSON.parse(localStorage.getItem('netflix_notes')) || [];
-  let selectedTimer = 0;
+  // VERİ YÖNETİMİ
+  let notes = JSON.parse(localStorage.getItem('n_pro_notes')) || [];
+  let timerSelection = 0;
   let activeTimers = {};
   let currentEditId = null;
 
-  // Expanding Input Logic
-  const inputWrapper = document.getElementById('inputWrapper');
-  const mainInput = document.getElementById('mainInput');
+  // AKILLI INPUT (Aynı sayfada büyüme)
+  const draftBox = document.getElementById('draftBox');
+  const mainDraft = document.getElementById('mainDraft');
+
+  mainDraft.addEventListener('focus', () => draftBox.classList.add('expanded'));
   
-  mainInput.addEventListener('focus', () => inputWrapper.classList.add('expanded'));
-  
-  // Tab Switching
-  function switchTab(tabName) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(`sec-${tabName}`).classList.add('active');
-    event.currentTarget.classList.add('active');
-    renderAll();
-    if(tabName === 'takvim') renderCalendar();
+  // Ekranda boş bir yere tıklanırsa input'u küçült (eğer içi boşsa)
+  document.addEventListener('click', (e) => {
+    if (!draftBox.contains(e.target) && mainDraft.value.trim() === '' && document.getElementById('refDraft').value.trim() === '') {
+      draftBox.classList.remove('expanded');
+    }
+  });
+
+  // PRATİK BUTONLAR
+  function copyDraft() {
+    navigator.clipboard.writeText(mainDraft.value).then(() => {
+      alert("Tümü Kopyalandı!");
+    });
   }
 
-  // Input Tools
-  function copyText() {
-    navigator.clipboard.writeText(mainInput.value).then(() => alert('Kopyalandı!'));
-  }
   function addTime() {
     const now = new Date();
-    const timeStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}] `;
-    mainInput.value += (mainInput.value ? '\n' : '') + timeStr;
-    mainInput.focus();
-  }
-  function setTimer(mins, btn) {
-    selectedTimer = mins;
-    document.querySelectorAll('.timer-opt').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    const tStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}] `;
+    mainDraft.value = mainDraft.value ? mainDraft.value + '\n' + tStr : tStr;
+    mainDraft.focus();
   }
 
-  // Note Management
-  function saveDraft() {
-    const text = mainInput.value.trim();
-    if(!text) return;
-    
-    const note = {
+  function setTimer(mins, el) {
+    timerSelection = mins;
+    document.querySelectorAll('.c-opt').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // SEKME DEĞİŞTİRME
+  function switchTab(tab) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(`sec-${tab}`).classList.add('active');
+    event.currentTarget.classList.add('active');
+    renderUI();
+  }
+
+  // NOT EKLEME VE İŞLEMLER
+  function saveNewDraft() {
+    const text = mainDraft.value.trim();
+    if (!text) return;
+
+    const newNote = {
       id: Date.now(),
       text: text,
-      ref: document.getElementById('refInput').value.trim(),
+      ref: document.getElementById('refDraft').value.trim(),
       stage: 'taslak',
       completed: false,
+      revisions: 0,
       date: new Date().toLocaleDateString('tr-TR'),
-      timerEnd: selectedTimer > 0 ? Date.now() + (selectedTimer * 60000) : null
+      deadline: timerSelection > 0 ? Date.now() + (timerSelection * 60000) : null
     };
-    
-    notes.unshift(note);
-    mainInput.value = '';
-    document.getElementById('refInput').value = '';
-    inputWrapper.classList.remove('expanded');
-    setTimer(0, document.querySelector('.timer-opt'));
+
+    notes.unshift(newNote);
+    mainDraft.value = '';
+    document.getElementById('refDraft').value = '';
+    draftBox.classList.remove('expanded');
+    setTimer(0, document.querySelector('.c-opt'));
     saveAndRender();
   }
 
-  function moveNote(id, newStage) {
-    const note = notes.find(n => n.id === id);
-    if(note) { note.stage = newStage; saveAndRender(); }
+  function moveStage(id, stage) {
+    const n = notes.find(x => x.id === id);
+    if(n) {
+      if(stage === 'final' && n.stage === 'revize') n.revisions++;
+      n.stage = stage;
+      saveAndRender();
+    }
   }
 
   function toggleComplete(id) {
-    const note = notes.find(n => n.id === id);
-    if(note) {
-      if(!note.completed) {
-        note.completed = true;
-        note.stage = 'arsiv'; // Finale tamamlanınca arşive gitsin
-      }
+    const n = notes.find(x => x.id === id);
+    if(n) {
+      n.completed = true;
+      n.stage = 'arsiv'; // Tamamlanınca arşive düşsün
       saveAndRender();
     }
   }
 
-  function deleteAll() {
-    if(confirm("Bugünün tüm notlarını ve görevlerini silmek istediğine emin misin?")) {
+  function restoreNote(id) {
+    const n = notes.find(x => x.id === id);
+    if(n) {
+      n.stage = 'final';
+      n.completed = false;
+      saveAndRender();
+    }
+  }
+
+  function clearDay() {
+    if(confirm("Bugünün tüm kayıtlarını silmek istediğine emin misin? (Arşivdekiler hariç)")) {
       const today = new Date().toLocaleDateString('tr-TR');
-      notes = notes.filter(n => n.date !== today);
+      notes = notes.filter(n => n.date !== today || n.stage === 'arsiv');
       saveAndRender();
     }
   }
 
-  function restoreFromArchive(id) {
-    const note = notes.find(n => n.id === id);
-    if(note) {
-      note.stage = 'final';
-      note.completed = false;
-      saveAndRender();
-    }
-  }
-
-  // Modals
-  function openEditModal(id) {
-    const note = notes.find(n => n.id === id);
-    if(!note) return;
+  // MODAL İŞLEMLERİ
+  function openModal(id) {
+    const n = notes.find(x => x.id === id);
+    if(!n) return;
     currentEditId = id;
+
+    document.getElementById('mTitle').innerText = n.stage.toUpperCase() + ' DÜZENLE';
+    const mRef = document.getElementById('mRef');
+    if(n.ref) { mRef.style.display = 'block'; mRef.innerText = n.ref; } else { mRef.style.display = 'none'; }
     
-    const refBox = document.getElementById('modalRef');
-    if(note.ref) { refBox.style.display = 'block'; refBox.innerText = "Referans: " + note.ref; } 
-    else { refBox.style.display = 'none'; }
+    document.getElementById('mText').value = n.text;
     
-    document.getElementById('modalEdit').value = note.text;
-    document.getElementById('modalTitle').innerText = note.stage === 'taslak' ? 'Taslağı Düzenle' : 'Revize Et';
-    
-    const actionBtn = document.getElementById('modalActionBtn');
-    if(note.stage === 'taslak') {
-      actionBtn.innerText = "Revizeye Aktar ➡️";
-      actionBtn.onclick = () => { saveModalEdit(); moveNote(id, 'revize'); closeModal(); };
-    } else if(note.stage === 'revize') {
-      actionBtn.innerText = "Finale Aktar ➡️";
-      actionBtn.style.background = "var(--success)";
-      actionBtn.onclick = () => { saveModalEdit(); moveNote(id, 'final'); closeModal(); };
+    const actionBtn = document.getElementById('mActionBtn');
+    if(n.stage === 'taslak') {
+      actionBtn.innerText = 'Revizeye Aktar ➡️';
+      actionBtn.style.background = '#3498db';
+      actionBtn.onclick = () => { saveModal(); moveStage(id, 'revize'); closeModal(); };
+    } else if(n.stage === 'revize') {
+      actionBtn.innerText = 'Finale Aktar ➡️';
+      actionBtn.style.background = 'var(--success)';
+      actionBtn.onclick = () => { saveModal(); moveStage(id, 'final'); closeModal(); };
     } else {
       actionBtn.style.display = 'none';
     }
@@ -306,76 +345,98 @@
   function closeModal() {
     document.getElementById('editModal').classList.remove('open');
     currentEditId = null;
-    document.getElementById('modalActionBtn').style.display = 'block';
-    document.getElementById('modalActionBtn').style.background = "var(--accent)";
+    document.getElementById('mActionBtn').style.display = 'block';
   }
 
-  function saveModalEdit() {
-    const note = notes.find(n => n.id === currentEditId);
-    if(note) {
-      note.text = document.getElementById('modalEdit').value;
+  function saveModal() {
+    const n = notes.find(x => x.id === currentEditId);
+    if(n) {
+      n.text = document.getElementById('mText').value;
       saveAndRender();
     }
   }
 
-  // Rendering
-  function renderAll() {
-    const grids = { taslak: document.getElementById('grid-taslak'), revize: document.getElementById('grid-revize'), final: document.getElementById('grid-final') };
-    const archiveList = document.getElementById('list-arsiv');
+  // ARAYÜZ ÇİZİMİ (RENDER)
+  function renderUI() {
+    // 1. Gridleri Temizle
+    const gTaslak = document.getElementById('grid-taslak');
+    const gRevize = document.getElementById('grid-revize');
+    const gFinal = document.getElementById('grid-final');
+    const lArsiv = document.getElementById('list-arsiv');
     
-    grids.taslak.innerHTML = ''; grids.revize.innerHTML = ''; grids.final.innerHTML = ''; archiveList.innerHTML = '';
+    gTaslak.innerHTML = ''; gRevize.innerHTML = ''; gFinal.innerHTML = ''; lArsiv.innerHTML = '';
 
-    notes.forEach(note => {
-      if(note.stage === 'arsiv') {
-        const d = document.createElement('div');
-        d.className = 'arch-card';
-        d.innerHTML = `
-          <div style="display:flex; flex-direction:column; gap:4px; max-width: 75%;">
-            <span style="font-size:9px; color:var(--text-muted);">${note.date}</span>
-            <span class="arch-content">${note.text}</span>
+    let total = notes.length;
+    let completedCount = 0;
+    let revCount = 0;
+
+    notes.forEach(n => {
+      revCount += (n.revisions || 0);
+
+      // ARŞİV LİSTESİ
+      if(n.stage === 'arsiv') {
+        completedCount++;
+        lArsiv.innerHTML += `
+          <div class="arch-item">
+            <div class="arch-info">
+              <div class="arch-date">${n.date} - Rev: ${n.revisions}</div>
+              <div class="arch-text">${n.text}</div>
+            </div>
+            <button class="restore-btn" onclick="restoreNote(${n.id})">Geri Al</button>
           </div>
-          <button class="restore-btn" onclick="restoreFromArchive(${note.id})">Geri Al</button>
         `;
-        archiveList.appendChild(d);
         return;
       }
 
+      // KARTLAR (Taslak, Revize, Final)
       const card = document.createElement('div');
-      card.className = `card stage-${note.stage} ${note.completed ? 'completed' : ''}`;
+      card.className = `card stage-${n.stage}`;
       
-      let timerHTML = '';
-      if(note.stage === 'taslak' && note.timerEnd) {
-        timerHTML = `<div class="card-timer" id="t-${note.id}">--:--</div>`;
-        startCardTimer(note);
+      let tHtml = '';
+      if(n.stage === 'taslak' && n.deadline) {
+        tHtml = `<div class="c-timer" id="tmr-${n.id}">--:--</div>`;
+        runTimer(n);
       }
 
-      let btnText = note.stage === 'taslak' ? 'Revize ➡️' : (note.stage === 'revize' ? 'Final ➡️' : 'Tamamla ✓');
-      let btnAction = note.stage === 'taslak' ? `moveNote(${note.id}, 'revize')` : (note.stage === 'revize' ? `moveNote(${note.id}, 'final')` : `toggleComplete(${note.id})`);
-      
-      let clickAction = note.stage !== 'final' ? `onclick="if(event.target.tagName !== 'BUTTON') openEditModal(${note.id})"` : '';
+      let btnTxt = n.stage === 'taslak' ? 'Revize ➡️' : (n.stage === 'revize' ? 'Final ➡️' : 'Tamamla ✓');
+      let btnColor = n.stage === 'taslak' ? '#3498db' : (n.stage === 'revize' ? 'var(--success)' : 'var(--text-muted)');
+      let clickEvt = n.stage === 'final' ? `toggleComplete(${n.id})` : `moveStage(${n.id}, '${n.stage === 'taslak' ? 'revize' : 'final'}')`;
 
       card.innerHTML = `
-        ${note.completed ? '<div class="check-mark">✓</div>' : ''}
-        ${timerHTML}
-        <div class="card-date">${note.date}</div>
-        <div class="card-text" ${clickAction}>${note.text}</div>
-        <button class="card-action" onclick="${btnAction}">${btnText}</button>
+        ${tHtml}
+        <div style="font-size:9px; color:var(--text-muted)">${n.date}</div>
+        <div class="c-text" onclick="openModal(${n.id})">${n.text}</div>
+        <div class="c-action" onclick="${clickEvt}">
+          <span>İlerle</span>
+          <span style="color:${btnColor}">${btnTxt}</span>
+        </div>
       `;
-      grids[note.stage].appendChild(card);
+
+      if(n.stage === 'taslak') gTaslak.appendChild(card);
+      if(n.stage === 'revize') gRevize.appendChild(card);
+      if(n.stage === 'final') gFinal.appendChild(card);
     });
+
+    // İstatistik Güncelleme
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-done').innerText = completedCount;
+    document.getElementById('stat-revs').innerText = revCount;
+
+    renderCalendar();
   }
 
-  function startCardTimer(note) {
-    if(activeTimers[note.id]) clearInterval(activeTimers[note.id]);
-    activeTimers[note.id] = setInterval(() => {
-      const el = document.getElementById(`t-${note.id}`);
-      if(!el) { clearInterval(activeTimers[note.id]); return; }
+  // TIMER (Geri Sayım)
+  function runTimer(n) {
+    if(activeTimers[n.id]) clearInterval(activeTimers[n.id]);
+    activeTimers[n.id] = setInterval(() => {
+      const el = document.getElementById(`tmr-${n.id}`);
+      if(!el) { clearInterval(activeTimers[n.id]); return; }
       
-      const left = Math.max(0, note.timerEnd - Date.now());
+      const left = Math.max(0, n.deadline - Date.now());
       if(left === 0) {
-        el.innerText = 'Süre Bitti';
-        el.style.color = 'var(--text-muted)';
-        clearInterval(activeTimers[note.id]);
+        el.innerText = 'SÜRE BİTTİ';
+        el.classList.add('expired');
+        clearInterval(activeTimers[n.id]);
       } else {
         const m = Math.floor(left / 60000);
         const s = Math.floor((left % 60000) / 1000);
@@ -384,45 +445,37 @@
     }, 1000);
   }
 
-  // Calendar
+  // İŞLEVSEL TAKVİM
   function renderCalendar() {
-    const calGrid = document.getElementById('cal-grid');
-    calGrid.innerHTML = '';
+    const cg = document.getElementById('calGrid');
+    cg.innerHTML = '';
     
     const now = new Date();
-    document.getElementById('cal-month').innerText = now.toLocaleString('tr-TR', { month: 'long', year: 'numeric' }).toUpperCase();
+    document.getElementById('calMonthStr').innerText = now.toLocaleString('tr-TR', { month: 'long', year: 'numeric' }).toUpperCase();
     
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
-    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    
-    // Adjust for Monday start
-    let startOffset = firstDay === 0 ? 6 : firstDay - 1; 
+    let firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+    let daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    let offset = firstDay === 0 ? 6 : firstDay - 1; 
 
-    for(let i=0; i<startOffset; i++) {
-      calGrid.innerHTML += `<div></div>`;
-    }
+    for(let i=0; i<offset; i++) cg.innerHTML += `<div></div>`;
 
-    for(let day=1; day<=daysInMonth; day++) {
-      const dateStr = new Date(now.getFullYear(), now.getMonth(), day).toLocaleDateString('tr-TR');
-      const hasNote = notes.some(n => n.date === dateStr);
-      const isToday = day === now.getDate();
+    for(let d=1; d<=daysInMonth; d++) {
+      const dStr = new Date(now.getFullYear(), now.getMonth(), d).toLocaleDateString('tr-TR');
+      // O güne ait not var mı kontrol et
+      const hasData = notes.some(x => x.date === dStr);
+      const isToday = d === now.getDate();
       
-      calGrid.innerHTML += `<div class="cal-day ${isToday ? 'today' : ''} ${hasNote ? 'has-note' : ''}">${day}</div>`;
+      cg.innerHTML += `<div class="cal-day ${isToday ? 'today' : ''} ${hasData ? 'has-data' : ''}">${d}</div>`;
     }
   }
 
   function saveAndRender() {
-    localStorage.setItem('netflix_notes', JSON.stringify(notes));
-    renderAll();
+    localStorage.setItem('n_pro_notes', JSON.stringify(notes));
+    renderUI();
   }
 
-  // Init
-  renderAll();
-
-  // Close modal when clicking outside
-  document.getElementById('editModal').addEventListener('click', function(e) {
-    if(e.target === this) closeModal();
-  });
+  // BAŞLANGIÇ
+  renderUI();
 </script>
 </body>
 </html>
