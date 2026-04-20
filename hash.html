@@ -4,626 +4,1360 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3 Adım Not</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root[data-theme="dark"] {
-            --bg: #0d0d0f; --bg2: #141416;
-            --card: #1a1a1e; --card2: #222228;
+            --bg: #0c0c0f;
+            --bg2: #131317;
+            --card: #1a1a1f;
+            --card2: #222229;
             --border: rgba(255,255,255,0.07);
-            --text: #f0f0f0; --muted: #6b6b7a;
-            --accent: #e5193a; --accent2: #ff4d6b;
-            --success: #00d97e; --warn: #f5a623; --info: #3d9cff;
+            --border2: rgba(255,255,255,0.12);
+            --text: #efefef;
+            --muted: #5e5e72;
+            --muted2: #8888a0;
+            --accent: #e5193a;
+            --accent2: #ff4d6b;
+            --info: #3d9cff;
+            --warn: #f5a623;
+            --success: #00d97e;
+            --glass: rgba(255,255,255,0.03);
         }
         :root[data-theme="light"] {
-            --bg: #f4f4f7; --bg2: #ebebef;
-            --card: #ffffff; --card2: #f0f0f5;
-            --border: rgba(0,0,0,0.08);
-            --text: #131318; --muted: #8888a0;
-            --accent: #e5193a; --accent2: #ff4d6b;
-            --success: #00b865; --warn: #d48a00; --info: #1a7ef5;
+            --bg: #f2f2f6;
+            --bg2: #e8e8ef;
+            --card: #ffffff;
+            --card2: #f0f0f6;
+            --border: rgba(0,0,0,0.07);
+            --border2: rgba(0,0,0,0.12);
+            --text: #111118;
+            --muted: #9494aa;
+            --muted2: #6666880;
+            --accent: #e5193a;
+            --accent2: #ff4d6b;
+            --info: #1a7ef5;
+            --warn: #d48a00;
+            --success: #00b865;
+            --glass: rgba(0,0,0,0.02);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
         body {
-            background: var(--bg); color: var(--text);
-            font-family: 'DM Sans', sans-serif;
-            padding-bottom: 90px; min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            padding-bottom: 80px;
+            min-height: 100vh;
             transition: background 0.3s, color 0.3s;
         }
 
         /* ── HEADER ── */
         header {
             position: sticky; top: 0; z-index: 50;
-            background: var(--bg2); border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px); padding: 14px 18px;
-            display: flex; align-items: center; gap: 12px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+            padding: 12px 16px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .header-title { font-family: 'Space Mono', monospace; font-size: 17px; font-weight: 700; flex: 1; }
+        .header-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 16px; font-weight: 700;
+            letter-spacing: -0.5px;
+            flex: 1;
+        }
         .header-title span { color: var(--accent); }
-        .header-btn {
-            background: var(--card2); border: 1px solid var(--border);
-            color: var(--muted); width: 36px; height: 36px;
-            border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 15px; transition: 0.2s;
+        .hbtn {
+            background: var(--card); border: 1px solid var(--border);
+            color: var(--muted2); width: 34px; height: 34px;
+            border-radius: 9px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; flex-shrink: 0;
         }
-        .header-btn:hover { color: var(--text); border-color: var(--accent); }
-        
-        /* ── STATS BAR ── */
+        .hbtn svg { width:16px; height:16px; stroke-width:1.8; }
+        .hbtn:hover { color: var(--text); border-color: var(--border2); }
+        .search-wrap { flex: 1; position: relative; display: none; }
+        .search-wrap.open { display: flex; }
+        .search-wrap input {
+            width: 100%; background: var(--card); border: 1px solid var(--border);
+            color: var(--text); padding: 8px 36px 8px 12px;
+            border-radius: 9px; font-size: 14px; outline: none;
+            font-family: 'Outfit', sans-serif; transition: border-color 0.2s;
+        }
+        .search-wrap input:focus { border-color: var(--accent); }
+        .search-wrap .s-ic {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            color: var(--muted); pointer-events: none;
+        }
+        .search-wrap .s-ic svg { width:14px; height:14px; }
+
+        /* ── STATS ── */
         .stats-bar {
-            display: flex; gap: 1px; overflow: hidden; margin: 16px 16px 0;
+            display: flex; gap: 1px; overflow: hidden;
+            margin: 14px 14px 0;
             border-radius: 12px; border: 1px solid var(--border);
         }
-        .stat-item { flex: 1; background: var(--card); padding: 12px 10px; text-align: center; cursor: pointer; }
+        .stat-item {
+            flex: 1; background: var(--card);
+            padding: 11px 8px; text-align: center;
+            cursor: pointer; transition: background 0.2s;
+        }
         .stat-item:hover { background: var(--card2); }
-        .stat-num { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1; }
-        .stat-num.taslak-c { color: var(--info); }
-        .stat-num.revize-c { color: var(--warn); }
-        .stat-num.final-c  { color: var(--success); }
-        .stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; }
+        .stat-num { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; line-height: 1; }
+        .stat-num.tc { color: var(--info); }
+        .stat-num.rc { color: var(--warn); }
+        .stat-num.fc { color: var(--success); }
+        .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* ── CONTAINER ── */
-        .container { padding: 16px; }
-        .tab-content { display: none; animation: fadeUp 0.25s ease; }
+        .container { padding: 14px; }
+
+        /* ── TABS ── */
+        .tab-content { display: none; animation: fadeUp 0.22s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-        /* ── TAGS & COLORS ── */
-        .color-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-        .color-dot {
-            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-            border: 2px solid transparent; transition: 0.15s; position: relative;
+        /* ── NEW NOTE BUTTON (Taslak) ── */
+        .new-note-trigger {
+            background: var(--card); border: 1px dashed var(--border2);
+            border-radius: 13px; padding: 14px 16px;
+            margin-bottom: 18px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            color: var(--muted2); transition: 0.2s;
+        }
+        .new-note-trigger:hover { border-color: var(--accent); color: var(--text); }
+        .new-note-trigger svg { width:18px; height:18px; stroke-width:1.8; flex-shrink:0; color: var(--accent); }
+        .new-note-trigger span { font-size: 14px; }
+
+        /* ── NEW NOTE PANEL ── */
+        .new-note-panel {
+            display: none; background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 16px;
+            margin-bottom: 18px;
+            animation: fadeUp 0.2s ease;
+        }
+        .new-note-panel.open { display: block; }
+
+        .panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .panel-title { font-size: 12px; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.8px; }
+        .panel-close {
+            background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px; transition:0.2s;
+        }
+        .panel-close:hover { color: var(--accent); }
+        .panel-close svg { width:16px; height:16px; stroke-width:2; }
+
+        /* Tag selector inside panel */
+        .tag-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .tag-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 500; cursor: pointer;
+            border: 1.5px solid transparent; transition: 0.15s; opacity: 0.65;
+        }
+        .tag-badge .tag-letter {
+            width: 16px; height: 16px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,0.9); font-weight: 700; font-size: 12px;
-            text-shadow: 0px 1px 2px rgba(0,0,0,0.5); text-transform: uppercase;
+            font-size: 9px; font-weight: 700; flex-shrink: 0;
+            color: #fff;
         }
-        .color-dot.selected { border-color: var(--text); transform: scale(1.15); box-shadow: 0 0 10px rgba(0,0,0,0.3); }
-        .btn-manage-tags {
-            background: transparent; border: 1px dashed var(--muted); color: var(--muted);
-            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 11px;
-        }
-        .btn-manage-tags:hover { border-color: var(--text); color: var(--text); }
+        .tag-badge.selected { opacity: 1; border-color: currentColor; }
+        .tag-badge:hover { opacity: 0.9; }
 
-        /* ── FORM ELEMENTS ── */
-        .input-group { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
-        .input-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        textarea, input[type="text"] {
-            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text); font-size: 14px; padding: 12px; outline: none; font-family: 'DM Sans', sans-serif;
-            resize: none;
+        /* Input blocks */
+        .note-block { margin-bottom: 10px; }
+        .block-label {
+            font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px;
+            color: var(--muted); margin-bottom: 6px; font-weight: 600;
         }
-        textarea:focus, input[type="text"]:focus { border-color: var(--accent); }
-        textarea.kaos-box { height: 120px; }
-        textarea.giris-box { height: 60px; margin-bottom: 10px; }
+        textarea {
+            width: 100%; background: var(--card2); border: 1px solid var(--border);
+            color: var(--text); font-size: 14px; resize: none; outline: none;
+            font-family: 'Outfit', sans-serif; line-height: 1.6;
+            border-radius: 10px; padding: 10px 12px;
+            transition: border-color 0.2s;
+        }
+        textarea:focus { border-color: var(--border2); }
+        textarea::placeholder { color: var(--muted); }
+        #girisTxt { height: 90px; }
+        #kaosTxt  { height: 180px; }
+
+        .char-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+        .char-count { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+        .timer-row {
+            display: flex; gap: 6px; align-items: center;
+            padding-top: 10px; margin-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        .timer-btn {
+            background: var(--card2); border: 1px solid var(--border);
+            color: var(--muted2); padding: 4px 9px;
+            border-radius: 20px; font-size: 11px; cursor: pointer;
+            transition: 0.2s; font-family: 'Space Mono', monospace;
+        }
+        .timer-btn:hover, .timer-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        #timerDisplay { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent); margin-left: auto; }
+        #timerDisplay.done { color: var(--success); animation: pulse 0.5s 3; }
+        @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
 
         .btn-save {
-            background: var(--accent); color: #fff; border: none; width: 100%; padding: 12px;
-            border-radius: 10px; font-weight: 600; font-size: 14px; margin-top: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+            background: var(--accent); color: #fff;
+            border: none; width: 100%; padding: 11px;
+            border-radius: 10px; font-weight: 600;
+            font-size: 14px; margin-top: 12px; cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: background 0.2s, transform 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
         }
+        .btn-save svg { width:16px; height:16px; stroke-width:2; }
+        .btn-save:hover { background: var(--accent2); }
         .btn-save:active { transform: scale(0.98); }
+        .btn-save.warn { background: var(--warn); }
+        .btn-save.warn:hover { background: #ffb84d; }
+        .btn-save.info { background: var(--info); }
+        .btn-save.info:hover { background: #5aafff; }
 
-        /* ── REVIZE 2-BLOCK LAYOUT ── */
-        .revize-draft-viewer { background: rgba(61,156,255,0.05); border: 1px solid var(--info); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
-        .revize-draft-viewer .text-content { font-size: 13px; color: var(--text); line-height: 1.6; margin-top: 8px; }
-        .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; color: var(--muted); }
-        .pagination button { background: var(--card2); border: none; color: var(--text); padding: 4px 10px; border-radius: 6px; cursor: pointer; }
-        .draft-preview-item {
-            background: var(--card2); border-radius: 8px; padding: 10px; font-size: 13px; color: var(--muted); cursor: pointer;
-            margin-bottom: 6px; display: flex; align-items: flex-start; gap: 8px; border: 1px solid transparent;
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            display: flex; gap: 5px; margin-bottom: 14px;
+            overflow-x: auto; padding-bottom: 2px;
+            scrollbar-width: none;
         }
-        .draft-preview-item.selected { border-color: var(--info); color: var(--text); background: rgba(61,156,255,0.1); }
-        .draft-preview-item .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-
-        /* ── CARDS GRID ── */
-        .section-label { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-        
-        .card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
-            display: flex; flex-direction: column; position: relative; overflow: hidden; height: 180px;
-        }
-        .card-stripe { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
-        .card-meta { font-size: 10px; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .card-cat { background: var(--card2); padding: 2px 6px; border-radius: 4px; font-size: 9px; color: var(--info); }
-        .card-text { font-size: 12px; line-height: 1.5; flex-grow: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; }
-        .card-actions { margin-top: 8px; display: flex; justify-content: flex-end; gap: 6px; }
-        .action-btn {
-            background: var(--card2); border: none; color: var(--muted); width: 28px; height: 28px;
-            border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px;
-        }
-        .action-btn:hover { color: var(--text); background: rgba(255,255,255,0.1); }
-
-        /* ── FAB BUTTON ── */
-        .fab-btn {
-            position: fixed; bottom: 80px; right: 20px; width: 56px; height: 56px;
-            background: var(--info); color: #fff; border: none; border-radius: 50%;
-            font-size: 24px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(61,156,255,0.4); cursor: pointer; z-index: 90;
-            transition: 0.2s;
-        }
-        .fab-btn:active { transform: scale(0.9); }
-
-        /* ── FILTERS ── */
-        .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .filter-bar::-webkit-scrollbar { display: none; }
         .filter-chip {
-            background: var(--card2); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px;
-            border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap;
+            background: var(--card); border: 1px solid var(--border);
+            color: var(--muted2); padding: 5px 11px;
+            border-radius: 20px; font-size: 12px; cursor: pointer;
+            white-space: nowrap; transition: 0.15s;
+            display: flex; align-items: center; gap: 5px; flex-shrink: 0;
         }
         .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .chip-letter {
+            width: 14px; height: 14px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
 
-        /* ── MODALS ── */
+        /* ── SECTION LABEL ── */
+        .section-label {
+            font-size: 11px; color: var(--muted); text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+        /* ── CARDS GRID ── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px;
+            aspect-ratio: 1 / 1;
+            display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .card.completed { opacity: 0.5; }
+        .card.completed .card-text { text-decoration: line-through; color: var(--muted); }
+
+        .card-stripe { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+
+        .card-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            margin-bottom: 5px; margin-top: 2px;
+        }
+        .card-tag-letter {
+            width: 15px; height: 15px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8px; font-weight: 700; color: #fff;
+        }
+        .card-tag-name { font-size: 10px; color: var(--muted); font-weight: 500; }
+
+        .card-meta { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 5px; }
+        .card-text {
+            font-size: 12px; line-height: 1.5; flex-grow: 1; overflow: hidden;
+            display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+            word-break: break-word;
+        }
+        .card-actions { margin-top: auto; padding-top: 6px; display: flex; justify-content: flex-end; gap: 5px; }
+        .action-btn {
+            background: rgba(255,255,255,0.05); border: none;
+            color: var(--muted); width: 26px; height: 26px;
+            border-radius: 7px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.15s;
+        }
+        .action-btn svg { width:12px; height:12px; stroke-width:2; }
+        .action-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .action-btn.go   { color: var(--warn); background: rgba(245,166,35,0.1); }
+        .action-btn.go:hover { background: rgba(245,166,35,0.2); }
+        .action-btn.done { color: var(--success); background: rgba(0,217,126,0.1); }
+        .action-btn.done:hover { background: rgba(0,217,126,0.2); }
+        .action-btn.back { color: var(--info); background: rgba(61,156,255,0.1); }
+        .action-btn.back:hover { background: rgba(61,156,255,0.2); }
+        .action-btn.del  { color: var(--accent); background: rgba(229,25,58,0.1); }
+        .action-btn.del:hover { background: rgba(229,25,58,0.2); }
+
+        /* ── EMPTY STATE ── */
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
+        .empty-icon { font-size: 46px; margin-bottom: 12px; filter: grayscale(0.3) opacity(0.6); }
+        .empty-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+        .empty-sub { font-size: 12px; line-height: 1.5; }
+
+        /* ── REVIZE TAB ── */
+        .revize-layout { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+
+        .rbox {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 14px;
+        }
+        .rbox-label {
+            font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-weight: 600;
+        }
+        .rbox-label svg { width:13px; height:13px; stroke-width:2; }
+        .rbox-label.blue { color: var(--info); }
+        .rbox-label.orange { color: var(--warn); }
+
+        /* Draft preview list with pagination */
+        .draft-pages { display: flex; flex-direction: column; gap: 6px; }
+        .draft-preview-item {
+            background: var(--card2); border-radius: 8px; padding: 10px 12px;
+            font-size: 13px; color: var(--muted2); cursor: pointer;
+            transition: 0.15s; border: 1.5px solid transparent;
+            display: flex; gap: 8px;
+        }
+        .draft-preview-item:hover { border-color: var(--info); color: var(--text); }
+        .draft-preview-item.selected { border-color: var(--info); color: var(--text); background: rgba(61,156,255,0.07); }
+        .draft-preview-item .dpi-dot {
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; margin-top: 1px;
+        }
+        .draft-preview-item .dpi-body { flex: 1; min-width: 0; }
+        .dpi-meta { font-size: 10px; color: var(--muted); margin-bottom: 2px; font-family: 'Space Mono', monospace; }
+        .dpi-text { font-size: 12px; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+
+        .draft-pagination {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+        }
+        .page-btn {
+            background: var(--card2); border: 1px solid var(--border);
+            color: var(--muted2); width: 30px; height: 30px;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.15s; font-size: 12px;
+        }
+        .page-btn svg { width:13px; height:13px; stroke-width:2; }
+        .page-btn:hover { border-color: var(--info); color: var(--info); }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .page-info { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+
+        /* Selected draft full view */
+        .selected-draft-view {
+            display: none; background: var(--card2); border-radius: 10px;
+            padding: 12px; margin-top: 10px; border-left: 3px solid var(--info);
+        }
+        .selected-draft-view.visible { display: block; }
+        .sdv-label { font-size: 10px; color: var(--info); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+        .sdv-text { 
+            font-size: 13px; line-height: 1.6; color: var(--text); white-space: pre-wrap; word-break: break-word; 
+            max-height: 200px; overflow-y: auto; padding-right: 4px;
+        }
+
+        /* ── FINAL TAB ── */
+        .final-header { margin-bottom: 16px; }
+        .final-note-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; margin-bottom: 10px; overflow: hidden;
+            transition: box-shadow 0.15s;
+        }
+        .final-note-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+        .fnc-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border);
+            background: var(--card);
+        }
+        .fnc-tag-dot {
+            width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .fnc-title { flex: 1; font-size: 13px; font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .fnc-meta { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
+        .fnc-expand { color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+        .fnc-expand svg { width:14px; height:14px; stroke-width:2; }
+        .final-note-card.expanded .fnc-expand { transform: rotate(180deg); }
+        .fnc-body { display: none; padding: 12px 14px; }
+        .final-note-card.expanded .fnc-body { display: block; }
+        .fnc-text { 
+            font-size: 13px; line-height: 1.7; color: var(--text); white-space: pre-wrap; word-break: break-word; 
+            max-height: 250px; overflow-y: auto; padding-right: 4px;
+        }
+        .fnc-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+        /* ── TAG MANAGER ── */
+        .tag-manager-modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8); z-index: 300;
+            align-items: flex-end; justify-content: center; padding: 16px;
+        }
+        .tag-manager-modal.active { display: flex; }
+        .tag-manager-content {
+            background: var(--card); width: 100%; max-width: 480px;
+            border-radius: 16px; padding: 20px;
+            animation: slideUp 0.22s ease; max-height: 85vh; display: flex; flex-direction: column;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity:0; }
+            to   { transform: translateY(0); opacity:1; }
+        }
+        .tm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .tm-title { font-size: 15px; font-weight: 600; }
+        .tm-list { overflow-y: auto; flex: 1; margin-bottom: 14px; }
+        .tm-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+        }
+        .tm-color-swatch {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; color: #fff; cursor: pointer;
+            flex-shrink: 0; border: 2px solid transparent; transition: 0.15s;
+        }
+        .tm-color-swatch:hover { border-color: var(--border2); }
+        .tm-name-input {
+            flex: 1; background: var(--card2); border: 1px solid var(--border);
+            color: var(--text); padding: 6px 10px; border-radius: 8px;
+            font-size: 13px; outline: none; font-family: 'Outfit', sans-serif;
+        }
+        .tm-name-input:focus { border-color: var(--border2); }
+        .tm-del {
+            background: none; border: none; color: var(--muted);
+            cursor: pointer; padding: 4px; border-radius: 6px; transition: 0.15s;
+        }
+        .tm-del svg { width:14px; height:14px; stroke-width:2; }
+        .tm-del:hover { color: var(--accent); background: rgba(229,25,58,0.1); }
+        .tm-add-row { display: flex; gap: 8px; align-items: center; }
+        .tm-add-btn {
+            background: var(--card2); border: 1px solid var(--border);
+            color: var(--muted2); padding: 8px 14px;
+            border-radius: 9px; font-size: 13px; cursor: pointer;
+            font-family: 'Outfit', sans-serif; transition: 0.15s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .tm-add-btn svg { width:14px; height:14px; stroke-width:2; }
+        .tm-add-btn:hover { color: var(--text); border-color: var(--border2); }
+        .tm-save-btn {
+            background: var(--accent); color: #fff; border: none;
+            width: 100%; padding: 11px; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            font-family: 'Outfit', sans-serif; transition: 0.15s; margin-top: 8px;
+        }
+        .tm-save-btn:hover { background: var(--accent2); }
+
+        /* Color palette popup */
+        .color-palette-popup {
+            display: none; position: fixed; z-index: 400;
+            background: var(--card2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .color-palette-popup.open { display: block; }
+        .cpp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
+        .cpp-dot {
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+            border: 2px solid transparent; transition: 0.15s;
+        }
+        .cpp-dot:hover, .cpp-dot.selected { border-color: var(--text); transform: scale(1.1); }
+        .cpp-custom { display: flex; gap: 6px; align-items: center; }
+        .cpp-custom label { font-size: 11px; color: var(--muted); }
+        .cpp-custom input[type="color"] { width: 30px; height: 28px; border: none; background: none; cursor: pointer; padding: 0; border-radius: 6px; }
+
+        /* ── EDIT MODAL ── */
         .modal {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 200; align-items: flex-end; justify-content: center; padding: 16px;
-            backdrop-filter: blur(4px);
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 200;
+            align-items: flex-end; justify-content: center; padding: 16px;
         }
         .modal.active { display: flex; }
-        .modal-content { background: var(--card); width: 100%; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.25s ease; }
-        @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .modal-title { font-size: 15px; font-weight: 600; color: var(--text); }
-        .close-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
-        
-        .tag-list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--card2); border-radius: 8px; margin-bottom: 8px; }
+        .modal-content {
+            background: var(--card); width: 100%; max-width: 480px;
+            border-radius: 16px; padding: 20px;
+            animation: slideUp 0.22s ease;
+        }
+        .modal-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted2); }
+        .modal-content textarea { height: 140px; }
+        .modal-actions { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+        .btn-ghost {
+            background: transparent; color: var(--muted); border: 1px solid var(--border);
+            width: 100%; padding: 10px; border-radius: 10px;
+            font-size: 14px; cursor: pointer; transition: 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+        .btn-ghost:hover { color: var(--text); }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 92px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--card); border: 1px solid var(--border2);
+            color: var(--text); padding: 9px 16px; border-radius: 50px;
+            font-size: 13px; z-index: 500; opacity: 0;
+            transition: opacity 0.22s, transform 0.22s;
+            pointer-events: none; white-space: nowrap;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* ── BOTTOM NAV ── */
         .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; background: var(--bg2); border-top: 1px solid var(--border);
-            display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom);
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            display: flex; z-index: 100;
         }
         .nav-item {
-            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--muted); padding: 12px 0; cursor: pointer; font-size: 11px;
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; gap: 3px;
+            color: var(--muted); padding: 10px 0 12px;
+            cursor: pointer; transition: color 0.2s; position: relative;
+            font-size: 11px;
         }
-        .nav-item i { font-size: 18px; }
+        .nav-item svg { width:20px; height:20px; stroke-width:1.8; }
         .nav-item.active { color: var(--text); }
-        .nav-item.active i { color: var(--accent); }
-
-        .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 30px;
-            font-size: 13px; z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; font-weight: 500;
+        .nav-item.active svg { stroke: var(--accent); }
+        .nav-item.active::before {
+            content: ''; position: absolute; top: 0; left: 28%; right: 28%;
+            height: 2px; background: var(--accent); border-radius: 0 0 3px 3px;
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .nav-badge {
+            position: absolute; top: 6px; right: calc(50% - 16px);
+            background: var(--accent); color: #fff;
+            font-size: 9px; font-weight: 700;
+            min-width: 14px; height: 14px; border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 3px; font-family: 'Space Mono', monospace;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     </style>
 </head>
 <body>
 
+<div class="color-palette-popup" id="colorPalettePopup">
+    <div class="cpp-grid" id="cppGrid"></div>
+    <div class="cpp-custom">
+        <label>Özel:</label>
+        <input type="color" id="cppCustomColor" value="#3d9cff">
+        <button class="tm-add-btn" style="padding:4px 10px;font-size:11px" onclick="applyCustomColor()">Uygula</button>
+    </div>
+</div>
+
 <header>
-    <div class="header-title">3 <span>Adım</span> Not</div>
-    <button class="header-btn" onclick="toggleTheme()"><i class="fa-regular fa-moon" id="themeIcon"></i></button>
+    <div class="header-title" id="headerTitleWrap">3 <span>Adım</span> Not</div>
+    <div class="search-wrap" id="searchWrap">
+        <input type="text" id="searchInput" placeholder="Notlarda ara..." oninput="renderAll()">
+        <span class="s-ic"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+    </div>
+    <button class="hbtn" onclick="toggleSearch()" title="Ara">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="hbtn" onclick="openTagManager()" title="Etiketler">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+    </button>
+    <button class="hbtn" id="themeToggle" onclick="toggleTheme()" title="Tema">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="themeIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
 </header>
 
 <div class="stats-bar">
-    <div class="stat-item" onclick="switchTab('taslak')">
-        <div class="stat-num taslak-c" id="sTaslak">0</div><div class="stat-label">Taslak</div>
+    <div class="stat-item" onclick="switchTabById('taslak')">
+        <div class="stat-num tc" id="statTaslak">0</div>
+        <div class="stat-label">Taslak</div>
     </div>
-    <div class="stat-item" onclick="switchTab('revize')">
-        <div class="stat-num revize-c" id="sRevize">0</div><div class="stat-label">Revize</div>
+    <div class="stat-item" onclick="switchTabById('revize')">
+        <div class="stat-num rc" id="statRevize">0</div>
+        <div class="stat-label">Revize</div>
     </div>
-    <div class="stat-item" onclick="switchTab('final')">
-        <div class="stat-num final-c" id="sFinal">0</div><div class="stat-label">Final</div>
+    <div class="stat-item" onclick="switchTabById('final')">
+        <div class="stat-num fc" id="statFinal">0</div>
+        <div class="stat-label">Final</div>
     </div>
 </div>
 
 <div class="container">
+
     <div id="taslak" class="tab-content active">
+
+        <div class="new-note-trigger" id="newNoteTrigger" onclick="openNewNotePanel()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Yeni not ekle</span>
+        </div>
+
+        <div class="new-note-panel" id="newNotePanel">
+            <div class="panel-header">
+                <span class="panel-title">Yeni Taslak</span>
+                <button class="panel-close" onclick="closeNewNotePanel()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="tag-selector" id="taslakTagSelector"></div>
+
+            <div class="note-block">
+                <div class="block-label">Giriş</div>
+                <textarea id="girisTxt" placeholder="Konuyu kısa özetle, başlık veya giriş cümlesi..."></textarea>
+            </div>
+
+            <div class="note-block">
+                <div class="block-label">Kaos Bölümü</div>
+                <textarea id="kaosTxt" placeholder="Aklına gelenleri dök — dağınık olsun, ham olsun, özgür yaz..." oninput="updateCharCount()"></textarea>
+            </div>
+
+            <div class="char-row">
+                <span class="char-count" id="charCount">0 / 800</span>
+            </div>
+
+            <div class="timer-row">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:14px;height:14px;color:var(--muted);flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <button class="timer-btn" onclick="startTimer(5, this)">5 dk</button>
+                <button class="timer-btn" onclick="startTimer(10, this)">10 dk</button>
+                <button class="timer-btn" onclick="startTimer(15, this)">15 dk</button>
+                <div id="timerDisplay"></div>
+            </div>
+            <button class="btn-save" onclick="addNote()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Taslak Olarak Kaydet
+            </button>
+        </div>
+
         <div class="filter-bar" id="taslakFilters"></div>
-        <div class="section-label"><i class="fa-regular fa-pen-to-square"></i> Taslaklarım</div>
+        <div class="section-label">Taslaklar</div>
         <div class="cards-grid" id="taslakGrid"></div>
-        <button class="fab-btn" onclick="openNewTaslak()"><i class="fa-solid fa-plus"></i></button>
     </div>
 
     <div id="revize" class="tab-content">
-        <div class="input-group">
-            <span class="input-label"><i class="fa-regular fa-folder-open"></i> Taslak Seç (Sayfa <span id="draftPageNum">1</span>)</span>
-            <div id="draftPreviewList"></div>
-            <div class="pagination">
-                <button onclick="changeDraftPage(-1)"><i class="fa-solid fa-chevron-left"></i> Önceki</button>
-                <button onclick="changeDraftPage(1)">Sonraki <i class="fa-solid fa-chevron-right"></i></button>
+        <div class="revize-layout">
+
+            <div class="rbox">
+                <div class="rbox-label blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    Taslak Notlar — Tıklayarak Seç
+                </div>
+                <div class="draft-pages" id="draftPageItems"></div>
+                <div class="draft-pagination" id="draftPagination">
+                    <button class="page-btn" id="prevPage" onclick="changeDraftPage(-1)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <span class="page-info" id="pageInfo">1 / 1</span>
+                    <button class="page-btn" id="nextPage" onclick="changeDraftPage(1)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+                <div class="selected-draft-view" id="selectedDraftView">
+                    <div class="sdv-label">Seçili Taslak — Tam Görünüm</div>
+                    <div class="sdv-text" id="selectedDraftText"></div>
+                </div>
+            </div>
+
+            <div class="rbox">
+                <div class="rbox-label orange">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Revize Notu Yaz (Sıfırdan)
+                </div>
+                <div class="tag-selector" id="revizeTagSelector"></div>
+                <textarea id="revizeInput" style="height:140px" placeholder="Seçtiğin taslağa bakarak yeni notunu buraya yaz..."></textarea>
+                <button class="btn-save warn" onclick="addRevizeNote()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Revize Olarak Kaydet
+                </button>
             </div>
         </div>
 
-        <div class="revize-draft-viewer" id="revizeViewer" style="display:none">
-            <span class="input-label" style="color:var(--info)"><i class="fa-regular fa-eye"></i> Seçili Taslak İçeriği</span>
-            <div class="text-content" id="selectedDraftText"></div>
-        </div>
-
-        <div class="input-group" id="revizeEditorBlock" style="display:none">
-            <span class="input-label" style="color:var(--warn)"><i class="fa-solid fa-hammer"></i> Yeni Revize Notu</span>
-            <div class="color-picker" id="revizeColorPicker"></div>
-            <textarea id="revizeInput" class="kaos-box" placeholder="Taslağı incele ve buraya yeni halini yaz..."></textarea>
-            <button class="btn-save" style="background:var(--warn)" onclick="saveRevize()"><i class="fa-solid fa-check-double"></i> Revizeyi Kaydet</button>
-        </div>
-
         <div class="filter-bar" id="revizeFilters"></div>
-        <div class="section-label"><i class="fa-solid fa-hammer"></i> Revize Edilenler</div>
+        <div class="section-label">Revize Edilenler</div>
         <div class="cards-grid" id="revizeGrid"></div>
     </div>
 
     <div id="final" class="tab-content">
-        <div class="filter-bar" id="finalCatFilters"></div>
-        <div class="section-label"><i class="fa-regular fa-flag"></i> Final Notlar</div>
-        <div class="cards-grid" id="finalGrid"></div>
+        <div class="filter-bar" id="finalFilters"></div>
+        <div id="finalList"></div>
     </div>
+
 </div>
 
-<div class="modal" id="taslakModal">
+<div class="modal" id="editModal">
     <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Yeni Taslak Ekle</div>
-            <button class="close-btn" onclick="closeModal('taslakModal')"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="color-picker" id="taslakColorPicker"></div>
-        <span class="input-label">Giriş Bölümü</span>
-        <textarea id="tGiris" class="giris-box" placeholder="Kısa bir özet veya başlık niteliğinde..."></textarea>
-        <span class="input-label">Kaos Bölümü</span>
-        <textarea id="tKaos" class="kaos-box" placeholder="Aklına ne geliyorsa buraya dök..."></textarea>
-        <button class="btn-save" onclick="saveTaslak()"><i class="fa-regular fa-floppy-disk"></i> Kaydet</button>
-    </div>
-</div>
-
-<div class="modal" id="tagModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Etiketleri Yönet</div>
-            <button class="close-btn" onclick="closeModal('tagModal'); renderAllPickers();"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div id="tagListArea"></div>
-        <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
-            <span class="input-label">Yeni Etiket Ekle</span>
-            <div style="display:flex; gap:10px;">
-                <input type="color" id="newTagColor" value="#3d9cff" style="width:40px; height:40px; padding:0; border:none; background:transparent; cursor:pointer;">
-                <input type="text" id="newTagName" placeholder="Etiket Adı" style="flex:1;">
-                <button class="btn-save" style="width:auto; margin:0; padding:0 16px;" onclick="addNewTag()"><i class="fa-solid fa-plus"></i></button>
-            </div>
+        <div class="modal-title">Notu Düzenle</div>
+        <div class="tag-selector" id="editTagSelector"></div>
+        <textarea id="editInput"></textarea>
+        <div class="modal-actions">
+            <button class="btn-save" onclick="saveEdit()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                Kaydet
+            </button>
+            <button class="btn-ghost" onclick="closeModal()">İptal</button>
         </div>
     </div>
 </div>
 
-<div class="modal" id="viewModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title" id="viewTitle">Not Detayı</div>
-            <button class="close-btn" onclick="closeModal('viewModal')"><i class="fa-solid fa-xmark"></i></button>
+<div class="tag-manager-modal" id="tagManagerModal">
+    <div class="tag-manager-content">
+        <div class="tm-header">
+            <span class="tm-title">Etiket Yönetimi</span>
+            <button class="hbtn" onclick="closeTagManager()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
-        <div class="color-picker" id="editColorPicker"></div>
-        <div id="categoryEditBlock" style="display:none; margin-bottom:12px;">
-            <span class="input-label">Kategori (Final Notları İçin)</span>
-            <input type="text" id="editCategory" placeholder="Örn: İş, Kişisel, Proje X...">
+        <div class="tm-list" id="tmList"></div>
+        <div class="tm-add-row">
+            <button class="tm-add-btn" onclick="addNewTag()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Yeni Etiket
+            </button>
         </div>
-        <textarea id="editTextGiris" class="giris-box" style="display:none;"></textarea>
-        <textarea id="editTextKaos" class="kaos-box"></textarea>
-        <button class="btn-save" onclick="saveEdit()"><i class="fa-regular fa-circle-check"></i> Güncelle</button>
+        <button class="tm-save-btn" onclick="saveTagsAndClose()">Kaydet & Kapat</button>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" id="nav-taslak" onclick="switchTab('taslak')"><i class="fa-regular fa-pen-to-square"></i><span>Taslak</span></div>
-    <div class="nav-item" id="nav-revize" onclick="switchTab('revize')"><i class="fa-solid fa-hammer"></i><span>Revize</span></div>
-    <div class="nav-item" id="nav-final" onclick="switchTab('final')"><i class="fa-regular fa-flag"></i><span>Final</span></div>
+    <div class="nav-item active" id="nav-taslak" onclick="switchTabById('taslak')">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span>Taslak</span>
+        <span class="nav-badge" id="badge-taslak" style="display:none"></span>
+    </div>
+    <div class="nav-item" id="nav-revize" onclick="switchTabById('revize')">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>Revize</span>
+        <span class="nav-badge" id="badge-revize" style="display:none"></span>
+    </div>
+    <div class="nav-item" id="nav-final" onclick="switchTabById('final')">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Final</span>
+        <span class="nav-badge" id="badge-final" style="display:none"></span>
+    </div>
 </nav>
 
 <script>
-// ── VERİ TABANI & STATE ──
-let defaultTags = [
-    { id: 1, name: 'Genel', color: '#3d9cff' },
-    { id: 2, name: 'Acil', color: '#e5193a' },
-    { id: 3, name: 'Önemli', color: '#f5a623' },
-    { id: 4, name: 'Fikir', color: '#00d97e' }
-];
-let tags = JSON.parse(localStorage.getItem('3a_tags')) || defaultTags;
-let notes = JSON.parse(localStorage.getItem('3a_notes')) || [];
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let notes = JSON.parse(localStorage.getItem('3adim_notes') || '[]');
 
-let activeTab = 'taslak';
-let selectedTagId = tags[0]?.id || null;
-let currentDraftPage = 1;
+const DEFAULT_TAGS = [
+    { id: 't1', name: 'Genel',    color: '#3d9cff' },
+    { id: 't2', name: 'Acil',     color: '#e5193a' },
+    { id: 't3', name: 'Önemli',   color: '#f5a623' },
+    { id: 't4', name: 'Fikir',    color: '#00d97e' },
+    { id: 't5', name: 'Kişisel',  color: '#b85cff' },
+    { id: 't6', name: 'Proje',    color: '#ff8c42' },
+];
+let tags = JSON.parse(localStorage.getItem('3adim_tags') || JSON.stringify(DEFAULT_TAGS));
+
+const PRESET_COLORS = ['#3d9cff','#e5193a','#f5a623','#00d97e','#b85cff','#ff8c42','#00c9c9','#ff6b6b','#a8e063','#f7971e','#c471ed','#12c2e9'];
+
+let selectedTagId = { taslak: tags[0]?.id || null, revize: tags[0]?.id || null, edit: tags[0]?.id || null };
+let activeFilter = { taslak: 'all', revize: 'all', final: 'all' };
 let selectedDraftId = null;
 let currentEditId = null;
+let timerInterval = null;
+let draftPage = 0;
+const DRAFTS_PER_PAGE = 5;
+const tabs = ['taslak','revize','final'];
 
-let filterTaslak = 'all';
-let filterFinalCat = 'all';
+// color palette popup state
+let cppTarget = null; // { type: 'tag', tagId } | { type: 'tm', index }
+let tmTags = []; // working copy for tag manager
 
 function save() {
-    localStorage.setItem('3a_tags', JSON.stringify(tags));
-    localStorage.setItem('3a_notes', JSON.stringify(notes));
+    localStorage.setItem('3adim_notes', JSON.stringify(notes));
+}
+function saveTags() {
+    localStorage.setItem('3adim_tags', JSON.stringify(tags));
 }
 
-// ── TEMA ──
+// ═══════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════
 function toggleTheme() {
     const root = document.documentElement;
     const isDark = root.getAttribute('data-theme') === 'dark';
     root.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    document.getElementById('themeIcon').className = isDark ? 'fa-regular fa-sun' : 'fa-regular fa-moon';
+    updateThemeIcon(!isDark);
+    localStorage.setItem('3adim_theme', isDark ? 'light' : 'dark');
 }
-
-// ── ETIKET SISTEMI ──
-function renderAllPickers() {
-    const pickers = ['taslakColorPicker', 'revizeColorPicker', 'editColorPicker'];
-    const html = tags.map(t => `
-        <div class="color-dot ${t.id === selectedTagId ? 'selected' : ''}" 
-             style="background:${t.color}; border-color:${t.color}" 
-             onclick="selectTag(${t.id}, this)" title="${t.name}">
-            ${t.name.charAt(0).toUpperCase()}
-        </div>
-    `).join('') + `<button class="btn-manage-tags" onclick="openTagManager()"><i class="fa-solid fa-gear"></i></button>`;
-    
-    pickers.forEach(p => {
-        const el = document.getElementById(p);
-        if(el) el.innerHTML = html;
-    });
-}
-function selectTag(id, el) {
-    selectedTagId = id;
-    const parent = el.parentElement;
-    parent.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-    el.classList.add('selected');
-}
-function openTagManager() {
-    renderTagManagerList();
-    document.getElementById('tagModal').classList.add('active');
-}
-function renderTagManagerList() {
-    const list = document.getElementById('tagListArea');
-    list.innerHTML = tags.map(t => `
-        <div class="tag-list-item">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div class="color-dot" style="background:${t.color}; width:20px; height:20px; font-size:10px;">${t.name.charAt(0).toUpperCase()}</div>
-                <span style="font-size:13px">${t.name}</span>
-            </div>
-            <button class="action-btn" onclick="deleteTag(${t.id})" style="color:var(--accent)"><i class="fa-solid fa-trash"></i></button>
-        </div>
-    `).join('');
-}
-function addNewTag() {
-    const name = document.getElementById('newTagName').value.trim();
-    const color = document.getElementById('newTagColor').value;
-    if(!name) return;
-    tags.push({ id: Date.now(), name, color });
-    document.getElementById('newTagName').value = '';
-    save(); renderTagManagerList();
-}
-function deleteTag(id) {
-    tags = tags.filter(t => t.id !== id);
-    if(selectedTagId === id) selectedTagId = tags[0]?.id || null;
-    save(); renderTagManagerList();
-}
-
-// ── TASLAK ISLEMLERI ──
-function openNewTaslak() {
-    document.getElementById('tGiris').value = '';
-    document.getElementById('tKaos').value = '';
-    document.getElementById('taslakModal').classList.add('active');
-}
-function saveTaslak() {
-    const g = document.getElementById('tGiris').value.trim();
-    const k = document.getElementById('tKaos').value.trim();
-    if(!g && !k) { showToast('Bir şeyler yazmalısın!'); return; }
-    
-    notes.push({
-        id: Date.now(), stage: 'taslak',
-        tagId: selectedTagId,
-        giris: g, kaos: k, text: k, // text alanı geriye dönük uyumluluk ve revize için
-        date: new Date().toISOString()
-    });
-    save(); closeModal('taslakModal'); renderAll(); showToast('Taslak eklendi');
-}
-
-// ── REVIZE ISLEMLERI ──
-function renderDraftPagination() {
-    const drafts = notes.filter(n => n.stage === 'taslak');
-    const totalPages = Math.ceil(drafts.length / 5);
-    if(currentDraftPage > totalPages) currentDraftPage = totalPages || 1;
-    
-    document.getElementById('draftPageNum').innerText = currentDraftPage;
-    const start = (currentDraftPage - 1) * 5;
-    const items = drafts.slice(start, start + 5);
-    
-    const list = document.getElementById('draftPreviewList');
-    if(items.length === 0) { list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px">Taslak bulunamadı.</div>'; return; }
-    
-    list.innerHTML = items.map(n => {
-        const t = tags.find(x => x.id === n.tagId) || tags[0];
-        const previewText = n.giris ? `<b>${n.giris}</b> - ${n.kaos}` : n.text;
-        return `
-        <div class="draft-preview-item ${n.id === selectedDraftId ? 'selected' : ''}" onclick="selectDraftForRevize(${n.id})">
-            <div class="dot" style="background:${t?.color || '#ccc'}"></div>
-            <div style="overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${previewText}</div>
-        </div>`;
-    }).join('');
-}
-function changeDraftPage(dir) {
-    const drafts = notes.filter(n => n.stage === 'taslak');
-    const totalPages = Math.ceil(drafts.length / 5);
-    currentDraftPage += dir;
-    if(currentDraftPage < 1) currentDraftPage = 1;
-    if(currentDraftPage > totalPages) currentDraftPage = totalPages || 1;
-    renderDraftPagination();
-}
-function selectDraftForRevize(id) {
-    selectedDraftId = id;
-    const note = notes.find(n => n.id === id);
-    if(note) {
-        document.getElementById('revizeViewer').style.display = 'block';
-        document.getElementById('revizeEditorBlock').style.display = 'block';
-        document.getElementById('selectedDraftText').innerHTML = `
-            ${note.giris ? `<strong>${note.giris}</strong><br><br>` : ''}
-            ${(note.kaos || note.text || '').replace(/\n/g,'<br>')}
-        `;
+function updateThemeIcon(isDark) {
+    const icon = document.getElementById('themeIcon');
+    if (isDark) {
+        icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    } else {
+        icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
     }
-    renderDraftPagination();
 }
-function saveRevize() {
-    const text = document.getElementById('revizeInput').value.trim();
-    if(!text) return;
-    notes.push({
-        id: Date.now(), stage: 'revize', sourceId: selectedDraftId,
-        tagId: selectedTagId, text: text,
-        date: new Date().toISOString()
-    });
-    // Opsiyonel: Eski taslağı silmek istersen -> notes = notes.filter(n => n.id !== selectedDraftId);
-    document.getElementById('revizeInput').value = '';
-    document.getElementById('revizeViewer').style.display = 'none';
-    document.getElementById('revizeEditorBlock').style.display = 'none';
-    selectedDraftId = null;
-    save(); renderAll(); showToast('Revize kaydedildi');
+(function initTheme() {
+    const t = localStorage.getItem('3adim_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    updateThemeIcon(t === 'dark');
+})();
+
+// ═══════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════
+function toggleSearch() {
+    const wrap = document.getElementById('searchWrap');
+    const titleWrap = document.getElementById('headerTitleWrap');
+    const isOpen = wrap.classList.contains('open');
+    wrap.classList.toggle('open', !isOpen);
+    titleWrap.style.display = isOpen ? '' : 'none';
+    if (!isOpen) wrap.querySelector('input').focus();
+    else { document.getElementById('searchInput').value = ''; renderAll(); }
 }
 
-// ── ORTAK KART RENDER ──
-function renderGrid(stage) {
-    const grid = document.getElementById(stage + 'Grid');
-    let items = notes.filter(n => n.stage === stage);
-    
-    // Filtreleme (Taslak için etiket, Final için Kategori)
-    if(stage === 'taslak' && filterTaslak !== 'all') items = items.filter(n => n.tagId === parseInt(filterTaslak));
-    if(stage === 'final' && filterFinalCat !== 'all') items = items.filter(n => n.category === filterFinalCat);
-
-    if(items.length === 0) {
-        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px 10px;font-size:13px;">Burada gösterilecek not yok.</div>`;
-        return;
-    }
-
-    grid.innerHTML = items.map(n => {
-        const tag = tags.find(t => t.id === n.tagId) || { color:'#888', name:'' };
-        let displayTxt = '';
-        if(n.stage === 'taslak') {
-            displayTxt = n.giris ? `<b>${n.giris}</b><br>${n.kaos}` : n.text;
-        } else {
-            displayTxt = n.text;
+// ═══════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════
+function startTimer(minutes, btn) {
+    clearInterval(timerInterval);
+    document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    let time = minutes * 60;
+    const display = document.getElementById('timerDisplay');
+    display.classList.remove('done');
+    timerInterval = setInterval(() => {
+        const m = Math.floor(time / 60), s = time % 60;
+        display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        if (time <= 0) {
+            clearInterval(timerInterval);
+            display.textContent = '✓ Bitti!';
+            display.classList.add('done');
+            document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+            setTimeout(() => { display.textContent = ''; display.classList.remove('done'); }, 3000);
         }
-        
-        let nextStage = stage === 'taslak' ? 'revize' : (stage === 'revize' ? 'final' : null);
-        
-        return `
-        <div class="card" onclick="openViewModal(${n.id})">
-            <div class="card-stripe" style="background:${tag.color}"></div>
-            <div class="card-meta">
-                <span><i class="fa-regular fa-clock" style="font-size:10px"></i> ${new Date(n.date).toLocaleDateString('tr-TR')}</span>
-                ${n.stage === 'final' && n.category ? `<span class="card-cat">${n.category}</span>` : ''}
-            </div>
-            <div class="card-text">${displayTxt.replace(/\n/g,'<br>')}</div>
-            <div class="card-actions" onclick="event.stopPropagation()">
-                ${nextStage ? `<button class="action-btn" onclick="moveNote(${n.id}, '${nextStage}')"><i class="fa-solid fa-arrow-right"></i></button>` : ''}
-                <button class="action-btn" onclick="deleteNote(${n.id})"><i class="fa-regular fa-trash-can"></i></button>
-            </div>
+        time--;
+    }, 1000);
+}
+
+// ═══════════════════════════════════════════════════
+// NEW NOTE PANEL (Taslak)
+// ═══════════════════════════════════════════════════
+function openNewNotePanel() {
+    document.getElementById('newNoteTrigger').style.display = 'none';
+    document.getElementById('newNotePanel').classList.add('open');
+    renderTagSelector('taslakTagSelector', 'taslak');
+}
+function closeNewNotePanel() {
+    document.getElementById('newNotePanel').classList.remove('open');
+    document.getElementById('newNoteTrigger').style.display = '';
+    document.getElementById('girisTxt').value = '';
+    document.getElementById('kaosTxt').value = '';
+    document.getElementById('charCount').textContent = '0 / 800';
+}
+function updateCharCount() {
+    const v = document.getElementById('kaosTxt').value.length;
+    document.getElementById('charCount').textContent = `${v} / 800`;
+}
+
+// ═══════════════════════════════════════════════════
+// TAG SELECTOR (inline)
+// ═══════════════════════════════════════════════════
+function renderTagSelector(containerId, context) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = tags.map(t => {
+        const letter = t.name.charAt(0).toUpperCase();
+        const sel = selectedTagId[context] === t.id ? 'selected' : '';
+        return `<div class="tag-badge ${sel}" style="color:${t.color};background:${t.color}22" onclick="selectTag('${context}','${t.id}')">
+            <span class="tag-letter" style="background:${t.color}">${letter}</span>
+            ${t.name}
         </div>`;
     }).join('');
 }
-
-function moveNote(id, target) {
-    const note = notes.find(n => n.id === id);
-    if(note) {
-        note.stage = target;
-        if(target === 'final' && !note.category) note.category = 'Genel';
-        save(); renderAll(); showToast(`Not taşındı: ${target.toUpperCase()}`);
-    }
+function selectTag(context, tagId) {
+    selectedTagId[context] = tagId;
+    renderTagSelector(context === 'taslak' ? 'taslakTagSelector' :
+                      context === 'revize' ? 'revizeTagSelector' : 'editTagSelector', context);
 }
-function deleteNote(id) { notes = notes.filter(n => n.id !== id); save(); renderAll(); }
 
-// ── OKUMA & DUZENLEME ──
-function openViewModal(id) {
+// ═══════════════════════════════════════════════════
+// ADD NOTE
+// ═══════════════════════════════════════════════════
+function addNote() {
+    const girisTxt = document.getElementById('girisTxt').value.trim();
+    const kaosTxt  = document.getElementById('kaosTxt').value.trim();
+    if (!girisTxt && !kaosTxt) { showToast('⚠️ En az bir alanı doldur'); return; }
+    const tag = tags.find(t => t.id === selectedTagId['taslak']) || tags[0];
+    const text = [girisTxt ? `[Giriş]\n${girisTxt}` : '', kaosTxt ? `[Kaos]\n${kaosTxt}` : ''].filter(Boolean).join('\n\n');
+    notes.push({
+        id: Date.now(), text,
+        girisTxt, kaosTxt,
+        stage: 'taslak', completed: false,
+        tagId: tag?.id || null,
+        color: tag?.color || '#3d9cff',
+        createdAt: new Date().toISOString()
+    });
+    save(); renderAll();
+    closeNewNotePanel();
+    showToast('✅ Taslak kaydedildi');
+}
+
+function addRevizeNote() {
+    const text = document.getElementById('revizeInput').value.trim();
+    if (!text) { showToast('⚠️ Revize notu boş olamaz'); return; }
+    const tag = tags.find(t => t.id === selectedTagId['revize']) || tags[0];
+    notes.push({
+        id: Date.now(), text,
+        stage: 'revize', completed: false,
+        tagId: tag?.id || null,
+        color: tag?.color || '#f5a623',
+        sourceDraftId: selectedDraftId || null,
+        createdAt: new Date().toISOString()
+    });
+    document.getElementById('revizeInput').value = '';
+    selectedDraftId = null;
+    document.getElementById('selectedDraftView').classList.remove('visible');
+    save(); renderAll();
+    showToast('🔨 Revize kaydedildi');
+}
+
+// ═══════════════════════════════════════════════════
+// MOVE / DELETE / COMPLETE
+// ═══════════════════════════════════════════════════
+function moveNote(id, newStage) {
     const note = notes.find(n => n.id === id);
-    if(!note) return;
+    if (note) { note.stage = newStage; save(); renderAll(); showToast(stageEmoji(newStage) + ' ' + stageLabel(newStage) + "'e taşındı"); }
+}
+function deleteNote(id) {
+    notes = notes.filter(n => n.id !== id);
+    save(); renderAll(); showToast('🗑️ Not silindi');
+}
+function toggleComplete(id) {
+    const note = notes.find(n => n.id === id);
+    if (note) { note.completed = !note.completed; save(); renderAll(); }
+}
+function stageLabel(s) { return s === 'taslak' ? 'Taslak' : s === 'revize' ? 'Revize' : 'Final'; }
+function stageEmoji(s) { return s === 'taslak' ? '✏️' : s === 'revize' ? '🔨' : '✅'; }
+
+// ═══════════════════════════════════════════════════
+// EDIT MODAL
+// ═══════════════════════════════════════════════════
+function openEdit(id) {
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
     currentEditId = id;
-    selectedTagId = note.tagId;
-    renderAllPickers();
-    
-    document.getElementById('viewTitle').innerText = note.stage.toUpperCase() + ' Detayı';
-    
-    const isTaslak = note.stage === 'taslak';
-    document.getElementById('editTextGiris').style.display = isTaslak ? 'block' : 'none';
-    
-    if(isTaslak) {
-        document.getElementById('editTextGiris').value = note.giris || '';
-        document.getElementById('editTextKaos').value = note.kaos || note.text || '';
-    } else {
-        document.getElementById('editTextKaos').value = note.text || '';
-    }
-
-    const catBlock = document.getElementById('categoryEditBlock');
-    if(note.stage === 'final') {
-        catBlock.style.display = 'block';
-        document.getElementById('editCategory').value = note.category || '';
-    } else {
-        catBlock.style.display = 'none';
-    }
-
-    document.getElementById('viewModal').classList.add('active');
+    selectedTagId['edit'] = note.tagId || tags[0]?.id;
+    document.getElementById('editInput').value = note.text;
+    renderTagSelector('editTagSelector', 'edit');
+    document.getElementById('editModal').classList.add('active');
+}
+function closeModal() {
+    document.getElementById('editModal').classList.remove('active');
+    currentEditId = null;
 }
 function saveEdit() {
     const note = notes.find(n => n.id === currentEditId);
-    if(!note) return;
-    note.tagId = selectedTagId;
-    
-    if(note.stage === 'taslak') {
-        note.giris = document.getElementById('editTextGiris').value;
-        note.kaos = document.getElementById('editTextKaos').value;
-        note.text = note.kaos; 
+    const txt = document.getElementById('editInput').value.trim();
+    if (!txt) return;
+    const tag = tags.find(t => t.id === selectedTagId['edit']);
+    if (note) {
+        note.text = txt;
+        note.tagId = tag?.id || null;
+        note.color = tag?.color || note.color;
+        save(); closeModal(); renderAll();
+        showToast('✏️ Not güncellendi');
+    }
+}
+
+// ═══════════════════════════════════════════════════
+// DRAFT PREVIEW (Revize tab) with pagination
+// ═══════════════════════════════════════════════════
+function renderDraftPreview() {
+    const drafts = notes.filter(n => n.stage === 'taslak');
+    const pageContainer = document.getElementById('draftPageItems');
+    const pagination = document.getElementById('draftPagination');
+
+    if (!drafts.length) {
+        pageContainer.innerHTML = '<div style="font-size:13px;color:var(--muted);text-align:center;padding:12px">Henüz taslak yok.</div>';
+        pagination.style.display = 'none';
+        return;
+    }
+
+    const totalPages = Math.ceil(drafts.length / DRAFTS_PER_PAGE);
+    if (draftPage >= totalPages) draftPage = totalPages - 1;
+    if (draftPage < 0) draftPage = 0;
+
+    const start = draftPage * DRAFTS_PER_PAGE;
+    const pageItems = drafts.slice(start, start + DRAFTS_PER_PAGE);
+
+    pageContainer.innerHTML = pageItems.map(n => {
+        const tag = tags.find(t => t.id === n.tagId);
+        const letter = tag ? tag.name.charAt(0).toUpperCase() : '?';
+        const color = tag?.color || n.color || '#3d9cff';
+        const sel = selectedDraftId === n.id ? 'selected' : '';
+        return `<div class="draft-preview-item ${sel}" onclick="selectDraft(${n.id})">
+            <div class="dpi-dot" style="background:${color}">${letter}</div>
+            <div class="dpi-body">
+                <div class="dpi-meta">${fmtDate(n.createdAt)}</div>
+                <div class="dpi-text">${n.text.replace(/\n/g,'<br>')}</div>
+            </div>
+        </div>`;
+    }).join('');
+
+    pagination.style.display = totalPages > 1 ? 'flex' : 'none';
+    document.getElementById('pageInfo').textContent = `${draftPage + 1} / ${totalPages}`;
+    document.getElementById('prevPage').disabled = draftPage === 0;
+    document.getElementById('nextPage').disabled = draftPage === totalPages - 1;
+}
+
+function changeDraftPage(dir) {
+    draftPage += dir;
+    renderDraftPreview();
+}
+
+function selectDraft(id) {
+    selectedDraftId = (selectedDraftId === id) ? null : id;
+    const note = notes.find(n => n.id === id);
+    const view = document.getElementById('selectedDraftView');
+    if (note && selectedDraftId) {
+        document.getElementById('selectedDraftText').textContent = note.text;
+        view.classList.add('visible');
+        document.getElementById('revizeInput').value = '';
     } else {
-        note.text = document.getElementById('editTextKaos').value;
+        view.classList.remove('visible');
     }
-    
-    if(note.stage === 'final') {
-        note.category = document.getElementById('editCategory').value.trim() || 'Genel';
-    }
-    
-    save(); closeModal('viewModal'); renderAll(); showToast('Güncellendi');
+    renderDraftPreview();
 }
 
-// ── FILTRELER (Final Kategorileri & Taslak Etiketleri) ──
-function renderFiltersUI() {
-    // Taslak Filters (Etiket bazlı)
-    const tContainer = document.getElementById('taslakFilters');
-    tContainer.innerHTML = `<div class="filter-chip ${filterTaslak === 'all' ? 'active':''}" onclick="filterTaslak='all';renderGrid('taslak');renderFiltersUI();">Tümü</div>` + 
-        tags.map(t => `<div class="filter-chip ${filterTaslak == t.id ? 'active':''}" onclick="filterTaslak='${t.id}';renderGrid('taslak');renderFiltersUI();">${t.name}</div>`).join('');
+// ═══════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════
+function renderFilters(stage, containerId) {
+    const stageNotes = notes.filter(n => n.stage === stage);
+    const usedTagIds = [...new Set(stageNotes.map(n => n.tagId).filter(Boolean))];
+    const container = document.getElementById(containerId);
+    if (!usedTagIds.length) { container.innerHTML = ''; return; }
 
-    // Final Filters (Kategori bazlı)
-    const finals = notes.filter(n => n.stage === 'final' && n.category);
-    const cats = [...new Set(finals.map(n => n.category))];
-    const fContainer = document.getElementById('finalCatFilters');
-    fContainer.innerHTML = `<div class="filter-chip ${filterFinalCat === 'all' ? 'active':''}" onclick="filterFinalCat='all';renderGrid('final');renderFiltersUI();">Tümü</div>` + 
-        cats.map(c => `<div class="filter-chip ${filterFinalCat === c ? 'active':''}" onclick="filterFinalCat='${c}';renderGrid('final');renderFiltersUI();">${c}</div>`).join('');
-}
-
-// ── YARDIMCI FONKSİYONLAR ──
-function switchTab(tab) {
-    ['taslak', 'revize', 'final'].forEach(t => {
-        document.getElementById(t).classList.remove('active');
-        document.getElementById('nav-' + t).classList.remove('active');
+    let html = `<div class="filter-chip ${activeFilter[stage]==='all'?'active':''}" onclick="setFilter('${stage}','all')">Tümü</div>`;
+    usedTagIds.forEach(tid => {
+        const tag = tags.find(t => t.id === tid);
+        if (!tag) return;
+        const letter = tag.name.charAt(0).toUpperCase();
+        const act = activeFilter[stage] === tid ? 'active' : '';
+        html += `<div class="filter-chip ${act}" onclick="setFilter('${stage}','${tid}')">
+            <span class="chip-letter" style="background:${tag.color}">${letter}</span>${tag.name}
+        </div>`;
     });
-    document.getElementById(tab).classList.add('active');
-    document.getElementById('nav-' + tab).classList.add('active');
-    activeTab = tab;
+    container.innerHTML = html;
+}
+function setFilter(stage, val) {
+    activeFilter[stage] = val;
     renderAll();
 }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ═══════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════
+function renderAll() {
+    const query = (document.getElementById('searchInput').value || '').toLowerCase();
+
+    ['taslak','revize'].forEach(stage => {
+        const grid = document.getElementById(stage + 'Grid');
+        let filtered = notes.filter(n => n.stage === stage);
+        if (query) filtered = filtered.filter(n => n.text.toLowerCase().includes(query));
+        if (activeFilter[stage] !== 'all') filtered = filtered.filter(n => n.tagId === activeFilter[stage]);
+        grid.innerHTML = filtered.length ? filtered.map(n => buildCard(n)).join('') : buildEmpty(stage, !!query);
+    });
+
+    // Final — list view
+    renderFinalList(query);
+
+    renderFilters('taslak','taslakFilters');
+    renderFilters('revize','revizeFilters');
+    renderFilters('final','finalFilters');
+    renderDraftPreview();
+    updateStats();
+
+    // Re-render tag selectors if panel open
+    if (document.getElementById('newNotePanel').classList.contains('open')) {
+        renderTagSelector('taslakTagSelector', 'taslak');
+    }
+    renderTagSelector('revizeTagSelector', 'revize');
+}
+
+function renderFinalList(query) {
+    const finalList = document.getElementById('finalList');
+    let filtered = notes.filter(n => n.stage === 'final');
+    if (query) filtered = filtered.filter(n => n.text.toLowerCase().includes(query));
+    if (activeFilter['final'] !== 'all') filtered = filtered.filter(n => n.tagId === activeFilter['final']);
+
+    if (!filtered.length) {
+        finalList.innerHTML = buildEmpty('final', !!query);
+        return;
+    }
+
+    finalList.innerHTML = filtered.map(n => {
+        const tag = tags.find(t => t.id === n.tagId);
+        const letter = tag ? tag.name.charAt(0).toUpperCase() : '?';
+        const color = tag?.color || n.color || '#00d97e';
+        const expanded = n._expanded ? 'expanded' : '';
+        const firstLine = n.text.split('\n')[0].substring(0, 60);
+        return `<div class="final-note-card ${expanded}" id="fnc-${n.id}">
+            <div class="fnc-header" onclick="toggleFinalExpand(${n.id})">
+                <div class="fnc-tag-dot" style="background:${color}">${letter}</div>
+                <div class="fnc-title">${firstLine}${n.text.length > 60 ? '…' : ''}</div>
+                <div class="fnc-meta">${fmtDate(n.createdAt)}</div>
+                <div class="fnc-expand">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+            </div>
+            <div class="fnc-body">
+                <div class="fnc-text">${n.text}</div>
+                <div class="fnc-actions">
+                    <button class="action-btn back" onclick="moveNote(${n.id},'revize')" title="Revizeye Geri">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button class="action-btn" onclick="openEdit(${n.id})" title="Düzenle">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="action-btn done ${n.completed?'':''}'" onclick="toggleComplete(${n.id})" title="Tamamla">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                    <button class="action-btn del" onclick="deleteNote(${n.id})" title="Sil">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function toggleFinalExpand(id) {
+    const note = notes.find(n => n.id === id);
+    if (note) { note._expanded = !note._expanded; renderAll(); }
+}
+
+function buildCard(note) {
+    const tag = tags.find(t => t.id === note.tagId);
+    const letter = tag ? tag.name.charAt(0).toUpperCase() : '?';
+    const color = tag?.color || note.color || '#3d9cff';
+    let actions = '';
+    if (note.stage === 'taslak') {
+        actions = `
+            <button class="action-btn" onclick="openEdit(${note.id})" title="Düzenle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="action-btn go" onclick="moveNote(${note.id},'revize')" title="Revizeye Taşı">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <button class="action-btn del" onclick="deleteNote(${note.id})" title="Sil">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>`;
+    } else if (note.stage === 'revize') {
+        actions = `
+            <button class="action-btn back" onclick="moveNote(${note.id},'taslak')" title="Taslağa Geri">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            </button>
+            <button class="action-btn" onclick="openEdit(${note.id})" title="Düzenle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="action-btn go" onclick="moveNote(${note.id},'final')" title="Finale Taşı">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </button>
+            <button class="action-btn del" onclick="deleteNote(${note.id})" title="Sil">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>`;
+    }
+    return `<div class="card ${note.completed?'completed':''}">
+        <div class="card-stripe" style="background:${color}"></div>
+        <div class="card-tag">
+            <div class="card-tag-letter" style="background:${color}">${letter}</div>
+            <span class="card-tag-name">${tag?.name || ''}</span>
+        </div>
+        <div class="card-meta">${fmtDate(note.createdAt)}</div>
+        <div class="card-text">${note.text.replace(/\n/g,'<br>')}</div>
+        <div class="card-actions">${actions}</div>
+    </div>`;
+}
+
+function buildEmpty(stage, isSearch) {
+    if (isSearch) return `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div class="empty-title">Sonuç yok</div><div class="empty-sub">Farklı bir terim dene.</div></div>`;
+    const map = {
+        taslak: { icon:'✏️', title:'Henüz taslak yok', sub:'Yukarıdan yeni not ekle.' },
+        revize:  { icon:'🔨', title:'Revize notu yok', sub:'Taslakları revizeye taşı.' },
+        final:   { icon:'✅', title:'Final notu yok', sub:'Revize ettiğin notları buraya taşı.' }
+    };
+    const e = map[stage];
+    return `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">${e.icon}</div><div class="empty-title">${e.title}</div><div class="empty-sub">${e.sub}</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// STATS & BADGES
+// ═══════════════════════════════════════════════════
+function updateStats() {
+    const counts = { taslak:0, revize:0, final:0 };
+    notes.forEach(n => counts[n.stage]++);
+    document.getElementById('statTaslak').textContent = counts.taslak;
+    document.getElementById('statRevize').textContent = counts.revize;
+    document.getElementById('statFinal').textContent  = counts.final;
+    tabs.forEach(s => {
+        const badge = document.getElementById('badge-' + s);
+        if (counts[s] > 0) { badge.textContent = counts[s]; badge.style.display = ''; }
+        else badge.style.display = 'none';
+    });
+}
+
+// ═══════════════════════════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════════════════════════
+function switchTabById(id) {
+    tabs.forEach(t => {
+        document.getElementById(t).classList.toggle('active', t === id);
+        document.getElementById('nav-' + t).classList.toggle('active', t === id);
+    });
+    renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// FORMAT DATE
+// ═══════════════════════════════════════════════════
+function fmtDate(iso) {
+    const d = new Date(iso), now = new Date(), diff = now - d;
+    if (diff < 60000) return 'Az önce';
+    if (diff < 3600000) return Math.floor(diff/60000) + ' dk';
+    if (diff < 86400000) return Math.floor(diff/3600000) + ' sa';
+    return d.toLocaleDateString('tr-TR', {day:'numeric',month:'short'});
+}
+
+// ═══════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════
+let toastTimer;
 function showToast(msg) {
     const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-}
-function updateStats() {
-    document.getElementById('sTaslak').innerText = notes.filter(n=>n.stage==='taslak').length;
-    document.getElementById('sRevize').innerText = notes.filter(n=>n.stage==='revize').length;
-    document.getElementById('sFinal').innerText = notes.filter(n=>n.stage==='final').length;
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-function renderAll() {
-    renderAllPickers();
-    renderDraftPagination();
-    renderFiltersUI();
-    renderGrid('taslak');
-    renderGrid('revize');
-    renderGrid('final');
-    updateStats();
+// ═══════════════════════════════════════════════════
+// TAG MANAGER
+// ═══════════════════════════════════════════════════
+function openTagManager() {
+    tmTags = JSON.parse(JSON.stringify(tags)); // deep copy
+    renderTmList();
+    document.getElementById('tagManagerModal').classList.add('active');
+}
+function closeTagManager() {
+    document.getElementById('tagManagerModal').classList.remove('active');
+    closePalette();
+}
+function saveTagsAndClose() {
+    // validate names
+    tmTags.forEach(t => { if (!t.name.trim()) t.name = 'Etiket'; });
+    tags = tmTags;
+    // fix any notes whose tag was deleted
+    const tagIds = new Set(tags.map(t => t.id));
+    notes.forEach(n => { if (n.tagId && !tagIds.has(n.tagId)) { n.tagId = tags[0]?.id || null; n.color = tags[0]?.color || '#3d9cff'; } });
+    saveTags(); save();
+    closeTagManager();
+    renderAll();
+    showToast('🏷️ Etiketler kaydedildi');
+}
+function renderTmList() {
+    const list = document.getElementById('tmList');
+    list.innerHTML = tmTags.map((t, i) => {
+        const letter = (t.name || '?').charAt(0).toUpperCase();
+        return `<div class="tm-item">
+            <div class="tm-color-swatch" style="background:${t.color}" onclick="openPaletteForTm(${i}, this)">${letter}</div>
+            <input class="tm-name-input" value="${t.name}" oninput="tmTags[${i}].name=this.value;updateTmSwatch(${i})" placeholder="Etiket adı">
+            <button class="tm-del" onclick="deleteTmTag(${i})">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+        </div>`;
+    }).join('');
+}
+function updateTmSwatch(i) {
+    const items = document.querySelectorAll('.tm-color-swatch');
+    if (items[i]) items[i].textContent = (tmTags[i].name || '?').charAt(0).toUpperCase();
+}
+function deleteTmTag(i) {
+    if (tmTags.length <= 1) { showToast('⚠️ En az 1 etiket olmalı'); return; }
+    tmTags.splice(i, 1);
+    renderTmList();
+}
+function addNewTag() {
+    const colors = ['#3d9cff','#e5193a','#f5a623','#00d97e','#b85cff','#ff8c42','#00c9c9'];
+    const color = colors[tmTags.length % colors.length];
+    tmTags.push({ id: 't' + Date.now(), name: 'Yeni Etiket', color });
+    renderTmList();
+    // scroll to bottom
+    const list = document.getElementById('tmList');
+    list.scrollTop = list.scrollHeight;
 }
 
+// Color Palette Popup
+function openPaletteForTm(index, swatchEl) {
+    cppTarget = { type: 'tm', index };
+    openPaletteAt(swatchEl, tmTags[index].color);
+}
+function openPaletteAt(anchorEl, currentColor) {
+    const popup = document.getElementById('colorPalettePopup');
+    const grid = document.getElementById('cppGrid');
+    grid.innerHTML = PRESET_COLORS.map(c => `<div class="cpp-dot ${c===currentColor?'selected':''}" style="background:${c}" onclick="applyPresetColor('${c}')"></div>`).join('');
+    document.getElementById('cppCustomColor').value = currentColor;
+    popup.classList.add('open');
+    const rect = anchorEl.getBoundingClientRect();
+    popup.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+    popup.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
+    // close on outside click
+    setTimeout(() => document.addEventListener('click', outsidePaletteClick, { once: true }), 10);
+}
+function outsidePaletteClick(e) {
+    if (!document.getElementById('colorPalettePopup').contains(e.target)) closePalette();
+}
+function closePalette() {
+    document.getElementById('colorPalettePopup').classList.remove('open');
+    cppTarget = null;
+}
+function applyPresetColor(color) {
+    applyColor(color);
+    closePalette();
+}
+function applyCustomColor() {
+    const color = document.getElementById('cppCustomColor').value;
+    applyColor(color);
+    closePalette();
+}
+function applyColor(color) {
+    if (!cppTarget) return;
+    if (cppTarget.type === 'tm') {
+        tmTags[cppTarget.index].color = color;
+        renderTmList();
+    }
+}
+
+// ═══════════════════════════════════════════════════
 // INIT
+// ═══════════════════════════════════════════════════
+// Initialize selectedTagId defaults
+selectedTagId = { taslak: tags[0]?.id || null, revize: tags[0]?.id || null, edit: tags[0]?.id || null };
+renderTagSelector('revizeTagSelector', 'revize');
 renderAll();
 </script>
 </body>
