@@ -3,136 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Netflix Notlar - Pro Edition</title>
+<title>Modern NoteFlow - Light Edition</title>
 <style>
   :root {
-    --bg: #000000;
-    --surface: #141414;
-    --surface-light: #2b2b2b;
-    --text: #ffffff;
-    --text-muted: #808080;
-    --netflix-red: #E50914;
-    --success: #2ecc71;
-    --border: #333333;
-    --radius: 6px;
+    --bg: #F4F5F7;
+    --surface: #FFFFFF;
+    --text: #1F2937;
+    --text-muted: #6B7280;
+    --accent: #4F46E5; /* Modern İndigo / Morumsu Mavi */
+    --accent-light: #EEF2FF;
+    --success: #10B981;
+    --danger: #EF4444;
+    --border: #E5E7EB;
+    --radius: 16px; /* Daha yumuşak köşeler */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     --safe-bottom: env(safe-area-inset-bottom, 15px);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); overflow-x: hidden; padding-top: 60px; padding-bottom: calc(70px + var(--safe-bottom)); }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); overflow-x: hidden; padding-top: 60px; padding-bottom: calc(80px + var(--safe-bottom)); }
 
   /* HEADER */
-  header { position: fixed; top: 0; left: 0; right: 0; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid var(--border); }
-  .logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--netflix-red); }
-  .delete-all-btn { background: rgba(229, 9, 20, 0.1); color: var(--netflix-red); border: 1px solid rgba(229, 9, 20, 0.3); padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  .delete-all-btn:active { transform: scale(0.95); background: var(--netflix-red); color: white; }
+  header { position: fixed; top: 0; left: 0; right: 0; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); z-index: 100; border-bottom: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .logo { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); }
+  .delete-all-btn { background: var(--surface); color: var(--danger); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow); }
+  .delete-all-btn:active { transform: scale(0.95); background: var(--danger); color: white; border-color: var(--danger); }
 
   /* TABS (Single Line Compact) */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(20,20,20,0.95); backdrop-filter: blur(15px); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 100; }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; color: var(--text-muted); font-size: 10px; font-weight: bold; letter-spacing: 0.5px; cursor: pointer; transition: 0.3s; border-top: 2px solid transparent; }
-  .nav-item.active { color: white; border-top-color: var(--netflix-red); background: linear-gradient(to bottom, rgba(229,9,20,0.1), transparent); }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); z-index: 100; box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.02); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 0; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; border-top: 3px solid transparent; }
+  .nav-item.active { color: var(--accent); border-top-color: var(--accent); background: var(--accent-light); }
 
   /* SECTIONS */
-  .section { display: none; padding: 15px; animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  .section { display: none; padding: 20px; animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
   .section.active { display: block; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
   /* SMART INPUT AREA */
-  .input-container { background: var(--surface-light); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; overflow: hidden; }
-  .input-container.expanded { border-color: var(--netflix-red); box-shadow: 0 4px 20px rgba(229, 9, 20, 0.15); }
+  .input-container { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 25px; transition: all 0.3s ease; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow); }
+  .input-container.expanded { border-color: var(--accent); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12); }
   
-  .input-main-row { display: flex; align-items: flex-start; padding: 12px; gap: 10px; }
-  .smart-input { flex: 1; background: transparent; border: none; color: white; font-size: 14px; resize: none; height: 24px; outline: none; transition: height 0.3s; line-height: 1.4; }
-  .input-container.expanded .smart-input { height: 120px; }
+  .active-timer-display { display: none; text-align: center; font-size: 18px; font-weight: 800; color: var(--accent); padding: 10px 0 0 0; letter-spacing: 1px; animation: pulse 1s infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+  .input-main-row { display: flex; align-items: flex-start; padding: 16px; gap: 12px; }
+  .smart-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 15px; resize: none; height: 26px; outline: none; transition: height 0.3s; line-height: 1.5; }
+  .smart-input::placeholder { color: #A1A1AA; }
+  .input-container.expanded .smart-input { height: 140px; }
   
   /* Right Side Tools */
   .quick-tools { display: flex; flex-direction: column; gap: 8px; transition: 0.3s; opacity: 0; pointer-events: none; width: 0; }
   .input-container.expanded .quick-tools { opacity: 1; pointer-events: all; width: 36px; }
-  .q-btn { width: 32px; height: 32px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
-  .q-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
+  .q-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: 0.2s; }
+  .q-btn:active { background: #E5E7EB; transform: scale(0.95); }
 
-  /* Expanded Extras (Challenge & Reference) */
-  .input-extras { padding: 0 12px; max-height: 0; opacity: 0; transition: all 0.3s; overflow: hidden; }
-  .input-container.expanded .input-extras { max-height: 150px; opacity: 1; padding-bottom: 12px; }
+  /* Expanded Extras */
+  .input-extras { padding: 0 16px; max-height: 0; opacity: 0; transition: all 0.3s; overflow: hidden; background: #FAFAFA; border-top: 1px solid transparent; }
+  .input-container.expanded .input-extras { max-height: 150px; opacity: 1; padding-bottom: 16px; padding-top: 12px; border-top-color: var(--border); }
   
-  .ref-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px dashed var(--border); color: var(--text-muted); font-size: 11px; padding: 8px; border-radius: 4px; margin-bottom: 10px; resize: none; height: 40px; outline: none; }
+  .challenge-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .c-lbl { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+  .c-opt { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; padding: 8px 0; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+  .c-opt.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
   
-  .challenge-bar { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
-  .c-lbl { font-size: 10px; color: var(--text-muted); margin-right: 5px; }
-  .c-opt { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 6px 0; text-align: center; border-radius: 4px; cursor: pointer; font-weight: bold; }
-  .c-opt.active { background: rgba(229, 9, 20, 0.1); border-color: var(--netflix-red); color: var(--netflix-red); }
-  
-  .save-btn { width: 100%; background: var(--netflix-red); color: white; border: none; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+  .save-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
+  .save-btn:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(79, 70, 229, 0.2); }
 
-  /* SQUARE CARDS (Netflix Style) */
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .card { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; position: relative; cursor: pointer; overflow: hidden; }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border); }
-  .card.stage-taslak::before { background: var(--netflix-red); }
-  .card.stage-revize::before { background: #3498db; }
+  /* SQUARE CARDS */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .card { aspect-ratio: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; position: relative; cursor: pointer; overflow: hidden; box-shadow: var(--shadow); transition: 0.2s; }
+  .card:active { transform: scale(0.98); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--border); }
+  .card.stage-taslak::before { background: var(--accent); }
+  .card.stage-revize::before { background: #3B82F6; }
   .card.stage-final::before { background: var(--success); }
   
-  .c-timer { position: absolute; top: 8px; right: 8px; background: rgba(229,9,20,0.15); color: var(--netflix-red); font-size: 9px; padding: 3px 6px; border-radius: 3px; font-weight: bold; letter-spacing: 0.5px; border: 1px solid rgba(229,9,20,0.3); }
-  .c-timer.expired { color: var(--text-muted); background: transparent; border-color: var(--border); }
+  .c-text { flex: 1; font-size: 13px; line-height: 1.6; color: var(--text); margin-top: 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word; }
+  .c-action { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 11px; font-weight: 700; padding: 10px; border-radius: 8px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
   
-  .c-text { flex: 1; font-size: 12px; line-height: 1.5; color: #ddd; margin-top: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-word; }
-  .c-action { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; font-size: 10px; font-weight: bold; padding: 7px; border-radius: 4px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-  
-  .card.completed { opacity: 0.5; border-color: var(--success); }
-  .card.completed .c-text { text-decoration: line-through; }
+  .card.completed { opacity: 0.6; border-color: var(--success); background: #F0FDF4; }
+  .card.completed .c-text { text-decoration: line-through; color: #166534; }
+  .card.completed::before { background: var(--success); }
 
-  /* ARCHIVE (Redesigned) */
-  .arch-stats { display: flex; justify-content: space-between; background: var(--surface-light); padding: 15px; border-radius: var(--radius); margin-bottom: 15px; border: 1px solid var(--border); }
+  /* ARCHIVE */
+  .arch-stats { display: flex; justify-content: space-between; background: var(--surface); padding: 20px; border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
   .a-stat { text-align: center; }
-  .a-val { font-size: 18px; font-weight: bold; color: var(--netflix-red); }
-  .a-lbl { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
+  .a-val { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .a-lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; margin-top: 4px; }
   
-  .arch-list { display: flex; flex-direction: column; gap: 10px; }
-  .arch-item { background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--border); }
+  .arch-list { display: flex; flex-direction: column; gap: 12px; }
+  .arch-item { background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
   .arch-info { flex: 1; overflow: hidden; }
-  .arch-date { font-size: 9px; color: var(--text-muted); margin-bottom: 4px; }
-  .arch-text { font-size: 12px; color: #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .restore-btn { background: transparent; border: 1px solid var(--border); color: white; font-size: 10px; padding: 5px 10px; border-radius: 4px; margin-left: 10px; cursor: pointer; }
+  .arch-date { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+  .arch-text { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .restore-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 11px; font-weight: 600; padding: 8px 12px; border-radius: 8px; margin-left: 12px; cursor: pointer; box-shadow: var(--shadow); }
 
-  /* CALENDAR (Compact & Functional) */
-  .cal-wrapper { background: var(--surface-light); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; }
-  .cal-head { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; margin-bottom: 15px; color: white; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-  .cal-day-name { text-align: center; font-size: 10px; color: var(--text-muted); margin-bottom: 8px; font-weight: bold; }
-  .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 12px; background: var(--surface); border-radius: 4px; position: relative; border: 1px solid transparent; }
-  .cal-day.today { border-color: var(--netflix-red); color: var(--netflix-red); font-weight: bold; }
-  .cal-day.has-data::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--success); border-radius: 50%; }
+  /* CALENDAR */
+  .cal-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .cal-head { display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .cal-day-name { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; }
+  .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px; font-weight: 500; background: var(--bg); border-radius: 8px; position: relative; border: 1px solid transparent; }
+  .cal-day.today { border-color: var(--accent); color: var(--accent); font-weight: 800; background: var(--accent-light); }
+  .cal-day.has-data::after { content: ''; position: absolute; bottom: 6px; width: 5px; height: 5px; background: var(--success); border-radius: 50%; }
 
   /* EDIT MODAL */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(5px); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
   .modal-overlay.open { display: flex; }
-  .modal-content { background: var(--surface-light); width: 100%; border-radius: 12px 12px 0 0; padding: 20px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid var(--border); }
+  .modal-content { background: var(--bg); width: 100%; border-radius: 24px 24px 0 0; padding: 24px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   
-  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-  .modal-title { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
-  .close-modal { background: transparent; border: none; color: var(--text-muted); font-size: 20px; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-title { font-size: 16px; font-weight: 800; color: var(--text); }
+  .close-modal { background: var(--surface); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 16px; color: var(--text); font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  .modal-ref { background: var(--surface); padding: 10px; font-size: 11px; color: var(--text-muted); border-left: 2px solid var(--border); margin-bottom: 15px; font-style: italic; border-radius: 0 4px 4px 0; }
-  .modal-textarea { width: 100%; height: 150px; background: var(--surface); color: white; border: 1px solid var(--border); padding: 12px; border-radius: 4px; resize: none; outline: none; margin-bottom: 15px; font-size: 14px; }
+  .modal-textarea { width: 100%; height: 200px; background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 16px; border-radius: 12px; resize: none; outline: none; margin-bottom: 20px; font-size: 15px; line-height: 1.5; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+  .modal-textarea:focus { border-color: var(--accent); }
   
-  .modal-actions { display: flex; gap: 10px; }
-  .m-btn { flex: 1; padding: 12px; border-radius: 4px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
-  .btn-save { background: var(--surface); color: white; border: 1px solid var(--border); }
-  .btn-forward { background: var(--netflix-red); color: white; }
+  .modal-actions { display: flex; gap: 12px; }
+  .m-btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; }
+  .btn-save { background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .btn-forward { background: var(--accent); color: white; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
 </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">N. TASLAK</div>
+    <div class="logo">NoteFlow Light</div>
     <button class="delete-all-btn" onclick="clearDay()">TÜMÜNÜ SİL</button>
   </header>
 
   <div id="sec-taslak" class="section active">
     <div class="input-container" id="draftBox">
+      <div class="active-timer-display" id="activeTimerDisplay">00:00</div>
+      
       <div class="input-main-row">
-        <textarea id="mainDraft" class="smart-input" placeholder="Günün notunu veya aklındakileri dök..."></textarea>
+        <textarea id="mainDraft" class="smart-input" placeholder="Referansını veya taslağını yazmaya başla..."></textarea>
         <div class="quick-tools">
           <button class="q-btn" onclick="copyDraft()" title="Tümünü Kopyala">📋</button>
           <button class="q-btn" onclick="addTime()" title="Saat Ekle">🕒</button>
@@ -140,9 +146,8 @@
       </div>
       
       <div class="input-extras">
-        <textarea id="refDraft" class="ref-input" placeholder="Alıntı veya referans linki..."></textarea>
         <div class="challenge-bar">
-          <span class="c-lbl">Challenge:</span>
+          <span class="c-lbl">Zamanlayıcı:</span>
           <div class="c-opt active" onclick="setTimer(0, this)">Yok</div>
           <div class="c-opt" onclick="setTimer(5, this)">5 dk</div>
           <div class="c-opt" onclick="setTimer(10, this)">10 dk</div>
@@ -166,8 +171,8 @@
   <div id="sec-arsiv" class="section">
     <div class="arch-stats">
       <div class="a-stat"><div class="a-val" id="stat-total">0</div><div class="a-lbl">TOPLAM</div></div>
-      <div class="a-stat"><div class="a-val" id="stat-done" style="color:var(--success)">0</div><div class="a-lbl">TAMAMLANAN</div></div>
-      <div class="a-stat"><div class="a-val" id="stat-revs" style="color:#3498db">0</div><div class="a-lbl">REVİZYON</div></div>
+      <div class="a-stat"><div class="a-val" id="stat-done" style="color:var(--success)">0</div><div class="a-lbl">BİTEN</div></div>
+      <div class="a-stat"><div class="a-val" id="stat-revs" style="color:#3B82F6">0</div><div class="a-lbl">REVİZE</div></div>
     </div>
     <div class="arch-list" id="list-arsiv"></div>
   </div>
@@ -197,7 +202,6 @@
         <span class="modal-title" id="mTitle">Düzenle</span>
         <button class="close-modal" onclick="closeModal()">✕</button>
       </div>
-      <div id="mRef" class="modal-ref"></div>
       <textarea id="mText" class="modal-textarea"></textarea>
       <div class="modal-actions">
         <button class="m-btn btn-save" onclick="saveModal()">Kaydet</button>
@@ -208,29 +212,77 @@
 
 <script>
   // VERİ YÖNETİMİ
-  let notes = JSON.parse(localStorage.getItem('n_pro_notes')) || [];
+  let notes = JSON.parse(localStorage.getItem('n_light_notes')) || [];
   let timerSelection = 0;
-  let activeTimers = {};
   let currentEditId = null;
 
-  // AKILLI INPUT (Aynı sayfada büyüme)
+  // CANLI YAZMA ZAMANLAYICISI MANTIĞI
+  let activeDraftTimer = null;
+  let timeLeft = 0;
+  let hasTypingStarted = false;
+
   const draftBox = document.getElementById('draftBox');
   const mainDraft = document.getElementById('mainDraft');
+  const timerDisplay = document.getElementById('activeTimerDisplay');
 
+  // Input Tıklanınca Büyüme
   mainDraft.addEventListener('focus', () => draftBox.classList.add('expanded'));
   
-  // Ekranda boş bir yere tıklanırsa input'u küçült (eğer içi boşsa)
+  // Dışarı tıklanınca küçülme (eğer boşsa)
   document.addEventListener('click', (e) => {
-    if (!draftBox.contains(e.target) && mainDraft.value.trim() === '' && document.getElementById('refDraft').value.trim() === '') {
+    if (!draftBox.contains(e.target) && mainDraft.value.trim() === '') {
       draftBox.classList.remove('expanded');
     }
   });
 
+  // Süre Seçimi
+  function setTimer(mins, el) {
+    timerSelection = mins;
+    document.querySelectorAll('.c-opt').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+    
+    // Zamanlayıcıyı sıfırla
+    clearInterval(activeDraftTimer);
+    hasTypingStarted = false;
+    
+    if (mins > 0) {
+      timeLeft = mins * 60;
+      timerDisplay.style.display = 'block';
+      timerDisplay.style.color = 'var(--accent)';
+      updateTimerUI();
+    } else {
+      timerDisplay.style.display = 'none';
+    }
+  }
+
+  // Yazmaya Başlayınca Geri Sayımı Tetikle
+  mainDraft.addEventListener('input', () => {
+    if (timerSelection > 0 && !hasTypingStarted && mainDraft.value.length > 0) {
+      hasTypingStarted = true;
+      activeDraftTimer = setInterval(() => {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) {
+          clearInterval(activeDraftTimer);
+          timerDisplay.innerText = "SÜRE BİTTİ!";
+          timerDisplay.style.color = "var(--danger)";
+          // İsteğe bağlı: navigator.vibrate([200, 100, 200]);
+        }
+      }, 1000);
+    }
+  });
+
+  function updateTimerUI() {
+    if(timeLeft <= 0) return;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    timerDisplay.innerText = `⏱ ${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+
   // PRATİK BUTONLAR
   function copyDraft() {
-    navigator.clipboard.writeText(mainDraft.value).then(() => {
-      alert("Tümü Kopyalandı!");
-    });
+    navigator.clipboard.writeText(mainDraft.value).then(() => alert("Tümü Kopyalandı!"));
   }
 
   function addTime() {
@@ -238,12 +290,6 @@
     const tStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}] `;
     mainDraft.value = mainDraft.value ? mainDraft.value + '\n' + tStr : tStr;
     mainDraft.focus();
-  }
-
-  function setTimer(mins, el) {
-    timerSelection = mins;
-    document.querySelectorAll('.c-opt').forEach(opt => opt.classList.remove('active'));
-    el.classList.add('active');
   }
 
   // SEKME DEĞİŞTİRME
@@ -263,19 +309,19 @@
     const newNote = {
       id: Date.now(),
       text: text,
-      ref: document.getElementById('refDraft').value.trim(),
       stage: 'taslak',
       completed: false,
       revisions: 0,
-      date: new Date().toLocaleDateString('tr-TR'),
-      deadline: timerSelection > 0 ? Date.now() + (timerSelection * 60000) : null
+      date: new Date().toLocaleDateString('tr-TR')
     };
 
     notes.unshift(newNote);
     mainDraft.value = '';
-    document.getElementById('refDraft').value = '';
     draftBox.classList.remove('expanded');
+    
+    // Geri sayımı tamamen sıfırla
     setTimer(0, document.querySelector('.c-opt'));
+    
     saveAndRender();
   }
 
@@ -292,7 +338,7 @@
     const n = notes.find(x => x.id === id);
     if(n) {
       n.completed = true;
-      n.stage = 'arsiv'; // Tamamlanınca arşive düşsün
+      n.stage = 'arsiv'; 
       saveAndRender();
     }
   }
@@ -321,15 +367,12 @@
     currentEditId = id;
 
     document.getElementById('mTitle').innerText = n.stage.toUpperCase() + ' DÜZENLE';
-    const mRef = document.getElementById('mRef');
-    if(n.ref) { mRef.style.display = 'block'; mRef.innerText = n.ref; } else { mRef.style.display = 'none'; }
-    
     document.getElementById('mText').value = n.text;
     
     const actionBtn = document.getElementById('mActionBtn');
     if(n.stage === 'taslak') {
       actionBtn.innerText = 'Revizeye Aktar ➡️';
-      actionBtn.style.background = '#3498db';
+      actionBtn.style.background = '#3B82F6';
       actionBtn.onclick = () => { saveModal(); moveStage(id, 'revize'); closeModal(); };
     } else if(n.stage === 'revize') {
       actionBtn.innerText = 'Finale Aktar ➡️';
@@ -358,7 +401,6 @@
 
   // ARAYÜZ ÇİZİMİ (RENDER)
   function renderUI() {
-    // 1. Gridleri Temizle
     const gTaslak = document.getElementById('grid-taslak');
     const gRevize = document.getElementById('grid-revize');
     const gFinal = document.getElementById('grid-final');
@@ -373,7 +415,7 @@
     notes.forEach(n => {
       revCount += (n.revisions || 0);
 
-      // ARŞİV LİSTESİ
+      // ARŞİV
       if(n.stage === 'arsiv') {
         completedCount++;
         lArsiv.innerHTML += `
@@ -388,26 +430,19 @@
         return;
       }
 
-      // KARTLAR (Taslak, Revize, Final)
+      // KARTLAR
       const card = document.createElement('div');
       card.className = `card stage-${n.stage}`;
-      
-      let tHtml = '';
-      if(n.stage === 'taslak' && n.deadline) {
-        tHtml = `<div class="c-timer" id="tmr-${n.id}">--:--</div>`;
-        runTimer(n);
-      }
 
       let btnTxt = n.stage === 'taslak' ? 'Revize ➡️' : (n.stage === 'revize' ? 'Final ➡️' : 'Tamamla ✓');
-      let btnColor = n.stage === 'taslak' ? '#3498db' : (n.stage === 'revize' ? 'var(--success)' : 'var(--text-muted)');
+      let btnColor = n.stage === 'taslak' ? '#3B82F6' : (n.stage === 'revize' ? 'var(--success)' : 'var(--text-muted)');
       let clickEvt = n.stage === 'final' ? `toggleComplete(${n.id})` : `moveStage(${n.id}, '${n.stage === 'taslak' ? 'revize' : 'final'}')`;
 
       card.innerHTML = `
-        ${tHtml}
-        <div style="font-size:9px; color:var(--text-muted)">${n.date}</div>
+        <div style="font-size:10px; font-weight:600; color:var(--text-muted)">${n.date}</div>
         <div class="c-text" onclick="openModal(${n.id})">${n.text}</div>
         <div class="c-action" onclick="${clickEvt}">
-          <span>İlerle</span>
+          <span style="color:var(--text-muted)">İlerle</span>
           <span style="color:${btnColor}">${btnTxt}</span>
         </div>
       `;
@@ -417,7 +452,6 @@
       if(n.stage === 'final') gFinal.appendChild(card);
     });
 
-    // İstatistik Güncelleme
     document.getElementById('stat-total').innerText = total;
     document.getElementById('stat-done').innerText = completedCount;
     document.getElementById('stat-revs').innerText = revCount;
@@ -425,27 +459,7 @@
     renderCalendar();
   }
 
-  // TIMER (Geri Sayım)
-  function runTimer(n) {
-    if(activeTimers[n.id]) clearInterval(activeTimers[n.id]);
-    activeTimers[n.id] = setInterval(() => {
-      const el = document.getElementById(`tmr-${n.id}`);
-      if(!el) { clearInterval(activeTimers[n.id]); return; }
-      
-      const left = Math.max(0, n.deadline - Date.now());
-      if(left === 0) {
-        el.innerText = 'SÜRE BİTTİ';
-        el.classList.add('expired');
-        clearInterval(activeTimers[n.id]);
-      } else {
-        const m = Math.floor(left / 60000);
-        const s = Math.floor((left % 60000) / 1000);
-        el.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-      }
-    }, 1000);
-  }
-
-  // İŞLEVSEL TAKVİM
+  // TAKVİM
   function renderCalendar() {
     const cg = document.getElementById('calGrid');
     cg.innerHTML = '';
@@ -461,7 +475,6 @@
 
     for(let d=1; d<=daysInMonth; d++) {
       const dStr = new Date(now.getFullYear(), now.getMonth(), d).toLocaleDateString('tr-TR');
-      // O güne ait not var mı kontrol et
       const hasData = notes.some(x => x.date === dStr);
       const isToday = d === now.getDate();
       
@@ -470,7 +483,7 @@
   }
 
   function saveAndRender() {
-    localStorage.setItem('n_pro_notes', JSON.stringify(notes));
+    localStorage.setItem('n_light_notes', JSON.stringify(notes));
     renderUI();
   }
 
