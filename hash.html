@@ -1,391 +1,474 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Takibi - Profesyonel & Canlı</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0d0f14; --surface: #161a24; --surface2: #1e2333; --border: #2a3045;
-    --accent: #f0c93a; --accent2: #4ef0a0; --accent3: #4ec8f0; --danger: #f05a4e;
-    --text: #e8ecf7; --muted: #6b7599; --radius: 14px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
-    min-height: 100vh; padding: 20px 20px 80px; position: relative;
-  }
-  body::before {
-    content: ''; position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(240,201,58,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(240,201,58,0.03) 1px, transparent 1px);
-    background-size: 40px 40px; pointer-events: none; z-index: 0;
-  }
-  .container { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Adım Not</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --accent: #e50914; /* Netflix kırmızısı dokunuşu */
+            --success: #1db954;
+            --border-radius: 12px;
+        }
 
-  /* Navigasyon */
-  .lib-controls {
-    display: flex; gap: 10px; margin-bottom: 24px;
-    background: var(--surface); padding: 10px; border-radius: var(--radius);
-    border: 1px solid var(--border); align-items: center;
-  }
-  .book-select {
-    flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px; font-family: 'Syne', sans-serif; font-weight: 600; font-size: 13px; outline: none;
-  }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  /* Dinamik Başlık Alanı */
-  header { text-align: center; margin-bottom: 24px; }
-  h1 { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1.1; margin-bottom: 5px; color: var(--accent); text-shadow: 0 0 20px rgba(240,201,58,0.2); }
-  .subtitle { font-family: 'Syne', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
-  
-  #coverDisplay {
-    width: 130px; height: 185px; margin: 0 auto 20px; border-radius: 10px;
-    background: var(--surface2); border: 1px solid var(--border);
-    display: none; object-fit: cover; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-  }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 80px; /* Alt menü için boşluk */
+        }
 
-  /* KÜNYE Bölümü */
-  .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
-  .sec-header { padding: 12px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .sec-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+        header {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-  .book-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
-  .book-field { display: flex; flex-direction: column; background: var(--surface); padding: 10px; }
-  .book-field.full { grid-column: span 2; }
-  .field-tag { font-size: 8px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; letter-spacing: 1px; }
-  .field-inp { background: transparent; border: none; outline: none; color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; }
+        .container {
+            padding: 20px;
+        }
 
-  /* CANLI SAYAÇLAR (Neon Etkisi) */
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 10px; text-align: center; transition: 0.3s; }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
-  
-  .stat-num.yellow { color: var(--accent); text-shadow: 0 0 20px rgba(240,201,58,0.6); }
-  .stat-num.green { color: var(--accent2); text-shadow: 0 0 20px rgba(78,240,160,0.6); }
-  .stat-num.blue { color: var(--accent3); text-shadow: 0 0 20px rgba(78,200,240,0.6); }
-  
-  .stat-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        /* Sekme İçerikleri */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
 
-  /* Sayfa Sayacı Kartı */
-  .counter-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 35px 20px; text-align: center; margin-bottom: 20px; position: relative;
-  }
-  .page-display { font-family: 'Syne', sans-serif; font-size: 85px; font-weight: 800; line-height: 1; color: var(--text); margin-bottom: 20px; text-shadow: 0 0 30px rgba(232,236,247,0.1); }
-  .cnt-btn { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 24px; font-weight: 700; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-  .cnt-plus { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(240,201,58,0.3); }
-  .cnt-minus { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  
-  .step-pill { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; font-size: 11px; color: var(--muted); cursor: pointer; transition: 0.2s; }
-  .step-pill.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-  /* Alıntılar & Notlar */
-  .quote-item { padding: 15px; border-bottom: 1px solid var(--border); }
-  .quote-text { font-size: 13px; line-height: 1.5; position: relative; padding-left: 12px; margin-bottom: 6px; border-left: 3px solid var(--accent); }
-  .quote-meta { font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; }
-  .add-btn { background: var(--accent); color: #000; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 12px; }
+        /* Taslak Girdi Alanı & Timer */
+        .input-group {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+        }
 
-  /* Tablo ve Diğerleri */
-  .history-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-  .history-table td { padding: 12px 16px; border-top: 1px solid var(--border); }
-  .io-btn { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 11px; }
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 16px;
+            resize: none;
+            outline: none;
+        }
 
-  #confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
-</style>
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .timer-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .timer-btn:hover, .timer-btn.active {
+            background: var(--accent);
+        }
+
+        #timerDisplay {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--accent);
+            margin-left: auto;
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        /* Netflix Tarzı Kart Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            aspect-ratio: 1 / 1; /* Kare kart */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .card:active {
+            transform: scale(0.96);
+        }
+
+        .card.completed {
+            opacity: 0.6;
+        }
+
+        .card.completed .card-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .card-text {
+            font-size: 14px;
+            line-height: 1.4;
+            flex-grow: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+        }
+
+        .card-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-main);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .action-btn.success {
+            color: var(--success);
+            background: rgba(29, 185, 84, 0.15);
+        }
+
+        .completed-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--success);
+            font-size: 20px;
+            display: none;
+        }
+
+        .card.completed .completed-badge {
+            display: block;
+        }
+
+        /* Alt Navigasyon (Mobil) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 12px;
+            gap: 5px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--text-main);
+        }
+
+        .nav-item.active i {
+            color: var(--accent);
+        }
+
+        /* Modal (Düzenleme için) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%;
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+        .modal-content textarea {
+            height: 200px;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
-<canvas id="confettiCanvas"></canvas>
 
-<div class="container">
-  <div class="lib-controls">
-    <select class="book-select" id="bookSelect" onchange="switchBook()"></select>
-    <button class="add-btn" style="background:var(--surface2); color:var(--text); border:1px solid var(--border);" onclick="createNewBook()">+ Yeni Kitap</button>
-  </div>
+    <header>
+        <span id="headerTitle">Taslak</span>
+        <i class="fa-solid fa-user-astronaut"></i>
+    </header>
 
-  <header>
-    <h1 id="dynTitle">Kitap Günlüğü</h1>
-    <p id="dynAuthor" class="subtitle">Yazarınızı girin</p>
-    <img id="coverDisplay" alt="Kapak">
-  </header>
+    <div class="container">
+        
+        <div id="taslak" class="tab-content active">
+            <div class="input-group">
+                <textarea id="draftInput" placeholder="Aklına gelenleri buraya dök, alıntı yap, karala..."></textarea>
+                
+                <div class="timer-controls">
+                    <i class="fa-solid fa-stopwatch" style="color: var(--text-muted);"></i>
+                    <button class="timer-btn" onclick="startTimer(5)">5 dk</button>
+                    <button class="timer-btn" onclick="startTimer(10)">10 dk</button>
+                    <button class="timer-btn" onclick="startTimer(15)">15 dk</button>
+                    <div id="timerDisplay"></div>
+                </div>
+                <button class="btn-primary" onclick="addNote()">Taslak Olarak Kaydet</button>
+            </div>
+            
+            <div class="cards-grid" id="taslakGrid">
+                </div>
+        </div>
 
-  <div class="section-card">
-    <div class="sec-header"><span class="sec-title">📖 KÜNYE</span></div>
-    <div class="book-fields">
-      <div class="book-field full">
-        <span class="field-tag">Kitap Adı</span>
-        <input class="field-inp" id="bName" placeholder="Kitap ismi..." oninput="saveMeta()">
-      </div>
-      <div class="book-field">
-        <span class="field-tag">Yazar</span>
-        <input class="field-inp" id="bAuthor" placeholder="Yazar..." oninput="saveMeta()">
-      </div>
-      <div class="book-field">
-        <span class="field-tag">Kapak URL</span>
-        <input class="field-inp" id="bCover" placeholder="https://..." oninput="saveMeta()">
-      </div>
-      <div class="book-field">
-        <span class="field-tag">Başlangıç</span>
-        <input class="field-inp" type="date" id="bStart" oninput="saveMeta()">
-      </div>
-      <div class="book-field">
-        <span class="field-tag">Hedef Bitiş</span>
-        <input class="field-inp" type="date" id="bDeadline" oninput="saveMeta()">
-      </div>
-      <div class="book-field">
-        <span class="field-tag">Toplam Sayfa</span>
-        <input class="field-inp" type="number" id="bTotal" placeholder="0" oninput="saveMeta()">
-      </div>
-      <div class="book-field">
-        <span class="field-tag">Durum</span>
-        <div id="statusEmojiArea" style="font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px;">—</div>
-      </div>
+        <div id="revize" class="tab-content">
+            <div class="cards-grid" id="revizeGrid">
+                </div>
+        </div>
+
+        <div id="final" class="tab-content">
+            <div class="cards-grid" id="finalGrid">
+                </div>
+        </div>
+
     </div>
-  </div>
 
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num yellow" id="stat-read">0</div>
-      <div class="stat-lbl">Okunan</div>
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <textarea id="editInput"></textarea>
+            <button class="btn-primary" onclick="saveEdit()">Değişiklikleri Kaydet</button>
+            <button class="btn-primary" style="background: transparent; color: var(--text-muted); margin-top: 5px;" onclick="closeModal()">İptal</button>
+        </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num green" id="stat-left">—</div>
-      <div class="stat-lbl">Kalan</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num blue" id="stat-days">—</div>
-      <div class="stat-lbl">Kalan Gün</div>
-    </div>
-  </div>
 
-  <div class="counter-card">
-    <div class="page-display" id="pageNum">0</div>
-    <div style="display:flex; align-items:center; justify-content:center; gap:35px; margin-bottom:20px;">
-      <button class="cnt-btn cnt-minus" onclick="addPages(-currentStep)">−</button>
-      <button class="cnt-btn cnt-plus" onclick="addPages(currentStep)">+</button>
-    </div>
-    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:15px;">
-      <button class="step-pill active" onclick="setStep(1,this)">1</button>
-      <button class="step-pill" onclick="setStep(5,this)">5</button>
-      <button class="step-pill" onclick="setStep(10,this)">10</button>
-      <button class="step-pill" onclick="setStep(25,this)">25</button>
-    </div>
-    <div id="progText" style="font-size:11px; color:var(--muted); font-weight:600; letter-spacing:0.5px;">Okuma henüz başlamadı</div>
-  </div>
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('taslak', this)">
+            <i class="fa-solid fa-pen-nib"></i>
+            <span>Taslak</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('revize', this)">
+            <i class="fa-solid fa-hammer"></i>
+            <span>Revize</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('final', this)">
+            <i class="fa-solid fa-flag-checkered"></i>
+            <span>Final</span>
+        </div>
+    </nav>
 
-  <div class="section-card">
-    <div class="sec-header"><span class="sec-title">❝ Alıntılar</span><span id="quoteCount" style="font-size:10px; color:var(--muted);">0 alıntı</span></div>
-    <div id="quotesList"></div>
-    <div style="padding:15px; background:rgba(0,0,0,0.15);">
-      <textarea id="quoteInp" class="field-inp" style="width:100%; height:60px; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border); margin-bottom:8px;" placeholder="Yeni bir alıntı..."></textarea>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <input type="number" id="quotePg" placeholder="S." style="width:60px; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:6px; border-radius:6px; font-size:12px;">
-        <button class="add-btn" onclick="addQuote()">+ Ekle</button>
-      </div>
-    </div>
-  </div>
+    <script>
+        // Not verileri (Uygulama yenilendiğinde sıfırlanır, tarayıcıda kalıcı yapmak için localStorage eklenebilir)
+        let notes = [];
+        let currentEditId = null;
+        let timerInterval;
 
-  <div class="section-card">
-    <div class="sec-header"><span class="sec-title">📝 Notlar</span></div>
-    <textarea id="notesArea" class="field-inp" style="width:100%; min-height:100px; padding:15px; line-height:1.6; resize:vertical;" placeholder="Kitap hakkındaki düşüncelerin..." oninput="saveMeta()"></textarea>
-  </div>
+        // Sekme Değiştirme
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+            
+            const titles = { 'taslak': 'Taslak', 'revize': 'Revize', 'final': 'Final' };
+            document.getElementById('headerTitle').innerText = titles[tabId];
+            
+            renderNotes();
+        }
 
-  <div class="section-card">
-    <div class="sec-header"><span class="sec-title">📊 Son Okumalar</span></div>
-    <table class="history-table"><tbody id="historyBody"></tbody></table>
-  </div>
+        // Zamanlayıcı (Challenge)
+        function startTimer(minutes) {
+            clearInterval(timerInterval);
+            let time = minutes * 60;
+            const display = document.getElementById('timerDisplay');
+            
+            timerInterval = setInterval(() => {
+                const min = Math.floor(time / 60);
+                const sec = time % 60;
+                display.innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+                
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                    display.innerText = "Süre Bitti!";
+                    setTimeout(() => display.innerText = "", 3000);
+                }
+                time--;
+            }, 1000);
+        }
 
-  <div class="footer-row">
-    <button class="io-btn" onclick="exportData()">💾 Yedekle</button>
-    <button class="io-btn" onclick="document.getElementById('importFile').click()">📂 Yükle</button>
-    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(this)">
-    <button class="io-btn" style="color:var(--danger)" onclick="deleteCurrentBook()">🗑 Kitabı Sil</button>
-  </div>
-</div>
+        // Not Ekleme
+        function addNote() {
+            const input = document.getElementById('draftInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                notes.push({
+                    id: Date.now(),
+                    text: text,
+                    stage: 'taslak', // taslak, revize, final
+                    completed: false
+                });
+                input.value = '';
+                renderNotes();
+            }
+        }
 
-<script>
-let appData = { activeId: null, books: [] };
-let currentBook = null;
-let currentStep = 1;
+        // Aşama Taşıma
+        function moveNote(id, newStage) {
+            const note = notes.find(n => n.id === id);
+            if (note) {
+                note.stage = newStage;
+                renderNotes();
+            }
+        }
 
-function init() {
-  const saved = localStorage.getItem('kitap_takibi_vFinal_Pro');
-  if(saved) appData = JSON.parse(saved);
-  if(!appData.books || appData.books.length === 0) createNewBook();
-  else {
-    currentBook = appData.books.find(b => b.id === appData.activeId) || appData.books[0];
-    appData.activeId = currentBook.id;
-    refreshUI();
-  }
-}
+        // Düzenleme İşlemleri
+        function openEdit(id) {
+            const note = notes.find(n => n.id === id);
+            if (note) {
+                currentEditId = id;
+                document.getElementById('editInput').value = note.text;
+                document.getElementById('editModal').classList.add('active');
+            }
+        }
 
-function saveData() { localStorage.setItem('kitap_takibi_vFinal_Pro', JSON.stringify(appData)); }
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditId = null;
+        }
 
-function createNewBook() {
-  const newBook = { id: Date.now().toString(), name: '', author: '', cover: '', start: '', deadline: '', total: 0, pages: 0, notes: '', quotes: [], history: [] };
-  appData.books.push(newBook); appData.activeId = newBook.id; currentBook = newBook;
-  saveData(); refreshUI();
-}
+        function saveEdit() {
+            const note = notes.find(n => n.id === currentEditId);
+            if (note) {
+                note.text = document.getElementById('editInput').value;
+                closeModal();
+                renderNotes();
+            }
+        }
 
-function switchBook() {
-  appData.activeId = document.getElementById('bookSelect').value;
-  currentBook = appData.books.find(b => b.id === appData.activeId);
-  saveData(); refreshUI();
-}
+        // Tamamlandı (Yeşil Tik) İşareti
+        function toggleComplete(id) {
+            const note = notes.find(n => n.id === id);
+            if (note) {
+                note.completed = !note.completed;
+                renderNotes();
+            }
+        }
 
-function saveMeta() {
-  currentBook.name = document.getElementById('bName').value;
-  currentBook.author = document.getElementById('bAuthor').value;
-  currentBook.cover = document.getElementById('bCover').value;
-  currentBook.start = document.getElementById('bStart').value;
-  currentBook.deadline = document.getElementById('bDeadline').value;
-  currentBook.total = parseInt(document.getElementById('bTotal').value) || 0;
-  currentBook.notes = document.getElementById('notesArea').value;
-  
-  document.getElementById('dynTitle').textContent = currentBook.name || 'Kitap Günlüğü';
-  document.getElementById('dynAuthor').textContent = currentBook.author || 'Yazarınızı girin';
-  
-  saveData(); updateCalculations(); updateCover(); updateDropdown();
-}
+        // Notları Ekrana Çizme
+        function renderNotes() {
+            const taslakGrid = document.getElementById('taslakGrid');
+            const revizeGrid = document.getElementById('revizeGrid');
+            const finalGrid = document.getElementById('finalGrid');
 
-function setStep(n, btn) {
-  currentStep = n;
-  document.querySelectorAll('.step-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
+            taslakGrid.innerHTML = ''; revizeGrid.innerHTML = ''; finalGrid.innerHTML = '';
 
-function addPages(delta) {
-  const prev = currentBook.pages;
-  currentBook.pages = Math.max(0, currentBook.pages + delta);
-  if(delta !== 0) {
-    currentBook.history.unshift({ date: new Date().toLocaleDateString('tr-TR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}), delta: delta, total: currentBook.pages });
-    if(currentBook.history.length > 5) currentBook.history.pop();
-  }
-  if(currentBook.total > 0 && currentBook.pages >= currentBook.total && prev < currentBook.total) launchConfetti();
-  saveData(); updateCalculations(); renderHistory();
-}
+            notes.forEach(note => {
+                const card = document.createElement('div');
+                card.className = `card ${note.completed ? 'completed' : ''}`;
+                
+                let actionsHTML = '';
+                
+                if (note.stage === 'taslak') {
+                    actionsHTML = `
+                        <button class="action-btn" onclick="openEdit(${note.id})" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
+                        <button class="action-btn" onclick="moveNote(${note.id}, 'revize')" title="Revizeye Aktar"><i class="fa-solid fa-arrow-right"></i></button>
+                    `;
+                } else if (note.stage === 'revize') {
+                    actionsHTML = `
+                        <button class="action-btn" onclick="openEdit(${note.id})" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
+                        <button class="action-btn" onclick="moveNote(${note.id}, 'final')" title="Finale Aktar"><i class="fa-solid fa-flag-checkered"></i></button>
+                    `;
+                } else if (note.stage === 'final') {
+                    actionsHTML = `
+                        <button class="action-btn success" onclick="toggleComplete(${note.id})" title="Tamamla"><i class="fa-solid fa-check"></i></button>
+                    `;
+                }
 
-function updateCalculations() {
-  const p = currentBook.pages, t = currentBook.total, d = currentBook.deadline;
-  document.getElementById('pageNum').textContent = p;
-  document.getElementById('stat-read').textContent = p;
-  document.getElementById('stat-left').textContent = t ? Math.max(0, t - p) : '—';
-  
-  let emojiHtml = '—';
-  if(t > 0) {
-    const pct = (p / t) * 100;
-    if(pct >= 100) emojiHtml = '🥹 <span style="color:var(--accent2); font-size:10px;">BİTTİ</span>';
-    else if(pct >= 70) emojiHtml = '🫅🏻 <span style="color:var(--accent3); font-size:10px;">BİTMEK ÜZERE</span>';
-    else if(pct >= 30) emojiHtml = '🤩 <span style="color:var(--accent); font-size:10px;">HARİKA</span>';
-    else emojiHtml = '🙂 <span style="color:var(--muted); font-size:10px;">BAŞLADIK</span>';
-    
-    document.getElementById('progText').textContent = `%${Math.min(100, Math.round(pct))} TAMAMLANDI (${Math.max(0, t-p)} SAYFA KALDI)`;
-  }
-  document.getElementById('statusEmojiArea').innerHTML = emojiHtml;
+                card.innerHTML = `
+                    <i class="fa-solid fa-circle-check completed-badge"></i>
+                    <div class="card-text">${note.text.replace(/\n/g, '<br>')}</div>
+                    <div class="card-actions">${actionsHTML}</div>
+                `;
 
-  if(d) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const end = new Date(d); end.setHours(0,0,0,0);
-    const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
-    document.getElementById('stat-days').textContent = diff > 0 ? diff : (diff === 0 ? 'Bgn' : 'Bitti');
-  }
-}
-
-function addQuote() {
-  const text = document.getElementById('quoteInp').value.trim();
-  const pg = document.getElementById('quotePg').value;
-  if(!text) return;
-  if(!currentBook.quotes) currentBook.quotes = [];
-  currentBook.quotes.unshift({ text, pg, date: new Date().toLocaleDateString('tr-TR') });
-  document.getElementById('quoteInp').value = ''; document.getElementById('quotePg').value = '';
-  saveData(); renderQuotes();
-}
-
-function refreshUI() {
-  document.getElementById('bName').value = currentBook.name || '';
-  document.getElementById('bAuthor').value = currentBook.author || '';
-  document.getElementById('bCover').value = currentBook.cover || '';
-  document.getElementById('bStart').value = currentBook.start || '';
-  document.getElementById('bDeadline').value = currentBook.deadline || '';
-  document.getElementById('bTotal').value = currentBook.total || '';
-  document.getElementById('notesArea').value = currentBook.notes || '';
-  document.getElementById('dynTitle').textContent = currentBook.name || 'Kitap Günlüğü';
-  document.getElementById('dynAuthor').textContent = currentBook.author || 'Yazarınızı girin';
-  updateDropdown(); updateCover(); updateCalculations(); renderHistory(); renderQuotes();
-}
-
-function renderQuotes() {
-  const list = document.getElementById('quotesList'); list.innerHTML = '';
-  const qs = currentBook.quotes || [];
-  document.getElementById('quoteCount').textContent = qs.length + ' alıntı';
-  qs.forEach((q, i) => {
-    list.innerHTML += `<div class="quote-item"><div class="quote-text">${q.text}</div><div class="quote-meta"><span>${q.pg ? 'S.'+q.pg : ''} · ${q.date}</span><button style="background:none; border:none; color:var(--muted); cursor:pointer;" onclick="deleteQuote(${i})">✕</button></div></div>`;
-  });
-}
-
-function renderHistory() {
-  const body = document.getElementById('historyBody'); body.innerHTML = '';
-  if(!currentBook.history || currentBook.history.length === 0) return;
-  currentBook.history.slice(0,5).forEach(h => {
-    body.innerHTML += `<tr><td>${h.date}</td><td style="color:${h.delta>0?'var(--accent2)':'var(--danger)'}; font-weight:700;">${h.delta>0?'+':''}${h.delta}</td><td>${h.total}</td></tr>`;
-  });
-}
-
-function updateCover() {
-  const img = document.getElementById('coverDisplay');
-  if(currentBook.cover) { img.src = currentBook.cover; img.style.display = 'block'; }
-  else img.style.display = 'none';
-}
-
-function updateDropdown() {
-  const sel = document.getElementById('bookSelect'); sel.innerHTML = '';
-  appData.books.forEach(b => {
-    const opt = document.createElement('option'); opt.value = b.id; opt.textContent = b.name || '(İsimsiz Kitap)';
-    if(b.id === appData.activeId) opt.selected = true;
-    sel.appendChild(opt);
-  });
-}
-
-function exportData() {
-  const blob = new Blob([JSON.stringify(appData, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `kitap-takibi-yedek.json`; a.click();
-}
-
-function importData(input) {
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if(imported.books) { appData = imported; currentBook = appData.books.find(b => b.id === appData.activeId); saveData(); refreshUI(); alert('Veriler yüklendi!'); }
-    } catch(err) { alert('Hatalı dosya!'); }
-  };
-  reader.readAsText(file);
-}
-
-function deleteCurrentBook() {
-  if(appData.books.length <= 1) return alert('Son kitabı silemezsin!');
-  if(confirm('Bu kitabı silmek istediğine emin misin?')) {
-    appData.books = appData.books.filter(b => b.id !== currentBook.id);
-    appData.activeId = appData.books[0].id; currentBook = appData.books[0];
-    saveData(); refreshUI();
-  }
-}
-
-function launchConfetti() {
-  const canvas = document.getElementById('confettiCanvas'), ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  let p = []; for(let i=0; i<100; i++) p.push({x:Math.random()*canvas.width, y:-20, c:['#f0c93a','#4ef0a0','#4ec8f0'][Math.floor(Math.random()*3)], v:Math.random()*3+2, s:Math.random()*5+2});
-  function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    p.forEach(i=>{ i.y+=i.v; ctx.fillStyle=i.c; ctx.fillRect(i.x,i.y,i.s,i.s); });
-    p=p.filter(i=>i.y<canvas.height); if(p.length) requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-init();
-</script>
+                if (note.stage === 'taslak') taslakGrid.appendChild(card);
+                else if (note.stage === 'revize') revizeGrid.appendChild(card);
+                else if (note.stage === 'final') finalGrid.appendChild(card);
+            });
+        }
+    </script>
 </body>
 </html>
