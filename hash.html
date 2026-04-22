@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chimptopus Note Space</title>
+    <title>Chimptopus Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Outfit:wght@300;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
@@ -16,123 +16,154 @@
             --text-main: #3d3d3d;
             --text-muted: #7a7a7a;
             --shadow: 0 8px 32px rgba(212, 129, 102, 0.1);
+            --neon: transparent;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; }
+        /* Karanlık Mod Değişkenleri */
+        .dark-mode {
+            --bg-color: #0b0c10;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --neon: 0 0 10px rgba(212, 129, 102, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
 
         .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: var(--shadow); }
 
         header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 500; color: var(--boho-terracotta); letter-spacing: -0.5px; }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 500; color: var(--boho-terracotta); box-shadow: var(--neon); }
 
-        /* Yan Menü & Arşiv Akordiyon */
-        #sideMenu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; z-index: 100; padding: 30px 20px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
-        #sideMenu.active { right: 0; }
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.15); display: none; z-index: 99; }
+        /* Takvim ve Menü Panelleri */
+        .side-panel { position: fixed; top: 0; right: -100%; width: 100%; height: 100%; z-index: 1000; padding: 30px 20px; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; background: var(--bg-color); }
+        .side-panel.active { right: 0; }
 
-        .archive-item { margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;}
-        .archive-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; cursor: pointer; transition: 0.3s; color: var(--text-main); }
-        .archive-header:hover { color: var(--boho-terracotta); }
-        .archive-body { padding: 5px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 10px; }
-        .action-btn { cursor: pointer; font-size: 18px; transition: 0.2s;}
-        .action-btn:active { transform: scale(0.8); }
+        /* Geri Sayım (Challenge) Butonları */
+        .timer-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .timer-btn { padding: 6px 12px; font-size: 11px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--glass-bg); cursor: pointer; color: var(--text-muted); }
+        .timer-btn.active { background: var(--boho-sage); color: white; }
 
-        /* Sekmeler ve Filtreler */
-        .workflow-tabs { display: flex; gap: 8px; padding: 10px 20px; }
-        .tab { padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); cursor: pointer; transition: 0.3s; color: var(--text-muted); }
-        .tab.active { background: var(--boho-terracotta); color: white; border-color: var(--boho-terracotta); }
+        /* Genişleyen Yazma Alanı */
+        .note-box { padding: 20px; display: flex; flex-direction: column; gap: 10px; position: relative; transition: all 0.4s ease; }
+        textarea { width: 100%; height: 120px; background: transparent; border: none; font-size: 16px; outline: none; color: var(--text-main); resize: none; transition: height 0.4s ease; }
+        textarea:focus { height: 300px; }
 
-        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; padding-left: 2px;}
-        .filter-chip { padding: 5px 12px; font-size: 11px; border-radius: 20px; border: 1px solid var(--glass-border); cursor: pointer; color: var(--text-muted); transition: 0.2s;}
-        .filter-chip.active { background: var(--boho-sage); color: white; border-color: var(--boho-sage); }
-
-        /* İçerik Blokları */
-        .main-container { padding: 0 20px 100px; }
-        .editor-section { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
-
-        .note-box { padding: 20px; display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .box-header { display: flex; justify-content: space-between; align-items: center; }
-        .box-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--boho-terracotta); font-weight: 600; }
-
-        textarea { width: 100%; height: 160px; background: transparent; border: none; font-size: 16px; outline: none; color: var(--text-main); resize: none; }
-        .readonly-preview { background: rgba(0,0,0,0.03); border-radius: 15px; padding: 15px; font-size: 14px; color: var(--text-muted); min-height: 80px; max-height: 150px; overflow-y: auto; line-height: 1.5; }
-
-        .records-section { margin-top: 30px; }
+        /* Arşiv & Kayıt Kartları (Netflix Tarzı) */
         .cards-grid { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0 20px; scrollbar-width: none; }
         .cards-grid::-webkit-scrollbar { display: none; }
-
-        .note-card { min-width: 130px; height: 130px; padding: 15px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .note-card:active { transform: scale(0.95); }
+        .note-card { min-width: 120px; height: 120px; padding: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
-        .delete-card-btn { position: absolute; bottom: 12px; right: 12px; font-size: 16px; color: #d9534f; opacity: 0.6; transition: 0.2s; }
-        .delete-card-btn:hover { opacity: 1; }
+        /* Takvim Tasarımı */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; text-align: center; }
+        .cal-day { padding: 10px; font-size: 12px; border-radius: 8px; background: var(--glass-bg); }
+        .cal-today { background: var(--boho-terracotta); color: white; }
 
-        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .icon-btn-small { background: transparent; border: none; color: var(--boho-sage); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 8px; transition: 0.2s;}
-        .icon-btn-small:hover { background: rgba(0,0,0,0.05); }
-
+        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 2000; display: none; padding: 40px 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
-    <div class="menu-overlay" onclick="toggleMenu()"></div>
-    
-    <div id="sideMenu" class="glass">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-            <h3 style="font-weight:500;">Arşiv</h3>
-            <span class="material-symbols-rounded" onclick="toggleMenu()" style="cursor:pointer">close</span>
-        </div>
-        <div id="archiveContainer"></div>
-        <hr style="margin:25px 0; border:0; border-top:1px solid var(--glass-border);">
-        <button class="tab" onclick="clearAll()" style="width:100%; color:#d9534f">Tüm Verileri Temizle</button>
-    </div>
-
     <header>
         <div class="logo">Chimptopus.</div>
-        <button class="icon-btn" onclick="toggleMenu()">
-            <span class="material-symbols-rounded">more_vert</span>
-        </button>
+        <div style="display: flex; gap: 10px;">
+            <button class="icon-btn" onclick="toggleDarkMode()" title="Karanlık Mod">
+                <span class="material-symbols-rounded" id="darkIcon">dark_mode</span>
+            </button>
+            <button class="icon-btn" onclick="togglePanel('sideMenu')">
+                <span class="material-symbols-rounded">menu</span>
+            </button>
+        </div>
     </header>
 
-    <div class="workflow-tabs">
-        <button class="tab active" onclick="switchTab('taslak', this)">Taslak</button>
-        <button class="tab" onclick="switchTab('revize', this)">Revize</button>
-        <button class="tab" onclick="switchTab('final', this)">Final</button>
+    <div id="sideMenu" class="side-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h2 style="font-weight:500;">İş İstasyonu</h2>
+            <span class="material-symbols-rounded" onclick="togglePanel('sideMenu')" style="cursor:pointer">close</span>
+        </div>
+
+        <div class="glass" style="padding: 15px; margin-bottom: 20px;">
+            <h4 id="currentMonth" style="font-size: 14px; color: var(--boho-terracotta); margin-bottom: 10px;">Nisan 2026</h4>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <button class="glass" style="width: 100%; padding: 15px; text-align: left; margin-bottom: 10px; border: none; cursor: pointer;" onclick="togglePanel('archivePanel')">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-rounded">archive</span>
+                <span>Arşiv Klasörü</span>
+            </div>
+        </button>
+
+        <hr style="margin:25px 0; border:0; border-top:1px solid var(--glass-border);">
+        <button onclick="clearAll()" style="color:#d9534f; background:none; border:none; cursor:pointer;">Tüm Verileri Temizle</button>
     </div>
 
-    <div class="main-container">
-        <div class="editor-section">
+    <div id="archivePanel" class="side-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h3 style="font-weight:500;">Arşivlenmiş Finaller</h3>
+            <span class="material-symbols-rounded" onclick="togglePanel('archivePanel')" style="cursor:pointer">arrow_back</span>
+        </div>
+        <div id="archiveGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+    </div>
+
+    <div class="workflow-tabs" style="display: flex; gap: 8px; padding: 10px 20px;">
+        <button class="tab active" onclick="switchTab('taslak', this)" id="tab-taslak" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); cursor: pointer;">Taslak</button>
+        <button class="tab" onclick="switchTab('revize', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); cursor: pointer;">Revize</button>
+        <button class="tab" onclick="switchTab('final', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); cursor: pointer;">Final</button>
+    </div>
+
+    <div class="main-container" style="padding: 0 20px 100px;">
+        <div class="editor-section" style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
+            
             <div class="glass note-box" id="referenceBox" style="display: none;">
-                <span class="box-label">Referans Not</span>
-                <div class="readonly-preview" id="refContent">Kayıtlardan bir not seç.</div>
+                <span style="font-size: 10px; color: var(--boho-terracotta); font-weight: 600; text-transform: uppercase;">Referans Not</span>
+                <div id="refContent" style="font-size: 14px; color: var(--text-muted); max-height: 100px; overflow-y: auto;">Referans seçilmedi.</div>
             </div>
 
             <div class="glass note-box">
-                <div class="box-header">
-                    <span class="box-label" id="boxLabel">Yeni Taslak</span>
-                    <button class="icon-btn-small" onclick="insertTimestamp()" title="Saat Ekle">
-                        <span class="material-symbols-rounded" style="font-size:18px;">schedule</span>
-                    </button>
+                <div class="timer-row">
+                    <button class="timer-btn" onclick="startCountdown(5, this)">5 dk</button>
+                    <button class="timer-btn" onclick="startCountdown(10, this)">10 dk</button>
+                    <button class="timer-btn" onclick="startCountdown(15, this)">15 dk</button>
+                    <span id="timerDisplay" style="margin-left: auto; font-size: 12px; color: var(--boho-terracotta); font-weight: 600;"></span>
                 </div>
-                <textarea id="noteInput" placeholder="Zihnindekileri buraya dök..."></textarea>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="boxLabel" style="font-size: 10px; color: var(--boho-terracotta); font-weight: 600; text-transform: uppercase;">Yeni Taslak</span>
+                    <div style="display: flex; gap: 5px;">
+                        <span class="material-symbols-rounded" onclick="insertTimestamp()" style="font-size: 18px; cursor: pointer; color: var(--boho-sage);">schedule</span>
+                        <span class="material-symbols-rounded" onclick="copyAll()" style="font-size: 18px; cursor: pointer; color: var(--boho-sage);">content_copy</span>
+                    </div>
+                </div>
+
+                <textarea id="noteInput" placeholder="Yazmaya başla (tıkladığında genişler)..."></textarea>
+                
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span id="statusMsg" style="font-size:11px; color:var(--boho-sage)"></span>
-                    <button class="icon-btn" style="background: var(--boho-terracotta); color: white;" onclick="handleAction()">
+                    <button class="icon-btn" style="background: var(--boho-terracotta); color: white; border: none;" onclick="handleAction()">
                         <span class="material-symbols-rounded">check</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="records-section">
+        <div class="records-section" style="margin-top: 30px;">
             <h3 style="font-weight:400; font-size:16px; margin-bottom: 10px;">Kayıtlar</h3>
-            <div class="filter-row">
-                <span class="filter-chip active" onclick="filterNotes('all', this)">Tümü</span>
-                <span class="filter-chip" onclick="filterNotes('taslak', this)">Taslak</span>
-                <span class="filter-chip" onclick="filterNotes('revize', this)">Revize</span>
-            </div>
             <div class="cards-grid" id="cardsGrid"></div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <span class="material-symbols-rounded" onclick="closeModal()" style="position: fixed; top: 20px; right: 20px; cursor: pointer; font-size: 32px;">close</span>
+        <div id="modalDate" style="font-size: 12px; color: var(--boho-terracotta); margin-bottom: 20px;"></div>
+        <div id="modalContent" style="font-size: 18px; line-height: 1.6; white-space: pre-wrap;"></div>
+        <div style="margin-top: 30px; display: flex; gap: 15px;">
+            <button class="icon-btn" onclick="copyModalContent()"><span class="material-symbols-rounded">content_copy</span></button>
+            <button class="icon-btn" id="modalDeleteBtn" style="color: #d9534f;"><span class="material-symbols-rounded">delete</span></button>
         </div>
     </div>
 
@@ -140,50 +171,51 @@
         let notes = JSON.parse(localStorage.getItem('chimptopus_notes')) || [];
         let archive = JSON.parse(localStorage.getItem('chimptopus_archive')) || [];
         let currentMode = 'taslak';
-        let currentFilter = 'all';
+        let timer;
 
-        renderNotes();
-        renderArchive();
+        function togglePanel(id) {
+            document.getElementById(id).classList.toggle('active');
+        }
 
-        function toggleMenu() {
-            const menu = document.getElementById('sideMenu');
-            const overlay = document.querySelector('.menu-overlay');
-            menu.classList.toggle('active');
-            overlay.style.display = menu.classList.contains('active') ? 'block' : 'none';
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('darkIcon');
+            icon.innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode';
         }
 
         function switchTab(mode, btn) {
             currentMode = mode;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+                t.style.background = 'var(--glass-bg)';
+                t.style.color = 'var(--text-muted)';
+            });
             btn.classList.add('active');
+            btn.style.background = 'var(--boho-terracotta)';
+            btn.style.color = 'white';
 
-            const refBox = document.getElementById('referenceBox');
-            const boxLabel = document.getElementById('boxLabel');
+            document.getElementById('referenceBox').style.display = (mode === 'taslak') ? 'none' : 'flex';
+            document.getElementById('boxLabel').innerText = "YENİ " + mode.toUpperCase();
+        }
+
+        function startCountdown(mins, btn) {
+            clearInterval(timer);
+            document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
-            if (mode === 'taslak') {
-                refBox.style.display = 'none';
-                boxLabel.innerText = "Yeni Taslak";
-            } else {
-                refBox.style.display = 'flex';
-                boxLabel.innerText = mode === 'revize' ? "Revize İşlemi" : "Final Dokunuşlar";
-            }
-        }
-
-        function insertTimestamp() {
-            const textarea = document.getElementById('noteInput');
-            const now = new Date();
-            const timeString = `[${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}] `;
-            textarea.value += timeString;
-            textarea.focus();
-        }
-
-        function selectForReference(id) {
-            const note = notes.find(n => n.id === id);
-            if (note) {
-                document.getElementById('refContent').innerText = note.text;
-                document.getElementById('referenceBox').style.display = 'flex';
-                showStatus("Referansa eklendi");
-            }
+            let seconds = mins * 60;
+            const display = document.getElementById('timerDisplay');
+            
+            timer = setInterval(() => {
+                let m = Math.floor(seconds / 60);
+                let s = seconds % 60;
+                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    alert("Zaman doldu! Notunu tamamla.");
+                }
+                seconds--;
+            }, 1000);
         }
 
         function handleAction() {
@@ -191,155 +223,104 @@
             if (!text.trim()) return;
 
             if (currentMode === 'final') {
-                archiveNote(text);
+                const item = { id: Date.now(), text, date: new Date().toLocaleDateString() };
+                archive.unshift(item);
             } else {
-                saveNote(text);
+                notes.unshift({ id: Date.now(), text, type: currentMode, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
             }
-        }
-
-        function saveNote(text) {
-            const newNote = {
-                id: Date.now(),
-                text: text,
-                type: currentMode,
-                date: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-            };
-            notes.unshift(newNote);
-            updateStorage();
+            
+            saveToStorage();
             document.getElementById('noteInput').value = '';
-            renderNotes();
-            showStatus("Kaydedildi");
+            renderAll();
+            showStatus("Tamamlandı");
         }
 
-        function archiveNote(text) {
-            const arcNote = {
-                id: Date.now(),
-                text: text,
-                date: new Date().toLocaleDateString('tr-TR')
-            };
-            archive.unshift(arcNote);
-            document.getElementById('noteInput').value = '';
-            updateStorage();
-            renderArchive();
-            showStatus("Arşivlendi!");
-        }
-
-        function deleteNote(id, event) {
-            event.stopPropagation(); // Karta tıklanma olayını engeller
-            if(confirm("Bu notu silmek istediğine emin misin?")) {
-                notes = notes.filter(n => n.id !== id);
-                updateStorage();
-                renderNotes();
-                showStatus("Silindi");
-            }
-        }
-
-        function deleteArchive(id, event) {
-            event.stopPropagation();
-            if(confirm("Bu arşiv notunu silmek istediğine emin misin?")) {
-                archive = archive.filter(a => a.id !== id);
-                updateStorage();
-                renderArchive();
-            }
-        }
-
-        function filterNotes(type, btn) {
-            currentFilter = type;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            renderNotes();
-        }
-
-        function renderNotes() {
+        function renderAll() {
+            // Kayıtlar
             const grid = document.getElementById('cardsGrid');
             grid.innerHTML = '';
-            
-            const filteredNotes = currentFilter === 'all' ? notes : notes.filter(n => n.type === currentFilter);
-            
-            filteredNotes.forEach(note => {
+            notes.forEach(n => {
                 const card = document.createElement('div');
                 card.className = 'glass note-card';
-                card.onclick = () => selectForReference(note.id);
-                card.innerHTML = `
-                    <span class="box-label" style="font-size:8px">${note.type}</span>
-                    <p style="font-size:12px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; margin-bottom: 10px;">${note.text}</p>
-                    <span style="font-size:9px; color:var(--text-muted)">${note.date}</span>
-                    <span class="material-symbols-rounded delete-card-btn" onclick="deleteNote(${note.id}, event)">delete</span>
-                `;
+                card.onclick = () => selectReference(n);
+                card.innerHTML = `<span style="font-size:8px; color:var(--boho-terracotta)">${n.type}</span>
+                                 <p style="font-size:12px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${n.text}</p>
+                                 <span style="font-size:9px; color:var(--text-muted)">${n.time}</span>`;
                 grid.appendChild(card);
             });
-        }
 
-        function renderArchive() {
-            const container = document.getElementById('archiveContainer');
-            if (archive.length === 0) {
-                container.innerHTML = '<p style="font-size:12px; color:var(--text-muted)">Arşiv boş.</p>';
-                return;
-            }
-            container.innerHTML = '';
-            archive.forEach(item => {
-                const words = item.text.split(' ');
-                const title = words.slice(0, 3).join(' ') + (words.length > 3 ? '...' : '');
-
-                const div = document.createElement('div');
-                div.className = 'archive-item';
-                div.innerHTML = `
-                    <div class="archive-header" onclick="toggleArchive(this)">
-                        <span style="font-weight:600; font-size:13px;">${title}</span>
-                        <span class="material-symbols-rounded expand-icon">expand_more</span>
-                    </div>
-                    <div class="archive-body" style="display:none;">
-                        <p style="font-size:13px; line-height:1.5; margin-bottom:10px; color:var(--text-main);">${item.text}</p>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:10px; color:var(--text-muted)">${item.date}</span>
-                            <div>
-                                <span class="material-symbols-rounded action-btn" style="color:#d9534f; margin-right:8px;" onclick="deleteArchive(${item.id}, event)">delete</span>
-                                <span class="material-symbols-rounded action-btn" style="color:var(--boho-terracotta);" onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')">content_copy</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
+            // Arşiv Paneli
+            const arcGrid = document.getElementById('archiveGrid');
+            arcGrid.innerHTML = '';
+            archive.forEach(a => {
+                const card = document.createElement('div');
+                card.className = 'glass note-card';
+                card.onclick = () => openArchiveDetail(a);
+                card.innerHTML = `<span style="font-size:8px; color:var(--boho-sage)">FINAL</span>
+                                 <p style="font-size:12px; overflow:hidden;">${a.text.substring(0, 30)}...</p>
+                                 <span style="font-size:9px; color:var(--text-muted)">${a.date}</span>`;
+                arcGrid.appendChild(card);
             });
         }
 
-        function toggleArchive(el) {
-            const body = el.nextElementSibling;
-            const icon = el.querySelector('.expand-icon');
-            if(body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.innerText = 'expand_less';
-            } else {
-                body.style.display = 'none';
-                icon.innerText = 'expand_more';
+        function selectReference(n) {
+            document.getElementById('refContent').innerText = n.text;
+            showStatus("Referans seçildi");
+        }
+
+        function openArchiveDetail(a) {
+            document.getElementById('modalContent').innerText = a.text;
+            document.getElementById('modalDate').innerText = "ARŞİV - " + a.date;
+            document.getElementById('detailModal').style.display = 'block';
+            document.getElementById('modalDeleteBtn').onclick = () => {
+                if(confirm("Silinsin mi?")) {
+                    archive = archive.filter(item => item.id !== a.id);
+                    saveToStorage(); renderAll(); closeModal();
+                }
+            };
+        }
+
+        function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+
+        function generateCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            const today = new Date().getDate();
+            for (let i = 1; i <= 30; i++) {
+                const day = document.createElement('div');
+                day.className = `cal-day ${i === today ? 'cal-today' : ''}`;
+                day.innerText = i;
+                grid.appendChild(day);
             }
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showStatus("Kopyalandı!");
-            });
+        function insertTimestamp() {
+            const ta = document.getElementById('noteInput');
+            const now = new Date();
+            ta.value += `[${now.getHours()}.${now.getMinutes().toString().padStart(2, '0')}] `;
+            ta.focus();
         }
 
-        function updateStorage() {
+        function copyAll() {
+            navigator.clipboard.writeText(document.getElementById('noteInput').value);
+            showStatus("Kopyalandı");
+        }
+
+        function saveToStorage() {
             localStorage.setItem('chimptopus_notes', JSON.stringify(notes));
             localStorage.setItem('chimptopus_archive', JSON.stringify(archive));
         }
 
-        function showStatus(msg) {
-            const el = document.getElementById('statusMsg');
-            el.innerText = msg;
-            setTimeout(() => el.innerText = '', 2000);
+        function showStatus(m) {
+            const s = document.getElementById('statusMsg');
+            s.innerText = m;
+            setTimeout(() => s.innerText = '', 2000);
         }
 
-        function clearAll() {
-            if(confirm("Tüm veriler silinecek, emin misin?")) {
-                localStorage.clear();
-                notes = []; archive = [];
-                renderNotes(); renderArchive();
-                toggleMenu();
-            }
-        }
+        function clearAll() { if(confirm("Emin misin?")) { localStorage.clear(); location.reload(); } }
+
+        renderAll();
+        generateCalendar();
     </script>
 </body>
 </html>
