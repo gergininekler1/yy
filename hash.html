@@ -35,8 +35,8 @@
         .archive-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; cursor: pointer; transition: 0.3s; color: var(--text-main); }
         .archive-header:hover { color: var(--boho-terracotta); }
         .archive-body { padding: 5px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 10px; }
-        .copy-archive-btn { cursor: pointer; color: var(--boho-terracotta); font-size: 18px; transition: 0.2s;}
-        .copy-archive-btn:active { transform: scale(0.8); }
+        .action-btn { cursor: pointer; font-size: 18px; transition: 0.2s;}
+        .action-btn:active { transform: scale(0.8); }
 
         /* Sekmeler ve Filtreler */
         .workflow-tabs { display: flex; gap: 8px; padding: 10px 20px; }
@@ -62,8 +62,11 @@
         .cards-grid { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0 20px; scrollbar-width: none; }
         .cards-grid::-webkit-scrollbar { display: none; }
 
-        .note-card { min-width: 130px; height: 130px; padding: 15px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
+        .note-card { min-width: 130px; height: 130px; padding: 15px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .note-card:active { transform: scale(0.95); }
+        
+        .delete-card-btn { position: absolute; bottom: 12px; right: 12px; font-size: 16px; color: #d9534f; opacity: 0.6; transition: 0.2s; }
+        .delete-card-btn:hover { opacity: 1; }
 
         .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .icon-btn-small { background: transparent; border: none; color: var(--boho-sage); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 8px; transition: 0.2s;}
@@ -80,8 +83,7 @@
             <h3 style="font-weight:500;">Arşiv</h3>
             <span class="material-symbols-rounded" onclick="toggleMenu()" style="cursor:pointer">close</span>
         </div>
-        <div id="archiveContainer">
-            </div>
+        <div id="archiveContainer"></div>
         <hr style="margin:25px 0; border:0; border-top:1px solid var(--glass-border);">
         <button class="tab" onclick="clearAll()" style="width:100%; color:#d9534f">Tüm Verileri Temizle</button>
     </div>
@@ -101,7 +103,6 @@
 
     <div class="main-container">
         <div class="editor-section">
-            
             <div class="glass note-box" id="referenceBox" style="display: none;">
                 <span class="box-label">Referans Not</span>
                 <div class="readonly-preview" id="refContent">Kayıtlardan bir not seç.</div>
@@ -125,16 +126,12 @@
         </div>
 
         <div class="records-section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
-                <h3 style="font-weight:400; font-size:16px;">Kayıtlar</h3>
-            </div>
-            
+            <h3 style="font-weight:400; font-size:16px; margin-bottom: 10px;">Kayıtlar</h3>
             <div class="filter-row">
                 <span class="filter-chip active" onclick="filterNotes('all', this)">Tümü</span>
                 <span class="filter-chip" onclick="filterNotes('taslak', this)">Taslak</span>
                 <span class="filter-chip" onclick="filterNotes('revize', this)">Revize</span>
             </div>
-
             <div class="cards-grid" id="cardsGrid"></div>
         </div>
     </div>
@@ -227,6 +224,25 @@
             showStatus("Arşivlendi!");
         }
 
+        function deleteNote(id, event) {
+            event.stopPropagation(); // Karta tıklanma olayını engeller
+            if(confirm("Bu notu silmek istediğine emin misin?")) {
+                notes = notes.filter(n => n.id !== id);
+                updateStorage();
+                renderNotes();
+                showStatus("Silindi");
+            }
+        }
+
+        function deleteArchive(id, event) {
+            event.stopPropagation();
+            if(confirm("Bu arşiv notunu silmek istediğine emin misin?")) {
+                archive = archive.filter(a => a.id !== id);
+                updateStorage();
+                renderArchive();
+            }
+        }
+
         function filterNotes(type, btn) {
             currentFilter = type;
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -246,8 +262,9 @@
                 card.onclick = () => selectForReference(note.id);
                 card.innerHTML = `
                     <span class="box-label" style="font-size:8px">${note.type}</span>
-                    <p style="font-size:12px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${note.text}</p>
+                    <p style="font-size:12px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; margin-bottom: 10px;">${note.text}</p>
                     <span style="font-size:9px; color:var(--text-muted)">${note.date}</span>
+                    <span class="material-symbols-rounded delete-card-btn" onclick="deleteNote(${note.id}, event)">delete</span>
                 `;
                 grid.appendChild(card);
             });
@@ -261,7 +278,6 @@
             }
             container.innerHTML = '';
             archive.forEach(item => {
-                // Sadece ilk 3 kelimeyi başlık yap
                 const words = item.text.split(' ');
                 const title = words.slice(0, 3).join(' ') + (words.length > 3 ? '...' : '');
 
@@ -276,7 +292,10 @@
                         <p style="font-size:13px; line-height:1.5; margin-bottom:10px; color:var(--text-main);">${item.text}</p>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-size:10px; color:var(--text-muted)">${item.date}</span>
-                            <span class="material-symbols-rounded copy-archive-btn" onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')">content_copy</span>
+                            <div>
+                                <span class="material-symbols-rounded action-btn" style="color:#d9534f; margin-right:8px;" onclick="deleteArchive(${item.id}, event)">delete</span>
+                                <span class="material-symbols-rounded action-btn" style="color:var(--boho-terracotta);" onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')">content_copy</span>
+                            </div>
                         </div>
                     </div>
                 `;
