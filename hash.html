@@ -56,7 +56,12 @@
         .cards-grid { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0 20px; scrollbar-width: none; }
         .cards-grid::-webkit-scrollbar { display: none; }
         .note-card { min-width: 120px; height: 120px; padding: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .note-card:active { transform: scale(0.95); }
         
+        /* Geri Gelen Silme Butonu CSS'i */
+        .delete-card-btn { position: absolute; bottom: 12px; right: 12px; font-size: 16px; color: #d9534f; opacity: 0.6; transition: 0.2s; z-index: 10; }
+        .delete-card-btn:hover { opacity: 1; }
+
         /* Takvim Tasarımı */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; text-align: center; }
         .cal-day { padding: 10px; font-size: 12px; border-radius: 8px; background: var(--glass-bg); }
@@ -91,15 +96,15 @@
             <div class="calendar-grid" id="calendarGrid"></div>
         </div>
 
-        <button class="glass" style="width: 100%; padding: 15px; text-align: left; margin-bottom: 10px; border: none; cursor: pointer;" onclick="togglePanel('archivePanel')">
+        <button class="glass" style="width: 100%; padding: 15px; text-align: left; margin-bottom: 10px; border: none; cursor: pointer; color: var(--text-main);" onclick="togglePanel('archivePanel')">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="material-symbols-rounded">archive</span>
+                <span class="material-symbols-rounded" style="color: var(--boho-sage);">archive</span>
                 <span>Arşiv Klasörü</span>
             </div>
         </button>
 
         <hr style="margin:25px 0; border:0; border-top:1px solid var(--glass-border);">
-        <button onclick="clearAll()" style="color:#d9534f; background:none; border:none; cursor:pointer;">Tüm Verileri Temizle</button>
+        <button onclick="clearAll()" style="color:#d9534f; background:none; border:none; cursor:pointer; width: 100%; text-align: left; font-size: 16px;">Tüm Verileri Temizle</button>
     </div>
 
     <div id="archivePanel" class="side-panel">
@@ -223,16 +228,27 @@
             if (!text.trim()) return;
 
             if (currentMode === 'final') {
-                const item = { id: Date.now(), text, date: new Date().toLocaleDateString() };
+                const item = { id: Date.now(), text, date: new Date().toLocaleDateString('tr-TR') };
                 archive.unshift(item);
             } else {
-                notes.unshift({ id: Date.now(), text, type: currentMode, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+                notes.unshift({ id: Date.now(), text, type: currentMode, time: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}) });
             }
             
             saveToStorage();
             document.getElementById('noteInput').value = '';
             renderAll();
             showStatus("Tamamlandı");
+        }
+
+        // --- EKSİK OLAN SİLME FONKSİYONU EKLENDİ ---
+        function deleteNote(id, event) {
+            event.stopPropagation(); // Karta tıklanıp referans açılmasını engeller
+            if(confirm("Bu notu silmek istediğine emin misin?")) {
+                notes = notes.filter(n => n.id !== id);
+                saveToStorage();
+                renderAll();
+                showStatus("Silindi");
+            }
         }
 
         function renderAll() {
@@ -243,9 +259,11 @@
                 const card = document.createElement('div');
                 card.className = 'glass note-card';
                 card.onclick = () => selectReference(n);
+                // SİLME BUTONU HTML İÇİNE YENİDEN YERLEŞTİRİLDİ
                 card.innerHTML = `<span style="font-size:8px; color:var(--boho-terracotta)">${n.type}</span>
-                                 <p style="font-size:12px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${n.text}</p>
-                                 <span style="font-size:9px; color:var(--text-muted)">${n.time}</span>`;
+                                 <p style="font-size:12px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; margin-bottom: 10px;">${n.text}</p>
+                                 <span style="font-size:9px; color:var(--text-muted)">${n.time}</span>
+                                 <span class="material-symbols-rounded delete-card-btn" onclick="deleteNote(${n.id}, event)">delete</span>`;
                 grid.appendChild(card);
             });
 
@@ -306,6 +324,11 @@
             showStatus("Kopyalandı");
         }
 
+        function copyModalContent() {
+            navigator.clipboard.writeText(document.getElementById('modalContent').innerText);
+            alert("Not kopyalandı!");
+        }
+
         function saveToStorage() {
             localStorage.setItem('chimptopus_notes', JSON.stringify(notes));
             localStorage.setItem('chimptopus_archive', JSON.stringify(archive));
@@ -317,7 +340,7 @@
             setTimeout(() => s.innerText = '', 2000);
         }
 
-        function clearAll() { if(confirm("Emin misin?")) { localStorage.clear(); location.reload(); } }
+        function clearAll() { if(confirm("Emin misin? Bütün kayıtlar ve arşiv gidecek!")) { localStorage.clear(); location.reload(); } }
 
         renderAll();
         generateCalendar();
