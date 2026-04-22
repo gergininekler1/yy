@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chimptopus Pro</title>
+    <title>Chimptopus Pro V6</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Outfit:wght@300;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
+            /* Dinamik Tema Renkleri (Değiştirilebilir) */
+            --theme-primary: #d48166;
+            --theme-secondary: #7d8c7d;
+            
             --bg-color: #fcfaf2;
-            --boho-terracotta: #d48166;
-            --boho-sage: #7d8c7d;
             --glass-bg: rgba(255, 255, 255, 0.7);
             --glass-border: rgba(0, 0, 0, 0.05);
             --text-main: #3d3d3d;
             --text-muted: #7a7a7a;
-            --shadow: 0 8px 32px rgba(212, 129, 102, 0.1);
+            --line-color: rgba(0, 0, 0, 0.06);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
         .dark-mode {
@@ -24,82 +27,90 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-main: #e0e0e0;
             --text-muted: #888;
+            --line-color: rgba(255, 255, 255, 0.05);
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(212, 129, 102, 0.05), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(125, 140, 125, 0.05), transparent 40%);
-            animation: auraBreath 15s ease-in-out infinite alternate;
+            background-color: var(--bg-color); color: var(--text-main);
+            min-height: 100vh; overflow-x: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: background 0.3s, color 0.3s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        @keyframes auraBreath {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; transition: background 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
-        
-        .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: var(--shadow); }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: var(--shadow); transition: all 0.3s; }
 
         header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 500; color: var(--boho-terracotta); }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 500; color: var(--theme-primary); transition: color 0.3s; }
 
-        .main-container { padding: 0 20px 100px; }
+        .main-container { padding: 0 20px 100px; display: block; }
+        .archive-container { padding: 0 20px 100px; display: none; } /* Yeni Arşiv Sayfası */
+
         .note-box { padding: 25px; display: flex; flex-direction: column; gap: 15px; position: relative; }
 
-        /* Çizgili Defter (Sabit Boyutlu) */
+        /* Çizgili Defter */
         textarea { 
-            width: 100%; 
-            height: 160px; /* Sabit boyut */
-            background-color: transparent; 
-            background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(212, 129, 102, 0.2) 28px);
-            background-attachment: local;
-            border: none; 
-            font-size: 16px; 
-            line-height: 28px; 
-            outline: none; 
-            color: var(--text-main); 
-            resize: none; 
+            width: 100%; height: 160px; background-color: transparent; 
+            background-image: repeating-linear-gradient(transparent, transparent 27px, var(--line-color) 28px);
+            background-attachment: local; border: none; font-size: 16px; line-height: 28px; 
+            outline: none; color: var(--text-main); resize: none; 
         }
+
+        /* 3. Kelime Hedefi Challenge */
+        .word-challenge { display: flex; align-items: center; gap: 8px; font-size: 12px; font-family: 'Outfit', sans-serif; font-weight: 500; color: var(--theme-secondary); }
+        .goal-input { width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--theme-primary); color: var(--theme-primary); font-size: 12px; font-weight: 600; text-align: center; outline: none; font-family: 'Outfit', sans-serif;}
+        .progress-bar-container { flex-grow: 1; height: 4px; background: var(--glass-border); border-radius: 2px; overflow: hidden; margin-left: 10px; }
+        .progress-bar { height: 100%; background: var(--theme-primary); width: 0%; transition: width 0.3s ease; }
 
         /* Vibe Çipleri */
         .mood-selector { display: flex; gap: 8px; margin-top: 5px; }
         .mood-dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s;}
         .mood-dot.active { border-color: var(--text-main); transform: scale(1.3); }
 
-        /* Link Önizlemesi */
-        .link-preview { background: rgba(125, 140, 125, 0.1); padding: 8px 12px; border-radius: 12px; font-size: 12px; color: var(--boho-sage); display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border: 1px solid var(--glass-border); margin-top: 5px; }
+        /* 8. Çapraz Referans (@Mention) & Link */
+        .mention-link { color: var(--theme-primary); cursor: pointer; font-weight: 600; text-decoration: underline; text-decoration-style: dotted; }
+        .link-preview { background: rgba(125, 140, 125, 0.1); padding: 8px 12px; border-radius: 12px; font-size: 12px; color: var(--theme-secondary); display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border: 1px solid var(--glass-border); margin-top: 5px; }
 
-        /* Filtreler ve Kayıtlar */
-        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; }
+        /* 1. Arama ve 6. Kanban Filtreleri */
+        .controls-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .search-bar { display: flex; align-items: center; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px 15px; }
+        .search-bar input { border: none; background: transparent; outline: none; color: var(--text-main); font-size: 14px; width: 100%; margin-left: 8px; font-family: 'Space Grotesk', sans-serif;}
+        
+        .filter-row { display: flex; justify-content: space-between; align-items: center; }
+        .filter-chips { display: flex; gap: 8px; }
         .filter-chip { padding: 5px 12px; font-size: 11px; border-radius: 20px; border: 1px solid var(--glass-border); cursor: pointer; color: var(--text-muted); transition: 0.2s;}
-        .filter-chip.active { background: var(--boho-sage); color: white; border-color: var(--boho-sage); }
+        .filter-chip.active { background: var(--theme-secondary); color: white; border-color: var(--theme-secondary); }
 
+        /* Kartlar (Grid & Kanban) */
         .cards-grid { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
         .cards-grid::-webkit-scrollbar { display: none; }
-        .note-card { min-width: 135px; height: 135px; padding: 15px; cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s;}
-        .note-card:active { transform: scale(0.95); }
-        .mood-indicator { width: 8px; height: 8px; border-radius: 50%; }
-
-        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); }
         
-        /* Yan Menü ve Arşiv Yapısı */
+        .kanban-board { display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
+        .kanban-column { min-width: 200px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02); padding: 10px; border-radius: 16px; border: 1px dashed var(--glass-border); }
+        .kanban-title { font-size: 11px; font-weight: 600; color: var(--theme-secondary); text-transform: uppercase; text-align: center; margin-bottom: 5px; }
+
+        .note-card { min-width: 135px; padding: 15px; cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s;}
+        .note-card:active { transform: scale(0.95); }
+        .note-card p { word-wrap: break-word; white-space: pre-wrap; }
+
+        .note-number { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 11px; color: var(--text-muted); opacity: 0.7; }
+        .highlight { background-color: rgba(212, 129, 102, 0.3); border-radius: 3px; } /* Arama vurgusu */
+
+        /* Yan Menü (Tema ve Yedekleme) */
         .side-panel { position: fixed; top: 0; right: -100%; width: 100%; max-width: 320px; height: 100%; z-index: 1000; padding: 30px 20px; background: var(--bg-color); transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto;}
         .side-panel.active { right: 0; }
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); display: none; z-index: 999; }
         .menu-overlay.active { display: block; }
 
-        .archive-item { margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;}
-        .archive-header { display: flex; justify-content: space-between; align-items: center; padding: 5px; cursor: pointer; font-size: 13px; font-weight: 600;}
-        .archive-body { padding: 10px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-top: 10px; font-size: 13px; line-height: 1.5; color: var(--text-main);}
-
-        .note-number { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 11px; color: var(--text-muted); opacity: 0.7; }
+        .theme-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--glass-border); cursor: pointer; }
+        .action-btn-menu { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main); font-family: 'Space Grotesk'; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        
+        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: 0.3s; }
+        
+        /* Arşiv Sayfası Grid */
+        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .archive-card { height: auto; min-height: 140px; }
 
     </style>
 </head>
@@ -108,117 +119,156 @@
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
 
     <header>
-        <div class="logo">Chimptopus.</div>
-        <div style="display: flex; gap: 10px;">
-            <button class="icon-btn" onclick="toggleDarkMode()"><span class="material-symbols-rounded">dark_mode</span></button>
-            <button class="icon-btn" onclick="togglePanel('sideMenu')"><span class="material-symbols-rounded">menu</span></button>
+        <div class="logo" id="mainLogo">Chimptopus.</div>
+        <div style="display: flex; gap: 8px;">
+            <button class="icon-btn" onclick="toggleArchivePage()" id="archiveToggleBtn" title="Arşiv Sayfası"><span class="material-symbols-rounded">inventory_2</span></button>
+            <button class="icon-btn" onclick="toggleDarkMode()" title="Karanlık Mod"><span class="material-symbols-rounded">dark_mode</span></button>
+            <button class="icon-btn" onclick="togglePanel('sideMenu')" title="Ayarlar"><span class="material-symbols-rounded">settings</span></button>
         </div>
     </header>
 
     <div id="sideMenu" class="side-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-weight:500;">Arşiv & Menü</h2>
+            <h2 style="font-weight:500;">Ayarlar</h2>
             <span class="material-symbols-rounded" onclick="closePanels()" style="cursor:pointer">close</span>
         </div>
         
-        <h4 style="color: var(--boho-sage); margin-bottom: 15px; font-size: 14px;">Arşivlenmiş Finaller</h4>
-        <div id="archiveContainer"></div>
+        <h4 style="color: var(--theme-secondary); margin-bottom: 10px; font-size: 13px;">Aura (Tema Seçimi)</h4>
+        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+            <div class="theme-btn" style="background: linear-gradient(45deg, #d48166, #7d8c7d);" onclick="changeTheme('#d48166', '#7d8c7d')" title="Boho"></div>
+            <div class="theme-btn" style="background: linear-gradient(45deg, #4A90E2, #50E3C2);" onclick="changeTheme('#4A90E2', '#50E3C2')" title="Ocean"></div>
+            <div class="theme-btn" style="background: linear-gradient(45deg, #FF007F, #00F0FF);" onclick="changeTheme('#FF007F', '#00F0FF')" title="Cyberpunk"></div>
+            <div class="theme-btn" style="background: linear-gradient(45deg, #8A9A5B, #D4B872);" onclick="changeTheme('#8A9A5B', '#D4B872')" title="Matcha"></div>
+        </div>
+
+        <h4 style="color: var(--theme-secondary); margin-bottom: 10px; font-size: 13px;">Veri Yönetimi</h4>
+        <button class="action-btn-menu" onclick="exportData()"><span class="material-symbols-rounded">download</span> Verileri Yedekle (.json)</button>
+        <label class="action-btn-menu" style="cursor: pointer;">
+            <span class="material-symbols-rounded">upload</span> Yedeği Yükle
+            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+        </label>
 
         <hr style="margin:25px 0; border:0; border-top:1px solid var(--glass-border);">
-        <button onclick="clearAll()" style="color:#d9534f; background:none; border:none; cursor:pointer; font-size: 15px; font-weight: 600;">Tüm Verileri Temizle</button>
+        <button class="action-btn-menu" onclick="clearAll()" style="color:#d9534f; border-color: rgba(217, 83, 79, 0.3);"><span class="material-symbols-rounded">delete_forever</span> Tüm Sistemi Sıfırla</button>
     </div>
 
-    <div class="workflow-tabs" style="display: flex; gap: 8px; padding: 10px 20px;">
-        <button class="tab active" onclick="switchTab('taslak', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--boho-terracotta); color: white; cursor: pointer;">Taslak</button>
-        <button class="tab" onclick="switchTab('revize', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-muted); cursor: pointer;">Revize</button>
-        <button class="tab" onclick="switchTab('final', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-muted); cursor: pointer;">Final</button>
-    </div>
+    <div id="mainPage" class="main-container">
+        <div class="workflow-tabs" style="display: flex; gap: 8px; padding-bottom: 15px;">
+            <button class="tab active" onclick="switchTab('taslak', this)" id="tabTaslak" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--theme-primary); background: var(--theme-primary); color: white; cursor: pointer;">Taslak</button>
+            <button class="tab" onclick="switchTab('revize', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-muted); cursor: pointer;">Revize</button>
+            <button class="tab" onclick="switchTab('final', this)" style="padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-muted); cursor: pointer;">Final</button>
+        </div>
 
-    <div class="main-container">
-        <div class="editor-section" style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
-            
+        <div class="editor-section" style="display: flex; flex-direction: column; gap: 15px;">
             <div class="glass note-box" id="referenceBox" style="display: none; padding: 15px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 9px; color: var(--boho-terracotta); font-weight: 600; text-transform: uppercase;">Referans Not</span>
+                    <span style="font-size: 9px; color: var(--theme-primary); font-weight: 600; text-transform: uppercase;">Referans Not</span>
                     <span id="refNum" class="note-number"></span>
                 </div>
-                <div id="refContent" style="font-size: 13px; color: var(--text-muted); max-height: 80px; overflow-y: auto; margin-top: 5px;"></div>
+                <div id="refContent" style="font-size: 14px; line-height: 1.5; color: var(--text-muted); max-height: 100px; overflow-y: auto; margin-top: 5px;"></div>
             </div>
 
             <div class="glass note-box" id="editorBox">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <div>
-                        <span id="boxLabel" style="font-size: 9px; color: var(--boho-terracotta); font-weight: 600; text-transform: uppercase;">Yeni Taslak</span>
+                        <span id="boxLabel" style="font-size: 9px; color: var(--theme-primary); font-weight: 600; text-transform: uppercase;">Yeni Taslak</span>
                         <div class="mood-selector">
                             <div class="mood-dot active" style="background: #d48166;" onclick="setMood('#d48166', this)"></div>
                             <div class="mood-dot" style="background: #7d8c7d;" onclick="setMood('#7d8c7d', this)"></div>
-                            <div class="mood-dot" style="background: #6b878c;" onclick="setMood('#6b878c', this)"></div>
+                            <div class="mood-dot" style="background: #4A90E2;" onclick="setMood('#4A90E2', this)"></div>
                         </div>
                     </div>
                     <div class="timer-row" style="display: flex; gap: 8px;">
                         <button class="icon-btn" style="width:auto; height:30px; padding:0 10px; font-size:11px;" onclick="startCountdown(5)">5dk</button>
-                        <button class="icon-btn" style="width:auto; height:30px; padding:0 10px; font-size:11px;" onclick="startCountdown(15)">15dk</button>
-                        <span id="timerDisplay" style="font-size:12px; font-weight:600; color:var(--boho-terracotta); margin-left: 5px; line-height: 30px;"></span>
+                        <span id="timerDisplay" style="font-size:12px; font-weight:600; color:var(--theme-primary); margin-left: 5px; line-height: 30px;"></span>
                     </div>
                 </div>
 
-                <textarea id="noteInput" placeholder="Zihnindekileri deftere dök..." oninput="handleInput()"></textarea>
+                <textarea id="noteInput" placeholder="Yazmaya başla... (@01 yazarak eski nota referans verebilirsin)" oninput="handleInput()"></textarea>
                 
                 <div id="linkContainer"></div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="word-challenge">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">edit_document</span>
+                    <span id="wordCount">0</span> / 
+                    <input type="number" id="wordGoal" class="goal-input" value="100" onchange="updateWordProgress()"> kelime
+                    <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--glass-border); padding-top: 10px;">
                     <div style="display: flex; gap: 15px; align-items: center;">
-                        <span id="statusMsg" style="color:var(--boho-sage); font-size: 11px; font-weight: 600;"></span>
+                        <span id="statusMsg" style="color:var(--theme-secondary); font-size: 11px; font-weight: 600;"></span>
                         <span class="material-symbols-rounded" style="font-size:20px; cursor:pointer; color:var(--text-muted);" onclick="undoText()" title="Geri Al">history</span>
                     </div>
                     <div style="display: flex; gap: 8px;">
-                        <button class="icon-btn" onclick="insertTimestamp()"><span class="material-symbols-rounded">schedule</span></button>
-                        <button class="icon-btn" style="background: var(--boho-terracotta); color: white; border: none;" onclick="handleAction()"><span class="material-symbols-rounded">done_all</span></button>
+                        <button class="icon-btn" onclick="insertTimestamp()" title="Saat Ekle"><span class="material-symbols-rounded">schedule</span></button>
+                        <button class="icon-btn" style="background: var(--theme-primary); color: white; border: none;" onclick="handleAction()"><span class="material-symbols-rounded">done_all</span></button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="records-section" style="margin-top: 30px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="font-weight:400; font-size:16px;">Kayıtlar</h3>
-            </div>
-            
-            <div class="filter-row">
-                <span class="filter-chip active" onclick="filterNotes('all', this)">Tümü</span>
-                <span class="filter-chip" onclick="filterNotes('taslak', this)">Taslak</span>
-                <span class="filter-chip" onclick="filterNotes('revize', this)">Revize</span>
+            <div class="controls-row">
+                <div class="search-bar">
+                    <span class="material-symbols-rounded" style="color: var(--text-muted); font-size: 18px;">search</span>
+                    <input type="text" id="searchInput" placeholder="Notlarda ara..." oninput="renderNotes()">
+                </div>
+                
+                <div class="filter-row">
+                    <div class="filter-chips">
+                        <span class="filter-chip active" onclick="filterNotes('all', this)">Tümü</span>
+                        <span class="filter-chip" onclick="filterNotes('taslak', this)">Taslak</span>
+                        <span class="filter-chip" onclick="filterNotes('revize', this)">Revize</span>
+                    </div>
+                    <button class="icon-btn" style="width: 32px; height: 32px;" onclick="toggleViewMode()" title="Görünümü Değiştir">
+                        <span class="material-symbols-rounded" id="viewIcon" style="font-size: 16px;">view_column</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="cards-grid" id="cardsGrid"></div>
+            <div id="dynamicBoard"></div>
         </div>
     </div>
 
+    <div id="archivePage" class="archive-container">
+        <h2 style="font-weight:500; margin-bottom: 5px; color: var(--theme-primary);">Finaller Arşivi</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Tamamlanmış ve arşive kaldırılmış şaheserlerin.</p>
+        <div class="archive-grid" id="archiveGridPage"></div>
+    </div>
+
     <script>
-        let notes = JSON.parse(localStorage.getItem('chimptopus_v5_notes')) || [];
-        let archive = JSON.parse(localStorage.getItem('chimptopus_v5_archive')) || [];
-        let globalCounter = parseInt(localStorage.getItem('chimptopus_v5_counter')) || 1;
+        // Veri Yapısı (v6)
+        let notes = JSON.parse(localStorage.getItem('chimptopus_v6_notes')) || [];
+        let archive = JSON.parse(localStorage.getItem('chimptopus_v6_archive')) || [];
+        let globalCounter = parseInt(localStorage.getItem('chimptopus_v6_counter')) || 1;
+        let savedTheme = JSON.parse(localStorage.getItem('chimptopus_v6_theme')) || { p: '#d48166', s: '#7d8c7d' };
         
         let currentMode = 'taslak';
         let currentFilter = 'all';
+        let viewMode = 'grid'; // grid veya kanban
+        let isArchiveOpen = false;
         let selectedMood = '#d48166';
         let textHistory = [];
         let timer;
 
+        // Başlangıç Kurulumları
+        changeTheme(savedTheme.p, savedTheme.s, false);
+        renderNotes();
+        renderArchivePage();
+
+        // -------------------------
+        // 1 & 8. Çapraz Referans ve Link Algılama
+        // -------------------------
         function handleInput() {
             const val = document.getElementById('noteInput').value;
             if (textHistory[textHistory.length - 1] !== val) {
                 textHistory.push(val);
                 if (textHistory.length > 20) textHistory.shift();
             }
+            
             detectLinks(val);
-        }
-
-        function undoText() {
-            if (textHistory.length > 1) {
-                textHistory.pop();
-                document.getElementById('noteInput').value = textHistory[textHistory.length - 1];
-            }
+            updateWordProgress(); // 3. Kelime Sayacı
         }
 
         function detectLinks(text) {
@@ -234,10 +284,348 @@
             }
         }
 
+        // Metin içindeki @01 vb. mentionları tıklanabilir HTML'e çevirir (Sadece önizlemede çalışır)
+        function formatMentionsAndHighlights(text, query = '') {
+            let formatted = text;
+            // Mention Formatı
+            formatted = formatted.replace(/@(\d{2,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
+            
+            // Arama Vurgusu
+            if (query) {
+                const regex = new RegExp(`(${query})`, "gi");
+                // HTML taglarının içini bozmamak için basit highlight (Geliştirilebilir)
+                formatted = formatted.replace(regex, '<span class="highlight">$1</span>');
+            }
+            return formatted;
+        }
+
+        function loadMention(num, event) {
+            if(event) event.stopPropagation();
+            // Notlarda veya arşivde ara
+            let found = notes.find(n => n.num === num) || archive.find(a => a.num === num);
+            if(found) {
+                document.getElementById('refNum').innerText = `#${found.num}`;
+                // İçinde de mention varsa çevir
+                document.getElementById('refContent').innerHTML = formatMentionsAndHighlights(found.text);
+                document.getElementById('referenceBox').style.display = 'flex';
+                showStatus("Referans Yüklendi");
+                // Main page'e dön (arşivdeyse)
+                if(isArchiveOpen) toggleArchivePage();
+            } else {
+                alert(`${num} numaralı not bulunamadı.`);
+            }
+        }
+
+        function undoText() {
+            if (textHistory.length > 1) {
+                textHistory.pop();
+                document.getElementById('noteInput').value = textHistory[textHistory.length - 1];
+                updateWordProgress();
+            }
+        }
+
+        // -------------------------
+        // 3. Kelime Hedefi (Challenge)
+        // -------------------------
+        function updateWordProgress() {
+            const val = document.getElementById('noteInput').value.trim();
+            const words = val.length === 0 ? 0 : val.split(/\s+/).length;
+            const goal = parseInt(document.getElementById('wordGoal').value) || 100;
+            
+            document.getElementById('wordCount').innerText = words;
+            
+            let percentage = Math.min((words / goal) * 100, 100);
+            const bar = document.getElementById('wordProgress');
+            bar.style.width = percentage + '%';
+
+            if(percentage === 100 && words > 0) {
+                bar.style.background = "#50E3C2"; // Hedef tamamlandı yeşili
+            } else {
+                bar.style.background = "var(--theme-primary)";
+            }
+        }
+
+        // -------------------------
+        // TEMA VE UI YÖNETİMİ
+        // -------------------------
+        function changeTheme(primary, secondary, save = true) {
+            document.documentElement.style.setProperty('--theme-primary', primary);
+            document.documentElement.style.setProperty('--theme-secondary', secondary);
+            if(save) {
+                localStorage.setItem('chimptopus_v6_theme', JSON.stringify({p: primary, s: secondary}));
+            }
+            // Tab renklerini güncelle
+            const activeTab = document.querySelector('.tab.active');
+            if(activeTab) {
+                activeTab.style.background = primary;
+                activeTab.style.borderColor = primary;
+            }
+            setMood(primary, document.querySelector('.mood-dot')); // İlk modu tema rengi yap
+        }
+
+        function toggleArchivePage() {
+            isArchiveOpen = !isArchiveOpen;
+            const btn = document.getElementById('archiveToggleBtn');
+            const main = document.getElementById('mainPage');
+            const arcPage = document.getElementById('archivePage');
+            const logo = document.getElementById('mainLogo');
+
+            if (isArchiveOpen) {
+                main.style.display = 'none';
+                arcPage.style.display = 'block';
+                btn.style.background = 'var(--theme-primary)';
+                btn.style.color = 'white';
+                logo.innerText = 'ChimpArchive.';
+                renderArchivePage();
+            } else {
+                main.style.display = 'block';
+                arcPage.style.display = 'none';
+                btn.style.background = 'var(--glass-bg)';
+                btn.style.color = 'var(--text-main)';
+                logo.innerText = 'Chimptopus.';
+            }
+        }
+
+        // -------------------------
+        // 5. YEDEKLEME (JSON)
+        // -------------------------
+        function exportData() {
+            const data = { notes, archive, counter: globalCounter, theme: savedTheme };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "chimptopus_yedek.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            closePanels();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.notes && imported.archive) {
+                        notes = imported.notes;
+                        archive = imported.archive;
+                        globalCounter = imported.counter || globalCounter;
+                        
+                        localStorage.setItem('chimptopus_v6_notes', JSON.stringify(notes));
+                        localStorage.setItem('chimptopus_v6_archive', JSON.stringify(archive));
+                        localStorage.setItem('chimptopus_v6_counter', globalCounter);
+                        
+                        if(imported.theme) changeTheme(imported.theme.p, imported.theme.s);
+                        
+                        renderNotes();
+                        renderArchivePage();
+                        alert("Yedek başarıyla yüklendi!");
+                        closePanels();
+                    } else { alert("Geçersiz dosya formatı."); }
+                } catch(err) { alert("Dosya okuma hatası."); }
+            };
+            reader.readAsText(file);
+        }
+
+        // -------------------------
+        // NOT İŞLEMLERİ
+        // -------------------------
         function setMood(color, el) {
             selectedMood = color;
             document.querySelectorAll('.mood-dot').forEach(d => d.classList.remove('active'));
             el.classList.add('active');
+        }
+
+        function switchTab(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.tab').forEach(t => {
+                t.style.background = 'var(--glass-bg)';
+                t.style.color = 'var(--text-muted)';
+                t.style.borderColor = 'var(--glass-border)';
+                t.classList.remove('active');
+            });
+            btn.classList.add('active');
+            btn.style.background = 'var(--theme-primary)';
+            btn.style.color = 'white';
+            btn.style.borderColor = 'var(--theme-primary)';
+            
+            document.getElementById('boxLabel').innerText = mode === 'final' ? "Arşive Gönderilecek Final" : "Yeni " + mode;
+            document.getElementById('referenceBox').style.display = mode === 'taslak' ? 'none' : 'flex';
+        }
+
+        function handleAction() {
+            const text = document.getElementById('noteInput').value;
+            if (!text.trim()) return;
+            const formattedNum = String(globalCounter).padStart(2, '0');
+
+            if (currentMode === 'final') {
+                archive.unshift({ id: Date.now(), num: formattedNum, text, date: new Date().toLocaleDateString('tr-TR') });
+                localStorage.setItem('chimptopus_v6_archive', JSON.stringify(archive));
+                showStatus("Arşive Eklendi!");
+            } else {
+                notes.unshift({
+                    id: Date.now(), num: formattedNum, text, type: currentMode, mood: selectedMood,
+                    time: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})
+                });
+                localStorage.setItem('chimptopus_v6_notes', JSON.stringify(notes));
+                showStatus("Kaydedildi");
+            }
+            
+            globalCounter++;
+            localStorage.setItem('chimptopus_v6_counter', globalCounter);
+            
+            document.getElementById('noteInput').value = '';
+            document.getElementById('linkContainer').innerHTML = '';
+            textHistory = [];
+            updateWordProgress();
+            renderNotes();
+            if(isArchiveOpen) renderArchivePage();
+        }
+
+        // -------------------------
+        // 6. KANBAN VE GRID RENDER
+        // -------------------------
+        function filterNotes(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderNotes();
+        }
+
+        function toggleViewMode() {
+            viewMode = viewMode === 'grid' ? 'kanban' : 'grid';
+            document.getElementById('viewIcon').innerText = viewMode === 'grid' ? 'view_column' : 'grid_view';
+            renderNotes();
+        }
+
+        function createCardHTML(n, query) {
+            const formattedText = formatMentionsAndHighlights(n.text, query);
+            return `
+                <div class="glass note-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                        <span class="note-number">#${n.num}</span>
+                        <div style="width:8px; height:8px; border-radius:50%; background:${n.mood}"></div>
+                    </div>
+                    <span style="font-size:8px; font-weight:600; color:var(--theme-primary); text-transform:uppercase;">${n.type}</span>
+                    <p style="font-size:12px; line-height:1.5; margin: 8px 0; flex-grow: 1; overflow:hidden; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;">${formattedText}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; z-index:10;">
+                        <span style="font-size:9px; color:var(--text-muted)">${n.time}</span>
+                        <span class="material-symbols-rounded" style="font-size:16px; color:#d9534f" onclick="deleteNote(${n.id}, event)">delete</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNotes() {
+            const board = document.getElementById('dynamicBoard');
+            board.innerHTML = '';
+            
+            // 1. Arama mantığı
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = notes;
+            
+            if (currentFilter !== 'all') filtered = filtered.filter(n => n.type === currentFilter);
+            if (query) filtered = filtered.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query));
+
+            if (viewMode === 'grid') {
+                const grid = document.createElement('div');
+                grid.className = 'cards-grid';
+                filtered.forEach(n => {
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = createCardHTML(n, query);
+                    const card = wrap.firstElementChild;
+                    card.onclick = (e) => { if(!e.target.classList.contains('mention-link') && e.target.innerText !== 'delete') loadMention(n.num); }
+                    grid.appendChild(card);
+                });
+                board.appendChild(grid);
+            } else {
+                // KANBAN Görünümü
+                const kanban = document.createElement('div');
+                kanban.className = 'kanban-board';
+                
+                ['taslak', 'revize'].forEach(type => {
+                    const col = document.createElement('div');
+                    col.className = 'kanban-column';
+                    col.innerHTML = `<div class="kanban-title">${type}</div>`;
+                    const colNotes = filtered.filter(n => n.type === type);
+                    
+                    colNotes.forEach(n => {
+                        const wrap = document.createElement('div');
+                        wrap.innerHTML = createCardHTML(n, query);
+                        const card = wrap.firstElementChild;
+                        card.onclick = (e) => { if(!e.target.classList.contains('mention-link') && e.target.innerText !== 'delete') loadMention(n.num); }
+                        col.appendChild(card);
+                    });
+                    kanban.appendChild(col);
+                });
+                board.appendChild(kanban);
+            }
+        }
+
+        // Yeni Arşiv Sayfası
+        function renderArchivePage() {
+            const grid = document.getElementById('archiveGridPage');
+            grid.innerHTML = '';
+            if (archive.length === 0) {
+                grid.innerHTML = '<p style="font-size:13px; color:var(--text-muted)">Henüz arşivlenmiş bir eser yok.</p>';
+                return;
+            }
+
+            archive.forEach(a => {
+                const formattedText = formatMentionsAndHighlights(a.text);
+                const card = document.createElement('div');
+                card.className = 'glass note-card archive-card';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                        <span class="note-number">#${a.num}</span>
+                        <span style="font-size:8px; font-weight:600; color:var(--theme-secondary);">FİNAL</span>
+                    </div>
+                    <p style="font-size:13px; line-height:1.6; margin: 8px 0; flex-grow: 1; color: var(--text-main);">${formattedText}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 10px;">
+                        <span style="font-size:10px; color:var(--text-muted)">${a.date}</span>
+                        <div style="display:flex; gap: 8px;">
+                            <span class="material-symbols-rounded" style="color:#d9534f; cursor:pointer; font-size: 18px;" onclick="deleteArchive(${a.id}, event)">delete</span>
+                            <span class="material-symbols-rounded" style="color:var(--theme-primary); cursor:pointer; font-size: 18px;" onclick="copyToClipboard('${a.text.replace(/'/g, "\\'")}', event)">content_copy</span>
+                        </div>
+                    </div>
+                `;
+                // Arşiv kartına tıklanınca referans olarak ana sayfaya taşı
+                card.onclick = (e) => {
+                    if(!e.target.classList.contains('mention-link') && e.target.innerText !== 'delete' && e.target.innerText !== 'content_copy') {
+                        loadMention(a.num);
+                    }
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function deleteNote(id, e) {
+            e.stopPropagation();
+            if(confirm("Bu notu kalıcı olarak silmek istediğine emin misin?")) {
+                notes = notes.filter(n => n.id !== id);
+                localStorage.setItem('chimptopus_v6_notes', JSON.stringify(notes));
+                renderNotes();
+            }
+        }
+
+        function deleteArchive(id, e) {
+            e.stopPropagation();
+            if(confirm("Arşivden kalıcı olarak silinsin mi?")) {
+                archive = archive.filter(a => a.id !== id);
+                localStorage.setItem('chimptopus_v6_archive', JSON.stringify(archive));
+                renderArchivePage();
+            }
+        }
+
+        // Yardımcı Fonksiyonlar
+        function insertTimestamp() {
+            const ta = document.getElementById('noteInput');
+            const now = new Date();
+            ta.value += `[${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}] `;
+            ta.focus();
+            updateWordProgress();
         }
 
         function startCountdown(mins) {
@@ -249,205 +637,20 @@
                 let m = Math.floor(sec / 60);
                 let s = sec % 60;
                 document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                if (sec <= 0) { 
-                    clearInterval(timer); 
-                    if(navigator.vibrate) navigator.vibrate(200);
-                    alert("Süre doldu!"); 
-                }
+                if (sec <= 0) { clearInterval(timer); if(navigator.vibrate) navigator.vibrate(200); alert("Süre doldu!"); }
             }, 1000);
         }
 
-        function switchTab(mode, btn) {
-            currentMode = mode;
-            document.querySelectorAll('.tab').forEach(t => {
-                t.style.background = 'var(--glass-bg)';
-                t.style.color = 'var(--text-muted)';
-                t.classList.remove('active');
-            });
-            btn.classList.add('active');
-            btn.style.background = 'var(--boho-terracotta)';
-            btn.style.color = 'white';
-            
-            document.getElementById('boxLabel').innerText = mode === 'final' ? "Arşive Gönderilecek Final" : "Yeni " + mode;
-            document.getElementById('referenceBox').style.display = mode === 'taslak' ? 'none' : 'flex';
-        }
-
-        function handleAction() {
-            const text = document.getElementById('noteInput').value;
-            if (!text.trim()) return;
-
-            const formattedNum = String(globalCounter).padStart(2, '0');
-
-            if (currentMode === 'final') {
-                archive.unshift({
-                    id: Date.now(),
-                    num: formattedNum,
-                    text,
-                    date: new Date().toLocaleDateString('tr-TR')
-                });
-                localStorage.setItem('chimptopus_v5_archive', JSON.stringify(archive));
-                showStatus("Arşivlendi!");
-                renderArchive();
-            } else {
-                notes.unshift({
-                    id: Date.now(),
-                    num: formattedNum,
-                    text,
-                    type: currentMode,
-                    mood: selectedMood,
-                    time: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})
-                });
-                localStorage.setItem('chimptopus_v5_notes', JSON.stringify(notes));
-                showStatus("Kaydedildi");
-                renderNotes();
-            }
-            
-            globalCounter++;
-            localStorage.setItem('chimptopus_v5_counter', globalCounter);
-            
-            document.getElementById('noteInput').value = '';
-            document.getElementById('linkContainer').innerHTML = '';
-            textHistory = [];
-        }
-
-        function filterNotes(type, btn) {
-            currentFilter = type;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            renderNotes();
-        }
-
-        function renderNotes() {
-            const grid = document.getElementById('cardsGrid');
-            grid.innerHTML = '';
-            
-            const filtered = currentFilter === 'all' ? notes : notes.filter(n => n.type === currentFilter);
-            
-            filtered.forEach(n => {
-                const card = document.createElement('div');
-                card.className = 'glass note-card';
-                card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
-                        <span class="note-number">#${n.num}</span>
-                        <div class="mood-indicator" style="background:${n.mood}"></div>
-                    </div>
-                    <span style="font-size:8px; font-weight:600; color:var(--boho-terracotta); text-transform:uppercase;">${n.type}</span>
-                    <p style="font-size:12px; line-height:1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; margin: 8px 0; flex-grow: 1;">${n.text}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center">
-                        <span style="font-size:9px; color:var(--text-muted)">${n.time}</span>
-                        <span class="material-symbols-rounded" style="font-size:16px; color:#d9534f" onclick="deleteNote(${n.id}, event)">delete</span>
-                    </div>
-                `;
-                card.onclick = () => {
-                    document.getElementById('refNum').innerText = `#${n.num}`;
-                    document.getElementById('refContent').innerText = n.text;
-                    document.getElementById('referenceBox').style.display = 'flex';
-                };
-                grid.appendChild(card);
-            });
-        }
-
-        function renderArchive() {
-            const container = document.getElementById('archiveContainer');
-            if (archive.length === 0) {
-                container.innerHTML = '<p style="font-size:12px; color:var(--text-muted)">Henüz arşivlenmiş not yok.</p>';
-                return;
-            }
-            container.innerHTML = '';
-            archive.forEach(item => {
-                const words = item.text.split(' ');
-                const title = words.slice(0, 4).join(' ') + (words.length > 4 ? '...' : '');
-
-                const div = document.createElement('div');
-                div.className = 'archive-item';
-                div.innerHTML = `
-                    <div class="archive-header" onclick="toggleArchive(this)">
-                        <div style="display:flex; align-items:center; gap: 8px;">
-                            <span class="note-number">#${item.num}</span>
-                            <span>${title}</span>
-                        </div>
-                        <span class="material-symbols-rounded expand-icon">expand_more</span>
-                    </div>
-                    <div class="archive-body" style="display:none;">
-                        <p style="margin-bottom:10px;">${item.text}</p>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:10px; color:var(--text-muted)">${item.date}</span>
-                            <div>
-                                <span class="material-symbols-rounded" style="color:#d9534f; cursor:pointer; margin-right:8px; font-size: 18px;" onclick="deleteArchive(${item.id})">delete</span>
-                                <span class="material-symbols-rounded" style="color:var(--boho-terracotta); cursor:pointer; font-size: 18px;" onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')">content_copy</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function toggleArchive(el) {
-            const body = el.nextElementSibling;
-            const icon = el.querySelector('.expand-icon');
-            if(body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.innerText = 'expand_less';
-            } else {
-                body.style.display = 'none';
-                icon.innerText = 'expand_more';
-            }
-        }
-
-        function deleteNote(id, e) {
-            e.stopPropagation();
-            if(confirm("Silinsin mi?")) {
-                notes = notes.filter(n => n.id !== id);
-                localStorage.setItem('chimptopus_v5_notes', JSON.stringify(notes));
-                renderNotes();
-            }
-        }
-
-        function deleteArchive(id) {
-            if(confirm("Arşivden kalıcı olarak silinsin mi?")) {
-                archive = archive.filter(a => a.id !== id);
-                localStorage.setItem('chimptopus_v5_archive', JSON.stringify(archive));
-                renderArchive();
-            }
-        }
-
-        function insertTimestamp() {
-            const ta = document.getElementById('noteInput');
-            const now = new Date();
-            ta.value += `[${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}] `;
-            ta.focus();
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Arşiv kopyalandı!");
-            });
+        function copyToClipboard(text, e) {
+            if(e) e.stopPropagation();
+            navigator.clipboard.writeText(text).then(() => { alert("Kopyalandı!"); });
         }
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
-        function togglePanel(id) { 
-            document.getElementById(id).classList.add('active'); 
-            document.getElementById('overlay').classList.add('active');
-        }
-        function closePanels() {
-            document.getElementById('sideMenu').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
-        }
-        function showStatus(m) { 
-            const s = document.getElementById('statusMsg');
-            s.innerText = m;
-            setTimeout(() => s.innerText = '', 2000);
-        }
-        function clearAll() { 
-            if(confirm("Tüm veriler ve sayaç sıfırlanacak!")) { 
-                localStorage.clear(); 
-                location.reload(); 
-            } 
-        }
-
-        renderNotes();
-        renderArchive();
+        function togglePanel(id) { document.getElementById(id).classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+        function closePanels() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+        function showStatus(m) { const s = document.getElementById('statusMsg'); s.innerText = m; setTimeout(() => s.innerText = '', 2000); }
+        function clearAll() { if(confirm("Tüm veriler (notlar, arşiv, tema ayarları) silinecek! İşlem geri alınamaz.")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
