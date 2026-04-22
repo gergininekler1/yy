@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Note Space - V2</title>
+    <title>Chimptopus Note Space</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Outfit:wght@300;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
@@ -24,24 +24,35 @@
         .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: var(--shadow); }
 
         header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 500; color: var(--boho-terracotta); }
+        .logo { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 500; color: var(--boho-terracotta); letter-spacing: -0.5px; }
 
-        /* Yan Menü & Arşiv */
+        /* Yan Menü & Arşiv Akordiyon */
         #sideMenu { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; z-index: 100; padding: 30px 20px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
         #sideMenu.active { right: 0; }
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.15); display: none; z-index: 99; }
 
-        .archive-item { padding: 15px; margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); position: relative; }
-        .copy-archive-btn { position: absolute; right: 5px; top: 15px; cursor: pointer; color: var(--boho-terracotta); font-size: 18px; }
+        .archive-item { margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;}
+        .archive-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; cursor: pointer; transition: 0.3s; color: var(--text-main); }
+        .archive-header:hover { color: var(--boho-terracotta); }
+        .archive-body { padding: 5px; background: rgba(0,0,0,0.02); border-radius: 8px; margin-bottom: 10px; }
+        .copy-archive-btn { cursor: pointer; color: var(--boho-terracotta); font-size: 18px; transition: 0.2s;}
+        .copy-archive-btn:active { transform: scale(0.8); }
 
+        /* Sekmeler ve Filtreler */
         .workflow-tabs { display: flex; gap: 8px; padding: 10px 20px; }
         .tab { padding: 10px 18px; border-radius: 50px; font-size: 13px; border: 1px solid var(--glass-border); background: var(--glass-bg); cursor: pointer; transition: 0.3s; color: var(--text-muted); }
         .tab.active { background: var(--boho-terracotta); color: white; border-color: var(--boho-terracotta); }
 
+        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; padding-left: 2px;}
+        .filter-chip { padding: 5px 12px; font-size: 11px; border-radius: 20px; border: 1px solid var(--glass-border); cursor: pointer; color: var(--text-muted); transition: 0.2s;}
+        .filter-chip.active { background: var(--boho-sage); color: white; border-color: var(--boho-sage); }
+
+        /* İçerik Blokları */
         .main-container { padding: 0 20px 100px; }
         .editor-section { margin-top: 15px; display: flex; flex-direction: column; gap: 15px; }
 
-        .note-box { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .note-box { padding: 20px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+        .box-header { display: flex; justify-content: space-between; align-items: center; }
         .box-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--boho-terracotta); font-weight: 600; }
 
         textarea { width: 100%; height: 160px; background: transparent; border: none; font-size: 16px; outline: none; color: var(--text-main); resize: none; }
@@ -55,6 +66,9 @@
         .note-card:active { transform: scale(0.95); }
 
         .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .icon-btn-small { background: transparent; border: none; color: var(--boho-sage); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 8px; transition: 0.2s;}
+        .icon-btn-small:hover { background: rgba(0,0,0,0.05); }
+
     </style>
 </head>
 <body>
@@ -67,14 +81,13 @@
             <span class="material-symbols-rounded" onclick="toggleMenu()" style="cursor:pointer">close</span>
         </div>
         <div id="archiveContainer">
-            <p style="font-size:12px; color:var(--text-muted)">Henüz arşivlenmiş bir final notu yok.</p>
-        </div>
+            </div>
         <hr style="margin:25px 0; border:0; border-top:1px solid var(--glass-border);">
-        <button class="tab" onclick="clearAll()" style="width:100%; color:#d9534f">Verileri Temizle</button>
+        <button class="tab" onclick="clearAll()" style="width:100%; color:#d9534f">Tüm Verileri Temizle</button>
     </div>
 
     <header>
-        <div class="logo">Aura.</div>
+        <div class="logo">Chimptopus.</div>
         <button class="icon-btn" onclick="toggleMenu()">
             <span class="material-symbols-rounded">more_vert</span>
         </button>
@@ -88,14 +101,20 @@
 
     <div class="main-container">
         <div class="editor-section">
+            
             <div class="glass note-box" id="referenceBox" style="display: none;">
                 <span class="box-label">Referans Not</span>
-                <div class="readonly-preview" id="refContent">Kayıtlardan bir not seçerek buraya aktarabilirsin.</div>
+                <div class="readonly-preview" id="refContent">Kayıtlardan bir not seç.</div>
             </div>
 
             <div class="glass note-box">
-                <span class="box-label" id="boxLabel">Yeni Taslak</span>
-                <textarea id="noteInput" placeholder="Notunu yazmaya baş..."></textarea>
+                <div class="box-header">
+                    <span class="box-label" id="boxLabel">Yeni Taslak</span>
+                    <button class="icon-btn-small" onclick="insertTimestamp()" title="Saat Ekle">
+                        <span class="material-symbols-rounded" style="font-size:18px;">schedule</span>
+                    </button>
+                </div>
+                <textarea id="noteInput" placeholder="Zihnindekileri buraya dök..."></textarea>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span id="statusMsg" style="font-size:11px; color:var(--boho-sage)"></span>
                     <button class="icon-btn" style="background: var(--boho-terracotta); color: white;" onclick="handleAction()">
@@ -106,15 +125,25 @@
         </div>
 
         <div class="records-section">
-            <h3 style="font-weight:400; font-size:16px;">Kayıtlar</h3>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+                <h3 style="font-weight:400; font-size:16px;">Kayıtlar</h3>
+            </div>
+            
+            <div class="filter-row">
+                <span class="filter-chip active" onclick="filterNotes('all', this)">Tümü</span>
+                <span class="filter-chip" onclick="filterNotes('taslak', this)">Taslak</span>
+                <span class="filter-chip" onclick="filterNotes('revize', this)">Revize</span>
+            </div>
+
             <div class="cards-grid" id="cardsGrid"></div>
         </div>
     </div>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('aura_notes')) || [];
-        let archive = JSON.parse(localStorage.getItem('aura_archive')) || [];
+        let notes = JSON.parse(localStorage.getItem('chimptopus_notes')) || [];
+        let archive = JSON.parse(localStorage.getItem('chimptopus_archive')) || [];
         let currentMode = 'taslak';
+        let currentFilter = 'all';
 
         renderNotes();
         renderArchive();
@@ -143,14 +172,20 @@
             }
         }
 
-        // Kayıtlardaki nota basınca referansa atar
+        function insertTimestamp() {
+            const textarea = document.getElementById('noteInput');
+            const now = new Date();
+            const timeString = `[${now.getHours().toString().padStart(2, '0')}.${now.getMinutes().toString().padStart(2, '0')}] `;
+            textarea.value += timeString;
+            textarea.focus();
+        }
+
         function selectForReference(id) {
             const note = notes.find(n => n.id === id);
             if (note) {
                 document.getElementById('refContent').innerText = note.text;
-                // Eğer taslak modundaysak, referans kutusunu görünür yap (opsiyonel)
                 document.getElementById('referenceBox').style.display = 'flex';
-                showStatus("Not referansa eklendi");
+                showStatus("Referansa eklendi");
             }
         }
 
@@ -176,7 +211,7 @@
             updateStorage();
             document.getElementById('noteInput').value = '';
             renderNotes();
-            showStatus("Not kaydedildi");
+            showStatus("Kaydedildi");
         }
 
         function archiveNote(text) {
@@ -186,18 +221,26 @@
                 date: new Date().toLocaleDateString('tr-TR')
             };
             archive.unshift(arcNote);
-            // Final yapıldığında inputu temizle
             document.getElementById('noteInput').value = '';
             updateStorage();
             renderArchive();
-            renderNotes(); // Eğer listeden silinmesini istiyorsan burası tetiklenir
-            showStatus("Final notu arşivlendi!");
+            showStatus("Arşivlendi!");
+        }
+
+        function filterNotes(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderNotes();
         }
 
         function renderNotes() {
             const grid = document.getElementById('cardsGrid');
             grid.innerHTML = '';
-            notes.forEach(note => {
+            
+            const filteredNotes = currentFilter === 'all' ? notes : notes.filter(n => n.type === currentFilter);
+            
+            filteredNotes.forEach(note => {
                 const card = document.createElement('div');
                 card.className = 'glass note-card';
                 card.onclick = () => selectForReference(note.id);
@@ -218,26 +261,50 @@
             }
             container.innerHTML = '';
             archive.forEach(item => {
+                // Sadece ilk 3 kelimeyi başlık yap
+                const words = item.text.split(' ');
+                const title = words.slice(0, 3).join(' ') + (words.length > 3 ? '...' : '');
+
                 const div = document.createElement('div');
                 div.className = 'archive-item';
                 div.innerHTML = `
-                    <p style="font-size:13px; padding-right:25px;">${item.text}</p>
-                    <span style="font-size:10px; color:var(--text-muted)">${item.date}</span>
-                    <span class="material-symbols-rounded copy-archive-btn" onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')">content_copy</span>
+                    <div class="archive-header" onclick="toggleArchive(this)">
+                        <span style="font-weight:600; font-size:13px;">${title}</span>
+                        <span class="material-symbols-rounded expand-icon">expand_more</span>
+                    </div>
+                    <div class="archive-body" style="display:none;">
+                        <p style="font-size:13px; line-height:1.5; margin-bottom:10px; color:var(--text-main);">${item.text}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:10px; color:var(--text-muted)">${item.date}</span>
+                            <span class="material-symbols-rounded copy-archive-btn" onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')">content_copy</span>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(div);
             });
         }
 
+        function toggleArchive(el) {
+            const body = el.nextElementSibling;
+            const icon = el.querySelector('.expand-icon');
+            if(body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.innerText = 'expand_less';
+            } else {
+                body.style.display = 'none';
+                icon.innerText = 'expand_more';
+            }
+        }
+
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                showStatus("Arşivden kopyalandı!");
+                showStatus("Kopyalandı!");
             });
         }
 
         function updateStorage() {
-            localStorage.setItem('aura_notes', JSON.stringify(notes));
-            localStorage.setItem('aura_archive', JSON.stringify(archive));
+            localStorage.setItem('chimptopus_notes', JSON.stringify(notes));
+            localStorage.setItem('chimptopus_archive', JSON.stringify(archive));
         }
 
         function showStatus(msg) {
@@ -247,7 +314,7 @@
         }
 
         function clearAll() {
-            if(confirm("Tüm veriler silinecek!")) {
+            if(confirm("Tüm veriler silinecek, emin misin?")) {
                 localStorage.clear();
                 notes = []; archive = [];
                 renderNotes(); renderArchive();
