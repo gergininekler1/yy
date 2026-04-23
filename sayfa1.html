@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#191919">
     <title>Chimptopus Pro</title>
     
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQ2hpbXB0b3B1cyBQcm8iLCJzaG9ydF9uYW1lIjoiTm90ZXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzE5MTkxOSIsInRoZW1lX2NvbG9yIjoiIzE5MTkxOSJ9" />
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQ2hpbXB0b3B1cyBQcm8iLCJzaG9ydF9uYW1lIjoiTm90ZXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzE5MTkxOSIsInRoZW1lX2NvbG9yIjoiIzE5MTkxOSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tL3MvaS9zaG9ydC10ZXJtL3JlbGVhc2UvbWF0ZXJpYWxzeW1ib2xzcm91bmRlZC9lZGl0X2RvY3VtZW50L2RlZmF1bHQvMjRweC5zdmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     
     <style>
@@ -431,12 +431,12 @@
                     </div>
                 </div>
 
-                <textarea id="noteInput" placeholder="Type your text here... (#tag @noteID)" oninput="handleInput()"></textarea>
+                <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
 
                 <div id="refContainer" style="display:none; flex-direction:column;">
                     <div class="ref-input-container">
                         <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
-                        <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 01, 04)" oninput="searchReference()">
+                        <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 001, 004)" oninput="searchReference()">
                     </div>
                     <div id="refCardsContainer" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
                 </div>
@@ -459,7 +459,7 @@
             </div>
 
             <div id="recentRecordsContainer" style="margin-top: 30px;">
-                <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Records</h4>
+                <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
                 <div class="recent-scroll" id="recentRecordsList"></div>
             </div>
 
@@ -491,11 +491,15 @@
         };
 
         /* ─────────────────────────────────────────
-           STATE
+           STATE & MIGRATION TO 3 DIGIT IDs
         ───────────────────────────────────────── */
         let notes        = JSON.parse(localStorage.getItem('chimptopus_v18_notes'))   || [];
         let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
         let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
+
+        // Migrating 2-digit IDs to 3-digit IDs
+        notes.forEach(n => { if (n.num && n.num.length === 2) n.num = '0' + n.num; });
+        archive.forEach(a => { if (a.num && a.num.length === 2) a.num = '0' + a.num; });
 
         const nonTaslak = notes.filter(n => n.type !== 'taslak');
         if (nonTaslak.length > 0) {
@@ -715,7 +719,7 @@
                     }
                     searchReference();
                 }
-                renderEditorButtons(page); updateWordProgress(); renderRecentRecords(page);
+                renderEditorButtons(page); updateWordProgress(); renderRecentRecords();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -743,26 +747,25 @@
         /* ─────────────────────────────────────────
            RECENT RECORDS LIST
         ───────────────────────────────────────── */
-        function renderRecentRecords(page) {
+        function renderRecentRecords() {
             const container = document.getElementById('recentRecordsList');
             container.innerHTML = '';
             
-            let list = []; let isTaslak = (page === 'taslak');
-            if (isTaslak) { list = notes.filter(n => n.type === 'taslak').slice(0, 5); } 
-            else { list = archive.slice(0, 5); }
+            // Taslak notlarını listele
+            let list = notes.filter(n => n.type === 'taslak').slice(0, 10);
 
             if (list.length === 0) {
-                container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No records yet.</div>`;
+                container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No drafts yet.</div>`;
                 return;
             }
 
             list.forEach(item => {
-                const color = isTaslak ? 'var(--color-taslak)' : 'var(--color-archive)';
+                const color = 'var(--color-taslak)';
                 const title = item.title ? `<div style="font-weight:600; font-size:12px; color:var(--text-main); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>` : '';
                 const timeSnippet = item.spentSeconds ? `<span style="font-size:10px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:2px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
 
                 const html = `
-                    <div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="${isTaslak ? `openRecordModal(${item.id})` : `openArchiveModal(${item.id})`}">
+                    <div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="openRecordModal(${item.id})">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <div style="font-size:11px; color:var(--text-muted); font-weight:700;">#${item.num}</div>
                             ${timeSnippet}
@@ -857,7 +860,7 @@
             let html = ''; let foundAny = false;
 
             ids.forEach(id => {
-                const formattedId = id.padStart(2, '0');
+                const formattedId = id.padStart(3, '0');
                 const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
                 if (found) {
                     foundAny = true;
@@ -908,7 +911,7 @@
 
         function formatMentionsAndHighlights(text, query = '') {
             let formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            formatted = formatted.replace(/@(\d{2,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
+            formatted = formatted.replace(/@(\d{1,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
             formatted = formatted.replace(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g, '<span class="tag-link">#$1</span>');
             if (query) {
                 const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
@@ -930,7 +933,7 @@
             const text = document.getElementById('noteInput').value;
             if (!text.trim()) { alert('Please enter some text.'); return; }
 
-            const textRefs    = text.match(/@(\d{2,})/g) || [];
+            const textRefs    = text.match(/@(\d{1,})/g) || [];
             const manualRefs  = document.getElementById('refInput').value.match(/\d+/g) || [];
             const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])];
             const tags        = extractTags(text);
@@ -940,7 +943,7 @@
                               .map(i => i.value.trim()).filter(v => v !== '') : [];
 
             if (actionType === 'save') {
-                const formattedNum = String(globalCounter).padStart(2, '0');
+                const formattedNum = String(globalCounter).padStart(3, '0');
                 notes.unshift({
                     id: Date.now(), num: formattedNum, text, type: currentPage,
                     title, questions, refs: combinedRefs, tags,
@@ -966,7 +969,7 @@
             else if (actionType === 'archive') {
                 let archiveNote = notes.find(x => x.id === editingNoteId);
                 let noteId = Date.now();
-                let noteNum = String(globalCounter).padStart(2, '0');
+                let noteNum = String(globalCounter).padStart(3, '0');
                 
                 if(archiveNote) {
                     noteId = archiveNote.id; noteNum = archiveNote.num;
@@ -982,13 +985,14 @@
 
                 localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 showStatus('Sent to Archive');
-                
-                // CRITICAL CLEANUP (Bug fix for Revize retaining memory)
+
+                // CLEANUP AFTER ARCHIVING
                 draftsMemory[currentPage] = ''; refsMemory[currentPage]   = '';
                 if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
                 localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
                 localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
                 localStorage.setItem('chimptopus_v18_meta',   JSON.stringify(metaMemory));
+                
                 document.getElementById('noteInput').value = '';
                 document.getElementById('refInput').value = '';
                 document.getElementById('metaTitle').value = '';
