@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus Pro - V17 iOS Final</title>
+    <title>Chimptopus Pro - V18 iOS Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
@@ -152,7 +152,6 @@
         .empty-state .icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
         .empty-state p { font-size: 15px; line-height: 1.5; margin: 0;}
 
-        /* Modal (Pop-up) */
         .ios-modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -327,12 +326,13 @@
     </nav>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('chimptopus_v17_notes')) || [];
-        let archive = JSON.parse(localStorage.getItem('chimptopus_v17_archive')) || [];
-        let globalCounter = parseInt(localStorage.getItem('chimptopus_v17_counter')) || 1;
+        let notes = JSON.parse(localStorage.getItem('chimptopus_v18_notes')) || [];
+        let archive = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
+        let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter')) || 1;
 
-        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v17_drafts')) || { taslak: '', revize: '', final: '' };
-        let refsMemory = JSON.parse(localStorage.getItem('chimptopus_v17_refs')) || { taslak: '', revize: '', final: '' };
+        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v18_drafts')) || { taslak: '', revize: '', final: '' };
+        let refsMemory = JSON.parse(localStorage.getItem('chimptopus_v18_refs')) || { taslak: '', revize: '', final: '' };
+        let metaMemory = JSON.parse(localStorage.getItem('chimptopus_v18_meta')) || { title: '', questions: [] };
 
         let currentPage = 'records'; 
         let viewMode = 'list'; 
@@ -341,22 +341,37 @@
         let timer;
 
         function navSwitchPage(page) {
-            editingNoteId = null;
-            document.getElementById('noteInput').value = '';
-            document.getElementById('refInput').value = '';
-            document.getElementById('metaTitle').value = '';
-            document.getElementById('questionsContainer').innerHTML = '';
-            addQuestionInput(); 
-            document.getElementById('referenceBox').style.display = 'none';
-            switchPage(page);
-        }
-
-        function switchPage(page) {
+            // ÖNCE MEVCUT SAYFAYI HAFIZAYA AL
             if (['taslak', 'revize', 'final'].includes(currentPage)) {
                 draftsMemory[currentPage] = document.getElementById('noteInput').value;
                 refsMemory[currentPage] = document.getElementById('refInput').value;
-                localStorage.setItem('chimptopus_v17_drafts', JSON.stringify(draftsMemory));
-                localStorage.setItem('chimptopus_v17_refs', JSON.stringify(refsMemory));
+                localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+                localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
+                
+                if(currentPage === 'taslak') {
+                    metaMemory.title = document.getElementById('metaTitle').value;
+                    metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
+                    localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+                }
+            }
+
+            // DÜZENLEMEDEN ÇIK VE YENİ SAYFAYA GİT
+            editingNoteId = null;
+            switchPage(page, false);
+        }
+
+        function switchPage(page, saveCurrent = true) {
+            // EditNote içinden gelirse mevcut sayfanın durumunu kaydetmesi gerekir
+            if (saveCurrent && ['taslak', 'revize', 'final'].includes(currentPage)) {
+                draftsMemory[currentPage] = document.getElementById('noteInput').value;
+                refsMemory[currentPage] = document.getElementById('refInput').value;
+                localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+                localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
+                if(currentPage === 'taslak') {
+                    metaMemory.title = document.getElementById('metaTitle').value;
+                    metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
+                    localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+                }
             }
 
             currentPage = page;
@@ -409,9 +424,22 @@
                     document.getElementById('boxLabel').innerText = label;
                     document.getElementById('stageBadge').style.background = getAutoColor(page);
                     
-                    document.getElementById('noteInput').value = draftsMemory[page] || '';
-                    document.getElementById('refInput').value = refsMemory[page] || '';
-                    searchReference();
+                    // Düzenleme modu değilse, hafızadaki verileri yükle
+                    if (!editingNoteId) {
+                        document.getElementById('noteInput').value = draftsMemory[page] || '';
+                        document.getElementById('refInput').value = refsMemory[page] || '';
+                        
+                        if (page === 'taslak') {
+                            document.getElementById('metaTitle').value = metaMemory.title || '';
+                            document.getElementById('questionsContainer').innerHTML = '';
+                            if(metaMemory.questions && metaMemory.questions.length > 0) {
+                                metaMemory.questions.forEach(q => addQuestionInput(q));
+                            } else {
+                                addQuestionInput();
+                            }
+                        }
+                        searchReference();
+                    }
                     
                     renderEditorButtons(page);
                 }
@@ -420,7 +448,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // HATA ÇÖZÜMÜ: Düzenleme Fonksiyonundaki Sıralama Değiştirildi
+        // HATA ÇÖZÜMÜ: EditNote tetiklendiğinde sayfa geçişini tetikliyoruz, sonra değerleri yazıyoruz.
         function editNote(id, e) {
             if(e) e.stopPropagation();
             const noteToEdit = notes.find(n => n.id === id);
@@ -428,22 +456,24 @@
 
             editingNoteId = id;
             
-            // 1. ÖNCE SAYFAYI DEĞİŞTİR (Bu sayede hafızadaki boş metin input'a dolar)
-            switchPage(noteToEdit.type);
-
-            // 2. SONRA İNPUTLARI DOLDUR (Hafızadaki veriyi ezerek gerçek notu gösterir)
-            document.getElementById('noteInput').value = noteToEdit.text;
-            document.getElementById('metaTitle').value = noteToEdit.title || '';
+            // Mevcut sayfayı kaydet ve yeni sayfaya geç
+            switchPage(noteToEdit.type, true);
             
-            document.getElementById('questionsContainer').innerHTML = '';
-            if (noteToEdit.questions && noteToEdit.questions.length > 0) {
-                noteToEdit.questions.forEach(q => addQuestionInput(q));
-            } else { addQuestionInput(); }
+            // Inputları notun verisiyle ez (Hafızadan değil)
+            document.getElementById('noteInput').value = noteToEdit.text;
+            
+            if (noteToEdit.type === 'taslak') {
+                document.getElementById('metaTitle').value = noteToEdit.title || '';
+                document.getElementById('questionsContainer').innerHTML = '';
+                if (noteToEdit.questions && noteToEdit.questions.length > 0) {
+                    noteToEdit.questions.forEach(q => addQuestionInput(q));
+                } else { addQuestionInput(); }
+            }
             
             document.getElementById('refInput').value = noteToEdit.refs ? noteToEdit.refs.join(', ') : '';
-            
             searchReference();
             updateWordProgress();
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -602,7 +632,7 @@
                     time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
                 });
                 globalCounter++;
-                localStorage.setItem('chimptopus_v17_counter', globalCounter);
+                localStorage.setItem('chimptopus_v18_counter', globalCounter);
                 showStatus("Oluşturuldu");
             } 
             else if (actionType === 'update') {
@@ -617,12 +647,14 @@
                 let n = notes.find(x => x.id === editingNoteId);
                 if(n) { n.text = text; n.type = 'revize'; n.title = title; n.questions = questions; }
                 showStatus("Revizeye Aktarıldı");
+                editingNoteId = n.id;
                 switchPage('revize'); saveToLocal(); return;
             }
             else if (actionType === 'transfer_final') {
                 let n = notes.find(x => x.id === editingNoteId);
                 if(n) { n.text = text; n.type = 'final'; n.refs = combinedRefs; }
                 showStatus("Finale Aktarıldı");
+                editingNoteId = n.id;
                 switchPage('final'); saveToLocal(); return;
             }
             else if (actionType === 'archive') {
@@ -635,17 +667,26 @@
                     });
                     notes.splice(nIndex, 1);
                 }
-                localStorage.setItem('chimptopus_v17_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 showStatus("Arşive Gönderildi");
                 navSwitchPage('archive'); saveToLocal(); return;
             }
 
             saveToLocal();
+            
+            // İşlem bitince hafızayı temizle
+            draftsMemory[currentPage] = '';
+            refsMemory[currentPage] = '';
+            if(currentPage === 'taslak') { metaMemory.title = ''; metaMemory.questions = []; }
+            localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
+            localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+
             navSwitchPage('records');
         }
 
         function saveToLocal() {
-            localStorage.setItem('chimptopus_v17_notes', JSON.stringify(notes));
+            localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes));
         }
 
         function createCardHTML(n, isList = false) {
@@ -779,7 +820,7 @@
         function deleteArchive(id) {
             if(confirm("Kalıcı olarak silinsin mi?")) {
                 archive = archive.filter(a => a.id !== id);
-                localStorage.setItem('chimptopus_v17_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 renderArchivePage();
             }
         }
@@ -793,8 +834,8 @@
                     id: item.id, num: item.num, text: item.text, type: 'final', mood: getAutoColor('final'), refs: item.refs,
                     time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
                 });
-                localStorage.setItem('chimptopus_v17_notes', JSON.stringify(notes));
-                localStorage.setItem('chimptopus_v17_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 renderArchivePage();
                 showStatus("Geri Yüklendi");
             }
@@ -823,7 +864,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "chimptopus_v17_yedek.json");
+            downloadAnchorNode.setAttribute("download", "chimptopus_v18_yedek.json");
             document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); closePanels();
         }
 
@@ -836,8 +877,8 @@
                     const imported = JSON.parse(e.target.result);
                     if(imported.notes && imported.archive) {
                         notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter;
-                        saveToLocal(); localStorage.setItem('chimptopus_v17_archive', JSON.stringify(archive));
-                        localStorage.setItem('chimptopus_v17_counter', globalCounter);
+                        saveToLocal(); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                        localStorage.setItem('chimptopus_v18_counter', globalCounter);
                         navSwitchPage('records'); alert("Yedek yüklendi!"); closePanels();
                     } else { alert("Geçersiz format."); }
                 } catch(err) { alert("Okuma hatası."); }
