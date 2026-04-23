@@ -3,42 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus Pro - V12 iOS</title>
+    <title>Chimptopus Pro - V19.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
-            /* Notion & iOS Minimal Renk Paleti */
-            --bg-color: #ffffff; 
+            --bg-color: #ffffff;
             --surface-color: #ffffff;
             --surface-alt: #f7f7f5;
             --text-main: #37352f;
             --text-muted: #9b9a97;
             --border-color: #e9e9e7;
-            --primary-blue: #2383e2; 
+            --primary-blue: #2383e2;
             --danger-color: #eb5757;
-            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            
-            /* Otomatik Renk Kodları */
-            --color-taslak: #d48166; 
-            --color-revize: #2383e2; 
-            --color-final: #30d158;  
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+            --color-taslak: #d48166;
+            --color-revize: #2383e2;
+            --color-final: #30d158;
         }
 
         .dark-mode {
             --bg-color: #191919;
             --surface-color: #202020;
             --surface-alt: #252525;
-            --text-main: rgba(255, 255, 255, 0.9);
-            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-main: rgba(255,255,255,0.9);
+            --text-muted: rgba(255,255,255,0.5);
             --border-color: #373737;
-            --primary-blue: #2eaadc;
-            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color); 
+            background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -48,90 +45,233 @@
 
         * { box-sizing: border-box; }
 
-        .card { 
-            background: var(--surface-color); 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            box-shadow: var(--card-shadow);
+        .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); }
+        header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+
+        /* ── PAGE TRANSITIONS ── */
+        .page-container { padding: 0 20px 130px; display: none; animation: pageIn 0.3s ease; }
+        .page-container.active { display: block; }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
+        /* ── TIMER PULSE ── */
+        @keyframes timerPulse {
+            0%   { box-shadow: 0 0 0 0 rgba(35,131,226,0.35); }
+            70%  { box-shadow: 0 0 0 8px rgba(35,131,226,0); }
+            100% { box-shadow: 0 0 0 0 rgba(35,131,226,0); }
+        }
+        .timer-running { animation: timerPulse 1.5s infinite; border-color: var(--primary-blue) !important; }
 
-        .page-container { padding: 0 20px 120px; display: none; animation: fadeIn 0.3s ease; }
-        .page-container.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* ── BOTTOM NAV ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            z-index: 1000;
+        }
+        .dark-mode .bottom-nav { background: rgba(25,25,25,0.88); }
 
-        .note-box { padding: 20px; display: flex; flex-direction: column; position: relative; background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 12px;}
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: var(--text-muted); cursor: pointer; flex: 1; text-align: center;
+            position: relative; padding-bottom: 4px;
+        }
+        .nav-item .icon { font-size: 24px; transition: transform 0.2s ease; }
+        .nav-item .label { font-size: 10px; font-weight: 500; }
 
-        .timer-btn { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; transition: 0.2s;}
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%; transform: translateX(-50%);
+            width: 0; height: 3px;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: width 0.25s ease;
+        }
+        .nav-item.active { color: var(--text-main); }
+        .nav-item.active .icon { transform: scale(1.1); }
+        .nav-item.active::after { width: 20px; }
+
+        /* ── NOTES ── */
+        .note-box {
+            padding: 20px; display: flex; flex-direction: column;
+            position: relative; background: var(--surface-alt);
+            border: 1px solid var(--border-color); border-radius: 12px;
+        }
+
+        .meta-input {
+            width: 100%; background: var(--surface-color); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 12px 15px; font-size: 14px; font-weight: 600;
+            color: var(--text-main); outline: none; font-family: inherit; box-shadow: var(--card-shadow);
+        }
+        .meta-input::placeholder { color: var(--text-muted); font-weight: 400; }
+        .meta-input-secondary { font-weight: 400; font-size: 13px; }
+
+        .timer-btn {
+            font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
+            background: var(--surface-color); border: 1px solid var(--border-color);
+            color: var(--text-muted); cursor: pointer; transition: 0.2s;
+        }
         .timer-btn:active { background: var(--border-color); }
 
-        textarea { 
-            width: 100%; height: 160px; background-color: var(--surface-color); 
+        textarea {
+            width: 100%; height: 160px; background-color: var(--surface-color);
             border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 15px; font-size: 16px; line-height: 1.5; 
-            outline: none; color: var(--text-main); resize: none; 
+            padding: 15px; font-size: 16px; line-height: 1.5;
+            outline: none; color: var(--text-main); resize: none;
             font-family: inherit; box-shadow: var(--card-shadow);
-            margin-top: 15px;
+            transition: height 0.3s ease;
         }
         textarea::placeholder { color: var(--text-muted); }
 
-        /* Akıllı Referans Alanı */
-        .ref-input-container { display: flex; gap: 10px; align-items: center; background: var(--surface-color); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px; }
-        .ref-input-container input { background: transparent; border: none; outline: none; font-size: 14px; color: var(--text-main); flex-grow: 1; font-family: inherit;}
-        
+        .ref-input-container {
+            display: flex; gap: 10px; align-items: center;
+            background: var(--surface-color); padding: 10px 15px;
+            border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px;
+        }
+        .ref-input-container input { background: transparent; border: none; outline: none; font-size: 14px; color: var(--text-main); flex-grow: 1; font-family: inherit; }
+
         #referenceBox { margin-top: 10px; padding: 15px; background: var(--surface-color); border-radius: 8px; border: 1px solid var(--border-color); display: none; }
         #refContent { max-height: 140px; overflow-y: auto; padding-right: 5px; }
         #refContent::-webkit-scrollbar { width: 4px; }
         #refContent::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-
-        .ref-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .ref-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-color); }
         .ref-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         .ref-item-text { font-size: 14px; line-height: 1.5; color: var(--text-main); margin-top: 4px; }
 
-        .word-challenge { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 15px;}
-        .goal-input { width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 13px; font-weight: 600; text-align: center; outline: none; font-family: inherit;}
+        .word-challenge {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 15px;
+        }
+        .goal-input {
+            width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--border-color);
+            color: var(--text-main); font-size: 13px; font-weight: 600; text-align: center; outline: none; font-family: inherit;
+        }
         .progress-bar-container { flex-grow: 1; height: 6px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-left: 10px; }
         .progress-bar { height: 100%; background: var(--primary-blue); width: 0%; transition: width 0.3s ease; }
 
+        /* ── RECORDS PAGE ── */
         .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .search-bar { display: flex; align-items: center; background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; flex-grow: 1; margin-right: 12px; }
-        .search-bar input { border: none; background: transparent; outline: none; color: var(--text-main); font-size: 15px; width: 100%; margin-left: 8px; font-family: inherit;}
-        
-        .cards-grid { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .cards-grid::-webkit-scrollbar { display: none; }
+        .search-bar {
+            display: flex; align-items: center; background: var(--surface-alt);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 10px 12px; flex-grow: 1; margin-right: 12px;
+        }
+        .search-bar input { border: none; background: transparent; outline: none; color: var(--text-main); font-size: 15px; width: 100%; margin-left: 8px; font-family: inherit; }
+
+        .tag-filter-bar {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px;
+            scrollbar-width: none; margin-bottom: 4px;
+        }
+        .tag-filter-bar::-webkit-scrollbar { display: none; }
+        .tag-chip {
+            flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 5px 12px;
+            border-radius: 20px; border: 1px solid var(--border-color);
+            background: var(--surface-color); color: var(--text-muted);
+            cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .tag-chip.active {
+            background: var(--text-main); color: var(--bg-color); border-color: var(--text-main);
+        }
+        .tag-chip:active { opacity: 0.8; }
+
+        /* ── CARDS ── */
+        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
         .cards-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 15px; }
 
-        .note-card { min-width: 150px; padding: 16px; cursor: pointer; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: 0.2s;}
+        .note-card {
+            min-width: 150px; padding: 16px; cursor: pointer; position: relative;
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
         .cards-list .note-card { width: 100%; min-height: auto; }
-        .note-card:active { transform: scale(0.98); background: var(--surface-alt); }
-        .note-card p { word-wrap: break-word; white-space: pre-wrap; font-size: 14px; color: var(--text-main); margin: 0; line-height: 1.4;}
-        .note-number { font-weight: 600; font-size: 12px; color: var(--text-muted); }
-        
-        .mention-link { color: var(--primary-blue); cursor: pointer; font-weight: 500; text-decoration: none; background: rgba(35, 131, 226, 0.1); padding: 2px 6px; border-radius: 4px; }
-        .highlight { background-color: rgba(35, 131, 226, 0.2); border-radius: 3px; padding: 0 2px;}
+        .note-card:active { transform: scale(0.985); }
 
-        .ref-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--surface-alt); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; color: var(--primary-blue); font-weight: 500; margin-top: 8px; cursor: pointer; transition: 0.2s;}
-        .ref-pill:hover { background: var(--border-color); }
-
-        /* YENİ: Ufak Kutu Arşiv Grid Tasarımı */
-        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
-        .archive-card { 
-            height: 110px; 
-            padding: 12px; 
-            display: flex; flex-direction: column; 
-            justify-content: flex-start;
-            cursor: pointer; transition: 0.2s;
-            background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow);
+        .card-title {
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin: 0 0 5px 0; line-height: 1.3;
         }
-        .archive-card:active { transform: scale(0.95); background: var(--surface-alt); }
-        .archive-card .text-snippet { 
-            font-size: 12px; line-height: 1.4; color: var(--text-muted); 
-            margin-top: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+        .card-body {
+            font-size: 13px; color: var(--text-muted); line-height: 1.5;
+            margin: 0; word-wrap: break-word; white-space: pre-wrap;
+        }
+        .card-body-full {
+            font-size: 14px; color: var(--text-main); line-height: 1.5;
+            margin: 0; word-wrap: break-word; white-space: pre-wrap;
         }
 
-        /* YENİ: iOS Tarzı Büyütme Modalı */
+        /* ── MENTIONS & TAGS ── */
+        .mention-link { color: var(--primary-blue); cursor: pointer; font-weight: 500; text-decoration: none; background: rgba(35,131,226,0.1); padding: 2px 6px; border-radius: 4px; }
+        .tag-link { color: #8e44ad; cursor: pointer; font-weight: 600; background: rgba(142,68,173,0.1); padding: 2px 6px; border-radius: 4px; font-size: inherit; }
+        .highlight { background-color: rgba(35,131,226,0.2); border-radius: 3px; padding: 0 2px; }
+
+        .ref-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--surface-alt); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; color: var(--primary-blue); font-weight: 500; margin-top: 8px; cursor: pointer; transition: 0.2s; }
+        .inline-tag-pill { display: inline-flex; align-items: center; font-size: 11px; background: rgba(142,68,173,0.1); border: 1px solid rgba(142,68,173,0.2); padding: 3px 8px; border-radius: 6px; color: #8e44ad; font-weight: 600; margin: 2px 4px 2px 0; }
+
+        /* ── SIDE PANEL ── */
+        .side-panel {
+            position: fixed; top: 0; right: 0; transform: translateX(100%);
+            width: 100%; max-width: 320px; height: 100%;
+            z-index: 2000; padding: 40px 25px;
+            background: var(--surface-color); border-left: 1px solid var(--border-color);
+            transition: transform 0.3s ease; overflow-y: auto;
+        }
+        .side-panel.active { transform: translateX(0); box-shadow: -5px 0 25px rgba(0,0,0,0.07); }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.2); display: none; z-index: 1500; opacity: 0; transition: opacity 0.3s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        .action-btn-menu {
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: var(--surface-color);
+            color: var(--text-main); font-family: inherit; font-size: 14px; font-weight: 500;
+            cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s;
+        }
+        .action-btn-menu:active { background: var(--surface-alt); }
+
+        /* Stats section */
+        .stats-section { margin-top: 25px; }
+        .stats-title { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-card {
+            background: var(--surface-alt); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; text-align: center;
+        }
+        .stat-number { font-size: 22px; font-weight: 700; color: var(--text-main); line-height: 1; }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .stat-wide { grid-column: span 2; }
+        .stat-bar-row { display: flex; gap: 4px; margin-top: 10px; height: 6px; border-radius: 4px; overflow: hidden; }
+        .stat-bar-seg { height: 100%; transition: width 0.4s ease; }
+
+        /* ── ICON & BUTTON UTILS ── */
+        .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: 0.2s; }
+        .icon-btn:hover { color: var(--text-main); }
+
+        .btn-primary { background: var(--primary-blue); color: white; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .btn-secondary { background: var(--surface-alt); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 500; font-size: 14px; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .btn-primary:active, .btn-secondary:active { opacity: 0.8; }
+
+        .action-icon { font-size: 20px; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .action-icon:hover { color: var(--text-main); }
+
+        /* ── EMPTY STATES ── */
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .empty-state-icon-wrap {
+            width: 72px; height: 72px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px; font-size: 36px;
+        }
+        .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text-main); margin: 0 0 8px; }
+        .empty-state p { font-size: 14px; line-height: 1.5; margin: 0; color: var(--text-muted); }
+
+        /* ── MODAL ── */
         .ios-modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -145,51 +285,25 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s;
         }
         .ios-modal.active .ios-modal-content { transform: translateY(0); }
-        .ios-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;}
-        .ios-modal-body { padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; }
-        .ios-modal-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: var(--surface-alt); }
+        .ios-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .ios-modal-body { flex-grow: 1; min-height: 0; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; word-wrap: break-word; }
+        .ios-modal-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: var(--surface-alt); flex-shrink: 0; }
 
-        .side-panel { 
-            position: fixed; top: 0; right: 0; transform: translateX(100%); 
-            width: 100%; max-width: 320px; height: 100%; 
-            z-index: 2000; padding: 40px 25px; 
-            background: var(--surface-color); border-left: 1px solid var(--border-color);
-            transition: transform 0.3s ease; overflow-y: auto;
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--text-main); color: var(--bg-color);
+            padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+            z-index: 9999; opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none; white-space: nowrap; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
-        .side-panel.active { transform: translateX(0); box-shadow: -5px 0 25px rgba(0,0,0,0.05); }
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.2); display: none; z-index: 1500; opacity: 0; transition: opacity 0.3s;}
-        .menu-overlay.active { display: block; opacity: 1;}
-
-        .action-btn-menu { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s;}
-        .action-btn-menu:active { background: var(--surface-alt); }
-        
-        .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: 0.2s; }
-        .icon-btn:active { background: var(--surface-alt); }
-        .icon-btn:hover { color: var(--text-main); }
-        
-        .btn-primary { background: var(--primary-blue); color: white; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit;}
-        .btn-primary:active { opacity: 0.8; }
-        
-        .action-icon { font-size:20px; cursor:pointer; color: var(--text-muted); transition: 0.2s; }
-        .action-icon:hover { color: var(--text-main); }
-
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            z-index: 1000;
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .toast-action {
+            background: rgba(255,255,255,0.2); border: none; border-radius: 6px;
+            color: inherit; font-size: 13px; font-weight: 700; padding: 4px 10px;
+            cursor: pointer; font-family: inherit;
         }
-        .dark-mode .bottom-nav { background: rgba(25, 25, 25, 0.85); }
-        
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--text-muted); cursor: pointer; flex: 1; text-align: center;
-        }
-        .nav-item.active { color: var(--text-main); }
-        .nav-item .icon { font-size: 24px; }
-        .nav-item .label { font-size: 10px; font-weight: 500; }
 
     </style>
 </head>
@@ -197,166 +311,380 @@
 
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
 
+    <div class="toast" id="toastEl">
+        <span id="toastMsg"></span>
+        <button class="toast-action" id="toastActionBtn" style="display:none;"></button>
+    </div>
+
     <div class="ios-modal" id="archiveModal" onclick="closeArchiveModal(event)">
         <div class="ios-modal-content" onclick="event.stopPropagation()">
             <div class="ios-modal-header">
                 <div>
-                    <div id="modalTitle" style="font-weight: 700; font-size: 18px; color: var(--text-main);"></div>
-                    <div id="modalDate" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;"></div>
+                    <div id="modalTitle" style="font-weight:700; font-size:18px; color:var(--text-main);"></div>
+                    <div id="modalDate" style="font-size:12px; color:var(--text-muted); margin-top:2px;"></div>
                 </div>
                 <span class="material-symbols-rounded" style="cursor:pointer; color:var(--text-muted);" onclick="closeArchiveModal(event)">close</span>
             </div>
             <div class="ios-modal-body" id="modalBody"></div>
-            <div class="ios-modal-footer">
-                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" id="modalDeleteBtn" title="Kalıcı Sil">delete</span>
-                <div style="display:flex; gap: 15px;">
-                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" id="modalRestoreBtn" title="Finale Geri Gönder">restore_page</span>
-                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" id="modalCopyBtn" title="Kopyala">content_copy</span>
-                </div>
-            </div>
+            <div class="ios-modal-footer" id="modalFooter"></div>
         </div>
     </div>
 
     <header>
         <div class="logo" id="mainLogo">📝 Notes</div>
-        <div style="display: flex; gap: 5px;">
+        <div style="display:flex; gap:5px;">
             <button class="icon-btn" onclick="toggleDarkMode()"><span class="material-symbols-rounded">dark_mode</span></button>
             <button class="icon-btn" onclick="togglePanel('sideMenu')"><span class="material-symbols-rounded">more_horiz</span></button>
         </div>
     </header>
 
     <div id="sideMenu" class="side-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-weight:600; margin:0; font-size: 20px;">Settings</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h2 style="font-weight:600; margin:0; font-size:20px;">Ayarlar</h2>
             <span class="material-symbols-rounded" onclick="closePanels()" style="cursor:pointer; color:var(--text-muted)">close</span>
         </div>
-        
-        <h4 style="color: var(--text-muted); margin-bottom: 10px; font-size: 12px; font-weight:600; text-transform:uppercase;">Data Management</h4>
-        <button class="action-btn-menu" onclick="exportData()"><span class="material-symbols-rounded" style="font-size: 18px;">download</span> Export JSON</button>
-        <label class="action-btn-menu" style="cursor: pointer;">
-            <span class="material-symbols-rounded" style="font-size: 18px;">upload</span> Import JSON
+
+        <button class="action-btn-menu" onclick="exportData()">
+            <span class="material-symbols-rounded" style="font-size:18px;">download</span> Yedekle (JSON)
+        </button>
+        <label class="action-btn-menu" style="cursor:pointer;">
+            <span class="material-symbols-rounded" style="font-size:18px;">upload</span> Yedek Yükle (JSON)
             <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
         </label>
+        <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
 
-        <hr style="margin:25px 0; border:0; border-top:1px solid var(--border-color);">
-        <button class="action-btn-menu" onclick="clearAll()" style="color:var(--danger-color);"><span class="material-symbols-rounded" style="font-size: 18px;">delete</span> Delete Workspace</button>
-    </div>
-
-    <div id="pageEditor" class="page-container active">
-        <div class="editor-section">
-            <div class="note-box" id="editorBox">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span id="boxLabel" style="font-size: 16px; font-weight: 700;">Taslak</span>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <span id="timerDisplay" style="font-size:13px; font-weight:600; color:var(--text-muted); margin-right: 5px;"></span>
-                        <button class="timer-btn" onclick="startCountdown(1)">1dk</button>
-                        <button class="timer-btn" onclick="startCountdown(5)">5dk</button>
-                        <button class="timer-btn" onclick="startCountdown(30)">30dk</button>
+        <div class="stats-section">
+            <div class="stats-title">İstatistikler</div>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">Aktif Not</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statArchived">0</div>
+                    <div class="stat-label">Arşivlenen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statWords">0</div>
+                    <div class="stat-label">Toplam Kelime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTags">0</div>
+                    <div class="stat-label">Benzersiz Etiket</div>
+                </div>
+                <div class="stat-card stat-wide">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;">
+                        <span style="color:var(--color-taslak); font-weight:600;" id="statTaslakLbl">T: 0</span>
+                        <span style="color:var(--color-revize); font-weight:600;" id="statRevizeLbl">R: 0</span>
+                        <span style="color:var(--color-final); font-weight:600;" id="statFinalLbl">F: 0</span>
                     </div>
-                </div>
-
-                <textarea id="noteInput" placeholder="Buraya yazın... (@01 ile mentionla)" oninput="handleInput()"></textarea>
-                
-                <div class="ref-input-container">
-                    <span class="material-symbols-rounded" style="color: var(--text-muted); font-size: 18px;">link</span>
-                    <input type="text" id="refInput" placeholder="Referansları yaz (Örn: 01, 02)" oninput="searchReference()">
-                </div>
-
-                <div class="card" id="referenceBox">
-                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 10px;">BAĞLANTILI BLOKLAR</div>
-                    <div id="refContent"></div>
-                </div>
-
-                <div class="word-challenge">
-                    <span class="material-symbols-rounded" style="font-size: 16px;">notes</span>
-                    <span id="wordCount">0</span> / 
-                    <input type="number" id="wordGoal" class="goal-input" value="100" onchange="updateWordProgress()"> 
-                    <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <span id="statusMsg" style="color:var(--text-muted); font-size: 12px;"></span>
-                        <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Geri Al" style="font-size: 18px;">undo</span>
-                        <span class="material-symbols-rounded action-icon" onclick="insertTimestamp()" title="Zaman Ekle" style="font-size: 18px;">schedule</span>
+                    <div class="stat-bar-row" id="statBarRow">
+                        <div class="stat-bar-seg" style="background:var(--color-taslak); width:33%;"></div>
+                        <div class="stat-bar-seg" style="background:var(--color-revize); width:33%;"></div>
+                        <div class="stat-bar-seg" style="background:var(--color-final); width:34%;"></div>
                     </div>
-                    <button class="btn-primary" onclick="handleAction()">Kaydet</button>
                 </div>
             </div>
         </div>
+
+        <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
+        <button class="action-btn-menu" onclick="clearAll()" style="color:var(--danger-color);">
+            <span class="material-symbols-rounded" style="font-size:18px;">delete</span> Çalışma Alanını Sil
+        </button>
     </div>
 
     <div id="pageRecords" class="page-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-weight:600; font-size: 24px; margin:0;">Records</h2>
-            <button class="icon-btn" style="background: var(--surface-color); border: 1px solid var(--border-color);" onclick="toggleViewMode()">
-                <span class="material-symbols-rounded" id="viewIcon" style="font-size: 20px;">view_list</span>
-            </button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="font-weight:600; font-size:24px; margin:0;">Kayıtlar</h2>
         </div>
         <div class="controls-row">
-            <div class="search-bar" style="margin: 0; width: 100%;">
-                <span class="material-symbols-rounded" style="color: var(--text-muted); font-size: 18px;">search</span>
-                <input type="text" id="searchInput" placeholder="Search blocks..." oninput="renderRecords()">
+            <div class="search-bar" style="margin:0; width:100%;">
+                <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">search</span>
+                <input type="text" id="searchInput" placeholder="Notlarda ara..." oninput="renderRecords()">
             </div>
         </div>
+        <div class="tag-filter-bar" id="tagFilterBar"></div>
         <div id="recordsBoard"></div>
     </div>
 
-    <div id="pageArchive" class="page-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-weight:600; font-size: 24px; margin:0;">Archive</h2>
+    <div id="pageEditor" class="page-container">
+        <div class="editor-section">
+
+            <div id="finalPendingState" style="display:none; width:100%;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="font-size:18px; margin:0;">Bekleyen Finaller</h3>
+                </div>
+                <div id="pendingFinalsBoard"></div>
+                <div id="emptyFinalState" style="display:none;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);">
+                            <span class="material-symbols-rounded" style="color:var(--color-final); font-size:36px;">task_alt</span>
+                        </div>
+                        <h3>Final Kuyruğu Boş</h3>
+                        <p>Final notu sıfırdan yazılamaz.<br>Bir <b>Revize</b> seçip Finale aktarın.</p>
+                    </div>
+                </div>
             </div>
+
+            <div class="note-box" id="editorWorkspace">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div id="stageBadge" style="width:12px; height:12px; border-radius:50%; background:var(--color-taslak)"></div>
+                        <span id="boxLabel" style="font-size:16px; font-weight:700; color:var(--text-main)">Taslak</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-right:1px solid var(--border-color); padding-right:10px;">
+                            <button class="timer-btn" onclick="resizeNoteBlock(1)">1x</button>
+                            <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
+                            <button class="timer-btn" onclick="resizeNoteBlock(3)">3x</button>
+                        </div>
+                        <div style="display:flex; gap:4px; align-items:center;">
+                            <span id="timerDisplay" style="font-size:13px; font-weight:600; color:var(--text-muted); margin-right:5px;"></span>
+                            <button class="timer-btn" onclick="startCountdown(1)">1dk</button>
+                            <button class="timer-btn" onclick="startCountdown(5)">5dk</button>
+                            <button class="timer-btn" onclick="startCountdown(30)">30dk</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="metaBlocks" style="display:none; flex-direction:column; gap:8px;">
+                    <input type="text" id="metaTitle" class="meta-input" placeholder="Başlık, Konu veya Ana Fikir...">
+                    <div id="questionsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <button class="icon-btn" onclick="addQuestionInput()" style="width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:transparent; font-size:13px;">+ Soru Ekle</button>
+                </div>
+
+                <textarea id="noteInput" placeholder="Metni buraya yazın... (#etiket @notID)" oninput="handleInput()"></textarea>
+
+                <div id="refContainer" style="display:none; flex-direction:column;">
+                    <div class="ref-input-container">
+                        <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
+                        <input type="text" id="refInput" placeholder="Bağlantılı not ID'leri (Örn: 01, 04)" oninput="searchReference()">
+                    </div>
+                    <div class="card" id="referenceBox">
+                        <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:10px;">BAĞLANTILI BLOKLAR</div>
+                        <div id="refContent"></div>
+                    </div>
+                </div>
+
+                <div class="word-challenge">
+                    <span class="material-symbols-rounded" style="font-size:16px;">notes</span>
+                    <span id="wordCount">0</span> /
+                    <input type="number" id="wordGoal" class="goal-input" value="100" onchange="updateWordProgress()">
+                    <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span id="statusMsg" style="color:var(--text-muted); font-size:12px;"></span>
+                        <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Geri Al" style="font-size:18px;">undo</span>
+                        <span class="material-symbols-rounded action-icon" onclick="insertTimestamp()" title="Zaman Ekle" style="font-size:18px;">schedule</span>
+                    </div>
+                    <div id="editorActions" style="display:flex; gap:8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pageArchive" class="page-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="font-weight:600; font-size:24px; margin:0;">Arşiv</h2>
+        </div>
         <div id="archiveBoard"></div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" id="nav-taslak" onclick="switchPage('taslak')">
+        <div class="nav-item active" id="nav-records" onclick="navSwitchPage('records')">
+            <span class="material-symbols-rounded icon">grid_view</span>
+            <span class="label">Kayıt</span>
+        </div>
+        <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
             <span class="material-symbols-rounded icon">edit_document</span>
             <span class="label">Taslak</span>
         </div>
-        <div class="nav-item" id="nav-revize" onclick="switchPage('revize')">
+        <div class="nav-item" id="nav-revize" onclick="navSwitchPage('revize')">
             <span class="material-symbols-rounded icon">find_replace</span>
             <span class="label">Revize</span>
         </div>
-        <div class="nav-item" id="nav-final" onclick="switchPage('final')">
+        <div class="nav-item" id="nav-final" onclick="navSwitchPage('final')">
             <span class="material-symbols-rounded icon">task_alt</span>
             <span class="label">Final</span>
         </div>
-        <div class="nav-item" id="nav-records" onclick="switchPage('records')">
-            <span class="material-symbols-rounded icon">grid_view</span>
-            <span class="label">Records</span>
-        </div>
-        <div class="nav-item" id="nav-archive" onclick="switchPage('archive')">
+        <div class="nav-item" id="nav-archive" onclick="navSwitchPage('archive')">
             <span class="material-symbols-rounded icon">inventory_2</span>
-            <span class="label">Archive</span>
+            <span class="label">Arşiv</span>
         </div>
     </nav>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('chimptopus_v12_notes')) || [];
-        let archive = JSON.parse(localStorage.getItem('chimptopus_v12_archive')) || [];
-        let globalCounter = parseInt(localStorage.getItem('chimptopus_v12_counter')) || 1;
-        
-        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v12_drafts')) || { taslak: '', revize: '', final: '' };
-        let refsMemory = JSON.parse(localStorage.getItem('chimptopus_v12_refs')) || { taslak: '', revize: '', final: '' };
+        /* ─────────────────────────────────────────
+           STATE
+        ───────────────────────────────────────── */
+        let notes        = JSON.parse(localStorage.getItem('chimptopus_v18_notes'))   || [];
+        let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
+        let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
 
-        let currentPage = 'taslak'; 
-        let viewMode = 'list'; 
-        let editingNoteId = null; 
-        let textHistory = [];
+        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v18_drafts')) || { taslak:'', revize:'', final:'' };
+        let refsMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_refs'))   || { taslak:'', revize:'', final:'' };
+        let metaMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_meta'))   || { title:'', questions:[] };
+        let wordGoalMemory = JSON.parse(localStorage.getItem('chimptopus_v19_wordgoal')) || { taslak:100, revize:200, final:400 };
+
+        let currentPage   = 'records';
+        let editingNoteId = null;
+        let textHistory   = [];
         let timer;
+        let timerRunning  = false;
+        let currentTagFilter = null;
 
-        document.getElementById('noteInput').value = draftsMemory['taslak'] || '';
-        document.getElementById('refInput').value = refsMemory['taslak'] || '';
-        searchReference();
+        /* ─────────────────────────────────────────
+           TOAST
+        ───────────────────────────────────────── */
+        let toastTimeout;
+        function showToast(msg, actionLabel, actionFn) {
+            const el = document.getElementById('toastEl');
+            const msgEl = document.getElementById('toastMsg');
+            const btnEl = document.getElementById('toastActionBtn');
 
-        function switchPage(page) {
-            if (['taslak', 'revize', 'final'].includes(currentPage)) {
-                draftsMemory[currentPage] = document.getElementById('noteInput').value;
-                refsMemory[currentPage] = document.getElementById('refInput').value;
-                localStorage.setItem('chimptopus_v12_drafts', JSON.stringify(draftsMemory));
-                localStorage.setItem('chimptopus_v12_refs', JSON.stringify(refsMemory));
+            msgEl.innerText = msg;
+
+            if (actionLabel && actionFn) {
+                btnEl.innerText = actionLabel;
+                btnEl.style.display = 'inline-block';
+                btnEl.onclick = () => { actionFn(); hideToast(); };
+            } else {
+                btnEl.style.display = 'none';
             }
+
+            el.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(hideToast, actionLabel ? 5000 : 2500);
+        }
+        function hideToast() {
+            document.getElementById('toastEl').classList.remove('show');
+        }
+
+        /* ─────────────────────────────────────────
+           STATS
+        ───────────────────────────────────────── */
+        function renderStats() {
+            const taslakCount  = notes.filter(n => n.type === 'taslak').length;
+            const revizeCount  = notes.filter(n => n.type === 'revize').length;
+            const finalCount   = notes.filter(n => n.type === 'final').length;
+            const total        = notes.length;
+            const totalWords   = notes.reduce((sum, n) => sum + (n.text.trim() ? n.text.trim().split(/\s+/).length : 0), 0);
+            const allTags      = getAllTags();
+
+            document.getElementById('statTotal').innerText    = total;
+            document.getElementById('statArchived').innerText = archive.length;
+            document.getElementById('statWords').innerText    = totalWords;
+            document.getElementById('statTags').innerText     = allTags.length;
+            document.getElementById('statTaslakLbl').innerText = `T: ${taslakCount}`;
+            document.getElementById('statRevizeLbl').innerText = `R: ${revizeCount}`;
+            document.getElementById('statFinalLbl').innerText  = `F: ${finalCount}`;
+
+            const bars = document.querySelectorAll('#statBarRow .stat-bar-seg');
+            if (total > 0) {
+                bars[0].style.width = (taslakCount / total * 100) + '%';
+                bars[1].style.width = (revizeCount / total * 100) + '%';
+                bars[2].style.width = (finalCount  / total * 100) + '%';
+            } else {
+                bars.forEach(b => b.style.width = '33.3%');
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           BACKUP REMINDER
+        ───────────────────────────────────────── */
+        function checkBackupReminder() {
+            const savedAt = parseInt(localStorage.getItem('chimptopus_v19_lastBackupAt')) || 0;
+            const diff = globalCounter - savedAt;
+            if (diff >= 10 && savedAt > 0) {
+                showToast(`${diff} not eklendi — yedek alma vakti!`, 'Yedekle', () => {
+                    exportData(); localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
+                });
+            } else if (savedAt === 0) {
+                localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           TAG HELPERS
+        ───────────────────────────────────────── */
+        function extractTags(text) {
+            const matches = text.match(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g) || [];
+            return [...new Set(matches.map(t => t.toLowerCase()))];
+        }
+
+        function getAllTags() {
+            const all = notes.flatMap(n => extractTags(n.text));
+            return [...new Set(all)].sort();
+        }
+
+        function renderTagFilterBar() {
+            const bar = document.getElementById('tagFilterBar');
+            const tags = getAllTags();
+            if (tags.length === 0) { bar.innerHTML = ''; return; }
+
+            let html = `<div class="tag-chip ${!currentTagFilter ? 'active' : ''}" onclick="setTagFilter(null)">Tümü</div>`;
+            tags.forEach(tag => {
+                html += `<div class="tag-chip ${currentTagFilter === tag ? 'active' : ''}" onclick="setTagFilter('${tag}')">${tag}</div>`;
+            });
+            bar.innerHTML = html;
+        }
+
+        function setTagFilter(tag) {
+            currentTagFilter = tag;
+            renderTagFilterBar();
+            renderRecords();
+        }
+
+        /* ─────────────────────────────────────────
+           TEMPLATE
+        ───────────────────────────────────────── */
+        function useAsTemplate(id, e) {
+            if (e) e.stopPropagation();
+            const n = notes.find(x => x.id === id);
+            if (!n) return;
+
+            editingNoteId = null;
+            switchPage('taslak', true);
+
+            document.getElementById('noteInput').value = '';
+            updateWordProgress();
+
+            showToast('📋 Şablon yüklendi — metni yazabilirsiniz');
+        }
+
+        /* ─────────────────────────────────────────
+           NAV & PAGE SWITCHING
+        ───────────────────────────────────────── */
+        function navSwitchPage(page) {
+            if (['taslak', 'revize', 'final'].includes(currentPage)) {
+                saveDraftMemory();
+            }
+            editingNoteId = null;
+            switchPage(page, false);
+        }
+
+        function saveDraftMemory() {
+            draftsMemory[currentPage] = document.getElementById('noteInput').value;
+            refsMemory[currentPage]   = document.getElementById('refInput').value;
+            localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
+            if (currentPage === 'revize') {
+                metaMemory.title     = document.getElementById('metaTitle').value;
+                metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
+                localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+            }
+            wordGoalMemory[currentPage] = parseInt(document.getElementById('wordGoal').value) || 100;
+            localStorage.setItem('chimptopus_v19_wordgoal', JSON.stringify(wordGoalMemory));
+        }
+
+        function switchPage(page, saveCurrent = true) {
+            if (saveCurrent && ['taslak', 'revize', 'final'].includes(currentPage)) {
+                saveDraftMemory();
+            }
+
+            if (page !== 'taslak') resizeNoteBlock(1);
 
             currentPage = page;
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -371,55 +699,187 @@
                 renderArchivePage();
             } else {
                 document.getElementById('pageEditor').classList.add('active');
-                document.getElementById('boxLabel').innerText = page === 'final' ? "Finale Gönder" : "Yeni " + page.charAt(0).toUpperCase() + page.slice(1);
-                
-                document.getElementById('noteInput').value = draftsMemory[page] || '';
-                document.getElementById('refInput').value = refsMemory[page] || '';
-                searchReference();
+
+                const workspace    = document.getElementById('editorWorkspace');
+                const pendingState = document.getElementById('finalPendingState');
+                const emptyMsg     = document.getElementById('emptyFinalState');
+                const pendingBoard = document.getElementById('pendingFinalsBoard');
+
+                if (page === 'final' && !editingNoteId) {
+                    workspace.style.display    = 'none';
+                    pendingState.style.display = 'block';
+
+                    const pendingFinals = notes.filter(n => n.type === 'final');
+                    if (pendingFinals.length > 0) {
+                        emptyMsg.style.display   = 'none';
+                        pendingBoard.innerHTML   = '';
+                        const container = document.createElement('div');
+                        container.className = 'cards-list';
+                        pendingFinals.forEach(n => {
+                            const wrap = document.createElement('div');
+                            wrap.innerHTML = createCardHTML(n, true);
+                            container.appendChild(wrap.firstElementChild);
+                        });
+                        pendingBoard.appendChild(container);
+                    } else {
+                        emptyMsg.style.display = 'block';
+                        pendingBoard.innerHTML  = '';
+                    }
+                } else {
+                    workspace.style.display    = 'flex';
+                    pendingState.style.display = 'none';
+
+                    document.getElementById('metaBlocks').style.display = (page === 'revize') ? 'flex' : 'none';
+                    document.getElementById('refContainer').style.display      = (page === 'revize') ? 'flex' : 'none';
+                    document.getElementById('sizeControls').style.display      = (page === 'taslak') ? 'flex' : 'none';
+
+                    const label = editingNoteId
+                        ? `Düzenle: #${notes.find(n => n.id === editingNoteId).num}`
+                        : 'Yeni ' + page.charAt(0).toUpperCase() + page.slice(1);
+
+                    document.getElementById('boxLabel').innerText = label;
+                    document.getElementById('stageBadge').style.background = getAutoColor(page);
+
+                    if (!editingNoteId) {
+                        document.getElementById('noteInput').value = draftsMemory[page] || '';
+                        document.getElementById('refInput').value  = refsMemory[page]   || '';
+                        document.getElementById('wordGoal').value  = wordGoalMemory[page] || 100;
+
+                        if (page === 'revize') {
+                            document.getElementById('metaTitle').value = metaMemory.title || '';
+                            document.getElementById('questionsContainer').innerHTML = '';
+                            if (metaMemory.questions && metaMemory.questions.length > 0) {
+                                metaMemory.questions.forEach(q => addQuestionInput(q));
+                            } else { addQuestionInput(); }
+                        }
+                        searchReference();
+                    }
+                    renderEditorButtons(page);
+                }
                 updateWordProgress();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function toggleViewMode() {
-            if(currentPage === 'archive') return; // Arşiv hep grid kalacak
-            viewMode = viewMode === 'grid' ? 'list' : 'grid';
-            document.getElementById('viewIcon').innerText = viewMode === 'grid' ? 'view_list' : 'grid_view';
-            renderRecords();
+        function editNote(id, e) {
+            if (e) e.stopPropagation();
+            const noteToEdit = notes.find(n => n.id === id);
+            if (!noteToEdit) return;
+
+            editingNoteId = id;
+            switchPage(noteToEdit.type, true);
+
+            document.getElementById('noteInput').value = noteToEdit.text;
+
+            if (noteToEdit.type === 'revize') {
+                document.getElementById('metaTitle').value = noteToEdit.title || '';
+                document.getElementById('questionsContainer').innerHTML = '';
+                if (noteToEdit.questions && noteToEdit.questions.length > 0) {
+                    noteToEdit.questions.forEach(q => addQuestionInput(q));
+                } else { addQuestionInput(); }
+            }
+            document.getElementById('refInput').value = noteToEdit.refs ? noteToEdit.refs.join(', ') : '';
+            searchReference();
+            updateWordProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function resizeNoteBlock(mul) {
+            document.getElementById('noteInput').style.height = (160 * mul) + 'px';
+        }
+
+        function addQuestionInput(val = '') {
+            const container = document.getElementById('questionsContainer');
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'meta-input meta-input-secondary';
+            input.style.marginBottom = '0';
+            input.placeholder = 'Soru, anahtar kelime vs...';
+            input.value = val;
+
+            const delBtn = document.createElement('span');
+            delBtn.className = 'material-symbols-rounded action-icon';
+            delBtn.style.color = 'var(--danger-color)';
+            delBtn.innerText = 'do_not_disturb_on';
+            delBtn.onclick = () => row.remove();
+
+            row.appendChild(input);
+            row.appendChild(delBtn);
+            container.appendChild(row);
+        }
+
+        function renderEditorButtons(page) {
+            const container = document.getElementById('editorActions');
+            let html = '';
+
+            if (page === 'taslak') {
+                if (editingNoteId) {
+                    html = `<button class="btn-secondary" onclick="handleAction('update')">Güncelle</button>
+                            <button class="btn-primary" style="background:var(--color-revize)" onclick="handleAction('transfer_revize')">Revizeye Aktar</button>`;
+                } else {
+                    html = `<button class="btn-primary" style="background:var(--color-taslak)" onclick="handleAction('save')">Taslağı Kaydet</button>`;
+                }
+            } else if (page === 'revize') {
+                if (editingNoteId) {
+                    html = `<button class="btn-secondary" onclick="handleAction('update')">Güncelle</button>
+                            <button class="btn-primary" style="background:var(--color-final)" onclick="handleAction('transfer_final')">Finale Aktar</button>`;
+                } else {
+                    html = `<button class="btn-primary" style="background:var(--color-revize)" onclick="handleAction('save')">Revizeyi Kaydet</button>`;
+                }
+            } else if (page === 'final') {
+                html = `<button class="btn-secondary" onclick="handleAction('update')">Güncelle</button>
+                        <button class="btn-primary" style="background:var(--text-main)" onclick="handleAction('archive')">Arşive Kaldır</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function getAutoColor(type) {
+            if (type === 'taslak') return 'var(--color-taslak)';
+            if (type === 'revize') return 'var(--color-revize)';
+            if (type === 'final')  return 'var(--color-final)';
+            return 'var(--text-muted)';
+        }
+
+        function getAutoColorHex(type) {
+            if (type === 'taslak') return '#d48166';
+            if (type === 'revize') return '#2383e2';
+            if (type === 'final')  return '#30d158';
+            return '#9b9a97';
+        }
+
+        /* ─────────────────────────────────────────
+           SEARCH & REFERENCE
+        ───────────────────────────────────────── */
         function searchReference() {
             let val = document.getElementById('refInput').value.trim();
-            let refBox = document.getElementById('referenceBox');
-            
-            if(!val) { refBox.style.display = 'none'; return; }
-            let ids = val.match(/\d+/g);
-            if(!ids || ids.length === 0) { refBox.style.display = 'none'; return; }
+            const refBox = document.getElementById('referenceBox');
+            if (!val) { refBox.style.display = 'none'; return; }
+
+            const ids = val.match(/\d+/g);
+            if (!ids || ids.length === 0) { refBox.style.display = 'none'; return; }
 
             let html = '';
             let foundAny = false;
 
             ids.forEach(id => {
-                let formattedId = id.padStart(2, '0');
-                let found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
-                
-                if(found) {
+                const formattedId = id.padStart(2, '0');
+                const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
+                if (found) {
                     foundAny = true;
-                    html += `
-                        <div class="ref-item">
-                            <span style="font-size: 12px; font-weight: 700; color: ${getAutoColor(found.type)};">#${found.num} <span style="font-weight:400; color:var(--text-muted)">(${found.type})</span></span>
-                            <div class="ref-item-text">${formatMentionsAndHighlights(found.text)}</div>
-                        </div>
-                    `;
+                    html += `<div class="ref-item">
+                                <span style="font-size:12px; font-weight:700; color:${getAutoColor(found.type)};">#${found.num}</span>
+                                <div class="ref-item-text">${formatMentionsAndHighlights(found.text)}</div>
+                             </div>`;
                 }
             });
 
-            if(foundAny) {
+            if (foundAny) {
                 document.getElementById('refContent').innerHTML = html;
                 refBox.style.display = 'block';
-            } else {
-                refBox.style.display = 'none';
-            }
+            } else { refBox.style.display = 'none'; }
         }
 
         function handleInput() {
@@ -442,184 +902,260 @@
         function updateWordProgress() {
             const val = document.getElementById('noteInput').value.trim();
             const words = val.length === 0 ? 0 : val.split(/\s+/).length;
-            const goal = parseInt(document.getElementById('wordGoal').value) || 100;
-            
+            const goal  = parseInt(document.getElementById('wordGoal').value) || 100;
+
             document.getElementById('wordCount').innerText = words;
-            let percentage = Math.min((words / goal) * 100, 100);
-            document.getElementById('wordProgress').style.width = percentage + '%';
+            document.getElementById('wordProgress').style.width = Math.min((words / goal) * 100, 100) + '%';
         }
 
-        function editNote(id, e) {
-            e.stopPropagation();
-            const noteToEdit = notes.find(n => n.id === id);
-            if (!noteToEdit) return;
-
-            editingNoteId = id;
-            switchPage(noteToEdit.type);
-            document.getElementById('noteInput').value = noteToEdit.text;
-            document.getElementById('boxLabel').innerText = "Düzenle: #" + noteToEdit.num;
-            document.getElementById('refInput').value = noteToEdit.refs ? noteToEdit.refs.join(', ') : '';
-            searchReference();
-
-            handleInput();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function getAutoColor(type) {
-            if(type === 'taslak') return 'var(--color-taslak)';
-            if(type === 'revize') return 'var(--color-revize)';
-            if(type === 'final') return 'var(--color-final)';
-            return 'var(--text-muted)';
-        }
-
+        /* ─────────────────────────────────────────
+           FORMAT (Mentions + Tags + Highlights)
+        ───────────────────────────────────────── */
         function formatMentionsAndHighlights(text, query = '') {
-            let formatted = text;
-            formatted = formatted.replace(/@(\d{2,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
+            let formatted = text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            formatted = formatted.replace(
+                /@(\d{2,})/g,
+                '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>'
+            );
+
+            formatted = formatted.replace(
+                /#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g,
+                '<span class="tag-link">#$1</span>'
+            );
+
             if (query) {
-                const regex = new RegExp(`(${query})`, "gi");
+                const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
                 formatted = formatted.replace(regex, '<span class="highlight">$1</span>');
             }
             return formatted;
         }
 
         function loadMention(num, event) {
-            if(event) event.stopPropagation();
+            if (event) event.stopPropagation();
+            closeArchiveModal();
             document.getElementById('refInput').value = num;
             searchReference();
         }
 
-        function handleAction() {
+        /* ─────────────────────────────────────────
+           ACTIONS (Save / Update / Transfer / Archive)
+        ───────────────────────────────────────── */
+        function handleAction(actionType) {
             const text = document.getElementById('noteInput').value;
-            if (!text.trim()) return;
-            
-            let saveType = currentPage;
-            let textRefs = text.match(/@(\d{2,})/g) || [];
-            let manualRefs = document.getElementById('refInput').value.match(/\d+/g) || [];
-            textRefs = textRefs.map(r => r.replace('@', ''));
-            let combinedRefs = [...new Set([...textRefs, ...manualRefs])];
+            if (!text.trim()) { alert('Lütfen metin giriniz.'); return; }
 
-            if (editingNoteId) {
-                const noteIndex = notes.findIndex(n => n.id === editingNoteId);
-                if (noteIndex > -1) {
-                    notes[noteIndex].text = text;
-                    notes[noteIndex].type = saveType; 
-                    notes[noteIndex].mood = getAutoColor(saveType);
-                    notes[noteIndex].refs = combinedRefs;
-                }
-                editingNoteId = null;
-                showStatus("Güncellendi");
-                localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
-            } else {
+            const textRefs    = text.match(/@(\d{2,})/g) || [];
+            const manualRefs  = document.getElementById('refInput').value.match(/\d+/g) || [];
+            const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])];
+            const tags        = extractTags(text);
+
+            const title     = (currentPage === 'revize') ? document.getElementById('metaTitle').value.trim() : '';
+            const questions = (currentPage === 'revize') ? Array.from(document.querySelectorAll('#questionsContainer input'))
+                              .map(i => i.value.trim()).filter(v => v !== '') : [];
+
+            if (actionType === 'save') {
                 const formattedNum = String(globalCounter).padStart(2, '0');
-                if (saveType === 'final') {
-                    archive.unshift({ 
-                        id: Date.now(), num: formattedNum, text, 
-                        refs: combinedRefs,
-                        date: new Date().toLocaleDateString('tr-TR') 
-                    });
-                    localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
-                    showStatus("Arşivlendi");
-                } else {
-                    notes.unshift({
-                        id: Date.now(), num: formattedNum, text, type: saveType, 
-                        mood: getAutoColor(saveType), refs: combinedRefs,
-                        time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
-                    });
-                    localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
-                    showStatus("Kaydedildi");
-                }
+                notes.unshift({
+                    id: Date.now(), num: formattedNum, text, type: currentPage,
+                    title, questions, refs: combinedRefs, tags,
+                    time: new Date().toLocaleDateString('tr-TR', { day:'numeric', month:'short' })
+                });
                 globalCounter++;
-                localStorage.setItem('chimptopus_v12_counter', globalCounter);
+                localStorage.setItem('chimptopus_v18_counter', globalCounter);
+                showStatus('Oluşturuldu');
+                checkBackupReminder();
             }
-            
-            draftsMemory[saveType] = '';
-            refsMemory[saveType] = '';
-            localStorage.setItem('chimptopus_v12_drafts', JSON.stringify(draftsMemory));
-            localStorage.setItem('chimptopus_v12_refs', JSON.stringify(refsMemory));
-            
-            document.getElementById('noteInput').value = '';
-            document.getElementById('refInput').value = '';
-            document.getElementById('referenceBox').style.display = 'none';
-            document.getElementById('boxLabel').innerText = "Yeni " + currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
-            
-            textHistory = [];
-            updateWordProgress();
+            else if (actionType === 'update') {
+                const n = notes.find(x => x.id === editingNoteId);
+                if (n) {
+                    n.text = text; n.refs = combinedRefs; n.tags = tags;
+                    if (currentPage === 'revize') { n.title = title; n.questions = questions; }
+                }
+                showStatus('Güncellendi');
+            }
+            else if (actionType === 'transfer_revize') {
+                const n = notes.find(x => x.id === editingNoteId);
+                if (n) { n.text = text; n.type = 'revize'; n.tags = tags; }
+                showStatus('Revizeye Aktarıldı');
+                editingNoteId = n.id;
+                switchPage('revize'); saveToLocal(); return;
+            }
+            else if (actionType === 'transfer_final') {
+                const n = notes.find(x => x.id === editingNoteId);
+                if (n) { n.text = text; n.type = 'final'; n.refs = combinedRefs; n.tags = tags; n.title = title; n.questions = questions; }
+                showStatus('Finale Aktarıldı');
+                editingNoteId = n.id;
+                switchPage('final'); saveToLocal(); return;
+            }
+            else if (actionType === 'archive') {
+                const nIndex = notes.findIndex(x => x.id === editingNoteId);
+                if (nIndex > -1) {
+                    const n = notes[nIndex];
+                    archive.unshift({
+                        id: n.id, num: n.num, text, title: n.title, refs: combinedRefs, tags,
+                        date: new Date().toLocaleDateString('tr-TR')
+                    });
+                    notes.splice(nIndex, 1);
+                }
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                showStatus('Arşive Gönderildi');
+                navSwitchPage('archive'); saveToLocal(); return;
+            }
+
+            saveToLocal();
+
+            draftsMemory[currentPage] = '';
+            refsMemory[currentPage]   = '';
+            if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+            localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
+            localStorage.setItem('chimptopus_v18_meta',   JSON.stringify(metaMemory));
+
+            navSwitchPage('records');
         }
 
-        function createCardHTML(n) {
+        function saveToLocal() {
+            localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes));
+        }
+
+        /* ─────────────────────────────────────────
+           CARD HTML FACTORY
+        ───────────────────────────────────────── */
+        function createCardHTML(n, isList = false) {
+            const borderColor = getAutoColorHex(n.type);
+
             let refPills = '';
-            if (n.refs && n.refs.length > 0) {
-                refPills = `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">` + 
-                    n.refs.map(r => `<span class="ref-pill" onclick="loadMention('${r}', event)"><span class="material-symbols-rounded" style="font-size:12px;">link</span>#${r}</span>`).join('') + 
+            if (isList && n.refs && n.refs.length > 0) {
+                refPills = `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">` +
+                    n.refs.map(r => `<span class="ref-pill" onclick="loadMention('${r}', event)">
+                        <span class="material-symbols-rounded" style="font-size:12px;">link</span>#${r}
+                    </span>`).join('') +
                 `</div>`;
             }
 
-            return `
-                <div class="card note-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                        <span class="note-number">#${n.num}</span>
-                        <div style="width:10px; height:10px; border-radius:50%; background:${n.mood}"></div>
-                    </div>
-                    <span style="font-size:8px; font-weight:600; color:var(--text-main); text-transform:uppercase; margin-bottom:5px; display:block;">${n.type}</span>
-                    <p>${formatMentionsAndHighlights(n.text)}</p>
-                    ${refPills}
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;">
-                        <span style="font-size:12px; color:var(--text-muted)">${n.time}</span>
-                        <div style="display:flex; gap: 14px;">
-                            <span class="material-symbols-rounded action-icon" onclick="editNote(${n.id}, event)">edit</span>
-                            <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${n.id}, event)">delete</span>
+            let tagPills = '';
+            const tags = n.tags || extractTags(n.text);
+            if (isList && tags.length > 0) {
+                tagPills = `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">` +
+                    tags.map(t => `<span class="inline-tag-pill">${t}</span>`).join('') +
+                `</div>`;
+            }
+
+            if (isList) {
+                return `
+                    <div class="card note-card" style="border-left: 4px solid ${borderColor}; padding-left: 14px;" onclick="editNote(${n.id}, event)">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span>
+                            <span style="font-size:10px; font-weight:700; color:${borderColor}; text-transform:uppercase; background:rgba(0,0,0,0.03); padding:3px 8px; border-radius:6px;">${n.type}</span>
+                        </div>
+                        ${n.title ? `<div class="card-title">${n.title}</div>` : ''}
+                        <p class="${n.title ? 'card-body' : 'card-body-full'}">${formatMentionsAndHighlights(n.text)}</p>
+                        ${tagPills}
+                        ${refPills}
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;">
+                            <span style="font-size:12px; color:var(--text-muted)">${n.time}</span>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <span class="material-symbols-rounded action-icon" style="font-size:18px;" onclick="useAsTemplate(${n.id}, event)" title="Şablon Olarak Kullan">content_copy</span>
+                                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color); font-size:18px;" onclick="deleteNote(${n.id}, event)">delete</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                return `
+                    <div class="card note-card" style="min-height:110px; padding:12px; border-left:4px solid ${borderColor}; padding-left:11px;" onclick="editNote(${n.id}, event)">
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span>
+                            <div style="width:8px; height:8px; border-radius:50%; background:${borderColor}"></div>
+                        </div>
+                        <div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
+                            ${n.title ? `<b style="color:var(--text-main)">${n.title}</b><br>` : ''}${n.text}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
+        /* ─────────────────────────────────────────
+           RENDER RECORDS
+        ───────────────────────────────────────── */
         function renderRecords() {
             const board = document.getElementById('recordsBoard');
             board.innerHTML = '';
-            
-            const query = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
+            const query = (document.getElementById('searchInput')?.value || '').toLowerCase();
+
             let filtered = notes;
-            if (query) filtered = filtered.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query));
+            if (query) {
+                filtered = filtered.filter(n =>
+                    n.text.toLowerCase().includes(query) ||
+                    n.num.includes(query) ||
+                    (n.title && n.title.toLowerCase().includes(query))
+                );
+            }
+            if (currentTagFilter) {
+                filtered = filtered.filter(n => (n.tags || extractTags(n.text)).includes(currentTagFilter));
+            }
+
+            renderTagFilterBar();
 
             if (filtered.length === 0) {
-                board.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Kayıt bulunamadı.</p>';
+                board.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon-wrap" style="background:var(--surface-alt);">
+                            <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span>
+                        </div>
+                        <h3>Kayıt Bulunamadı</h3>
+                        <p>${currentTagFilter ? `"${currentTagFilter}" etiketinde not yok.` : 'Arama ile eşleşen kayıt yok.'}</p>
+                    </div>`;
                 return;
             }
 
             const container = document.createElement('div');
-            container.className = viewMode === 'grid' ? 'cards-grid' : 'cards-list';
-            
+            container.className = 'archive-grid';
+
             filtered.forEach(n => {
                 const wrap = document.createElement('div');
-                wrap.innerHTML = createCardHTML(n);
-                const card = wrap.firstElementChild;
-                container.appendChild(card);
+                wrap.innerHTML = createCardHTML(n, false);
+                container.appendChild(wrap.firstElementChild);
             });
             board.appendChild(container);
         }
 
-        // YENİ ARŞİV KUTU SİSTEMİ
+        /* ─────────────────────────────────────────
+           RENDER ARCHIVE
+        ───────────────────────────────────────── */
         function renderArchivePage() {
             const board = document.getElementById('archiveBoard');
             board.innerHTML = '';
             if (archive.length === 0) {
-                board.innerHTML = '<p style="font-size:14px; color:var(--text-muted); text-align:center; padding: 40px 0;">Arşiv boş.</p>';
+                board.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);">
+                            <span class="material-symbols-rounded" style="color:var(--color-final); font-size:36px;">inventory_2</span>
+                        </div>
+                        <h3>Arşiv Boş</h3>
+                        <p>Final aşamasındaki notları<br>arşive kaldırarak buraya taşıyabilirsiniz.</p>
+                    </div>`;
                 return;
             }
 
             const container = document.createElement('div');
-            container.className = 'archive-grid'; // Hep grid olacak (ufak kutular)
+            container.className = 'archive-grid';
 
             archive.forEach(a => {
                 const card = document.createElement('div');
-                card.className = 'archive-card';
+                card.className = 'card note-card';
+                card.style.cssText = 'min-height:110px; padding:12px; border-left:4px solid var(--color-final); padding-left:11px;';
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                        <span class="note-number" style="font-size: 14px;">#${a.num}</span>
+                        <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${a.num}</span>
                         <span class="material-symbols-rounded" style="font-size:16px; color:var(--color-final)">check_circle</span>
                     </div>
-                    <div class="text-snippet">${a.text}</div>
+                    <div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
+                        ${a.title ? `<b style="color:var(--text-main)">${a.title}</b><br>` : ''}${a.text}
+                    </div>
                 `;
                 card.onclick = () => openArchiveModal(a.id);
                 container.appendChild(card);
@@ -627,18 +1163,26 @@
             board.appendChild(container);
         }
 
-        // MODAL FONKSİYONLARI
+        /* ─────────────────────────────────────────
+           ARCHIVE MODAL
+        ───────────────────────────────────────── */
         function openArchiveModal(id) {
             const item = archive.find(a => a.id === id);
-            if(!item) return;
+            if (!item) return;
 
-            document.getElementById('modalTitle').innerText = "Final #" + item.num;
-            document.getElementById('modalBody').innerHTML = formatMentionsAndHighlights(item.text);
-            document.getElementById('modalDate').innerText = item.date;
+            document.getElementById('modalTitle').innerText = 'Final #' + item.num;
+            document.getElementById('modalBody').innerHTML  = formatMentionsAndHighlights(item.text);
+            document.getElementById('modalDate').innerText  = item.date;
 
-            document.getElementById('modalRestoreBtn').onclick = () => { restoreToFinal(item.id); closeArchiveModal(); };
-            document.getElementById('modalDeleteBtn').onclick = () => { deleteArchive(item.id); closeArchiveModal(); };
-            document.getElementById('modalCopyBtn').onclick = () => { navigator.clipboard.writeText(item.text); showStatus("Kopyalandı"); closeArchiveModal(); };
+            const footer = document.getElementById('modalFooter');
+            const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            footer.innerHTML = `
+                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeArchiveModal();" title="Kalıcı Sil">delete</span>
+                <div style="display:flex; gap:15px;">
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToFinal(${item.id}); closeArchiveModal();" title="Finale Geri Gönder">restore_page</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Kopyalandı')); closeArchiveModal();" title="Kopyala">content_copy</span>
+                </div>
+            `;
 
             const modal = document.getElementById('archiveModal');
             modal.style.display = 'flex';
@@ -646,76 +1190,96 @@
         }
 
         function closeArchiveModal(e) {
-            if(e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return;
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return;
             const modal = document.getElementById('archiveModal');
             modal.classList.remove('active');
             setTimeout(() => modal.style.display = 'none', 300);
         }
 
+        /* ─────────────────────────────────────────
+           DELETE / RESTORE
+        ───────────────────────────────────────── */
         function deleteNote(id, e) {
             e.stopPropagation();
-            if(confirm("Silmek istediğine emin misin?")) {
+            if (confirm('Silmek istediğine emin misin?')) {
                 notes = notes.filter(n => n.id !== id);
-                localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
-                renderRecords();
+                saveToLocal(); renderRecords();
+                if (currentPage === 'final') navSwitchPage('final');
             }
         }
 
         function deleteArchive(id) {
-            if(confirm("Kalıcı olarak silinsin mi?")) {
+            if (confirm('Kalıcı olarak silinsin mi?')) {
                 archive = archive.filter(a => a.id !== id);
-                localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 renderArchivePage();
             }
         }
 
         function restoreToFinal(id) {
             const index = archive.findIndex(a => a.id === id);
-            if(index > -1) {
+            if (index > -1) {
                 const item = archive[index];
                 archive.splice(index, 1);
                 notes.unshift({
-                    id: item.id, num: item.num, text: item.text, type: 'final', mood: getAutoColor('final'), refs: item.refs,
-                    time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
+                    id: item.id, num: item.num, text: item.text, type: 'final',
+                    refs: item.refs, tags: item.tags,
+                    time: new Date().toLocaleDateString('tr-TR', { day:'numeric', month:'short' })
                 });
-                localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
-                localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v18_notes',   JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 renderArchivePage();
-                showStatus("Geri Yüklendi");
+                showToast('♻️ Finale geri yüklendi');
             }
         }
 
-        function insertTimestamp() {
-            const ta = document.getElementById('noteInput');
-            const now = new Date();
-            ta.value += `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}] `;
-            ta.focus();
-            updateWordProgress();
-        }
-
+        /* ─────────────────────────────────────────
+           TIMER
+        ───────────────────────────────────────── */
         function startCountdown(mins) {
             clearInterval(timer);
             let sec = mins * 60;
-            document.getElementById('timerDisplay').innerText = `${mins}:00`;
+            const display = document.getElementById('timerDisplay');
+            const noteBox = document.getElementById('editorWorkspace');
+            display.innerText = `${mins}:00`;
+            noteBox.classList.add('timer-running');
+            timerRunning = true;
+
             timer = setInterval(() => {
                 sec--;
-                let m = Math.floor(sec / 60);
-                let s = sec % 60;
-                document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                if (sec <= 0) { clearInterval(timer); if(navigator.vibrate) navigator.vibrate(200); alert("Odak süresi bitti!"); }
+                const m = Math.floor(sec / 60);
+                const s = sec % 60;
+                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                if (sec <= 0) {
+                    clearInterval(timer);
+                    timerRunning = false;
+                    noteBox.classList.remove('timer-running');
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    showToast('⏱ Odak süresi bitti!');
+                }
             }, 1000);
         }
 
+        /* ─────────────────────────────────────────
+           UTILS
+        ───────────────────────────────────────── */
+        function insertTimestamp() {
+            const ta = document.getElementById('noteInput');
+            const now = new Date();
+            ta.value += `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}] `;
+            ta.focus(); updateWordProgress();
+        }
+
         function exportData() {
-            const data = { notes, archive, counter: globalCounter, drafts: draftsMemory, refs: refsMemory };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "chimptopus_v12_yedek.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            const data = { notes, archive, counter: globalCounter };
+            const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+            const a = document.createElement('a');
+            a.setAttribute('href', dataStr);
+            a.setAttribute('download', 'chimptopus_v19_yedek.json');
+            document.body.appendChild(a); a.click(); a.remove();
+            localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
             closePanels();
+            showToast('✅ Yedek indirildi');
         }
 
         function importData(event) {
@@ -725,28 +1289,50 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if(imported.notes && imported.archive) {
-                        notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter;
-                        draftsMemory = imported.drafts || draftsMemory; refsMemory = imported.refs || refsMemory;
-                        localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
-                        localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
-                        localStorage.setItem('chimptopus_v12_counter', globalCounter);
-                        localStorage.setItem('chimptopus_v12_drafts', JSON.stringify(draftsMemory));
-                        localStorage.setItem('chimptopus_v12_refs', JSON.stringify(refsMemory));
-                        
-                        if(currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage();
-                        alert("Yedek başarıyla yüklendi!"); closePanels();
-                    } else { alert("Geçersiz format."); }
-                } catch(err) { alert("Okuma hatası."); }
+                    if (imported.notes && imported.archive) {
+                        notes = imported.notes; archive = imported.archive;
+                        globalCounter = imported.counter || globalCounter;
+                        saveToLocal();
+                        localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                        localStorage.setItem('chimptopus_v18_counter', globalCounter);
+                        navSwitchPage('records');
+                        closePanels();
+                        showToast('✅ Yedek yüklendi');
+                    } else { alert('Geçersiz format.'); }
+                } catch (err) { alert('Okuma hatası.'); }
             };
             reader.readAsText(file);
         }
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
-        function togglePanel(id) { document.getElementById(id).classList.add('active'); document.getElementById('overlay').classList.add('active'); }
-        function closePanels() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-        function showStatus(m) { const s = document.getElementById('statusMsg'); s.innerText = m; setTimeout(() => s.innerText = '', 2000); }
-        function clearAll() { if(confirm("Tüm sistemi sıfırlamak istediğine emin misin?")) { localStorage.clear(); location.reload(); } }
+
+        function togglePanel(id) {
+            document.getElementById(id).classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+            if (id === 'sideMenu') renderStats();
+        }
+
+        function closePanels() {
+            document.getElementById('sideMenu').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function showStatus(m) {
+            const s = document.getElementById('statusMsg');
+            s.innerText = m;
+            setTimeout(() => s.innerText = '', 2000);
+        }
+
+        function clearAll() {
+            if (confirm('Tüm sistemi sıfırlamak istediğine emin misin?')) {
+                localStorage.clear(); location.reload();
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           INIT
+        ───────────────────────────────────────── */
+        navSwitchPage('records');
     </script>
 </body>
 </html>
