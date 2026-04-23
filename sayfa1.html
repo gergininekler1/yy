@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus Pro - V19.4</title>
+    <title>Chimptopus Pro - V19.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
@@ -19,7 +19,7 @@
 
             --color-taslak: #d48166;
             --color-revize: #2383e2;
-            --color-archive: #30d158; /* Önceden finaldi, şimdi arşiv için kullanılıyor */
+            --color-archive: #30d158; 
         }
 
         .dark-mode {
@@ -58,14 +58,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── TIMER PULSE ── */
-        @keyframes timerPulse {
-            0%   { box-shadow: 0 0 0 0 rgba(35,131,226,0.35); }
-            70%  { box-shadow: 0 0 0 8px rgba(35,131,226,0); }
-            100% { box-shadow: 0 0 0 0 rgba(35,131,226,0); }
-        }
-        .timer-running { animation: timerPulse 1.5s infinite; border-color: var(--primary-blue) !important; }
-
         /* ── BOTTOM NAV ── */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -100,7 +92,7 @@
         .nav-item.active .icon { transform: scale(1.1); }
         .nav-item.active::after { width: 20px; }
 
-        /* ── NOTES ── */
+        /* ── NOTES & EDITOR ── */
         .note-box {
             padding: 20px; display: flex; flex-direction: column;
             position: relative; background: var(--surface-alt);
@@ -119,8 +111,16 @@
             font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
             background: var(--surface-color); border: 1px solid var(--border-color);
             color: var(--text-muted); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 4px;
         }
         .timer-btn:active { background: var(--border-color); }
+        
+        @keyframes pulseBorder {
+            0% { border-color: var(--border-color); }
+            50% { border-color: var(--primary-blue); }
+            100% { border-color: var(--border-color); }
+        }
+        .sw-running { animation: pulseBorder 2s infinite; color: var(--primary-blue); }
 
         textarea {
             width: 100%; height: 160px; background-color: var(--surface-color);
@@ -147,16 +147,17 @@
         .ref-item-text::-webkit-scrollbar { width: 4px; }
         .ref-item-text::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
+        /* Level Progress */
         .word-challenge {
             display: flex; align-items: center; gap: 8px;
             font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 15px;
         }
-        .goal-input {
-            width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--border-color);
-            color: var(--text-main); font-size: 13px; font-weight: 600; text-align: center; outline: none; font-family: inherit;
-        }
-        .progress-bar-container { flex-grow: 1; height: 6px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-left: 10px; }
+        .progress-bar-container { flex-grow: 1; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-left: 10px; }
         .progress-bar { height: 100%; background: var(--primary-blue); width: 0%; transition: width 0.3s ease; }
+
+        /* Recent Records Scroll */
+        .recent-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+        .recent-scroll::-webkit-scrollbar { display: none; }
 
         /* ── RECORDS PAGE ── */
         .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -301,14 +302,14 @@
         <button class="toast-action" id="toastActionBtn" style="display:none;"></button>
     </div>
 
-    <div class="ios-modal" id="archiveModal" onclick="closeArchiveModal(event)">
+    <div class="ios-modal" id="universalModal" onclick="closeUniversalModal(event)">
         <div class="ios-modal-content" onclick="event.stopPropagation()">
             <div class="ios-modal-header">
                 <div>
                     <div id="modalTitle" style="font-weight:700; font-size:18px; color:var(--text-main);"></div>
                     <div id="modalDate" style="font-size:12px; color:var(--text-muted); margin-top:2px;"></div>
                 </div>
-                <span class="material-symbols-rounded" style="cursor:pointer; color:var(--text-muted);" onclick="closeArchiveModal(event)">close</span>
+                <span class="material-symbols-rounded" style="cursor:pointer; color:var(--text-muted);" onclick="closeUniversalModal(event)">close</span>
             </div>
             <div class="ios-modal-body" id="modalBody"></div>
             <div class="ios-modal-footer" id="modalFooter"></div>
@@ -343,7 +344,7 @@
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
                     <div class="stat-number" id="statTotal">0</div>
-                    <div class="stat-label">Aktif Not</div>
+                    <div class="stat-label">Taslak Not</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="statArchived">0</div>
@@ -360,11 +361,11 @@
                 <div class="stat-card stat-wide">
                     <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;">
                         <span style="color:var(--color-taslak); font-weight:600;" id="statTaslakLbl">T: 0</span>
-                        <span style="color:var(--color-revize); font-weight:600;" id="statRevizeLbl">R: 0</span>
+                        <span style="color:var(--color-archive); font-weight:600;" id="statRevizeLbl">A: 0</span>
                     </div>
                     <div class="stat-bar-row" id="statBarRow">
                         <div class="stat-bar-seg" style="background:var(--color-taslak); width:50%;"></div>
-                        <div class="stat-bar-seg" style="background:var(--color-revize); width:50%;"></div>
+                        <div class="stat-bar-seg" style="background:var(--color-archive); width:50%;"></div>
                     </div>
                 </div>
             </div>
@@ -378,7 +379,7 @@
 
     <div id="pageRecords" class="page-container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="font-weight:600; font-size:24px; margin:0;">Kayıtlar</h2>
+            <h2 style="font-weight:600; font-size:24px; margin:0;">Kayıtlar <span style="font-size:14px; font-weight:500; color:var(--text-muted);">(Taslaklar)</span></h2>
         </div>
         <div class="controls-row">
             <div class="search-bar" style="margin:0; width:100%;">
@@ -404,12 +405,14 @@
                             <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
                             <button class="timer-btn" onclick="resizeNoteBlock(3)">3x</button>
                         </div>
-                        <div style="display:flex; gap:4px; align-items:center;">
-                            <span id="timerDisplay" style="font-size:13px; font-weight:600; color:var(--text-muted); margin-right:5px;"></span>
-                            <button class="timer-btn" onclick="startCountdown(1)">1dk</button>
-                            <button class="timer-btn" onclick="startCountdown(5)">5dk</button>
-                            <button class="timer-btn" onclick="startCountdown(30)">30dk</button>
+                        
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <span id="swDisplay" style="font-size:14px; font-weight:700; font-variant-numeric: tabular-nums; color:var(--text-muted); margin-right:2px;">00:00</span>
+                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()">
+                                <span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span>
+                            </button>
                         </div>
+
                     </div>
                 </div>
 
@@ -436,9 +439,9 @@
                 </div>
 
                 <div class="word-challenge">
-                    <span class="material-symbols-rounded" style="font-size:16px;">notes</span>
-                    <span id="wordCount">0</span> /
-                    <input type="number" id="wordGoal" class="goal-input" value="100" onchange="updateWordProgress()">
+                    <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
+                    <span id="wordLevel" style="font-weight:700; color:var(--primary-blue)">Seviye 1</span>
+                    <span id="wordCountUI" style="margin-left:auto; font-size:12px; font-weight:600; color:var(--text-muted);">0 / 50</span>
                     <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
                 </div>
 
@@ -452,6 +455,12 @@
                     <div id="editorActions" style="display:flex; gap:8px;"></div>
                 </div>
             </div>
+
+            <div id="recentRecordsContainer" style="margin-top: 30px;">
+                <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">El Altındaki Kayıtlar</h4>
+                <div class="recent-scroll" id="recentRecordsList"></div>
+            </div>
+
         </div>
     </div>
 
@@ -465,7 +474,7 @@
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-records" onclick="navSwitchPage('records')">
             <span class="material-symbols-rounded icon">grid_view</span>
-            <span class="label">Kayıt</span>
+            <span class="label">Kayıtlar</span>
         </div>
         <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
             <span class="material-symbols-rounded icon">edit_document</span>
@@ -489,16 +498,18 @@
         let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
         let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
 
-        // V19.4 Migration: If any old note has type 'final', push to archive.
-        const oldFinals = notes.filter(n => n.type === 'final');
-        if (oldFinals.length > 0) {
-            oldFinals.forEach(n => {
+        // Cleanup: Migrate any remaining "final" or "revize" notes in "notes" to archive/proper place 
+        // to enforce that notes array ONLY holds 'taslak'
+        const nonTaslak = notes.filter(n => n.type !== 'taslak');
+        if (nonTaslak.length > 0) {
+            nonTaslak.forEach(n => {
                 archive.unshift({
                     id: n.id, num: n.num, text: n.text, title: n.title, refs: n.refs, tags: n.tags,
-                    date: new Date().toLocaleDateString('tr-TR')
+                    date: new Date().toLocaleDateString('tr-TR'),
+                    spentSeconds: n.spentSeconds || 0
                 });
             });
-            notes = notes.filter(n => n.type !== 'final');
+            notes = notes.filter(n => n.type === 'taslak');
             localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes));
             localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
         }
@@ -506,15 +517,17 @@
         let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v18_drafts')) || { taslak:'', revize:'' };
         let refsMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_refs'))   || { taslak:'', revize:'' };
         let metaMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_meta'))   || { title:'', questions:[] };
-        let wordGoalMemory = JSON.parse(localStorage.getItem('chimptopus_v19_wordgoal')) || { taslak:100, revize:200 };
 
         let currentPage   = 'records';
         let editingNoteId = null;
         let textHistory   = [];
-        let timer;
-        let timerRunning  = false;
         let currentTagFilter = null;
         let isMetaVisible = true;
+
+        /* Stopwatch State */
+        let swInterval;
+        let swSeconds = 0;
+        let swRunning = false;
 
         /* ─────────────────────────────────────────
            TOAST
@@ -539,39 +552,34 @@
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(hideToast, actionLabel ? 5000 : 2500);
         }
-        function hideToast() {
-            document.getElementById('toastEl').classList.remove('show');
-        }
+        function hideToast() { document.getElementById('toastEl').classList.remove('show'); }
 
         /* ─────────────────────────────────────────
-           STATS
+           STATS & BACKUP
         ───────────────────────────────────────── */
         function renderStats() {
-            const taslakCount  = notes.filter(n => n.type === 'taslak').length;
-            const revizeCount  = notes.filter(n => n.type === 'revize').length;
-            const total        = notes.length;
+            const taslakCount  = notes.length; // Only taslak exists in notes now
+            const archiveCount = archive.length;
             const totalWords   = notes.reduce((sum, n) => sum + (n.text.trim() ? n.text.trim().split(/\s+/).length : 0), 0);
             const allTags      = getAllTags();
 
-            document.getElementById('statTotal').innerText    = total;
-            document.getElementById('statArchived').innerText = archive.length;
+            document.getElementById('statTotal').innerText    = taslakCount;
+            document.getElementById('statArchived').innerText = archiveCount;
             document.getElementById('statWords').innerText    = totalWords;
             document.getElementById('statTags').innerText     = allTags.length;
             document.getElementById('statTaslakLbl').innerText = `T: ${taslakCount}`;
-            document.getElementById('statRevizeLbl').innerText = `R: ${revizeCount}`;
+            document.getElementById('statRevizeLbl').innerText = `A: ${archiveCount}`;
 
             const bars = document.querySelectorAll('#statBarRow .stat-bar-seg');
+            const total = taslakCount + archiveCount;
             if (total > 0) {
                 bars[0].style.width = (taslakCount / total * 100) + '%';
-                bars[1].style.width = (revizeCount / total * 100) + '%';
+                bars[1].style.width = (archiveCount / total * 100) + '%';
             } else {
                 bars.forEach(b => b.style.width = '50%');
             }
         }
 
-        /* ─────────────────────────────────────────
-           BACKUP REMINDER
-        ───────────────────────────────────────── */
         function checkBackupReminder() {
             const savedAt = parseInt(localStorage.getItem('chimptopus_v19_lastBackupAt')) || 0;
             const diff = globalCounter - savedAt;
@@ -582,6 +590,40 @@
             } else if (savedAt === 0) {
                 localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
             }
+        }
+
+        /* ─────────────────────────────────────────
+           STOPWATCH
+        ───────────────────────────────────────── */
+        function toggleStopwatch() {
+            const btn = document.getElementById('swToggleBtn');
+            const icon = document.getElementById('swToggleIcon');
+            
+            if (swRunning) {
+                clearInterval(swInterval);
+                swRunning = false;
+                icon.innerText = 'play_arrow';
+                btn.classList.remove('sw-running');
+            } else {
+                swInterval = setInterval(() => {
+                    swSeconds++;
+                    document.getElementById('swDisplay').innerText = formatTime(swSeconds);
+                }, 1000);
+                swRunning = true;
+                icon.innerText = 'pause';
+                btn.classList.add('sw-running');
+            }
+        }
+
+        function formatTime(sec) {
+            if(!sec) return "00:00";
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function pauseStopwatchSafe() {
+            if (swRunning) toggleStopwatch();
         }
 
         /* ─────────────────────────────────────────
@@ -622,11 +664,13 @@
             if (e) e.stopPropagation();
             const n = notes.find(x => x.id === id);
             if (!n) return;
+            closeUniversalModal();
 
             editingNoteId = null;
             switchPage('taslak', true);
 
             document.getElementById('noteInput').value = '';
+            swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
             updateWordProgress();
 
             showToast('📋 Şablon yüklendi — metni yazabilirsiniz');
@@ -653,8 +697,6 @@
                 metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
                 localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
             }
-            wordGoalMemory[currentPage] = parseInt(document.getElementById('wordGoal').value) || 100;
-            localStorage.setItem('chimptopus_v19_wordgoal', JSON.stringify(wordGoalMemory));
         }
 
         function switchPage(page, saveCurrent = true) {
@@ -662,6 +704,7 @@
                 saveDraftMemory();
             }
 
+            pauseStopwatchSafe();
             if (page !== 'taslak') resizeNoteBlock(1);
 
             currentPage = page;
@@ -676,17 +719,15 @@
                 document.getElementById('pageArchive').classList.add('active');
                 renderArchivePage();
             } else {
+                // Editor Pages
                 document.getElementById('pageEditor').classList.add('active');
-
-                const workspace = document.getElementById('editorWorkspace');
-                workspace.style.display = 'flex';
-
+                document.getElementById('editorWorkspace').style.display = 'flex';
                 document.getElementById('metaBlocksContainer').style.display = (page === 'revize') ? 'flex' : 'none';
                 document.getElementById('refContainer').style.display = (page === 'revize') ? 'flex' : 'none';
-                document.getElementById('sizeControls').style.display = (page === 'taslak' || page === 'revize') ? 'flex' : 'none';
+                document.getElementById('sizeControls').style.display = 'flex';
 
                 const label = editingNoteId
-                    ? `Düzenle: #${notes.find(n => n.id === editingNoteId).num}`
+                    ? `Düzenle: #${notes.find(n => n.id === editingNoteId)?.num || ''}`
                     : 'Yeni ' + page.charAt(0).toUpperCase() + page.slice(1);
 
                 document.getElementById('boxLabel').innerText = label;
@@ -695,7 +736,7 @@
                 if (!editingNoteId) {
                     document.getElementById('noteInput').value = draftsMemory[page] || '';
                     document.getElementById('refInput').value  = refsMemory[page]   || '';
-                    document.getElementById('wordGoal').value  = wordGoalMemory[page] || 100;
+                    swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
 
                     if (page === 'revize') {
                         document.getElementById('metaTitle').value = metaMemory.title || '';
@@ -706,14 +747,15 @@
                     }
                     searchReference();
                 }
+                
                 renderEditorButtons(page);
                 updateWordProgress();
+                renderRecentRecords(page);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function editNote(id, e) {
-            if (e) e.stopPropagation();
+        function editNote(id) {
             const noteToEdit = notes.find(n => n.id === id);
             if (!noteToEdit) return;
 
@@ -721,6 +763,8 @@
             switchPage(noteToEdit.type, true);
 
             document.getElementById('noteInput').value = noteToEdit.text;
+            swSeconds = noteToEdit.spentSeconds || 0;
+            document.getElementById('swDisplay').innerText = formatTime(swSeconds);
 
             if (noteToEdit.type === 'revize') {
                 document.getElementById('metaTitle').value = noteToEdit.title || '';
@@ -734,6 +778,49 @@
             updateWordProgress();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        /* ─────────────────────────────────────────
+           RECENT RECORDS LIST
+        ───────────────────────────────────────── */
+        function renderRecentRecords(page) {
+            const container = document.getElementById('recentRecordsList');
+            container.innerHTML = '';
+            
+            // List logic: Taslak => son taslaklar. Revize => son arşivlenenler.
+            let list = [];
+            let isTaslak = (page === 'taslak');
+            
+            if (isTaslak) {
+                list = notes.filter(n => n.type === 'taslak').slice(0, 5);
+            } else {
+                list = archive.slice(0, 5);
+            }
+
+            if (list.length === 0) {
+                container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">Henüz kayıt yok.</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const color = isTaslak ? 'var(--color-taslak)' : 'var(--color-archive)';
+                const title = item.title ? `<div style="font-weight:600; font-size:12px; color:var(--text-main); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>` : '';
+                
+                const timeSnippet = item.spentSeconds ? `<span style="font-size:10px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:2px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+
+                const html = `
+                    <div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="${isTaslak ? `openRecordModal(${item.id})` : `openArchiveModal(${item.id})`}">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">#${item.num}</div>
+                            ${timeSnippet}
+                        </div>
+                        ${title}
+                        <div style="font-size:11px; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${item.text}</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
 
         function resizeNoteBlock(mul) {
             document.getElementById('noteInput').style.height = (160 * mul) + 'px';
@@ -767,23 +854,20 @@
             const wrapper = document.getElementById('metaInputsWrapper');
             const icon = document.getElementById('toggleMetaIcon');
             if (isMetaVisible) {
-                wrapper.style.display = 'flex';
-                icon.innerText = 'visibility_off';
+                wrapper.style.display = 'flex'; icon.innerText = 'visibility_off';
             } else {
-                wrapper.style.display = 'none';
-                icon.innerText = 'visibility';
+                wrapper.style.display = 'none'; icon.innerText = 'visibility';
             }
         }
 
         function clearCurrentNote() {
-            if (confirm("Tüm içeriği (başlık, sorular ve metin) silmek istediğine emin misin?")) {
+            if (confirm("Tüm içeriği silmek istediğine emin misin?")) {
                 document.getElementById('noteInput').value = '';
                 document.getElementById('metaTitle').value = '';
                 document.getElementById('questionsContainer').innerHTML = '';
                 addQuestionInput(); 
                 document.getElementById('refInput').value = '';
-                searchReference();
-                updateWordProgress();
+                searchReference(); updateWordProgress();
                 showToast('🧹 İçerik tamamen temizlendi');
             }
         }
@@ -800,12 +884,8 @@
                     html = `<button class="btn-primary" style="background:var(--color-taslak)" onclick="handleAction('save')">Taslağı Kaydet</button>`;
                 }
             } else if (page === 'revize') {
-                if (editingNoteId) {
-                    html = `<button class="btn-secondary" onclick="handleAction('update')">Güncelle</button>
-                            <button class="btn-primary" style="background:var(--color-archive)" onclick="handleAction('archive')">Arşive Kaldır</button>`;
-                } else {
-                    html = `<button class="btn-primary" style="background:var(--color-revize)" onclick="handleAction('save')">Revizeyi Kaydet</button>`;
-                }
+                // In Revize, whether there's an ID or not, main goal is saving to Archive
+                html = `<button class="btn-primary" style="background:var(--color-archive)" onclick="handleAction('archive')">Arşive Kaldır</button>`;
             }
             container.innerHTML = html;
         }
@@ -823,7 +903,7 @@
         }
 
         /* ─────────────────────────────────────────
-           SEARCH & REFERENCE (UPDATED FOR INDIVIDUAL BLOCKS)
+           SEARCH & REFERENCE 
         ───────────────────────────────────────── */
         function searchReference() {
             let val = document.getElementById('refInput').value.trim();
@@ -841,7 +921,6 @@
                 const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
                 if (found) {
                     foundAny = true;
-                    // Arşivde ise rengi farklı alalım
                     const color = found.type ? getAutoColorHex(found.type) : 'var(--color-archive)'; 
                     
                     html += `
@@ -858,9 +937,7 @@
 
             if (foundAny) {
                 container.innerHTML = html;
-            } else { 
-                container.innerHTML = ''; 
-            }
+            } else { container.innerHTML = ''; }
         }
 
         function handleInput() {
@@ -880,32 +957,30 @@
             }
         }
 
+        /* ── LEVEL SYSTEM ── */
         function updateWordProgress() {
             const val = document.getElementById('noteInput').value.trim();
             const words = val.length === 0 ? 0 : val.split(/\s+/).length;
-            const goal  = parseInt(document.getElementById('wordGoal').value) || 100;
+            
+            const level = Math.floor(words / 50) + 1;
+            const remainder = words % 50;
 
-            document.getElementById('wordCount').innerText = words;
-            document.getElementById('wordProgress').style.width = Math.min((words / goal) * 100, 100) + '%';
+            document.getElementById('wordLevel').innerText = `Seviye ${level}`;
+            document.getElementById('wordCountUI').innerText = `${remainder} / 50`;
+            document.getElementById('wordProgress').style.width = (remainder / 50 * 100) + '%';
         }
 
-        /* ─────────────────────────────────────────
-           FORMAT (Mentions + Tags + Highlights)
-        ───────────────────────────────────────── */
         function formatMentionsAndHighlights(text, query = '') {
             let formatted = text
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
             formatted = formatted.replace(
                 /@(\d{2,})/g,
                 '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>'
             );
-
             formatted = formatted.replace(
                 /#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g,
                 '<span class="tag-link">#$1</span>'
             );
-
             if (query) {
                 const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
                 formatted = formatted.replace(regex, '<span class="highlight">$1</span>');
@@ -915,7 +990,7 @@
 
         function loadMention(num, event) {
             if (event) event.stopPropagation();
-            closeArchiveModal();
+            closeUniversalModal();
             document.getElementById('refInput').value = num;
             searchReference();
         }
@@ -924,6 +999,7 @@
            ACTIONS (Save / Update / Transfer / Archive)
         ───────────────────────────────────────── */
         function handleAction(actionType) {
+            pauseStopwatchSafe();
             const text = document.getElementById('noteInput').value;
             if (!text.trim()) { alert('Lütfen metin giriniz.'); return; }
 
@@ -941,7 +1017,8 @@
                 notes.unshift({
                     id: Date.now(), num: formattedNum, text, type: currentPage,
                     title, questions, refs: combinedRefs, tags,
-                    time: new Date().toLocaleDateString('tr-TR', { day:'numeric', month:'short' })
+                    time: new Date().toLocaleDateString('tr-TR', { day:'numeric', month:'short' }),
+                    spentSeconds: swSeconds
                 });
                 globalCounter++;
                 localStorage.setItem('chimptopus_v18_counter', globalCounter);
@@ -951,20 +1028,20 @@
             else if (actionType === 'update') {
                 const n = notes.find(x => x.id === editingNoteId);
                 if (n) {
-                    n.text = text; n.refs = combinedRefs; n.tags = tags;
+                    n.text = text; n.refs = combinedRefs; n.tags = tags; n.spentSeconds = swSeconds;
                     if (currentPage === 'revize') { n.title = title; n.questions = questions; }
                 }
                 showStatus('Güncellendi');
             }
             else if (actionType === 'transfer_revize') {
+                // Sadece revize sayfasına geçiriyoruz, tipi henüz taslak olarak kalıyor ta ki arşivlenene kadar.
+                // Ya da editörü doldurup geçiyoruz. 
                 const n = notes.find(x => x.id === editingNoteId);
-                if (n) { n.text = text; n.type = 'revize'; n.tags = tags; }
+                if (n) { n.text = text; n.spentSeconds = swSeconds; }
                 showStatus('Revizeye Aktarıldı');
-                editingNoteId = n.id;
                 switchPage('revize'); saveToLocal(); return;
             }
             else if (actionType === 'archive') {
-                // Eğer mevcut nota Arşiv de diyorsak (Revize'den) güncelleyip öyle atalım
                 let archiveNote = notes.find(x => x.id === editingNoteId);
                 let noteId = Date.now();
                 let noteNum = String(globalCounter).padStart(2, '0');
@@ -972,17 +1049,16 @@
                 if(archiveNote) {
                     noteId = archiveNote.id;
                     noteNum = archiveNote.num;
-                    // Aktif notlardan çıkar
-                    notes = notes.filter(n => n.id !== editingNoteId);
+                    notes = notes.filter(n => n.id !== editingNoteId); // Remove from taslak list
                 } else {
-                    // Hiç kaydedilmemiş bir şeyi direkt arşive atıyorsa
                     globalCounter++;
                     localStorage.setItem('chimptopus_v18_counter', globalCounter);
                 }
 
                 archive.unshift({
                     id: noteId, num: noteNum, text: text, title: title, refs: combinedRefs, tags: tags,
-                    date: new Date().toLocaleDateString('tr-TR')
+                    date: new Date().toLocaleDateString('tr-TR'),
+                    spentSeconds: swSeconds
                 });
 
                 localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
@@ -993,14 +1069,12 @@
             saveToLocal();
 
             // Bellek temizleme
-            draftsMemory[currentPage] = '';
-            refsMemory[currentPage]   = '';
+            draftsMemory[currentPage] = ''; refsMemory[currentPage]   = '';
             if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
             localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
             localStorage.setItem('chimptopus_v18_meta',   JSON.stringify(metaMemory));
 
-            // DOM Temizleme
             document.getElementById('noteInput').value = '';
             document.getElementById('refInput').value = '';
             document.getElementById('metaTitle').value = '';
@@ -1014,78 +1088,48 @@
         }
 
         /* ─────────────────────────────────────────
-           CARD HTML FACTORY
+           RENDER RECORDS & ARCHIVE
         ───────────────────────────────────────── */
         function createCardHTML(n, isList = false) {
-            const borderColor = getAutoColorHex(n.type);
-
-            let refPills = '';
-            if (isList && n.refs && n.refs.length > 0) {
-                refPills = `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">` +
-                    n.refs.map(r => `<span class="ref-pill" onclick="loadMention('${r}', event)">
-                        <span class="material-symbols-rounded" style="font-size:12px;">link</span>#${r}
-                    </span>`).join('') +
-                `</div>`;
-            }
+            const borderColor = n.type ? getAutoColorHex(n.type) : 'var(--color-archive)';
 
             let tagPills = '';
             const tags = n.tags || extractTags(n.text);
             if (isList && tags.length > 0) {
                 tagPills = `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">` +
-                    tags.map(t => `<span class="inline-tag-pill">${t}</span>`).join('') +
-                `</div>`;
+                    tags.map(t => `<span class="inline-tag-pill">${t}</span>`).join('') + `</div>`;
             }
+
+            const timeLabel = n.time || n.date || '';
+            const timerHtml = n.spentSeconds ? `<span style="font-weight:600; display:flex; align-items:center; gap:2px; margin-left:8px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(n.spentSeconds)}</span>` : '';
 
             if (isList) {
                 return `
-                    <div class="card note-card" style="border-left: 4px solid ${borderColor}; padding-left: 14px;" onclick="editNote(${n.id}, event)">
+                    <div class="card note-card" style="border-left: 4px solid ${borderColor}; padding-left: 14px;" onclick="openRecordModal(${n.id})">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span>
-                            <span style="font-size:10px; font-weight:700; color:${borderColor}; text-transform:uppercase; background:rgba(0,0,0,0.03); padding:3px 8px; border-radius:6px;">${n.type}</span>
                         </div>
                         ${n.title ? `<div class="card-title">${n.title}</div>` : ''}
                         <p class="${n.title ? 'card-body' : 'card-body-full'}">${formatMentionsAndHighlights(n.text)}</p>
                         ${tagPills}
-                        ${refPills}
                         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;">
-                            <span style="font-size:12px; color:var(--text-muted)">${n.time}</span>
-                            <div style="display:flex; gap:6px; align-items:center;">
-                                <span class="material-symbols-rounded action-icon" style="font-size:18px;" onclick="useAsTemplate(${n.id}, event)" title="Şablon Olarak Kullan">content_copy</span>
-                                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color); font-size:18px;" onclick="deleteNote(${n.id}, event)">delete</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="card note-card" style="min-height:110px; padding:12px; border-left:4px solid ${borderColor}; padding-left:11px;" onclick="editNote(${n.id}, event)">
-                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                            <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span>
-                            <div style="width:8px; height:8px; border-radius:50%; background:${borderColor}"></div>
-                        </div>
-                        <div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
-                            ${n.title ? `<b style="color:var(--text-main)">${n.title}</b><br>` : ''}${n.text}
+                            <span style="font-size:12px; color:var(--text-muted); display:flex; align-items:center;">${timeLabel} ${timerHtml}</span>
                         </div>
                     </div>
                 `;
             }
         }
 
-        /* ─────────────────────────────────────────
-           RENDER RECORDS
-        ───────────────────────────────────────── */
         function renderRecords() {
             const board = document.getElementById('recordsBoard');
             board.innerHTML = '';
             const query = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
-            let filtered = notes;
+            // SADECE TASLAK NOTLAR
+            let filtered = notes.filter(n => n.type === 'taslak');
+            
             if (query) {
-                filtered = filtered.filter(n =>
-                    n.text.toLowerCase().includes(query) ||
-                    n.num.includes(query) ||
-                    (n.title && n.title.toLowerCase().includes(query))
-                );
+                filtered = filtered.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query) || (n.title && n.title.toLowerCase().includes(query)));
             }
             if (currentTagFilter) {
                 filtered = filtered.filter(n => (n.tags || extractTags(n.text)).includes(currentTagFilter));
@@ -1099,8 +1143,8 @@
                         <div class="empty-state-icon-wrap" style="background:var(--surface-alt);">
                             <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span>
                         </div>
-                        <h3>Kayıt Bulunamadı</h3>
-                        <p>${currentTagFilter ? `"${currentTagFilter}" etiketinde not yok.` : 'Arama ile eşleşen kayıt yok.'}</p>
+                        <h3>Taslak Bulunamadı</h3>
+                        <p>${currentTagFilter ? `"${currentTagFilter}" etiketinde not yok.` : 'Arama ile eşleşen veya kaydedilmiş taslak yok.'}</p>
                     </div>`;
                 return;
             }
@@ -1110,15 +1154,12 @@
 
             filtered.forEach(n => {
                 const wrap = document.createElement('div');
-                wrap.innerHTML = createCardHTML(n, false);
+                wrap.innerHTML = createCardHTML(n, true);
                 container.appendChild(wrap.firstElementChild);
             });
             board.appendChild(container);
         }
 
-        /* ─────────────────────────────────────────
-           RENDER ARCHIVE
-        ───────────────────────────────────────── */
         function renderArchivePage() {
             const board = document.getElementById('archiveBoard');
             board.innerHTML = '';
@@ -1138,6 +1179,7 @@
             container.className = 'archive-grid';
 
             archive.forEach(a => {
+                const timerHtml = a.spentSeconds ? `<span style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:4px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(a.spentSeconds)}</span>` : '';
                 const card = document.createElement('div');
                 card.className = 'card note-card';
                 card.style.cssText = 'min-height:110px; padding:12px; border-left:4px solid var(--color-archive); padding-left:11px;';
@@ -1149,6 +1191,7 @@
                     <div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
                         ${a.title ? `<b style="color:var(--text-main)">${a.title}</b><br>` : ''}${a.text}
                     </div>
+                    ${timerHtml}
                 `;
                 card.onclick = () => openArchiveModal(a.id);
                 container.appendChild(card);
@@ -1157,34 +1200,60 @@
         }
 
         /* ─────────────────────────────────────────
-           ARCHIVE MODAL
+           UNIVERSAL MODALS (RECORDS & ARCHIVE)
         ───────────────────────────────────────── */
-        function openArchiveModal(id) {
-            const item = archive.find(a => a.id === id);
+        function openRecordModal(id) {
+            const item = notes.find(a => a.id === id);
             if (!item) return;
 
-            document.getElementById('modalTitle').innerText = 'Arşivlenmiş Blok #' + item.num;
+            const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+            
+            document.getElementById('modalTitle').innerText = 'Taslak #' + item.num;
+            document.getElementById('modalDate').innerHTML  = item.time + timeHtml;
             document.getElementById('modalBody').innerHTML  = formatMentionsAndHighlights(item.text);
-            document.getElementById('modalDate').innerText  = item.date;
 
             const footer = document.getElementById('modalFooter');
-            const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
             footer.innerHTML = `
-                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeArchiveModal();" title="Kalıcı Sil">delete</span>
-                <div style="display:flex; gap:15px;">
-                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeArchiveModal();" title="Revizeye Geri Gönder">restore_page</span>
-                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Kopyalandı')); closeArchiveModal();" title="Kopyala">content_copy</span>
+                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();" title="Sil">delete</span>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)" title="Şablon Olarak Kullan">content_copy</span>
+                    <button class="btn-primary" style="padding:6px 16px; border-radius:20px;" onclick="editNote(${item.id}); closeUniversalModal();">Düzenle</button>
                 </div>
             `;
 
-            const modal = document.getElementById('archiveModal');
+            const modal = document.getElementById('universalModal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
-        function closeArchiveModal(e) {
+        function openArchiveModal(id) {
+            const item = archive.find(a => a.id === id);
+            if (!item) return;
+
+            const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+
+            document.getElementById('modalTitle').innerText = 'Arşivlenmiş Blok #' + item.num;
+            document.getElementById('modalDate').innerHTML  = item.date + timeHtml;
+            document.getElementById('modalBody').innerHTML  = formatMentionsAndHighlights(item.text);
+
+            const footer = document.getElementById('modalFooter');
+            const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            footer.innerHTML = `
+                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Kalıcı Sil">delete</span>
+                <div style="display:flex; gap:15px;">
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Revizeye Geri Gönder">restore_page</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Kopyalandı')); closeUniversalModal();" title="Kopyala">content_copy</span>
+                </div>
+            `;
+
+            const modal = document.getElementById('universalModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeUniversalModal(e) {
             if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return;
-            const modal = document.getElementById('archiveModal');
+            const modal = document.getElementById('universalModal');
             modal.classList.remove('active');
             setTimeout(() => modal.style.display = 'none', 300);
         }
@@ -1192,8 +1261,7 @@
         /* ─────────────────────────────────────────
            DELETE / RESTORE
         ───────────────────────────────────────── */
-        function deleteNote(id, e) {
-            e.stopPropagation();
+        function deleteNote(id) {
             if (confirm('Silmek istediğine emin misin?')) {
                 notes = notes.filter(n => n.id !== id);
                 saveToLocal(); renderRecords();
@@ -1213,43 +1281,21 @@
             if (index > -1) {
                 const item = archive[index];
                 archive.splice(index, 1);
+                // Geri yüklenen not taslak listesine katılır, böylece düzeneleme döngüsüne girer.
                 notes.unshift({
-                    id: item.id, num: item.num, text: item.text, type: 'revize',
+                    id: item.id, num: item.num, text: item.text, type: 'taslak',
                     title: item.title, refs: item.refs, tags: item.tags,
-                    time: new Date().toLocaleDateString('tr-TR', { day:'numeric', month:'short' })
+                    time: new Date().toLocaleDateString('tr-TR', { day:'numeric', month:'short' }),
+                    spentSeconds: item.spentSeconds || 0
                 });
                 localStorage.setItem('chimptopus_v18_notes',   JSON.stringify(notes));
                 localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 renderArchivePage();
                 showToast('♻️ Revizeye geri yüklendi');
+                // Otomatik olarak o notu revize modunda aç
+                editNote(item.id);
+                switchPage('revize');
             }
-        }
-
-        /* ─────────────────────────────────────────
-           TIMER
-        ───────────────────────────────────────── */
-        function startCountdown(mins) {
-            clearInterval(timer);
-            let sec = mins * 60;
-            const display = document.getElementById('timerDisplay');
-            const noteBox = document.getElementById('editorWorkspace');
-            display.innerText = `${mins}:00`;
-            noteBox.classList.add('timer-running');
-            timerRunning = true;
-
-            timer = setInterval(() => {
-                sec--;
-                const m = Math.floor(sec / 60);
-                const s = sec % 60;
-                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-                if (sec <= 0) {
-                    clearInterval(timer);
-                    timerRunning = false;
-                    noteBox.classList.remove('timer-running');
-                    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                    showToast('⏱ Odak süresi bitti!');
-                }
-            }, 1000);
         }
 
         /* ─────────────────────────────────────────
@@ -1270,8 +1316,7 @@
             a.setAttribute('download', 'chimptopus_v19_yedek.json');
             document.body.appendChild(a); a.click(); a.remove();
             localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
-            closePanels();
-            showToast('✅ Yedek indirildi');
+            closePanels(); showToast('✅ Yedek indirildi');
         }
 
         function importData(event) {
@@ -1287,9 +1332,7 @@
                         saveToLocal();
                         localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                         localStorage.setItem('chimptopus_v18_counter', globalCounter);
-                        navSwitchPage('records');
-                        closePanels();
-                        showToast('✅ Yedek yüklendi');
+                        navSwitchPage('records'); closePanels(); showToast('✅ Yedek yüklendi');
                     } else { alert('Geçersiz format.'); }
                 } catch (err) { alert('Okuma hatası.'); }
             };
@@ -1297,28 +1340,21 @@
         }
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
-
         function togglePanel(id) {
             document.getElementById(id).classList.add('active');
             document.getElementById('overlay').classList.add('active');
             if (id === 'sideMenu') renderStats();
         }
-
         function closePanels() {
             document.getElementById('sideMenu').classList.remove('active');
             document.getElementById('overlay').classList.remove('active');
         }
-
         function showStatus(m) {
-            const s = document.getElementById('statusMsg');
-            s.innerText = m;
+            const s = document.getElementById('statusMsg'); s.innerText = m;
             setTimeout(() => s.innerText = '', 2000);
         }
-
         function clearAll() {
-            if (confirm('Tüm sistemi sıfırlamak istediğine emin misin?')) {
-                localStorage.clear(); location.reload();
-            }
+            if (confirm('Tüm sistemi sıfırlamak istediğine emin misin?')) { localStorage.clear(); location.reload(); }
         }
 
         /* ─────────────────────────────────────────
