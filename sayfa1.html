@@ -2,8 +2,15 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus Pro - V19.6</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#191919">
+    <title>Chimptopus Pro</title>
+    
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQ2hpbXB0b3B1cyBQcm8iLCJzaG9ydF9uYW1lIjoiTm90ZXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzE5MTkxOSIsInRoZW1lX2NvbG9yIjoiIzE5MTkxOSJ9" />
+    
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
@@ -17,7 +24,7 @@
             --danger-color: #eb5757;
             --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
 
-            --color-taslak: #d48166;
+            --color-taslak: #8e8e93; /* Yeni Gri Taslak Rengi */
             --color-revize: #2383e2;
             --color-archive: #30d158; 
         }
@@ -41,16 +48,18 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             transition: background 0.3s ease, color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
+            /* Top nav için boşluk bırakıyoruz */
+            padding-top: calc(75px + env(safe-area-inset-top)); 
         }
 
         * { box-sizing: border-box; }
 
         .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); }
-        header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        header { padding: 0 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
 
         /* ── PAGE TRANSITIONS ── */
-        .page-container { padding: 0 20px 130px; display: none; animation: pageIn 0.3s ease; }
+        .page-container { padding: 0 20px 40px; display: none; animation: pageIn 0.3s ease; }
         .page-container.active { display: block; }
 
         @keyframes pageIn {
@@ -58,39 +67,47 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── BOTTOM NAV ── */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(255,255,255,0.88);
+        /* ── TIMER PULSE ── */
+        @keyframes timerPulse {
+            0%   { box-shadow: 0 0 0 0 rgba(35,131,226,0.35); }
+            70%  { box-shadow: 0 0 0 8px rgba(35,131,226,0); }
+            100% { box-shadow: 0 0 0 0 rgba(35,131,226,0); }
+        }
+        .timer-running { animation: timerPulse 1.5s infinite; border-color: var(--primary-blue) !important; }
+
+        /* ── TOP NAV (Minimalist) ── */
+        .top-nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(25,25,25,0.85);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around;
-            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: calc(8px + env(safe-area-inset-top)) 0 8px;
             z-index: 1000;
         }
-        .dark-mode .bottom-nav { background: rgba(25,25,25,0.88); }
+        body:not(.dark-mode) .top-nav { background: rgba(255,255,255,0.88); }
 
         .nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
             color: var(--text-muted); cursor: pointer; flex: 1; text-align: center;
             position: relative; padding-bottom: 4px;
         }
-        .nav-item .icon { font-size: 24px; transition: transform 0.2s ease; }
-        .nav-item .label { font-size: 10px; font-weight: 500; }
+        .nav-item .icon { font-size: 20px; transition: transform 0.2s ease; }
+        .nav-item .label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .nav-item::after {
             content: '';
             position: absolute;
-            bottom: -2px;
+            bottom: -4px;
             left: 50%; transform: translateX(-50%);
-            width: 0; height: 3px;
+            width: 0; height: 2px;
             background: var(--text-main);
             border-radius: 2px;
             transition: width 0.25s ease;
         }
         .nav-item.active { color: var(--text-main); }
         .nav-item.active .icon { transform: scale(1.1); }
-        .nav-item.active::after { width: 20px; }
+        .nav-item.active::after { width: 16px; }
 
         /* ── NOTES & EDITOR ── */
         .note-box {
@@ -277,7 +294,7 @@
 
         /* ── TOAST ── */
         .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
             background: var(--text-main); color: var(--bg-color);
             padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
             z-index: 9999; opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
@@ -293,7 +310,26 @@
 
     </style>
 </head>
-<body>
+<body class="dark-mode">
+
+    <nav class="top-nav">
+        <div class="nav-item active" id="nav-records" onclick="navSwitchPage('records')">
+            <span class="material-symbols-rounded icon">grid_view</span>
+            <span class="label">Kayıtlar</span>
+        </div>
+        <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
+            <span class="material-symbols-rounded icon">edit_document</span>
+            <span class="label">Taslak</span>
+        </div>
+        <div class="nav-item" id="nav-revize" onclick="navSwitchPage('revize')">
+            <span class="material-symbols-rounded icon">find_replace</span>
+            <span class="label">Revize</span>
+        </div>
+        <div class="nav-item" id="nav-archive" onclick="navSwitchPage('archive')">
+            <span class="material-symbols-rounded icon">inventory_2</span>
+            <span class="label">Arşiv</span>
+        </div>
+    </nav>
 
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
 
@@ -319,7 +355,7 @@
     <header>
         <div class="logo" id="mainLogo">📝 Notes</div>
         <div style="display:flex; gap:5px;">
-            <button class="icon-btn" onclick="toggleDarkMode()"><span class="material-symbols-rounded">dark_mode</span></button>
+            <button class="icon-btn" onclick="toggleDarkMode()"><span class="material-symbols-rounded" id="themeIcon">light_mode</span></button>
             <button class="icon-btn" onclick="togglePanel('sideMenu')"><span class="material-symbols-rounded">more_horiz</span></button>
         </div>
     </header>
@@ -400,6 +436,8 @@
                         <span id="boxLabel" style="font-size:16px; font-weight:700; color:var(--text-main)">Taslak</span>
                     </div>
                     <div style="display:flex; gap:10px; align-items:center;">
+                        <span class="material-symbols-rounded action-icon" onclick="clearCurrentNote()" title="Tümünü Sil" style="font-size:22px; color:var(--danger-color); margin-right:4px;">delete_sweep</span>
+
                         <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-right:1px solid var(--border-color); padding-right:10px;">
                             <button class="timer-btn" onclick="resizeNoteBlock(1)">1x</button>
                             <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
@@ -448,7 +486,6 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
                     <div style="display:flex; gap:10px; align-items:center;">
                         <span id="statusMsg" style="color:var(--text-muted); font-size:12px;"></span>
-                        <span class="material-symbols-rounded action-icon" onclick="clearCurrentNote()" title="Tümünü Sil" style="font-size:18px; color:var(--danger-color);">delete_sweep</span>
                         <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Geri Al" style="font-size:18px;">undo</span>
                         <span class="material-symbols-rounded action-icon" onclick="insertTimestamp()" title="Zaman Ekle" style="font-size:18px;">schedule</span>
                     </div>
@@ -471,26 +508,23 @@
         <div id="archiveBoard"></div>
     </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" id="nav-records" onclick="navSwitchPage('records')">
-            <span class="material-symbols-rounded icon">grid_view</span>
-            <span class="label">Kayıtlar</span>
-        </div>
-        <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
-            <span class="material-symbols-rounded icon">edit_document</span>
-            <span class="label">Taslak</span>
-        </div>
-        <div class="nav-item" id="nav-revize" onclick="navSwitchPage('revize')">
-            <span class="material-symbols-rounded icon">find_replace</span>
-            <span class="label">Revize</span>
-        </div>
-        <div class="nav-item" id="nav-archive" onclick="navSwitchPage('archive')">
-            <span class="material-symbols-rounded icon">inventory_2</span>
-            <span class="label">Arşiv</span>
-        </div>
-    </nav>
-
     <script>
+        /* ─────────────────────────────────────────
+           THEME INITIALIZATION
+        ───────────────────────────────────────── */
+        if (localStorage.getItem('chimptopus_theme') === 'light') {
+            document.body.classList.remove('dark-mode');
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('chimptopus_theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').innerText = isDark ? 'light_mode' : 'dark_mode';
+        }
+        window.onload = () => {
+            document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode';
+        };
+
         /* ─────────────────────────────────────────
            STATE
         ───────────────────────────────────────── */
@@ -498,8 +532,6 @@
         let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
         let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
 
-        // Cleanup: Migrate any remaining "final" or "revize" notes in "notes" to archive/proper place 
-        // to enforce that notes array ONLY holds 'taslak'
         const nonTaslak = notes.filter(n => n.type !== 'taslak');
         if (nonTaslak.length > 0) {
             nonTaslak.forEach(n => {
@@ -558,7 +590,7 @@
            STATS & BACKUP
         ───────────────────────────────────────── */
         function renderStats() {
-            const taslakCount  = notes.length; // Only taslak exists in notes now
+            const taslakCount  = notes.length; 
             const archiveCount = archive.length;
             const totalWords   = notes.reduce((sum, n) => sum + (n.text.trim() ? n.text.trim().split(/\s+/).length : 0), 0);
             const allTags      = getAllTags();
@@ -719,7 +751,6 @@
                 document.getElementById('pageArchive').classList.add('active');
                 renderArchivePage();
             } else {
-                // Editor Pages
                 document.getElementById('pageEditor').classList.add('active');
                 document.getElementById('editorWorkspace').style.display = 'flex';
                 document.getElementById('metaBlocksContainer').style.display = (page === 'revize') ? 'flex' : 'none';
@@ -820,7 +851,6 @@
             });
         }
 
-
         function resizeNoteBlock(mul) {
             document.getElementById('noteInput').style.height = (160 * mul) + 'px';
         }
@@ -895,7 +925,7 @@
         }
 
         function getAutoColorHex(type) {
-            if (type === 'taslak') return '#d48166';
+            if (type === 'taslak') return '#8e8e93';
             if (type === 'revize') return '#2383e2';
             return '#9b9a97';
         }
@@ -1086,7 +1116,6 @@
         /* ─────────────────────────────────────────
            RENDER RECORDS & ARCHIVE
         ───────────────────────────────────────── */
-        // DÜZELTİLDİ: Artık Kayıtlar bölümünde list(büyük) yerine false(küçük grid) kart çağrılıyor.
         function createCardHTML(n, isList = false) {
             const borderColor = n.type ? getAutoColorHex(n.type) : 'var(--color-archive)';
 
@@ -1115,7 +1144,6 @@
                     </div>
                 `;
             } else {
-                // UFAK KART GÖRÜNÜMÜ (KAYITLAR İÇİN)
                 const timerHtml = n.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(n.spentSeconds)}</div>` : '';
                 return `
                     <div class="card note-card" style="min-height:110px; padding:12px; border-left:4px solid ${borderColor}; padding-left:11px;" onclick="openRecordModal(${n.id})">
@@ -1137,7 +1165,6 @@
             board.innerHTML = '';
             const query = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
-            // SADECE TASLAK NOTLAR
             let filtered = notes.filter(n => n.type === 'taslak');
             
             if (query) {
@@ -1166,7 +1193,6 @@
 
             filtered.forEach(n => {
                 const wrap = document.createElement('div');
-                // FALSE göndererek UFAK KART oluşturmasını sağlıyoruz.
                 wrap.innerHTML = createCardHTML(n, false);
                 container.appendChild(wrap.firstElementChild);
             });
@@ -1294,7 +1320,6 @@
             if (index > -1) {
                 const item = archive[index];
                 archive.splice(index, 1);
-                // Geri yüklenen not taslak listesine katılır, böylece düzeneleme döngüsüne girer.
                 notes.unshift({
                     id: item.id, num: item.num, text: item.text, type: 'taslak',
                     title: item.title, refs: item.refs, tags: item.tags,
@@ -1351,7 +1376,6 @@
             reader.readAsText(file);
         }
 
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
         function togglePanel(id) {
             document.getElementById(id).classList.add('active');
             document.getElementById('overlay').classList.add('active');
