@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus Pro - V11 iOS</title>
+    <title>Chimptopus Pro - V12 iOS</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
@@ -19,9 +19,9 @@
             --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             
             /* Otomatik Renk Kodları */
-            --color-taslak: #d48166; /* Kiremit */
-            --color-revize: #2383e2; /* Mavi */
-            --color-final: #30d158;  /* Yeşil */
+            --color-taslak: #d48166; 
+            --color-revize: #2383e2; 
+            --color-final: #30d158;  
         }
 
         .dark-mode {
@@ -112,9 +112,42 @@
         .mention-link { color: var(--primary-blue); cursor: pointer; font-weight: 500; text-decoration: none; background: rgba(35, 131, 226, 0.1); padding: 2px 6px; border-radius: 4px; }
         .highlight { background-color: rgba(35, 131, 226, 0.2); border-radius: 3px; padding: 0 2px;}
 
-        /* Bağlantı Etiketleri (Pills) */
         .ref-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--surface-alt); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; color: var(--primary-blue); font-weight: 500; margin-top: 8px; cursor: pointer; transition: 0.2s;}
         .ref-pill:hover { background: var(--border-color); }
+
+        /* YENİ: Ufak Kutu Arşiv Grid Tasarımı */
+        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+        .archive-card { 
+            height: 110px; 
+            padding: 12px; 
+            display: flex; flex-direction: column; 
+            justify-content: flex-start;
+            cursor: pointer; transition: 0.2s;
+            background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow);
+        }
+        .archive-card:active { transform: scale(0.95); background: var(--surface-alt); }
+        .archive-card .text-snippet { 
+            font-size: 12px; line-height: 1.4; color: var(--text-muted); 
+            margin-top: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+        }
+
+        /* YENİ: iOS Tarzı Büyütme Modalı */
+        .ios-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            z-index: 3000; display: none; opacity: 0; transition: opacity 0.3s;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .ios-modal.active { display: flex; opacity: 1; }
+        .ios-modal-content {
+            background: var(--surface-color); border-radius: 16px; width: 100%; max-width: 400px;
+            max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s;
+        }
+        .ios-modal.active .ios-modal-content { transform: translateY(0); }
+        .ios-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;}
+        .ios-modal-body { padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; }
+        .ios-modal-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: var(--surface-alt); }
 
         .side-panel { 
             position: fixed; top: 0; right: 0; transform: translateX(100%); 
@@ -140,8 +173,6 @@
         .action-icon { font-size:20px; cursor:pointer; color: var(--text-muted); transition: 0.2s; }
         .action-icon:hover { color: var(--text-main); }
 
-        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-        
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: rgba(255, 255, 255, 0.85); 
@@ -165,6 +196,26 @@
 <body>
 
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
+
+    <div class="ios-modal" id="archiveModal" onclick="closeArchiveModal(event)">
+        <div class="ios-modal-content" onclick="event.stopPropagation()">
+            <div class="ios-modal-header">
+                <div>
+                    <div id="modalTitle" style="font-weight: 700; font-size: 18px; color: var(--text-main);"></div>
+                    <div id="modalDate" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;"></div>
+                </div>
+                <span class="material-symbols-rounded" style="cursor:pointer; color:var(--text-muted);" onclick="closeArchiveModal(event)">close</span>
+            </div>
+            <div class="ios-modal-body" id="modalBody"></div>
+            <div class="ios-modal-footer">
+                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" id="modalDeleteBtn" title="Kalıcı Sil">delete</span>
+                <div style="display:flex; gap: 15px;">
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" id="modalRestoreBtn" title="Finale Geri Gönder">restore_page</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" id="modalCopyBtn" title="Kopyala">content_copy</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <header>
         <div class="logo" id="mainLogo">📝 Notes</div>
@@ -193,7 +244,6 @@
 
     <div id="pageEditor" class="page-container active">
         <div class="editor-section">
-            
             <div class="note-box" id="editorBox">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span id="boxLabel" style="font-size: 16px; font-weight: 700;">Taslak</span>
@@ -255,10 +305,7 @@
     <div id="pageArchive" class="page-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="font-weight:600; font-size: 24px; margin:0;">Archive</h2>
-            <button class="icon-btn" style="background: var(--surface-color); border: 1px solid var(--border-color);" onclick="toggleViewMode()">
-                <span class="material-symbols-rounded" id="viewIconArchive" style="font-size: 20px;">view_list</span>
-            </button>
-        </div>
+            </div>
         <div id="archiveBoard"></div>
     </div>
 
@@ -286,13 +333,12 @@
     </nav>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('chimptopus_v11_notes')) || [];
-        let archive = JSON.parse(localStorage.getItem('chimptopus_v11_archive')) || [];
-        let globalCounter = parseInt(localStorage.getItem('chimptopus_v11_counter')) || 1;
+        let notes = JSON.parse(localStorage.getItem('chimptopus_v12_notes')) || [];
+        let archive = JSON.parse(localStorage.getItem('chimptopus_v12_archive')) || [];
+        let globalCounter = parseInt(localStorage.getItem('chimptopus_v12_counter')) || 1;
         
-        // Taslakları sayfa değişiminde korumak için hafıza objesi
-        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v11_drafts')) || { taslak: '', revize: '', final: '' };
-        let refsMemory = JSON.parse(localStorage.getItem('chimptopus_v11_refs')) || { taslak: '', revize: '', final: '' };
+        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v12_drafts')) || { taslak: '', revize: '', final: '' };
+        let refsMemory = JSON.parse(localStorage.getItem('chimptopus_v12_refs')) || { taslak: '', revize: '', final: '' };
 
         let currentPage = 'taslak'; 
         let viewMode = 'list'; 
@@ -300,18 +346,16 @@
         let textHistory = [];
         let timer;
 
-        // Başlangıçta aktif sekmenin hafızasını yükle
         document.getElementById('noteInput').value = draftsMemory['taslak'] || '';
         document.getElementById('refInput').value = refsMemory['taslak'] || '';
         searchReference();
 
         function switchPage(page) {
-            // Mevcut editör sekmesindeysek yazdıklarını kaybetmemek için hafızaya al
             if (['taslak', 'revize', 'final'].includes(currentPage)) {
                 draftsMemory[currentPage] = document.getElementById('noteInput').value;
                 refsMemory[currentPage] = document.getElementById('refInput').value;
-                localStorage.setItem('chimptopus_v11_drafts', JSON.stringify(draftsMemory));
-                localStorage.setItem('chimptopus_v11_refs', JSON.stringify(refsMemory));
+                localStorage.setItem('chimptopus_v12_drafts', JSON.stringify(draftsMemory));
+                localStorage.setItem('chimptopus_v12_refs', JSON.stringify(refsMemory));
             }
 
             currentPage = page;
@@ -329,31 +373,26 @@
                 document.getElementById('pageEditor').classList.add('active');
                 document.getElementById('boxLabel').innerText = page === 'final' ? "Finale Gönder" : "Yeni " + page.charAt(0).toUpperCase() + page.slice(1);
                 
-                // Geçilen sekmenin hafızadaki yedeğini getir
                 document.getElementById('noteInput').value = draftsMemory[page] || '';
                 document.getElementById('refInput').value = refsMemory[page] || '';
                 searchReference();
                 updateWordProgress();
             }
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function toggleViewMode() {
+            if(currentPage === 'archive') return; // Arşiv hep grid kalacak
             viewMode = viewMode === 'grid' ? 'list' : 'grid';
             document.getElementById('viewIcon').innerText = viewMode === 'grid' ? 'view_list' : 'grid_view';
-            document.getElementById('viewIconArchive').innerText = viewMode === 'grid' ? 'view_list' : 'grid_view';
-            if(currentPage === 'archive') renderArchivePage(); else renderRecords();
+            renderRecords();
         }
 
-        // ÇOKLU REFERANS BULUCU
         function searchReference() {
             let val = document.getElementById('refInput').value.trim();
             let refBox = document.getElementById('referenceBox');
             
             if(!val) { refBox.style.display = 'none'; return; }
-
-            // Virgül veya boşlukla ayrılmış tüm sayıları bulur (Örn: "01, 02, 05")
             let ids = val.match(/\d+/g);
             if(!ids || ids.length === 0) { refBox.style.display = 'none'; return; }
 
@@ -416,13 +455,9 @@
             if (!noteToEdit) return;
 
             editingNoteId = id;
-            
-            // Note'un sayfasına geç
             switchPage(noteToEdit.type);
             document.getElementById('noteInput').value = noteToEdit.text;
             document.getElementById('boxLabel').innerText = "Düzenle: #" + noteToEdit.num;
-            
-            // Eğer referansları varsa inputa koy
             document.getElementById('refInput').value = noteToEdit.refs ? noteToEdit.refs.join(', ') : '';
             searchReference();
 
@@ -430,7 +465,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // OTOMATİK RENK BELİRLEME SİSTEMİ
         function getAutoColor(type) {
             if(type === 'taslak') return 'var(--color-taslak)';
             if(type === 'revize') return 'var(--color-revize)';
@@ -450,7 +484,6 @@
 
         function loadMention(num, event) {
             if(event) event.stopPropagation();
-            // Arama kutusuna id'yi yapıştırıp sayfada buldur
             document.getElementById('refInput').value = num;
             searchReference();
         }
@@ -460,12 +493,9 @@
             if (!text.trim()) return;
             
             let saveType = currentPage;
-
-            // Metin ve input içindeki tüm referans bağlantılarını (örn: @01 veya 05) ayıkla
             let textRefs = text.match(/@(\d{2,})/g) || [];
             let manualRefs = document.getElementById('refInput').value.match(/\d+/g) || [];
             textRefs = textRefs.map(r => r.replace('@', ''));
-            // Tüm referansları birleştirip tekrar edenleri sil (Benzersiz array)
             let combinedRefs = [...new Set([...textRefs, ...manualRefs])];
 
             if (editingNoteId) {
@@ -478,7 +508,7 @@
                 }
                 editingNoteId = null;
                 showStatus("Güncellendi");
-                localStorage.setItem('chimptopus_v11_notes', JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
             } else {
                 const formattedNum = String(globalCounter).padStart(2, '0');
                 if (saveType === 'final') {
@@ -487,27 +517,25 @@
                         refs: combinedRefs,
                         date: new Date().toLocaleDateString('tr-TR') 
                     });
-                    localStorage.setItem('chimptopus_v11_archive', JSON.stringify(archive));
+                    localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
                     showStatus("Arşivlendi");
                 } else {
                     notes.unshift({
                         id: Date.now(), num: formattedNum, text, type: saveType, 
-                        mood: getAutoColor(saveType),
-                        refs: combinedRefs,
+                        mood: getAutoColor(saveType), refs: combinedRefs,
                         time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
                     });
-                    localStorage.setItem('chimptopus_v11_notes', JSON.stringify(notes));
+                    localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
                     showStatus("Kaydedildi");
                 }
                 globalCounter++;
-                localStorage.setItem('chimptopus_v11_counter', globalCounter);
+                localStorage.setItem('chimptopus_v12_counter', globalCounter);
             }
             
-            // Kaydettikten sonra aktif sayfanın yedeğini ve kutuları temizle
             draftsMemory[saveType] = '';
             refsMemory[saveType] = '';
-            localStorage.setItem('chimptopus_v11_drafts', JSON.stringify(draftsMemory));
-            localStorage.setItem('chimptopus_v11_refs', JSON.stringify(refsMemory));
+            localStorage.setItem('chimptopus_v12_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v12_refs', JSON.stringify(refsMemory));
             
             document.getElementById('noteInput').value = '';
             document.getElementById('refInput').value = '';
@@ -518,16 +546,7 @@
             updateWordProgress();
         }
 
-        function createCardHTML(n, isArchive = false) {
-            let actionButtons = isArchive ? `
-                <span class="material-symbols-rounded action-icon" onclick="restoreToFinal(${n.id}, event)" title="Geri Gönder">restore_page</span>
-                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${n.id}, event)">delete</span>
-            ` : `
-                <span class="material-symbols-rounded action-icon" onclick="editNote(${n.id}, event)">edit</span>
-                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${n.id}, event)">delete</span>
-            `;
-
-            // Bağlantı Pill'leri (Link Chips)
+        function createCardHTML(n) {
             let refPills = '';
             if (n.refs && n.refs.length > 0) {
                 refPills = `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">` + 
@@ -539,15 +558,17 @@
                 <div class="card note-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
                         <span class="note-number">#${n.num}</span>
-                        ${isArchive 
-                            ? '<span class="material-symbols-rounded" style="font-size:16px; color:var(--color-final)">check_circle</span>' 
-                            : `<div style="width:10px; height:10px; border-radius:50%; background:${n.mood}"></div>`}
+                        <div style="width:10px; height:10px; border-radius:50%; background:${n.mood}"></div>
                     </div>
+                    <span style="font-size:8px; font-weight:600; color:var(--text-main); text-transform:uppercase; margin-bottom:5px; display:block;">${n.type}</span>
                     <p>${formatMentionsAndHighlights(n.text)}</p>
                     ${refPills}
                     <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;">
-                        <span style="font-size:12px; color:var(--text-muted)">${n.time || n.date}</span>
-                        <div style="display:flex; gap: 14px;">${actionButtons}</div>
+                        <span style="font-size:12px; color:var(--text-muted)">${n.time}</span>
+                        <div style="display:flex; gap: 14px;">
+                            <span class="material-symbols-rounded action-icon" onclick="editNote(${n.id}, event)">edit</span>
+                            <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${n.id}, event)">delete</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -571,14 +592,14 @@
             
             filtered.forEach(n => {
                 const wrap = document.createElement('div');
-                wrap.innerHTML = createCardHTML(n, false);
+                wrap.innerHTML = createCardHTML(n);
                 const card = wrap.firstElementChild;
-                card.onclick = () => { navigator.clipboard.writeText(n.text); showStatus("Kopyalandı"); }
                 container.appendChild(card);
             });
             board.appendChild(container);
         }
 
+        // YENİ ARŞİV KUTU SİSTEMİ
         function renderArchivePage() {
             const board = document.getElementById('archiveBoard');
             board.innerHTML = '';
@@ -588,38 +609,67 @@
             }
 
             const container = document.createElement('div');
-            container.className = viewMode === 'grid' ? 'archive-grid' : 'archive-list';
+            container.className = 'archive-grid'; // Hep grid olacak (ufak kutular)
 
             archive.forEach(a => {
-                const wrap = document.createElement('div');
-                wrap.innerHTML = createCardHTML(a, true);
-                const card = wrap.firstElementChild;
-                card.onclick = () => { navigator.clipboard.writeText(a.text); showStatus("Kopyalandı"); }
+                const card = document.createElement('div');
+                card.className = 'archive-card';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <span class="note-number" style="font-size: 14px;">#${a.num}</span>
+                        <span class="material-symbols-rounded" style="font-size:16px; color:var(--color-final)">check_circle</span>
+                    </div>
+                    <div class="text-snippet">${a.text}</div>
+                `;
+                card.onclick = () => openArchiveModal(a.id);
                 container.appendChild(card);
             });
             board.appendChild(container);
+        }
+
+        // MODAL FONKSİYONLARI
+        function openArchiveModal(id) {
+            const item = archive.find(a => a.id === id);
+            if(!item) return;
+
+            document.getElementById('modalTitle').innerText = "Final #" + item.num;
+            document.getElementById('modalBody').innerHTML = formatMentionsAndHighlights(item.text);
+            document.getElementById('modalDate').innerText = item.date;
+
+            document.getElementById('modalRestoreBtn').onclick = () => { restoreToFinal(item.id); closeArchiveModal(); };
+            document.getElementById('modalDeleteBtn').onclick = () => { deleteArchive(item.id); closeArchiveModal(); };
+            document.getElementById('modalCopyBtn').onclick = () => { navigator.clipboard.writeText(item.text); showStatus("Kopyalandı"); closeArchiveModal(); };
+
+            const modal = document.getElementById('archiveModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeArchiveModal(e) {
+            if(e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return;
+            const modal = document.getElementById('archiveModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
         }
 
         function deleteNote(id, e) {
             e.stopPropagation();
             if(confirm("Silmek istediğine emin misin?")) {
                 notes = notes.filter(n => n.id !== id);
-                localStorage.setItem('chimptopus_v11_notes', JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
                 renderRecords();
             }
         }
 
-        function deleteArchive(id, e) {
-            e.stopPropagation();
+        function deleteArchive(id) {
             if(confirm("Kalıcı olarak silinsin mi?")) {
                 archive = archive.filter(a => a.id !== id);
-                localStorage.setItem('chimptopus_v11_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
                 renderArchivePage();
             }
         }
 
-        function restoreToFinal(id, e) {
-            e.stopPropagation();
+        function restoreToFinal(id) {
             const index = archive.findIndex(a => a.id === id);
             if(index > -1) {
                 const item = archive[index];
@@ -628,8 +678,8 @@
                     id: item.id, num: item.num, text: item.text, type: 'final', mood: getAutoColor('final'), refs: item.refs,
                     time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
                 });
-                localStorage.setItem('chimptopus_v11_notes', JSON.stringify(notes));
-                localStorage.setItem('chimptopus_v11_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
                 renderArchivePage();
                 showStatus("Geri Yüklendi");
             }
@@ -661,7 +711,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "chimptopus_v11_yedek.json");
+            downloadAnchorNode.setAttribute("download", "chimptopus_v12_yedek.json");
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
@@ -677,14 +727,12 @@
                     const imported = JSON.parse(e.target.result);
                     if(imported.notes && imported.archive) {
                         notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter;
-                        draftsMemory = imported.drafts || draftsMemory;
-                        refsMemory = imported.refs || refsMemory;
-                        
-                        localStorage.setItem('chimptopus_v11_notes', JSON.stringify(notes));
-                        localStorage.setItem('chimptopus_v11_archive', JSON.stringify(archive));
-                        localStorage.setItem('chimptopus_v11_counter', globalCounter);
-                        localStorage.setItem('chimptopus_v11_drafts', JSON.stringify(draftsMemory));
-                        localStorage.setItem('chimptopus_v11_refs', JSON.stringify(refsMemory));
+                        draftsMemory = imported.drafts || draftsMemory; refsMemory = imported.refs || refsMemory;
+                        localStorage.setItem('chimptopus_v12_notes', JSON.stringify(notes));
+                        localStorage.setItem('chimptopus_v12_archive', JSON.stringify(archive));
+                        localStorage.setItem('chimptopus_v12_counter', globalCounter);
+                        localStorage.setItem('chimptopus_v12_drafts', JSON.stringify(draftsMemory));
+                        localStorage.setItem('chimptopus_v12_refs', JSON.stringify(refsMemory));
                         
                         if(currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage();
                         alert("Yedek başarıyla yüklendi!"); closePanels();
