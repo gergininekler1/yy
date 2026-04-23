@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus Pro - V15 iOS</title>
+    <title>Chimptopus Pro - V16 iOS Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
@@ -45,13 +45,7 @@
 
         * { box-sizing: border-box; }
 
-        .card { 
-            background: var(--surface-color); 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            box-shadow: var(--card-shadow);
-        }
-
+        .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); }
         header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
 
@@ -61,10 +55,8 @@
 
         .note-box { padding: 20px; display: flex; flex-direction: column; position: relative; background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 12px;}
 
-        /* Meta Inputları */
         .meta-input { width: 100%; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 15px; font-size: 14px; font-weight: 600; color: var(--text-main); outline: none; font-family: inherit; box-shadow: var(--card-shadow); }
         .meta-input::placeholder { color: var(--text-muted); font-weight: 400; }
-        
         .meta-input-secondary { font-weight: 400; font-size: 13px; }
 
         .timer-btn { font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; transition: 0.2s;}
@@ -88,6 +80,7 @@
         #refContent::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         .ref-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-color); }
         .ref-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .ref-item-text { font-size: 14px; line-height: 1.5; color: var(--text-main); margin-top: 4px; }
 
         .word-challenge { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 15px;}
         .goal-input { width: 45px; background: transparent; border: none; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 13px; font-weight: 600; text-align: center; outline: none; font-family: inherit;}
@@ -155,12 +148,11 @@
         .nav-item .icon { font-size: 24px; }
         .nav-item .label { font-size: 10px; font-weight: 500; }
 
-        /* Final Bekleyenler & Empty State */
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
         .empty-state .icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
         .empty-state p { font-size: 15px; line-height: 1.5; margin: 0;}
 
-        /* iOS Modal (Pop-up) */
+        /* Modal (Pop-up) */
         .ios-modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -211,6 +203,7 @@
             <h2 style="font-weight:600; margin:0; font-size: 20px;">Settings</h2>
             <span class="material-symbols-rounded" onclick="closePanels()" style="cursor:pointer; color:var(--text-muted)">close</span>
         </div>
+        
         <button class="action-btn-menu" onclick="exportData()"><span class="material-symbols-rounded" style="font-size: 18px;">download</span> Export JSON</button>
         <label class="action-btn-menu" style="cursor: pointer;">
             <span class="material-symbols-rounded" style="font-size: 18px;">upload</span> Import JSON
@@ -220,7 +213,23 @@
         <button class="action-btn-menu" onclick="clearAll()" style="color:var(--danger-color);"><span class="material-symbols-rounded" style="font-size: 18px;">delete</span> Delete Workspace</button>
     </div>
 
-    <div id="pageEditor" class="page-container active">
+    <div id="pageRecords" class="page-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-weight:600; font-size: 24px; margin:0;">Kayıtlar</h2>
+            <button class="icon-btn" style="background: var(--surface-color); border: 1px solid var(--border-color);" onclick="toggleViewMode()">
+                <span class="material-symbols-rounded" id="viewIcon" style="font-size: 20px;">view_list</span>
+            </button>
+        </div>
+        <div class="controls-row">
+            <div class="search-bar" style="margin: 0; width: 100%;">
+                <span class="material-symbols-rounded" style="color: var(--text-muted); font-size: 18px;">search</span>
+                <input type="text" id="searchInput" placeholder="Notlarda ara..." oninput="renderRecords()">
+            </div>
+        </div>
+        <div id="recordsBoard"></div>
+    </div>
+
+    <div id="pageEditor" class="page-container">
         <div class="editor-section">
             
             <div id="finalPendingState" style="display: none; width: 100%;">
@@ -248,11 +257,10 @@
                     </div>
                 </div>
 
-                <div id="taslakMetaBlocks" style="display:flex; flex-direction:column; gap:12px;">
+                <div id="taslakMetaBlocks" style="display:flex; flex-direction:column; gap:8px;">
                     <input type="text" id="metaTitle" class="meta-input" placeholder="Başlık, Konu veya Ana Fikir...">
-                    <div id="questionsContainer" style="display:flex; flex-direction:column; gap:8px;">
-                        </div>
-                    <button class="icon-btn" onclick="addQuestionInput()" style="width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:transparent; font-size:13px;">+ Soru / Detay Ekle</button>
+                    <div id="questionsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <button class="icon-btn" onclick="addQuestionInput()" style="width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:transparent; font-size:13px;">+ Soru Ekle</button>
                 </div>
 
                 <textarea id="noteInput" placeholder="Metni buraya yazın..." oninput="handleInput()"></textarea>
@@ -288,31 +296,19 @@
         </div>
     </div>
 
-    <div id="pageRecords" class="page-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-weight:600; font-size: 24px; margin:0;">Records</h2>
-            <button class="icon-btn" style="background: var(--surface-color); border: 1px solid var(--border-color);" onclick="toggleViewMode()">
-                <span class="material-symbols-rounded" id="viewIcon" style="font-size: 20px;">view_list</span>
-            </button>
-        </div>
-        <div class="controls-row">
-            <div class="search-bar" style="margin: 0; width: 100%;">
-                <span class="material-symbols-rounded" style="color: var(--text-muted); font-size: 18px;">search</span>
-                <input type="text" id="searchInput" placeholder="Search blocks..." oninput="renderRecords()">
-            </div>
-        </div>
-        <div id="recordsBoard"></div>
-    </div>
-
     <div id="pageArchive" class="page-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-weight:600; font-size: 24px; margin:0;">Archive</h2>
+            <h2 style="font-weight:600; font-size: 24px; margin:0;">Arşiv</h2>
         </div>
         <div id="archiveBoard"></div>
     </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" id="nav-taslak" onclick="navSwitchPage('taslak')">
+        <div class="nav-item active" id="nav-records" onclick="navSwitchPage('records')">
+            <span class="material-symbols-rounded icon">grid_view</span>
+            <span class="label">Kayıt</span>
+        </div>
+        <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
             <span class="material-symbols-rounded icon">edit_document</span>
             <span class="label">Taslak</span>
         </div>
@@ -324,44 +320,45 @@
             <span class="material-symbols-rounded icon">task_alt</span>
             <span class="label">Final</span>
         </div>
-        <div class="nav-item" id="nav-records" onclick="navSwitchPage('records')">
-            <span class="material-symbols-rounded icon">grid_view</span>
-            <span class="label">Records</span>
-        </div>
         <div class="nav-item" id="nav-archive" onclick="navSwitchPage('archive')">
             <span class="material-symbols-rounded icon">inventory_2</span>
-            <span class="label">Archive</span>
+            <span class="label">Arşiv</span>
         </div>
     </nav>
 
     <script>
-        let notes = JSON.parse(localStorage.getItem('chimptopus_v15_notes')) || [];
-        let archive = JSON.parse(localStorage.getItem('chimptopus_v15_archive')) || [];
-        let globalCounter = parseInt(localStorage.getItem('chimptopus_v15_counter')) || 1;
+        let notes = JSON.parse(localStorage.getItem('chimptopus_v16_notes')) || [];
+        let archive = JSON.parse(localStorage.getItem('chimptopus_v16_archive')) || [];
+        let globalCounter = parseInt(localStorage.getItem('chimptopus_v16_counter')) || 1;
 
-        let currentPage = 'taslak'; 
+        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v16_drafts')) || { taslak: '', revize: '', final: '' };
+        let refsMemory = JSON.parse(localStorage.getItem('chimptopus_v16_refs')) || { taslak: '', revize: '', final: '' };
+
+        let currentPage = 'records'; 
         let viewMode = 'list'; 
         let editingNoteId = null; 
         let textHistory = [];
         let timer;
 
-        // Başlangıç Kurulumu
-        addQuestionInput(); 
-        switchPage('taslak');
-
-        // Navigasyondan tıklanınca
         function navSwitchPage(page) {
             editingNoteId = null;
             document.getElementById('noteInput').value = '';
             document.getElementById('refInput').value = '';
             document.getElementById('metaTitle').value = '';
             document.getElementById('questionsContainer').innerHTML = '';
-            addQuestionInput(); // En az 1 boş soru kutusu
+            addQuestionInput(); 
             document.getElementById('referenceBox').style.display = 'none';
             switchPage(page);
         }
 
         function switchPage(page) {
+            if (['taslak', 'revize', 'final'].includes(currentPage)) {
+                draftsMemory[currentPage] = document.getElementById('noteInput').value;
+                refsMemory[currentPage] = document.getElementById('refInput').value;
+                localStorage.setItem('chimptopus_v16_drafts', JSON.stringify(draftsMemory));
+                localStorage.setItem('chimptopus_v16_refs', JSON.stringify(refsMemory));
+            }
+
             currentPage = page;
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
@@ -381,12 +378,10 @@
                 let emptyMsg = document.getElementById('emptyFinalState');
                 let pendingBoard = document.getElementById('pendingFinalsBoard');
                 
-                // Final Sayfası Koruması ve Bekleyenler
                 if (page === 'final' && !editingNoteId) {
                     workspace.style.display = 'none';
                     pendingState.style.display = 'block';
                     
-                    // Final bekleyenleri filtrele
                     let pendingFinals = notes.filter(n => n.type === 'final');
                     if (pendingFinals.length > 0) {
                         emptyMsg.style.display = 'none';
@@ -395,7 +390,7 @@
                         container.className = 'cards-list';
                         pendingFinals.forEach(n => {
                             let wrap = document.createElement('div');
-                            wrap.innerHTML = createCardHTML(n, true); // Liste formatında
+                            wrap.innerHTML = createCardHTML(n, true);
                             container.appendChild(wrap.firstElementChild);
                         });
                         pendingBoard.appendChild(container);
@@ -407,13 +402,16 @@
                     workspace.style.display = 'flex';
                     pendingState.style.display = 'none';
                     
-                    // Görünürlük Kontrolleri
                     document.getElementById('taslakMetaBlocks').style.display = (page === 'taslak') ? 'flex' : 'none';
                     document.getElementById('refContainer').style.display = (page === 'revize') ? 'flex' : 'none';
                     
                     let label = editingNoteId ? `Düzenle: #${notes.find(n=>n.id===editingNoteId).num}` : "Yeni " + page.charAt(0).toUpperCase() + page.slice(1);
                     document.getElementById('boxLabel').innerText = label;
                     document.getElementById('stageBadge').style.background = getAutoColor(page);
+                    
+                    document.getElementById('noteInput').value = draftsMemory[page] || '';
+                    document.getElementById('refInput').value = refsMemory[page] || '';
+                    searchReference();
                     
                     renderEditorButtons(page);
                 }
@@ -422,15 +420,29 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Dinamik Soru Ekleme Mekaniği
+        // Dinamik Soru Ekleme ve Silme (Güncellendi)
         function addQuestionInput(val = '') {
             const container = document.getElementById('questionsContainer');
+            const row = document.createElement('div');
+            row.style.cssText = "display:flex; gap:8px; align-items:center;";
+            
             const input = document.createElement('input');
             input.type = 'text';
             input.className = 'meta-input meta-input-secondary';
+            input.style.marginBottom = '0';
             input.placeholder = 'Soru, anahtar kelime vs...';
             input.value = val;
-            container.appendChild(input);
+            
+            const delBtn = document.createElement('span');
+            delBtn.className = 'material-symbols-rounded action-icon';
+            delBtn.style.color = 'var(--danger-color)';
+            delBtn.style.cursor = 'pointer';
+            delBtn.innerText = 'do_not_disturb_on';
+            delBtn.onclick = () => row.remove();
+
+            row.appendChild(input);
+            row.appendChild(delBtn);
+            container.appendChild(row);
         }
 
         function renderEditorButtons(page) {
@@ -533,7 +545,6 @@
             if (!noteToEdit) return;
 
             editingNoteId = id;
-            
             document.getElementById('noteInput').value = noteToEdit.text;
             document.getElementById('metaTitle').value = noteToEdit.title || '';
             
@@ -543,9 +554,9 @@
             } else { addQuestionInput(); }
             
             document.getElementById('refInput').value = noteToEdit.refs ? noteToEdit.refs.join(', ') : '';
-            searchReference();
-
+            
             switchPage(noteToEdit.type);
+            searchReference();
         }
 
         function formatMentionsAndHighlights(text, query = '') {
@@ -565,7 +576,6 @@
             searchReference();
         }
 
-        // İŞ AKIŞI YÖNETİMİ
         function handleAction(actionType) {
             const text = document.getElementById('noteInput').value;
             if (!text.trim()) { alert("Lütfen metin giriniz."); return; }
@@ -575,7 +585,6 @@
             let combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])];
 
             let title = document.getElementById('metaTitle').value.trim();
-            // Soruları dizi olarak topla
             let questions = Array.from(document.querySelectorAll('#questionsContainer input'))
                             .map(i => i.value.trim()).filter(v => v !== '');
 
@@ -587,7 +596,7 @@
                     time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
                 });
                 globalCounter++;
-                localStorage.setItem('chimptopus_v15_counter', globalCounter);
+                localStorage.setItem('chimptopus_v16_counter', globalCounter);
                 showStatus("Oluşturuldu");
             } 
             else if (actionType === 'update') {
@@ -620,7 +629,7 @@
                     });
                     notes.splice(nIndex, 1);
                 }
-                localStorage.setItem('chimptopus_v15_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v16_archive', JSON.stringify(archive));
                 showStatus("Arşive Gönderildi");
                 navSwitchPage('archive'); saveToLocal(); return;
             }
@@ -630,7 +639,7 @@
         }
 
         function saveToLocal() {
-            localStorage.setItem('chimptopus_v15_notes', JSON.stringify(notes));
+            localStorage.setItem('chimptopus_v16_notes', JSON.stringify(notes));
         }
 
         function createCardHTML(n, isList = false) {
@@ -723,7 +732,6 @@
             board.appendChild(container);
         }
 
-        // iOS Tarzı Modal Kontrolleri
         function openArchiveModal(id) {
             let item = archive.find(a => a.id === id);
             if(!item) return;
@@ -758,14 +766,14 @@
             if(confirm("Silmek istediğine emin misin?")) {
                 notes = notes.filter(n => n.id !== id);
                 saveToLocal(); renderRecords();
-                if(currentPage === 'final') navSwitchPage('final'); // Sayfayı yeniler
+                if(currentPage === 'final') navSwitchPage('final'); 
             }
         }
 
         function deleteArchive(id) {
             if(confirm("Kalıcı olarak silinsin mi?")) {
                 archive = archive.filter(a => a.id !== id);
-                localStorage.setItem('chimptopus_v15_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v16_archive', JSON.stringify(archive));
                 renderArchivePage();
             }
         }
@@ -779,8 +787,8 @@
                     id: item.id, num: item.num, text: item.text, type: 'final', mood: getAutoColor('final'), refs: item.refs,
                     time: new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'short'})
                 });
-                localStorage.setItem('chimptopus_v15_notes', JSON.stringify(notes));
-                localStorage.setItem('chimptopus_v15_archive', JSON.stringify(archive));
+                localStorage.setItem('chimptopus_v16_notes', JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v16_archive', JSON.stringify(archive));
                 renderArchivePage();
                 showStatus("Geri Yüklendi");
             }
@@ -809,7 +817,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "chimptopus_v15_yedek.json");
+            downloadAnchorNode.setAttribute("download", "chimptopus_v16_yedek.json");
             document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); closePanels();
         }
 
@@ -822,8 +830,8 @@
                     const imported = JSON.parse(e.target.result);
                     if(imported.notes && imported.archive) {
                         notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter;
-                        saveToLocal(); localStorage.setItem('chimptopus_v15_archive', JSON.stringify(archive));
-                        localStorage.setItem('chimptopus_v15_counter', globalCounter);
+                        saveToLocal(); localStorage.setItem('chimptopus_v16_archive', JSON.stringify(archive));
+                        localStorage.setItem('chimptopus_v16_counter', globalCounter);
                         navSwitchPage('records'); alert("Yedek yüklendi!"); closePanels();
                     } else { alert("Geçersiz format."); }
                 } catch(err) { alert("Okuma hatası."); }
@@ -835,6 +843,9 @@
         function closePanels() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
         function showStatus(m) { const s = document.getElementById('statusMsg'); s.innerText = m; setTimeout(() => s.innerText = '', 2000); }
         function clearAll() { if(confirm("Tüm sistemi sıfırlamak istediğine emin misin?")) { localStorage.clear(); location.reload(); } }
+
+        // Sistemin başlangıç ekranını Kayıtlar olarak ayarla
+        navSwitchPage('records');
     </script>
 </body>
 </html>
