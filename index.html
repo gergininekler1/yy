@@ -123,7 +123,7 @@
 
         .ref-input-container {
             display: flex; gap: 10px; align-items: center; background: var(--surface-color); padding: 10px 15px;
-            border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px;
+            border-radius: 8px; border: 1px solid var(--border-color);
         }
         .ref-input-container input { background: transparent; border: none; outline: none; font-size: 14px; color: var(--text-main); flex-grow: 1; font-family: inherit; }
 
@@ -265,9 +265,7 @@
 
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
 
-    <div class="toast" id="toastEl">
-        <span id="toastMsg"></span>
-    </div>
+    <div class="toast" id="toastEl"><span id="toastMsg"></span></div>
 
     <div class="ios-modal" id="universalModal" onclick="closeUniversalModal(event)">
         <div class="ios-modal-content" onclick="event.stopPropagation()">
@@ -350,6 +348,7 @@
     <div id="pageEditor" class="page-container">
         <div class="editor-section">
             <div class="note-box" id="editorWorkspace">
+                
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
                     <div style="display:flex; align-items:center; gap:8px;">
                         <div id="stageBadge" style="width:12px; height:12px; border-radius:50%; background:var(--color-taslak)"></div>
@@ -363,11 +362,25 @@
                         </div>
                         <div style="display:flex; gap:6px; align-items:center;">
                             <span id="swDisplay" style="font-size:14px; font-weight:700; font-variant-numeric: tabular-nums; color:var(--text-muted); margin-right:2px;">00:00</span>
-                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()">
-                                <span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span>
-                            </button>
+                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()"><span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span></button>
                             <span class="material-symbols-rounded action-icon" onclick="clearCurrentNote()" title="Delete All" style="font-size:22px; color:var(--danger-color); margin-left:6px;">delete_sweep</span>
                         </div>
+                    </div>
+                </div>
+
+                <div id="topLinksBlock" style="display:none; flex-direction:column; gap:10px; margin-bottom:15px; padding:12px; background:var(--bg-color); border:1px solid var(--border-color); border-radius:8px;">
+                    
+                    <div class="ref-input-container" style="margin-top:0;">
+                        <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
+                        <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 001, 004)" oninput="searchReference()">
+                    </div>
+                    <div id="refCardsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    
+                    <div id="backlinkContainer" style="display:none; flex-direction:column; margin-top:8px; padding-top:12px; border-top:1px dashed var(--border-color);">
+                        <div style="font-size:11px; font-weight:700; color:var(--primary-blue); margin-bottom:10px; display:flex; align-items:center; gap:4px;">
+                            <span class="material-symbols-rounded" style="font-size:16px;">keyboard_return</span> LINKED FROM (BACKLINKS)
+                        </div>
+                        <div id="backlinkCardsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
                     </div>
                 </div>
 
@@ -383,28 +396,19 @@
                     </div>
                 </div>
 
-                <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
-
-                <div id="refContainer" style="display:none; flex-direction:column;">
-                    <div class="ref-input-container">
-                        <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
-                        <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 001, 004)" oninput="searchReference()">
-                    </div>
-                    <div id="refCardsContainer" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
-                </div>
-                
-                <div id="backlinkContainer" style="display:none; flex-direction:column; margin-top:15px; padding-top:15px; border-top:1px dashed var(--border-color);">
-                    <div style="font-size:11px; font-weight:700; color:var(--primary-blue); margin-bottom:10px; display:flex; align-items:center; gap:4px;">
-                        <span class="material-symbols-rounded" style="font-size:16px;">keyboard_return</span> LINKED FROM (BACKLINKS)
-                    </div>
-                    <div id="backlinkCardsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 4px; margin-bottom:8px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--text-muted);">TEXT EDITOR</span>
+                    <span class="material-symbols-rounded action-icon" id="toggleEditorIcon" onclick="toggleEditorText()" style="font-size:20px;">visibility_off</span>
                 </div>
 
-                <div class="word-challenge">
-                    <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
-                    <span id="wordLevel" style="font-weight:700; color:var(--primary-blue)">Level 1</span>
-                    <span id="wordCountUI" style="margin-left:auto; font-size:12px; font-weight:600; color:var(--text-muted);">0 / 50</span>
-                    <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
+                <div id="editorTextWrapper" style="display:flex; flex-direction:column; gap:15px;">
+                    <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
+                    <div class="word-challenge">
+                        <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
+                        <span id="wordLevel" style="font-weight:700; color:var(--primary-blue)">Level 1</span>
+                        <span id="wordCountUI" style="margin-left:auto; font-size:12px; font-weight:600; color:var(--text-muted);">0 / 50</span>
+                        <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
+                    </div>
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
@@ -459,7 +463,8 @@
         let metaMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_meta'))   || { title:'', questions:[] };
 
         let currentPage   = 'records'; let editingNoteId = null; let textHistory   = [];
-        let currentTagFilter = null; let isMetaVisible = true;
+        let currentTagFilter = null; 
+        let isMetaVisible = true; let isEditorVisible = true;
         let swInterval; let swSeconds = 0; let swRunning = false;
 
         /* ─────────────────────────────────────────
@@ -525,7 +530,7 @@
         function saveDraftMemory() {
             draftsMemory[currentPage] = document.getElementById('noteInput').value; refsMemory[currentPage]   = document.getElementById('refInput').value;
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
-            if (currentPage === 'revize') {
+            if (currentPage === 'taslak' || currentPage === 'revize') {
                 metaMemory.title = document.getElementById('metaTitle').value;
                 metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
                 localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
@@ -544,15 +549,18 @@
             else if (page === 'archive') { document.getElementById('pageArchive').classList.add('active'); renderArchivePage(); } 
             else {
                 document.getElementById('pageEditor').classList.add('active');
-                document.getElementById('metaBlocksContainer').style.display = (page === 'revize') ? 'flex' : 'none';
-                document.getElementById('refContainer').style.display = (page === 'revize') ? 'flex' : 'none';
+                
+                // Show/Hide Top Blocks based on page
+                document.getElementById('metaBlocksContainer').style.display = (page === 'taslak' || page === 'revize') ? 'flex' : 'none';
+                document.getElementById('topLinksBlock').style.display = (page === 'taslak' || page === 'revize') ? 'flex' : 'none';
+                
                 document.getElementById('boxLabel').innerText = editingNoteId ? `Edit: #${notes.find(n => n.id === editingNoteId)?.num || ''}` : 'New ' + (page === 'taslak' ? 'Draft' : 'Revise');
                 document.getElementById('stageBadge').style.background = page === 'taslak' ? 'var(--color-taslak)' : 'var(--color-revize)';
 
                 if (!editingNoteId) {
                     document.getElementById('noteInput').value = draftsMemory[page] || ''; document.getElementById('refInput').value  = refsMemory[page] || '';
                     swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
-                    if (page === 'revize') {
+                    if (page === 'taslak' || page === 'revize') {
                         document.getElementById('metaTitle').value = metaMemory.title || ''; document.getElementById('questionsContainer').innerHTML = '';
                         if (metaMemory.questions && metaMemory.questions.length > 0) metaMemory.questions.forEach(q => addQuestionInput(q)); else addQuestionInput();
                     }
@@ -567,7 +575,7 @@
             const noteToEdit = notes.find(n => n.id === id); if (!noteToEdit) return;
             editingNoteId = id; switchPage(noteToEdit.type, true);
             document.getElementById('noteInput').value = noteToEdit.text; swSeconds = noteToEdit.spentSeconds || 0; document.getElementById('swDisplay').innerText = formatTime(swSeconds);
-            if (noteToEdit.type === 'revize') {
+            if (noteToEdit.type === 'taslak' || noteToEdit.type === 'revize') {
                 document.getElementById('metaTitle').value = noteToEdit.title || ''; document.getElementById('questionsContainer').innerHTML = '';
                 if (noteToEdit.questions && noteToEdit.questions.length > 0) noteToEdit.questions.forEach(q => addQuestionInput(q)); else addQuestionInput();
             }
@@ -576,24 +584,21 @@
         }
 
         /* ─────────────────────────────────────────
-           BACKLINKS (YENİ ÖZELLİK)
+           BACKLINKS & LINKS
         ───────────────────────────────────────── */
         function renderBacklinks() {
             const container = document.getElementById('backlinkContainer');
             const cardsContainer = document.getElementById('backlinkCardsContainer');
             
-            // Sadece bir not düzenleniyorsa ve sayfa revize ise gösterelim
-            if (!editingNoteId || currentPage !== 'revize') { container.style.display = 'none'; return; }
+            if (!editingNoteId) { container.style.display = 'none'; return; }
             
             let currentNote = notes.find(n => n.id === editingNoteId) || archive.find(a => a.id === editingNoteId);
             if (!currentNote) { container.style.display = 'none'; return; }
             
-            let targetNum = currentNote.num;
-            let backlinks = [];
+            let targetNum = currentNote.num; let backlinks = [];
             
-            // Tüm notları tara
             [...notes, ...archive].forEach(item => {
-                if (item.id === currentNote.id) return; // Kendini geç
+                if (item.id === currentNote.id) return; 
                 let isLinked = false;
                 if (item.refs && item.refs.includes(targetNum)) isLinked = true;
                 if (item.text && item.text.includes('@' + targetNum)) isLinked = true;
@@ -607,165 +612,129 @@
                     html += `
                         <div class="card" style="padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="${found.type === 'taslak' ? `openRecordModal(${found.id})` : `openArchiveModal(${found.id})`}">
                             <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
-                                <span>LINKED FROM</span>
-                                <span style="color:${color}">#${found.num}</span>
+                                <span>LINKED FROM</span><span style="color:${color}">#${found.num}</span>
                             </div>
                             <div class="ref-item-text" style="max-height:80px; overflow-y:auto; padding-right:4px;">${formatMentionsAndHighlights(found.text)}</div>
-                        </div>
-                    `;
+                        </div>`;
                 });
-                cardsContainer.innerHTML = html;
-                container.style.display = 'flex';
-            } else {
-                container.style.display = 'none';
-            }
+                cardsContainer.innerHTML = html; container.style.display = 'flex';
+            } else { container.style.display = 'none'; }
+        }
+
+        function searchReference() {
+            let val = document.getElementById('refInput').value.trim(); const container = document.getElementById('refCardsContainer');
+            if (!val) { container.innerHTML = ''; return; }
+            const ids = val.match(/\d+/g); if (!ids || ids.length === 0) { container.innerHTML = ''; return; }
+            let html = ''; let foundAny = false;
+
+            ids.forEach(id => {
+                const formattedId = id.padStart(3, '0'); const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
+                if (found) {
+                    foundAny = true; const color = found.type ? getAutoColorHex(found.type) : 'var(--color-archive)'; 
+                    html += `
+                        <div class="card" style="padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="${found.type === 'taslak' ? `openRecordModal(${found.id})` : `openArchiveModal(${found.id})`}">
+                            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
+                                <span>LINKED TO</span><span style="color:${color}">#${found.num}</span>
+                            </div>
+                            <div class="ref-item-text" style="max-height:100px; overflow-y:auto; padding-right:4px;">${formatMentionsAndHighlights(found.text)}</div>
+                        </div>`;
+                }
+            });
+            container.innerHTML = foundAny ? html : '';
         }
 
         /* ─────────────────────────────────────────
            GRAPH VIEW (ZİHİN HARİTASI)
         ───────────────────────────────────────── */
-        let graphActive = false;
-        let gNodes = []; let gEdges = [];
-        let panX = 0, panY = 0;
-        let isDraggingGraph = false; let lastMouseX = 0, lastMouseY = 0;
-
+        let graphActive = false; let gNodes = []; let gEdges = []; let panX = 0, panY = 0; let isDraggingGraph = false; let lastMouseX = 0, lastMouseY = 0;
         function initGraph() {
-            const canvas = document.getElementById('graphCanvas');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            panX = canvas.width / 2; panY = canvas.height / 2;
-
-            gNodes = []; gEdges = [];
-            const all = [...notes, ...archive];
-            
+            const canvas = document.getElementById('graphCanvas'); canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            panX = canvas.width / 2; panY = canvas.height / 2; gNodes = []; gEdges = []; const all = [...notes, ...archive];
+            all.forEach(item => { gNodes.push({ id: item.id, num: item.num, type: item.type || 'archive', title: item.title, x: (Math.random() - 0.5) * Math.min(canvas.width, 500), y: (Math.random() - 0.5) * Math.min(canvas.height, 500), vx: 0, vy: 0 }); });
             all.forEach(item => {
-                gNodes.push({
-                    id: item.id, num: item.num, type: item.type || 'archive', title: item.title,
-                    x: (Math.random() - 0.5) * Math.min(canvas.width, 500), 
-                    y: (Math.random() - 0.5) * Math.min(canvas.height, 500),
-                    vx: 0, vy: 0
-                });
-            });
-
-            all.forEach(item => {
-                let textRefs = item.text.match(/@(\d{1,})/g) || [];
-                let allRefs = [...new Set([...(item.refs || []), ...textRefs.map(r=>r.replace('@',''))])];
+                let textRefs = item.text.match(/@(\d{1,})/g) || []; let allRefs = [...new Set([...(item.refs || []), ...textRefs.map(r=>r.replace('@',''))])];
                 allRefs.forEach(r => {
-                    let targetNum = r.padStart(3, '0');
-                    let tNode = gNodes.find(n => n.num === targetNum);
-                    let sNode = gNodes.find(n => n.id === item.id);
+                    let targetNum = r.padStart(3, '0'); let tNode = gNodes.find(n => n.num === targetNum); let sNode = gNodes.find(n => n.id === item.id);
                     if (tNode && sNode && tNode !== sNode) gEdges.push({ source: sNode, target: tNode });
                 });
             });
         }
-
-        function openGraphView() {
-            document.getElementById('graphOverlay').style.display = 'flex';
-            graphActive = true; initGraph(); requestAnimationFrame(drawGraph);
-        }
-
+        function openGraphView() { document.getElementById('graphOverlay').style.display = 'flex'; graphActive = true; initGraph(); requestAnimationFrame(drawGraph); }
         function closeGraphView() { document.getElementById('graphOverlay').style.display = 'none'; graphActive = false; }
-
-        // Touch & Drag events for Canvas
         const cvs = document.getElementById('graphCanvas');
         cvs.addEventListener('mousedown', e => { isDraggingGraph = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
-        cvs.addEventListener('mousemove', e => { 
-            if(!isDraggingGraph) return;
-            panX += e.clientX - lastMouseX; panY += e.clientY - lastMouseY;
-            lastMouseX = e.clientX; lastMouseY = e.clientY;
-        });
-        cvs.addEventListener('mouseup', () => { isDraggingGraph = false; });
-        cvs.addEventListener('mouseleave', () => { isDraggingGraph = false; });
-        
+        cvs.addEventListener('mousemove', e => { if(!isDraggingGraph) return; panX += e.clientX - lastMouseX; panY += e.clientY - lastMouseY; lastMouseX = e.clientX; lastMouseY = e.clientY; });
+        cvs.addEventListener('mouseup', () => { isDraggingGraph = false; }); cvs.addEventListener('mouseleave', () => { isDraggingGraph = false; });
         cvs.addEventListener('touchstart', e => { isDraggingGraph = true; lastMouseX = e.touches[0].clientX; lastMouseY = e.touches[0].clientY; });
-        cvs.addEventListener('touchmove', e => { 
-            if(!isDraggingGraph) return;
-            panX += e.touches[0].clientX - lastMouseX; panY += e.touches[0].clientY - lastMouseY;
-            lastMouseX = e.touches[0].clientX; lastMouseY = e.touches[0].clientY;
-            e.preventDefault(); // prevent scrolling
-        }, {passive: false});
+        cvs.addEventListener('touchmove', e => { if(!isDraggingGraph) return; panX += e.touches[0].clientX - lastMouseX; panY += e.touches[0].clientY - lastMouseY; lastMouseX = e.touches[0].clientX; lastMouseY = e.touches[0].clientY; e.preventDefault(); }, {passive: false});
         cvs.addEventListener('touchend', () => { isDraggingGraph = false; });
 
         function drawGraph() {
             if (!graphActive) return;
-            const canvas = document.getElementById('graphCanvas'); const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Physics
+            const canvas = document.getElementById('graphCanvas'); const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
             const k = 0.05; const repulsion = 4000; const damping = 0.85;
             for(let i=0; i<gNodes.length; i++) {
-                let n1 = gNodes[i];
-                n1.vx -= n1.x * 0.001; n1.vy -= n1.y * 0.001; // center gravity
+                let n1 = gNodes[i]; n1.vx -= n1.x * 0.001; n1.vy -= n1.y * 0.001;
                 for(let j=i+1; j<gNodes.length; j++) {
-                    let n2 = gNodes[j]; let dx = n1.x - n2.x; let dy = n1.y - n2.y;
-                    let distSq = dx*dx + dy*dy; if(distSq === 0) distSq = 1;
-                    let force = repulsion / distSq; let dist = Math.sqrt(distSq);
-                    let fx = (dx/dist)*force; let fy = (dy/dist)*force;
+                    let n2 = gNodes[j]; let dx = n1.x - n2.x; let dy = n1.y - n2.y; let distSq = dx*dx + dy*dy; if(distSq === 0) distSq = 1;
+                    let force = repulsion / distSq; let dist = Math.sqrt(distSq); let fx = (dx/dist)*force; let fy = (dy/dist)*force;
                     n1.vx += fx; n1.vy += fy; n2.vx -= fx; n2.vy -= fy;
                 }
             }
             gEdges.forEach(e => {
-                let dx = e.target.x - e.source.x; let dy = e.target.y - e.source.y;
-                let dist = Math.sqrt(dx*dx + dy*dy); if(dist === 0) dist = 1;
+                let dx = e.target.x - e.source.x; let dy = e.target.y - e.source.y; let dist = Math.sqrt(dx*dx + dy*dy); if(dist === 0) dist = 1;
                 let force = (dist - 80) * k; let fx = (dx/dist)*force; let fy = (dy/dist)*force;
                 e.source.vx += fx; e.source.vy += fy; e.target.vx -= fx; e.target.vy -= fy;
             });
-            
             ctx.save(); ctx.translate(panX, panY);
-            
-            // Draw Edges
-            ctx.strokeStyle = document.body.classList.contains('dark-mode') ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = document.body.classList.contains('dark-mode') ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'; ctx.lineWidth = 2;
             gEdges.forEach(e => { ctx.beginPath(); ctx.moveTo(e.source.x, e.source.y); ctx.lineTo(e.target.x, e.target.y); ctx.stroke(); });
-            
-            // Draw Nodes
             gNodes.forEach(n => {
                 n.x += n.vx; n.y += n.vy; n.vx *= damping; n.vy *= damping;
-                ctx.beginPath(); ctx.arc(n.x, n.y, 16, 0, 2*Math.PI);
-                ctx.fillStyle = n.type === 'taslak' ? '#8e8e93' : '#30d158'; ctx.fill();
-                ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#ffffff' : '#000000';
-                ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText('#' + n.num, n.x, n.y + 28);
+                ctx.beginPath(); ctx.arc(n.x, n.y, 16, 0, 2*Math.PI); ctx.fillStyle = n.type === 'taslak' ? '#8e8e93' : '#30d158'; ctx.fill();
+                ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#ffffff' : '#000000'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+                
+                // ADDED TITLE TO GRAPH
+                let label = '#' + n.num + (n.title ? ' ' + n.title : '');
+                ctx.fillText(label, n.x, n.y + 28);
             });
             ctx.restore(); requestAnimationFrame(drawGraph);
         }
 
         /* ─────────────────────────────────────────
-           UTILS & OTHERS
+           UTILS & UI COMPONENTS
         ───────────────────────────────────────── */
-        function renderRecentRecords() {
-            const container = document.getElementById('recentRecordsList'); container.innerHTML = '';
-            let list = notes.filter(n => n.type === 'taslak').slice(0, 10);
-            if (list.length === 0) { container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No drafts yet.</div>`; return; }
-            list.forEach(item => {
-                const html = `
-                    <div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid var(--color-taslak); cursor:pointer;" onclick="openRecordModal(${item.id})">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">#${item.num}</div>
-                            ${item.spentSeconds ? `<span style="font-size:10px; font-weight:600; color:var(--text-muted); display:flex; align-items:center;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(item.spentSeconds)}</span>` : ''}
-                        </div>
-                        ${item.title ? `<div style="font-weight:600; font-size:12px; color:var(--text-main); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>` : ''}
-                        <div style="font-size:11px; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${item.text}</div>
-                    </div>`;
-                container.innerHTML += html;
-            });
+        function useAsTemplate(id, e) {
+            if (e) e.stopPropagation(); const n = notes.find(x => x.id === id); if (!n) return; closeUniversalModal();
+            editingNoteId = null; switchPage('taslak', true);
+            document.getElementById('noteInput').value = ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; updateWordProgress(); showToast('📋 Template loaded');
         }
+
         function resizeNoteBlock(mul) { document.getElementById('noteInput').style.height = (160 * mul) + 'px'; }
+        
         function addQuestionInput(val = '') {
             const container = document.getElementById('questionsContainer'); const row = document.createElement('div'); row.style.cssText = 'display:flex; gap:8px; align-items:center;';
             const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = val;
             const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => row.remove();
             row.appendChild(input); row.appendChild(delBtn); container.appendChild(row);
         }
+
         function toggleMeta() {
             isMetaVisible = !isMetaVisible; const wrapper = document.getElementById('metaInputsWrapper'); const icon = document.getElementById('toggleMetaIcon');
             if (isMetaVisible) { wrapper.style.display = 'flex'; icon.innerText = 'visibility_off'; } else { wrapper.style.display = 'none'; icon.innerText = 'visibility'; }
         }
+
+        function toggleEditorText() {
+            isEditorVisible = !isEditorVisible; const wrapper = document.getElementById('editorTextWrapper'); const icon = document.getElementById('toggleEditorIcon');
+            if (isEditorVisible) { wrapper.style.display = 'flex'; icon.innerText = 'visibility_off'; } else { wrapper.style.display = 'none'; icon.innerText = 'visibility'; }
+        }
+
         function clearCurrentNote() {
             if (confirm("Are you sure you want to delete all content?")) {
                 document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; searchReference(); renderBacklinks(); updateWordProgress(); showToast('🧹 Content fully cleared');
             }
         }
+
         function renderEditorButtons(page) {
             const container = document.getElementById('editorActions'); let html = '';
             if (page === 'taslak') {
@@ -774,42 +743,19 @@
             } else if (page === 'revize') { html = `<button class="btn-primary" style="background:var(--color-archive)" onclick="handleAction('archive')">Move to Archive</button>`; }
             container.innerHTML = html;
         }
-        function getAutoColorHex(type) { return type === 'taslak' ? '#8e8e93' : '#30d158'; }
-        function getAutoColor(type) { return type === 'taslak' ? 'var(--color-taslak)' : (type === 'revize' ? 'var(--color-revize)' : 'var(--text-muted)'); }
-        
-        function searchReference() {
-            let val = document.getElementById('refInput').value.trim(); const container = document.getElementById('refCardsContainer');
-            if (!val) { container.innerHTML = ''; return; }
-            const ids = val.match(/\d+/g); if (!ids || ids.length === 0) { container.innerHTML = ''; return; }
-            let html = ''; let foundAny = false;
-            ids.forEach(id => {
-                const formattedId = id.padStart(3, '0'); const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
-                if (found) {
-                    foundAny = true; const color = found.type ? getAutoColorHex(found.type) : 'var(--color-archive)'; 
-                    html += `
-                        <div class="card" style="padding:12px; border-left:4px solid ${color};">
-                            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
-                                <span>LINKED BLOCK</span><span style="color:${color}">#${found.num}</span>
-                            </div>
-                            <div class="ref-item-text" style="max-height:100px; overflow-y:auto; padding-right:4px;">${formatMentionsAndHighlights(found.text)}</div>
-                        </div>`;
-                }
-            });
-            container.innerHTML = foundAny ? html : '';
-        }
+
         function handleInput() {
             const val = document.getElementById('noteInput').value;
-            if (textHistory[textHistory.length - 1] !== val) { textHistory.push(val); if (textHistory.length > 20) textHistory.shift(); }
-            updateWordProgress();
+            if (textHistory[textHistory.length - 1] !== val) { textHistory.push(val); if (textHistory.length > 20) textHistory.shift(); } updateWordProgress();
         }
-        function undoText() {
-            if (textHistory.length > 1) { textHistory.pop(); document.getElementById('noteInput').value = textHistory[textHistory.length - 1]; updateWordProgress(); }
-        }
+        function undoText() { if (textHistory.length > 1) { textHistory.pop(); document.getElementById('noteInput').value = textHistory[textHistory.length - 1]; updateWordProgress(); } }
+
         function updateWordProgress() {
             const val = document.getElementById('noteInput').value.trim(); const words = val.length === 0 ? 0 : val.split(/\s+/).length;
             const level = Math.floor(words / 50) + 1; const remainder = words % 50;
             document.getElementById('wordLevel').innerText = `Level ${level}`; document.getElementById('wordCountUI').innerText = `${remainder} / 50`; document.getElementById('wordProgress').style.width = (remainder / 50 * 100) + '%';
         }
+
         function formatMentionsAndHighlights(text, query = '') {
             let formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             formatted = formatted.replace(/@(\d{1,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
@@ -819,12 +765,15 @@
         }
         function loadMention(num, event) { if (event) event.stopPropagation(); closeUniversalModal(); document.getElementById('refInput').value = num; searchReference(); }
 
+        /* ─────────────────────────────────────────
+           CORE ACTIONS (Save / Transfer / Archive)
+        ───────────────────────────────────────── */
         function handleAction(actionType) {
             pauseStopwatchSafe(); const text = document.getElementById('noteInput').value; if (!text.trim()) { alert('Please enter some text.'); return; }
             const textRefs = text.match(/@(\d{1,})/g) || []; const manualRefs = document.getElementById('refInput').value.match(/\d+/g) || [];
             const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])]; const tags = extractTags(text);
-            const title = (currentPage === 'revize') ? document.getElementById('metaTitle').value.trim() : '';
-            const questions = (currentPage === 'revize') ? Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim()).filter(v => v !== '') : [];
+            const title = document.getElementById('metaTitle').value.trim();
+            const questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim()).filter(v => v !== '');
 
             if (actionType === 'save') {
                 const formattedNum = String(globalCounter).padStart(3, '0');
@@ -832,9 +781,9 @@
                 globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); showStatus('Created'); checkBackupReminder();
             } else if (actionType === 'update') {
                 const n = notes.find(x => x.id === editingNoteId);
-                if (n) { n.text = text; n.refs = combinedRefs; n.tags = tags; n.spentSeconds = swSeconds; if (currentPage === 'revize') { n.title = title; n.questions = questions; } } showStatus('Updated');
+                if (n) { n.text = text; n.refs = combinedRefs; n.tags = tags; n.spentSeconds = swSeconds; n.title = title; n.questions = questions; } showStatus('Updated');
             } else if (actionType === 'transfer_revize') {
-                const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.spentSeconds = swSeconds; }
+                const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.spentSeconds = swSeconds; n.title = title; n.questions = questions; }
                 showStatus('Moved to Revise'); switchPage('revize'); saveToLocal(); return;
             } else if (actionType === 'archive') {
                 let archiveNote = notes.find(x => x.id === editingNoteId); let noteId = Date.now(); let noteNum = String(globalCounter).padStart(3, '0');
@@ -843,17 +792,40 @@
                 archive.unshift({ id: noteId, num: noteNum, text: text, title: title, refs: combinedRefs, tags: tags, date: new Date().toLocaleDateString(), spentSeconds: swSeconds });
                 localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); showStatus('Sent to Archive');
                 
-                draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+                draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; metaMemory.title = ''; metaMemory.questions = [];
                 localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory)); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
                 navSwitchPage('archive'); saveToLocal(); return;
             }
             saveToLocal();
-            draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+            draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; metaMemory.title = ''; metaMemory.questions = [];
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory)); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+            document.getElementById('noteInput').value = ''; document.getElementById('refInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = '';
             navSwitchPage('records');
         }
 
+        /* ─────────────────────────────────────────
+           RENDERING VIEWS
+        ───────────────────────────────────────── */
+        function getAutoColorHex(type) { return type === 'taslak' ? '#8e8e93' : '#30d158'; }
+        function getAutoColor(type) { return type === 'taslak' ? 'var(--color-taslak)' : (type === 'revize' ? 'var(--color-revize)' : 'var(--text-muted)'); }
         function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
+
+        function renderRecentRecords() {
+            const container = document.getElementById('recentRecordsList'); container.innerHTML = '';
+            let list = notes.filter(n => n.type === 'taslak').slice(0, 10);
+            if (list.length === 0) { container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No drafts yet.</div>`; return; }
+            list.forEach(item => {
+                const color = 'var(--color-taslak)';
+                const title = item.title ? `<div style="font-weight:600; font-size:12px; color:var(--text-main); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>` : '';
+                const timeSnippet = item.spentSeconds ? `<span style="font-size:10px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:2px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+                const html = `
+                    <div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="openRecordModal(${item.id})">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><div style="font-size:11px; color:var(--text-muted); font-weight:700;">#${item.num}</div>${timeSnippet}</div>
+                        ${title}<div style="font-size:11px; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${item.text}</div>
+                    </div>`;
+                container.innerHTML += html;
+            });
+        }
 
         function createCardHTML(n, isList = false) {
             const borderColor = n.type ? getAutoColorHex(n.type) : 'var(--color-archive)';
@@ -885,16 +857,14 @@
             if (query) { filtered = filtered.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query) || (n.title && n.title.toLowerCase().includes(query))); }
             if (currentTagFilter) { filtered = filtered.filter(n => (n.tags || extractTags(n.text)).includes(currentTagFilter)); }
             renderTagFilterBar();
-            if (filtered.length === 0) {
-                board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:var(--surface-alt);"><span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span></div><h3>No Drafts Found</h3></div>`; return;
-            }
+            if (filtered.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:var(--surface-alt);"><span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span></div><h3>No Drafts Found</h3><p>${currentTagFilter ? `No notes in tag "${currentTagFilter}".` : 'No drafts match your search or saved.'}</p></div>`; return; }
             const container = document.createElement('div'); container.className = 'archive-grid';
             filtered.forEach(n => { const wrap = document.createElement('div'); wrap.innerHTML = createCardHTML(n, false); container.appendChild(wrap.firstElementChild); }); board.appendChild(container);
         }
 
         function renderArchivePage() {
             const board = document.getElementById('archiveBoard'); board.innerHTML = '';
-            if (archive.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);"><span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span></div><h3>Archive Empty</h3></div>`; return; }
+            if (archive.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);"><span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span></div><h3>Archive Empty</h3><p>You can move notes in the revision stage here by archiving them.</p></div>`; return; }
             const container = document.createElement('div'); container.className = 'archive-grid';
             archive.forEach(a => {
                 const timerHtml = a.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(a.spentSeconds)}</div>` : '';
@@ -905,6 +875,9 @@
             board.appendChild(container);
         }
 
+        /* ─────────────────────────────────────────
+           MODALS
+        ───────────────────────────────────────── */
         function openRecordModal(id) {
             const item = notes.find(a => a.id === id); if (!item) return;
             const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
@@ -912,7 +885,6 @@
             document.getElementById('modalFooter').innerHTML = `<span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();" title="Delete">delete</span><div style="display:flex; gap:15px; align-items:center;"><span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)" title="Use as Template">content_copy</span><button class="btn-primary" style="padding:6px 16px; border-radius:20px;" onclick="editNote(${item.id}); closeUniversalModal();">Edit</button></div>`;
             const modal = document.getElementById('universalModal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
         }
-
         function openArchiveModal(id) {
             const item = archive.find(a => a.id === id); if (!item) return;
             const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
@@ -921,7 +893,6 @@
             document.getElementById('modalFooter').innerHTML = `<span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span><div style="display:flex; gap:15px;"><span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span><span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Copied')); closeUniversalModal();" title="Copy">content_copy</span></div>`;
             const modal = document.getElementById('universalModal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
         }
-
         function closeUniversalModal(e) { if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return; const modal = document.getElementById('universalModal'); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); }
 
         function deleteNote(id) { if (confirm('Are you sure you want to delete?')) { notes = notes.filter(n => n.id !== id); saveToLocal(); renderRecords(); } }
