@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#191919">
+    <title>Chimptopus Pro</title>
+    
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQ2hpbXB0b3B1cyBQcm8iLCJzaG9ydF9uYW1lIjoiTm90ZXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzE5MTkxOSIsInRoZW1lX2NvbG9yIjoiIzE5MTkxOSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tL3MvaS9zaG9ydC10ZXJtL3JlbGVhc2UvbWF0ZXJpYWxzeW1ib2xzcm91bmRlZC9lZGl0X2RvY3VtZW50L2RlZmF1bHQvMjRweC5zdmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --surface-color: #ffffff;
+            --surface-alt: #f7f7f5;
+            --text-main: #37352f;
+            --text-muted: #9b9a97;
+            --border-color: #e9e9e7;
+            --primary-blue: #2383e2;
+            --danger-color: #eb5757;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+            --color-taslak: #8e8e93;
+            --color-revize: #2383e2;
+            --color-archive: #30d158; 
+        }
+
+        .dark-mode {
+            --bg-color: #191919;
+            --surface-color: #202020;
+            --surface-alt: #252525;
+            --text-main: rgba(255,255,255,0.9);
+            --text-muted: rgba(255,255,255,0.5);
+            --border-color: #373737;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            padding-top: calc(125px + env(safe-area-inset-top)); 
+        }
+
+        * { box-sizing: border-box; }
+
+        .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); }
+        
+        /* ── APP HEADER & TABS ── */
+        .app-header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: var(--bg-color);
+            z-index: 1010;
+            padding: calc(15px + env(safe-area-inset-top)) 20px 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+
+        .top-tabs {
+            position: fixed; top: calc(56px + env(safe-area-inset-top)); left: 0; width: 100%;
+            background: rgba(25,25,25,0.85);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        body:not(.dark-mode) .top-tabs { background: rgba(255,255,255,0.88); }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            color: var(--text-muted); cursor: pointer; flex: 1; text-align: center;
+            position: relative; padding-bottom: 4px;
+        }
+        .nav-item .icon { font-size: 18px; transition: transform 0.2s ease; }
+        .nav-item .label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .nav-item::after {
+            content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 2px; background: var(--text-main); border-radius: 2px;
+            transition: width 0.25s ease;
+        }
+        .nav-item.active { color: var(--text-main); }
+        .nav-item.active .icon { transform: scale(1.1); }
+        .nav-item.active::after { width: 16px; }
+
+        /* ── PAGE TRANSITIONS ── */
+        .page-container { padding: 0 20px 40px; display: none; animation: pageIn 0.3s ease; }
+        .page-container.active { display: block; }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── EDITOR ── */
+        .note-box {
+            padding: 20px; display: flex; flex-direction: column;
+            position: relative; background: var(--surface-alt);
+            border: 1px solid var(--border-color); border-radius: 12px;
+        }
+
+        .meta-input {
+            width: 100%; background: var(--surface-color); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 12px 15px; font-size: 14px; font-weight: 600;
+            color: var(--text-main); outline: none; font-family: inherit; box-shadow: var(--card-shadow);
+        }
+        .meta-input::placeholder { color: var(--text-muted); font-weight: 400; }
+        .meta-input-secondary { font-weight: 400; font-size: 13px; }
+
+        .timer-btn {
+            font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
+            background: var(--surface-color); border: 1px solid var(--border-color);
+            color: var(--text-muted); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .timer-btn:active { background: var(--border-color); }
+        
+        @keyframes pulseBorder {
+            0% { border-color: var(--border-color); }
+            50% { border-color: var(--primary-blue); }
+            100% { border-color: var(--border-color); }
+        }
+        .sw-running { animation: pulseBorder 2s infinite; color: var(--primary-blue); }
+
+        textarea {
+            width: 100%; height: 160px; background-color: var(--surface-color);
+            background-image: repeating-linear-gradient(transparent, transparent 31px, var(--border-color) 31px, var(--border-color) 32px);
+            background-attachment: local;
+            line-height: 32px; padding: 6px 15px; font-size: 16px; 
+            border: 1px solid var(--border-color); border-radius: 8px;
+            outline: none; color: var(--text-main); resize: none;
+            font-family: inherit; box-shadow: var(--card-shadow);
+            transition: height 0.3s ease;
+        }
+        textarea::placeholder { color: var(--text-muted); }
+
+        .ref-input-container {
+            display: flex; gap: 10px; align-items: center;
+            background: var(--surface-color); padding: 10px 15px;
+            border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px;
+        }
+        .ref-input-container input { background: transparent; border: none; outline: none; font-size: 14px; color: var(--text-main); flex-grow: 1; font-family: inherit; }
+
+        .ref-item-text { font-size: 14px; line-height: 1.5; color: var(--text-main); margin-top: 4px; }
+        .ref-item-text::-webkit-scrollbar { width: 4px; }
+        .ref-item-text::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .word-challenge {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 15px;
+        }
+        .progress-bar-container { flex-grow: 1; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-left: 10px; }
+        .progress-bar { height: 100%; background: var(--primary-blue); width: 0%; transition: width 0.3s ease; }
+
+        .recent-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+        .recent-scroll::-webkit-scrollbar { display: none; }
+
+        /* ── RECORDS PAGE ── */
+        .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .search-bar {
+            display: flex; align-items: center; background: var(--surface-alt);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 10px 12px; flex-grow: 1; margin-right: 12px;
+        }
+        .search-bar input { border: none; background: transparent; outline: none; color: var(--text-main); font-size: 15px; width: 100%; margin-left: 8px; font-family: inherit; }
+
+        .tag-filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; margin-bottom: 4px; }
+        .tag-filter-bar::-webkit-scrollbar { display: none; }
+        .tag-chip {
+            flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 5px 12px;
+            border-radius: 20px; border: 1px solid var(--border-color);
+            background: var(--surface-color); color: var(--text-muted);
+            cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .tag-chip.active { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); }
+        .tag-chip:active { opacity: 0.8; }
+
+        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+
+        .note-card {
+            min-width: 150px; padding: 16px; cursor: pointer; position: relative;
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .note-card:active { transform: scale(0.985); }
+
+        .mention-link { color: var(--primary-blue); cursor: pointer; font-weight: 500; text-decoration: none; background: rgba(35,131,226,0.1); padding: 2px 6px; border-radius: 4px; }
+        .tag-link { color: #8e44ad; cursor: pointer; font-weight: 600; background: rgba(142,68,173,0.1); padding: 2px 6px; border-radius: 4px; font-size: inherit; }
+        .highlight { background-color: rgba(35,131,226,0.2); border-radius: 3px; padding: 0 2px; }
+        .inline-tag-pill { display: inline-flex; align-items: center; font-size: 11px; background: rgba(142,68,173,0.1); border: 1px solid rgba(142,68,173,0.2); padding: 3px 8px; border-radius: 6px; color: #8e44ad; font-weight: 600; margin: 2px 4px 2px 0; }
+
+        /* ── SIDE PANEL ── */
+        .side-panel {
+            position: fixed; top: 0; right: 0; transform: translateX(100%);
+            width: 100%; max-width: 320px; height: 100%;
+            z-index: 2000; padding: 40px 25px;
+            background: var(--surface-color); border-left: 1px solid var(--border-color);
+            transition: transform 0.3s ease; overflow-y: auto;
+        }
+        .side-panel.active { transform: translateX(0); box-shadow: -5px 0 25px rgba(0,0,0,0.07); }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.2); display: none; z-index: 1500; opacity: 0; transition: opacity 0.3s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        .action-btn-menu {
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: var(--surface-color);
+            color: var(--text-main); font-family: inherit; font-size: 14px; font-weight: 500;
+            cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s;
+        }
+        .action-btn-menu:active { background: var(--surface-alt); }
+
+        .stats-section { margin-top: 25px; }
+        .stats-title { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat-card { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center; }
+        .stat-number { font-size: 22px; font-weight: 700; color: var(--text-main); line-height: 1; }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .stat-wide { grid-column: span 2; }
+        .stat-bar-row { display: flex; gap: 4px; margin-top: 10px; height: 6px; border-radius: 4px; overflow: hidden; }
+        .stat-bar-seg { height: 100%; transition: width 0.4s ease; }
+
+        /* ── UTILS ── */
+        .icon-btn { background: transparent; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: 0.2s; }
+        .icon-btn:hover { color: var(--text-main); }
+        .btn-primary { background: var(--primary-blue); color: white; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .btn-secondary { background: var(--surface-alt); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; font-weight: 500; font-size: 14px; padding: 8px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+        .btn-primary:active, .btn-secondary:active { opacity: 0.8; }
+        .action-icon { font-size: 20px; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .action-icon:hover { color: var(--text-main); }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .empty-state-icon-wrap { width: 72px; height: 72px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px; }
+        .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text-main); margin: 0 0 8px; }
+        .empty-state p { font-size: 14px; line-height: 1.5; margin: 0; color: var(--text-muted); }
+
+        .ios-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            z-index: 3000; display: none; opacity: 0; transition: opacity 0.3s;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .ios-modal.active { display: flex; opacity: 1; }
+        .ios-modal-content {
+            background: var(--surface-color); border-radius: 16px; width: 100%; max-width: 400px;
+            max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s;
+        }
+        .ios-modal.active .ios-modal-content { transform: translateY(0); }
+        .ios-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .ios-modal-body { flex-grow: 1; min-height: 0; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; word-wrap: break-word; }
+        .ios-modal-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: var(--surface-alt); flex-shrink: 0; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--text-main); color: var(--bg-color);
+            padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+            z-index: 9999; opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none; white-space: nowrap; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .toast-action {
+            background: rgba(255,255,255,0.2); border: none; border-radius: 6px;
+            color: inherit; font-size: 13px; font-weight: 700; padding: 4px 10px;
+            cursor: pointer; font-family: inherit;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <header class="app-header">
+        <div class="logo" id="mainLogo">📝 Notes</div>
+        <div style="display:flex; gap:5px;">
+            <button class="icon-btn" onclick="toggleDarkMode()"><span class="material-symbols-rounded" id="themeIcon">light_mode</span></button>
+            <button class="icon-btn" onclick="togglePanel('sideMenu')"><span class="material-symbols-rounded">more_horiz</span></button>
+        </div>
+    </header>
+
+    <nav class="top-tabs">
+        <div class="nav-item active" id="nav-records" onclick="navSwitchPage('records')">
+            <span class="material-symbols-rounded icon">grid_view</span>
+            <span class="label">Records</span>
+        </div>
+        <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
+            <span class="material-symbols-rounded icon">edit_document</span>
+            <span class="label">Draft</span>
+        </div>
+        <div class="nav-item" id="nav-revize" onclick="navSwitchPage('revize')">
+            <span class="material-symbols-rounded icon">find_replace</span>
+            <span class="label">Revise</span>
+        </div>
+        <div class="nav-item" id="nav-archive" onclick="navSwitchPage('archive')">
+            <span class="material-symbols-rounded icon">inventory_2</span>
+            <span class="label">Archive</span>
+        </div>
+    </nav>
+
+    <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
+
+    <div class="toast" id="toastEl">
+        <span id="toastMsg"></span>
+        <button class="toast-action" id="toastActionBtn" style="display:none;"></button>
+    </div>
+
+    <div class="ios-modal" id="universalModal" onclick="closeUniversalModal(event)">
+        <div class="ios-modal-content" onclick="event.stopPropagation()">
+            <div class="ios-modal-header">
+                <div>
+                    <div id="modalTitle" style="font-weight:700; font-size:18px; color:var(--text-main);"></div>
+                    <div id="modalDate" style="font-size:12px; color:var(--text-muted); margin-top:2px;"></div>
+                </div>
+                <span class="material-symbols-rounded" style="cursor:pointer; color:var(--text-muted);" onclick="closeUniversalModal(event)">close</span>
+            </div>
+            <div class="ios-modal-body" id="modalBody"></div>
+            <div class="ios-modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <div id="sideMenu" class="side-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h2 style="font-weight:600; margin:0; font-size:20px;">Settings</h2>
+            <span class="material-symbols-rounded" onclick="closePanels()" style="cursor:pointer; color:var(--text-muted)">close</span>
+        </div>
+
+        <button class="action-btn-menu" onclick="exportData()">
+            <span class="material-symbols-rounded" style="font-size:18px;">download</span> Export Backup (JSON)
+        </button>
+        <label class="action-btn-menu" style="cursor:pointer;">
+            <span class="material-symbols-rounded" style="font-size:18px;">upload</span> Import Backup (JSON)
+            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+        </label>
+        <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
+
+        <div class="stats-section">
+            <div class="stats-title">Statistics</div>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">Draft Notes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statArchived">0</div>
+                    <div class="stat-label">Archived</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statWords">0</div>
+                    <div class="stat-label">Total Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTags">0</div>
+                    <div class="stat-label">Unique Tags</div>
+                </div>
+                <div class="stat-card stat-wide">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;">
+                        <span style="color:var(--color-taslak); font-weight:600;" id="statTaslakLbl">D: 0</span>
+                        <span style="color:var(--color-archive); font-weight:600;" id="statRevizeLbl">A: 0</span>
+                    </div>
+                    <div class="stat-bar-row" id="statBarRow">
+                        <div class="stat-bar-seg" style="background:var(--color-taslak); width:50%;"></div>
+                        <div class="stat-bar-seg" style="background:var(--color-archive); width:50%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr style="margin:20px 0; border:0; border-top:1px solid var(--border-color);">
+        <button class="action-btn-menu" onclick="clearAll()" style="color:var(--danger-color);">
+            <span class="material-symbols-rounded" style="font-size:18px;">delete</span> Clear Workspace
+        </button>
+    </div>
+
+    <div id="pageRecords" class="page-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="font-weight:600; font-size:24px; margin:0;">Records <span style="font-size:14px; font-weight:500; color:var(--text-muted);">(Drafts)</span></h2>
+        </div>
+        <div class="controls-row">
+            <div class="search-bar" style="margin:0; width:100%;">
+                <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">search</span>
+                <input type="text" id="searchInput" placeholder="Search notes..." oninput="renderRecords()">
+            </div>
+        </div>
+        <div class="tag-filter-bar" id="tagFilterBar"></div>
+        <div id="recordsBoard"></div>
+    </div>
+
+    <div id="pageEditor" class="page-container">
+        <div class="editor-section">
+            <div class="note-box" id="editorWorkspace">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div id="stageBadge" style="width:12px; height:12px; border-radius:50%; background:var(--color-taslak)"></div>
+                        <span id="boxLabel" style="font-size:16px; font-weight:700; color:var(--text-main)">Draft</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        
+                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-right:1px solid var(--border-color); padding-right:10px;">
+                            <button class="timer-btn" onclick="resizeNoteBlock(1)">1x</button>
+                            <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
+                            <button class="timer-btn" onclick="resizeNoteBlock(3)">3x</button>
+                        </div>
+                        
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <span id="swDisplay" style="font-size:14px; font-weight:700; font-variant-numeric: tabular-nums; color:var(--text-muted); margin-right:2px;">00:00</span>
+                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()">
+                                <span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span>
+                            </button>
+                            <span class="material-symbols-rounded action-icon" onclick="clearCurrentNote()" title="Delete All" style="font-size:22px; color:var(--danger-color); margin-left:6px;">delete_sweep</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="metaBlocksContainer" style="display:none; flex-direction:column; gap:8px; margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 4px;">
+                        <span style="font-size:12px; font-weight:700; color:var(--text-muted);">TITLE AND QUESTIONS</span>
+                        <span class="material-symbols-rounded action-icon" id="toggleMetaIcon" onclick="toggleMeta()" style="font-size:20px;">visibility_off</span>
+                    </div>
+                    <div id="metaInputsWrapper" style="display:flex; flex-direction:column; gap:8px;">
+                        <input type="text" id="metaTitle" class="meta-input" placeholder="Title, Topic or Main Idea...">
+                        <div id="questionsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                        <button class="icon-btn" onclick="addQuestionInput()" style="width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:transparent; font-size:13px;">+ Add Question</button>
+                    </div>
+                </div>
+
+                <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
+
+                <div id="refContainer" style="display:none; flex-direction:column;">
+                    <div class="ref-input-container">
+                        <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
+                        <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 001, 004)" oninput="searchReference()">
+                    </div>
+                    <div id="refCardsContainer" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
+                </div>
+
+                <div class="word-challenge">
+                    <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
+                    <span id="wordLevel" style="font-weight:700; color:var(--primary-blue)">Level 1</span>
+                    <span id="wordCountUI" style="margin-left:auto; font-size:12px; font-weight:600; color:var(--text-muted);">0 / 50</span>
+                    <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span id="statusMsg" style="color:var(--text-muted); font-size:12px;"></span>
+                        <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Undo" style="font-size:18px;">undo</span>
+                        <span class="material-symbols-rounded action-icon" onclick="insertTimestamp()" title="Insert Time" style="font-size:18px;">schedule</span>
+                    </div>
+                    <div id="editorActions" style="display:flex; gap:8px;"></div>
+                </div>
+            </div>
+
+            <div id="recentRecordsContainer" style="margin-top: 30px;">
+                <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
+                <div class="recent-scroll" id="recentRecordsList"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="pageArchive" class="page-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="font-weight:600; font-size:24px; margin:0;">Archive</h2>
+        </div>
+        <div id="archiveBoard"></div>
+    </div>
+
+    <script>
+        /* ─────────────────────────────────────────
+           THEME INITIALIZATION
+        ───────────────────────────────────────── */
+        if (localStorage.getItem('chimptopus_theme') === 'light') {
+            document.body.classList.remove('dark-mode');
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('chimptopus_theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').innerText = isDark ? 'light_mode' : 'dark_mode';
+        }
+        window.onload = () => {
+            document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode';
+        };
+
+        /* ─────────────────────────────────────────
+           STATE & MIGRATION TO 3 DIGIT IDs
+        ───────────────────────────────────────── */
+        let notes        = JSON.parse(localStorage.getItem('chimptopus_v18_notes'))   || [];
+        let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
+        let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
+
+        // Migrating 2-digit IDs to 3-digit IDs
+        notes.forEach(n => { if (n.num && n.num.length === 2) n.num = '0' + n.num; });
+        archive.forEach(a => { if (a.num && a.num.length === 2) a.num = '0' + a.num; });
+
+        const nonTaslak = notes.filter(n => n.type !== 'taslak');
+        if (nonTaslak.length > 0) {
+            nonTaslak.forEach(n => {
+                archive.unshift({
+                    id: n.id, num: n.num, text: n.text, title: n.title, refs: n.refs, tags: n.tags,
+                    date: new Date().toLocaleDateString(),
+                    spentSeconds: n.spentSeconds || 0
+                });
+            });
+            notes = notes.filter(n => n.type === 'taslak');
+            localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes));
+            localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+        }
+
+        let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v18_drafts')) || { taslak:'', revize:'' };
+        let refsMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_refs'))   || { taslak:'', revize:'' };
+        let metaMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_meta'))   || { title:'', questions:[] };
+
+        let currentPage   = 'records';
+        let editingNoteId = null;
+        let textHistory   = [];
+        let currentTagFilter = null;
+        let isMetaVisible = true;
+
+        let swInterval;
+        let swSeconds = 0;
+        let swRunning = false;
+
+        /* ─────────────────────────────────────────
+           TOAST
+        ───────────────────────────────────────── */
+        let toastTimeout;
+        function showToast(msg, actionLabel, actionFn) {
+            const el = document.getElementById('toastEl');
+            const msgEl = document.getElementById('toastMsg');
+            const btnEl = document.getElementById('toastActionBtn');
+
+            msgEl.innerText = msg;
+            if (actionLabel && actionFn) {
+                btnEl.innerText = actionLabel; btnEl.style.display = 'inline-block';
+                btnEl.onclick = () => { actionFn(); hideToast(); };
+            } else { btnEl.style.display = 'none'; }
+
+            el.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(hideToast, actionLabel ? 5000 : 2500);
+        }
+        function hideToast() { document.getElementById('toastEl').classList.remove('show'); }
+
+        /* ─────────────────────────────────────────
+           STATS & BACKUP
+        ───────────────────────────────────────── */
+        function renderStats() {
+            const taslakCount  = notes.length; 
+            const archiveCount = archive.length;
+            const totalWords   = notes.reduce((sum, n) => sum + (n.text.trim() ? n.text.trim().split(/\s+/).length : 0), 0);
+            const allTags      = getAllTags();
+
+            document.getElementById('statTotal').innerText    = taslakCount;
+            document.getElementById('statArchived').innerText = archiveCount;
+            document.getElementById('statWords').innerText    = totalWords;
+            document.getElementById('statTags').innerText     = allTags.length;
+            document.getElementById('statTaslakLbl').innerText = `D: ${taslakCount}`;
+            document.getElementById('statRevizeLbl').innerText = `A: ${archiveCount}`;
+
+            const bars = document.querySelectorAll('#statBarRow .stat-bar-seg');
+            const total = taslakCount + archiveCount;
+            if (total > 0) {
+                bars[0].style.width = (taslakCount / total * 100) + '%';
+                bars[1].style.width = (archiveCount / total * 100) + '%';
+            } else {
+                bars.forEach(b => b.style.width = '50%');
+            }
+        }
+
+        function checkBackupReminder() {
+            const savedAt = parseInt(localStorage.getItem('chimptopus_v19_lastBackupAt')) || 0;
+            const diff = globalCounter - savedAt;
+            if (diff >= 10 && savedAt > 0) {
+                showToast(`${diff} notes created — time to backup!`, 'Backup', () => {
+                    exportData(); localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
+                });
+            } else if (savedAt === 0) {
+                localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           STOPWATCH
+        ───────────────────────────────────────── */
+        function toggleStopwatch() {
+            const btn = document.getElementById('swToggleBtn');
+            const icon = document.getElementById('swToggleIcon');
+            if (swRunning) {
+                clearInterval(swInterval); swRunning = false;
+                icon.innerText = 'play_arrow'; btn.classList.remove('sw-running');
+            } else {
+                swInterval = setInterval(() => {
+                    swSeconds++; document.getElementById('swDisplay').innerText = formatTime(swSeconds);
+                }, 1000);
+                swRunning = true; icon.innerText = 'pause'; btn.classList.add('sw-running');
+            }
+        }
+        function formatTime(sec) {
+            if(!sec) return "00:00";
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+        function pauseStopwatchSafe() { if (swRunning) toggleStopwatch(); }
+
+        /* ─────────────────────────────────────────
+           TAG HELPERS
+        ───────────────────────────────────────── */
+        function extractTags(text) {
+            const matches = text.match(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g) || [];
+            return [...new Set(matches.map(t => t.toLowerCase()))];
+        }
+        function getAllTags() {
+            const all = notes.flatMap(n => extractTags(n.text));
+            return [...new Set(all)].sort();
+        }
+        function renderTagFilterBar() {
+            const bar = document.getElementById('tagFilterBar');
+            const tags = getAllTags();
+            if (tags.length === 0) { bar.innerHTML = ''; return; }
+
+            let html = `<div class="tag-chip ${!currentTagFilter ? 'active' : ''}" onclick="setTagFilter(null)">All</div>`;
+            tags.forEach(tag => {
+                html += `<div class="tag-chip ${currentTagFilter === tag ? 'active' : ''}" onclick="setTagFilter('${tag}')">${tag}</div>`;
+            });
+            bar.innerHTML = html;
+        }
+        function setTagFilter(tag) {
+            currentTagFilter = tag; renderTagFilterBar(); renderRecords();
+        }
+
+        /* ─────────────────────────────────────────
+           TEMPLATE
+        ───────────────────────────────────────── */
+        function useAsTemplate(id, e) {
+            if (e) e.stopPropagation();
+            const n = notes.find(x => x.id === id);
+            if (!n) return;
+            closeUniversalModal();
+
+            editingNoteId = null;
+            switchPage('taslak', true);
+
+            document.getElementById('noteInput').value = '';
+            swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
+            updateWordProgress();
+
+            showToast('📋 Template loaded — ready to write');
+        }
+
+        /* ─────────────────────────────────────────
+           NAV & PAGE SWITCHING
+        ───────────────────────────────────────── */
+        function navSwitchPage(page) {
+            if (['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); }
+            editingNoteId = null; switchPage(page, false);
+        }
+
+        function saveDraftMemory() {
+            draftsMemory[currentPage] = document.getElementById('noteInput').value;
+            refsMemory[currentPage]   = document.getElementById('refInput').value;
+            localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
+            if (currentPage === 'revize') {
+                metaMemory.title     = document.getElementById('metaTitle').value;
+                metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
+                localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+            }
+        }
+
+        function switchPage(page, saveCurrent = true) {
+            if (saveCurrent && ['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); }
+            pauseStopwatchSafe();
+            if (page !== 'taslak') resizeNoteBlock(1);
+
+            currentPage = page;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            document.getElementById('nav-' + page).classList.add('active');
+
+            if (page === 'records') {
+                document.getElementById('pageRecords').classList.add('active'); renderRecords();
+            } else if (page === 'archive') {
+                document.getElementById('pageArchive').classList.add('active'); renderArchivePage();
+            } else {
+                document.getElementById('pageEditor').classList.add('active');
+                document.getElementById('editorWorkspace').style.display = 'flex';
+                document.getElementById('metaBlocksContainer').style.display = (page === 'revize') ? 'flex' : 'none';
+                document.getElementById('refContainer').style.display = (page === 'revize') ? 'flex' : 'none';
+                document.getElementById('sizeControls').style.display = 'flex';
+
+                const label = editingNoteId
+                    ? `Edit: #${notes.find(n => n.id === editingNoteId)?.num || ''}`
+                    : 'New ' + (page === 'taslak' ? 'Draft' : 'Revise');
+
+                document.getElementById('boxLabel').innerText = label;
+                document.getElementById('stageBadge').style.background = getAutoColor(page);
+
+                if (!editingNoteId) {
+                    document.getElementById('noteInput').value = draftsMemory[page] || '';
+                    document.getElementById('refInput').value  = refsMemory[page]   || '';
+                    swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
+
+                    if (page === 'revize') {
+                        document.getElementById('metaTitle').value = metaMemory.title || '';
+                        document.getElementById('questionsContainer').innerHTML = '';
+                        if (metaMemory.questions && metaMemory.questions.length > 0) {
+                            metaMemory.questions.forEach(q => addQuestionInput(q));
+                        } else { addQuestionInput(); }
+                    }
+                    searchReference();
+                }
+                renderEditorButtons(page); updateWordProgress(); renderRecentRecords();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function editNote(id) {
+            const noteToEdit = notes.find(n => n.id === id);
+            if (!noteToEdit) return;
+
+            editingNoteId = id; switchPage(noteToEdit.type, true);
+            document.getElementById('noteInput').value = noteToEdit.text;
+            swSeconds = noteToEdit.spentSeconds || 0;
+            document.getElementById('swDisplay').innerText = formatTime(swSeconds);
+
+            if (noteToEdit.type === 'revize') {
+                document.getElementById('metaTitle').value = noteToEdit.title || '';
+                document.getElementById('questionsContainer').innerHTML = '';
+                if (noteToEdit.questions && noteToEdit.questions.length > 0) {
+                    noteToEdit.questions.forEach(q => addQuestionInput(q));
+                } else { addQuestionInput(); }
+            }
+            document.getElementById('refInput').value = noteToEdit.refs ? noteToEdit.refs.join(', ') : '';
+            searchReference(); updateWordProgress(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ─────────────────────────────────────────
+           RECENT RECORDS LIST
+        ───────────────────────────────────────── */
+        function renderRecentRecords() {
+            const container = document.getElementById('recentRecordsList');
+            container.innerHTML = '';
+            
+            // Taslak notlarını listele
+            let list = notes.filter(n => n.type === 'taslak').slice(0, 10);
+
+            if (list.length === 0) {
+                container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No drafts yet.</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const color = 'var(--color-taslak)';
+                const title = item.title ? `<div style="font-weight:600; font-size:12px; color:var(--text-main); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>` : '';
+                const timeSnippet = item.spentSeconds ? `<span style="font-size:10px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:2px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+
+                const html = `
+                    <div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="openRecordModal(${item.id})">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">#${item.num}</div>
+                            ${timeSnippet}
+                        </div>
+                        ${title}
+                        <div style="font-size:11px; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${item.text}</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function resizeNoteBlock(mul) { document.getElementById('noteInput').style.height = (160 * mul) + 'px'; }
+
+        function addQuestionInput(val = '') {
+            const container = document.getElementById('questionsContainer');
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+
+            const input = document.createElement('input');
+            input.type = 'text'; input.className = 'meta-input meta-input-secondary';
+            input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...';
+            input.value = val;
+
+            const delBtn = document.createElement('span');
+            delBtn.className = 'material-symbols-rounded action-icon';
+            delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on';
+            delBtn.onclick = () => row.remove();
+
+            row.appendChild(input); row.appendChild(delBtn); container.appendChild(row);
+        }
+
+        function toggleMeta() {
+            isMetaVisible = !isMetaVisible;
+            const wrapper = document.getElementById('metaInputsWrapper');
+            const icon = document.getElementById('toggleMetaIcon');
+            if (isMetaVisible) { wrapper.style.display = 'flex'; icon.innerText = 'visibility_off'; } 
+            else { wrapper.style.display = 'none'; icon.innerText = 'visibility'; }
+        }
+
+        function clearCurrentNote() {
+            if (confirm("Are you sure you want to delete all content?")) {
+                document.getElementById('noteInput').value = '';
+                document.getElementById('metaTitle').value = '';
+                document.getElementById('questionsContainer').innerHTML = '';
+                addQuestionInput(); 
+                document.getElementById('refInput').value = '';
+                searchReference(); updateWordProgress();
+                showToast('🧹 Content fully cleared');
+            }
+        }
+
+        function renderEditorButtons(page) {
+            const container = document.getElementById('editorActions');
+            let html = '';
+            if (page === 'taslak') {
+                if (editingNoteId) {
+                    html = `<button class="btn-secondary" onclick="handleAction('update')">Update</button>
+                            <button class="btn-primary" style="background:var(--color-revize)" onclick="handleAction('transfer_revize')">Move to Revise</button>`;
+                } else {
+                    html = `<button class="btn-primary" style="background:var(--color-taslak)" onclick="handleAction('save')">Save Draft</button>`;
+                }
+            } else if (page === 'revize') {
+                html = `<button class="btn-primary" style="background:var(--color-archive)" onclick="handleAction('archive')">Move to Archive</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function getAutoColor(type) {
+            if (type === 'taslak') return 'var(--color-taslak)';
+            if (type === 'revize') return 'var(--color-revize)';
+            return 'var(--text-muted)';
+        }
+
+        function getAutoColorHex(type) {
+            if (type === 'taslak') return '#8e8e93';
+            if (type === 'revize') return '#2383e2';
+            return '#9b9a97';
+        }
+
+        /* ─────────────────────────────────────────
+           SEARCH & REFERENCE 
+        ───────────────────────────────────────── */
+        function searchReference() {
+            let val = document.getElementById('refInput').value.trim();
+            const container = document.getElementById('refCardsContainer');
+            if (!val) { container.innerHTML = ''; return; }
+
+            const ids = val.match(/\d+/g);
+            if (!ids || ids.length === 0) { container.innerHTML = ''; return; }
+
+            let html = ''; let foundAny = false;
+
+            ids.forEach(id => {
+                const formattedId = id.padStart(3, '0');
+                const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
+                if (found) {
+                    foundAny = true;
+                    const color = found.type ? getAutoColorHex(found.type) : 'var(--color-archive)'; 
+                    html += `
+                        <div class="card" style="padding:12px; border-left:4px solid ${color};">
+                            <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
+                                <span>LINKED BLOCK</span>
+                                <span style="color:${color}">#${found.num}</span>
+                            </div>
+                            <div class="ref-item-text" style="max-height:100px; overflow-y:auto; padding-right:4px;">${formatMentionsAndHighlights(found.text)}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (foundAny) { container.innerHTML = html; } else { container.innerHTML = ''; }
+        }
+
+        function handleInput() {
+            const val = document.getElementById('noteInput').value;
+            if (textHistory[textHistory.length - 1] !== val) {
+                textHistory.push(val);
+                if (textHistory.length > 20) textHistory.shift();
+            }
+            updateWordProgress();
+        }
+
+        function undoText() {
+            if (textHistory.length > 1) {
+                textHistory.pop(); document.getElementById('noteInput').value = textHistory[textHistory.length - 1];
+                updateWordProgress();
+            }
+        }
+
+        /* ── LEVEL SYSTEM ── */
+        function updateWordProgress() {
+            const val = document.getElementById('noteInput').value.trim();
+            const words = val.length === 0 ? 0 : val.split(/\s+/).length;
+            
+            const level = Math.floor(words / 50) + 1;
+            const remainder = words % 50;
+
+            document.getElementById('wordLevel').innerText = `Level ${level}`;
+            document.getElementById('wordCountUI').innerText = `${remainder} / 50`;
+            document.getElementById('wordProgress').style.width = (remainder / 50 * 100) + '%';
+        }
+
+        function formatMentionsAndHighlights(text, query = '') {
+            let formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            formatted = formatted.replace(/@(\d{1,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
+            formatted = formatted.replace(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g, '<span class="tag-link">#$1</span>');
+            if (query) {
+                const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                formatted = formatted.replace(regex, '<span class="highlight">$1</span>');
+            }
+            return formatted;
+        }
+
+        function loadMention(num, event) {
+            if (event) event.stopPropagation();
+            closeUniversalModal(); document.getElementById('refInput').value = num; searchReference();
+        }
+
+        /* ─────────────────────────────────────────
+           ACTIONS (Save / Update / Transfer / Archive)
+        ───────────────────────────────────────── */
+        function handleAction(actionType) {
+            pauseStopwatchSafe();
+            const text = document.getElementById('noteInput').value;
+            if (!text.trim()) { alert('Please enter some text.'); return; }
+
+            const textRefs    = text.match(/@(\d{1,})/g) || [];
+            const manualRefs  = document.getElementById('refInput').value.match(/\d+/g) || [];
+            const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])];
+            const tags        = extractTags(text);
+
+            const title     = (currentPage === 'revize') ? document.getElementById('metaTitle').value.trim() : '';
+            const questions = (currentPage === 'revize') ? Array.from(document.querySelectorAll('#questionsContainer input'))
+                              .map(i => i.value.trim()).filter(v => v !== '') : [];
+
+            if (actionType === 'save') {
+                const formattedNum = String(globalCounter).padStart(3, '0');
+                notes.unshift({
+                    id: Date.now(), num: formattedNum, text, type: currentPage,
+                    title, questions, refs: combinedRefs, tags,
+                    time: new Date().toLocaleDateString(), spentSeconds: swSeconds
+                });
+                globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter);
+                showStatus('Created'); checkBackupReminder();
+            }
+            else if (actionType === 'update') {
+                const n = notes.find(x => x.id === editingNoteId);
+                if (n) {
+                    n.text = text; n.refs = combinedRefs; n.tags = tags; n.spentSeconds = swSeconds;
+                    if (currentPage === 'revize') { n.title = title; n.questions = questions; }
+                }
+                showStatus('Updated');
+            }
+            else if (actionType === 'transfer_revize') {
+                const n = notes.find(x => x.id === editingNoteId);
+                if (n) { n.text = text; n.spentSeconds = swSeconds; }
+                showStatus('Moved to Revise');
+                switchPage('revize'); saveToLocal(); return;
+            }
+            else if (actionType === 'archive') {
+                let archiveNote = notes.find(x => x.id === editingNoteId);
+                let noteId = Date.now();
+                let noteNum = String(globalCounter).padStart(3, '0');
+                
+                if(archiveNote) {
+                    noteId = archiveNote.id; noteNum = archiveNote.num;
+                    notes = notes.filter(n => n.id !== editingNoteId); 
+                } else {
+                    globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter);
+                }
+
+                archive.unshift({
+                    id: noteId, num: noteNum, text: text, title: title, refs: combinedRefs, tags: tags,
+                    date: new Date().toLocaleDateString(), spentSeconds: swSeconds
+                });
+
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                showStatus('Sent to Archive');
+
+                // CLEANUP AFTER ARCHIVING
+                draftsMemory[currentPage] = ''; refsMemory[currentPage]   = '';
+                if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+                localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+                localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
+                localStorage.setItem('chimptopus_v18_meta',   JSON.stringify(metaMemory));
+                
+                document.getElementById('noteInput').value = '';
+                document.getElementById('refInput').value = '';
+                document.getElementById('metaTitle').value = '';
+                document.getElementById('questionsContainer').innerHTML = '';
+
+                navSwitchPage('archive'); saveToLocal(); return;
+            }
+
+            saveToLocal();
+
+            draftsMemory[currentPage] = ''; refsMemory[currentPage]   = '';
+            if (currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+            localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v18_refs',   JSON.stringify(refsMemory));
+            localStorage.setItem('chimptopus_v18_meta',   JSON.stringify(metaMemory));
+
+            document.getElementById('noteInput').value = '';
+            document.getElementById('refInput').value = '';
+            document.getElementById('metaTitle').value = '';
+            document.getElementById('questionsContainer').innerHTML = '';
+
+            navSwitchPage('records');
+        }
+
+        function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
+
+        /* ─────────────────────────────────────────
+           RENDER RECORDS & ARCHIVE
+        ───────────────────────────────────────── */
+        function createCardHTML(n, isList = false) {
+            const borderColor = n.type ? getAutoColorHex(n.type) : 'var(--color-archive)';
+
+            if (isList) {
+                let tagPills = ''; const tags = n.tags || extractTags(n.text);
+                if (tags.length > 0) { tagPills = `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">` + tags.map(t => `<span class="inline-tag-pill">${t}</span>`).join('') + `</div>`; }
+                const timeLabel = n.time || n.date || '';
+                const timerHtml = n.spentSeconds ? `<span style="font-weight:600; display:flex; align-items:center; gap:2px; margin-left:8px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(n.spentSeconds)}</span>` : '';
+
+                return `
+                    <div class="card note-card" style="border-left: 4px solid ${borderColor}; padding-left: 14px;" onclick="openRecordModal(${n.id})">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span>
+                        </div>
+                        ${n.title ? `<div class="card-title">${n.title}</div>` : ''}
+                        <p class="${n.title ? 'card-body' : 'card-body-full'}">${formatMentionsAndHighlights(n.text)}</p>
+                        ${tagPills}
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;">
+                            <span style="font-size:12px; color:var(--text-muted); display:flex; align-items:center;">${timeLabel} ${timerHtml}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const timerHtml = n.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(n.spentSeconds)}</div>` : '';
+                return `
+                    <div class="card note-card" style="min-height:110px; padding:12px; border-left:4px solid ${borderColor}; padding-left:11px;" onclick="openRecordModal(${n.id})">
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span>
+                            <div style="width:8px; height:8px; border-radius:50%; background:${borderColor}"></div>
+                        </div>
+                        <div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
+                            ${n.title ? `<b style="color:var(--text-main)">${n.title}</b><br>` : ''}${n.text}
+                        </div>
+                        ${timerHtml}
+                    </div>
+                `;
+            }
+        }
+
+        function renderRecords() {
+            const board = document.getElementById('recordsBoard'); board.innerHTML = '';
+            const query = (document.getElementById('searchInput')?.value || '').toLowerCase();
+            let filtered = notes.filter(n => n.type === 'taslak');
+            
+            if (query) { filtered = filtered.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query) || (n.title && n.title.toLowerCase().includes(query))); }
+            if (currentTagFilter) { filtered = filtered.filter(n => (n.tags || extractTags(n.text)).includes(currentTagFilter)); }
+
+            renderTagFilterBar();
+            if (filtered.length === 0) {
+                board.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon-wrap" style="background:var(--surface-alt);">
+                            <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span>
+                        </div>
+                        <h3>No Drafts Found</h3>
+                        <p>${currentTagFilter ? `No notes in tag "${currentTagFilter}".` : 'No drafts match your search or saved.'}</p>
+                    </div>`;
+                return;
+            }
+
+            const container = document.createElement('div'); container.className = 'archive-grid';
+            filtered.forEach(n => {
+                const wrap = document.createElement('div'); wrap.innerHTML = createCardHTML(n, false);
+                container.appendChild(wrap.firstElementChild);
+            });
+            board.appendChild(container);
+        }
+
+        function renderArchivePage() {
+            const board = document.getElementById('archiveBoard'); board.innerHTML = '';
+            if (archive.length === 0) {
+                board.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);">
+                            <span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span>
+                        </div>
+                        <h3>Archive Empty</h3>
+                        <p>You can move notes in the revision stage here by archiving them.</p>
+                    </div>`;
+                return;
+            }
+            const container = document.createElement('div'); container.className = 'archive-grid';
+            archive.forEach(a => {
+                const timerHtml = a.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(a.spentSeconds)}</div>` : '';
+                const card = document.createElement('div');
+                card.className = 'card note-card'; card.style.cssText = 'min-height:110px; padding:12px; border-left:4px solid var(--color-archive); padding-left:11px;';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${a.num}</span>
+                        <span class="material-symbols-rounded" style="font-size:16px; color:var(--color-archive)">check_circle</span>
+                    </div>
+                    <div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">
+                        ${a.title ? `<b style="color:var(--text-main)">${a.title}</b><br>` : ''}${a.text}
+                    </div>
+                    ${timerHtml}
+                `;
+                card.onclick = () => openArchiveModal(a.id); container.appendChild(card);
+            });
+            board.appendChild(container);
+        }
+
+        /* ─────────────────────────────────────────
+           UNIVERSAL MODALS (RECORDS & ARCHIVE)
+        ───────────────────────────────────────── */
+        function openRecordModal(id) {
+            const item = notes.find(a => a.id === id); if (!item) return;
+            const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+            
+            document.getElementById('modalTitle').innerText = 'Draft #' + item.num;
+            document.getElementById('modalDate').innerHTML  = item.time + timeHtml;
+            document.getElementById('modalBody').innerHTML  = formatMentionsAndHighlights(item.text);
+
+            const footer = document.getElementById('modalFooter');
+            footer.innerHTML = `
+                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();" title="Delete">delete</span>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)" title="Use as Template">content_copy</span>
+                    <button class="btn-primary" style="padding:6px 16px; border-radius:20px;" onclick="editNote(${item.id}); closeUniversalModal();">Edit</button>
+                </div>
+            `;
+            const modal = document.getElementById('universalModal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function openArchiveModal(id) {
+            const item = archive.find(a => a.id === id); if (!item) return;
+            const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
+
+            document.getElementById('modalTitle').innerText = 'Archived Block #' + item.num;
+            document.getElementById('modalDate').innerHTML  = item.date + timeHtml;
+            document.getElementById('modalBody').innerHTML  = formatMentionsAndHighlights(item.text);
+
+            const footer = document.getElementById('modalFooter');
+            const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            footer.innerHTML = `
+                <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span>
+                <div style="display:flex; gap:15px;">
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Copied')); closeUniversalModal();" title="Copy">content_copy</span>
+                </div>
+            `;
+            const modal = document.getElementById('universalModal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeUniversalModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return;
+            const modal = document.getElementById('universalModal');
+            modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        /* ─────────────────────────────────────────
+           DELETE / RESTORE
+        ───────────────────────────────────────── */
+        function deleteNote(id) {
+            if (confirm('Are you sure you want to delete?')) {
+                notes = notes.filter(n => n.id !== id); saveToLocal(); renderRecords();
+            }
+        }
+        function deleteArchive(id) {
+            if (confirm('Delete permanently?')) {
+                archive = archive.filter(a => a.id !== id);
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); renderArchivePage();
+            }
+        }
+        function restoreToRevize(id) {
+            const index = archive.findIndex(a => a.id === id);
+            if (index > -1) {
+                const item = archive[index]; archive.splice(index, 1);
+                notes.unshift({
+                    id: item.id, num: item.num, text: item.text, type: 'taslak',
+                    title: item.title, refs: item.refs, tags: item.tags,
+                    time: new Date().toLocaleDateString(), spentSeconds: item.spentSeconds || 0
+                });
+                localStorage.setItem('chimptopus_v18_notes',   JSON.stringify(notes));
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                renderArchivePage(); showToast('♻️ Restored to Revise');
+                editNote(item.id); switchPage('revize');
+            }
+        }
+
+        /* ─────────────────────────────────────────
+           UTILS
+        ───────────────────────────────────────── */
+        function insertTimestamp() {
+            const ta = document.getElementById('noteInput'); const now = new Date();
+            ta.value += `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}] `;
+            ta.focus(); updateWordProgress();
+        }
+
+        function exportData() {
+            const data = { notes, archive, counter: globalCounter };
+            const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+            const a = document.createElement('a'); a.setAttribute('href', dataStr); a.setAttribute('download', 'chimptopus_v19_backup.json');
+            document.body.appendChild(a); a.click(); a.remove();
+            localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter);
+            closePanels(); showToast('✅ Backup downloaded');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.notes && imported.archive) {
+                        notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter;
+                        saveToLocal();
+                        localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                        localStorage.setItem('chimptopus_v18_counter', globalCounter);
+                        navSwitchPage('records'); closePanels(); showToast('✅ Backup imported');
+                    } else { alert('Invalid format.'); }
+                } catch (err) { alert('Read error.'); }
+            };
+            reader.readAsText(file);
+        }
+
+        function togglePanel(id) { document.getElementById(id).classList.add('active'); document.getElementById('overlay').classList.add('active'); if (id === 'sideMenu') renderStats(); }
+        function closePanels() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+        function showStatus(m) { const s = document.getElementById('statusMsg'); s.innerText = m; setTimeout(() => s.innerText = '', 2000); }
+        function clearAll() { if (confirm('Are you sure you want to reset the entire system?')) { localStorage.clear(); location.reload(); } }
+
+        /* ─────────────────────────────────────────
+           INIT
+        ───────────────────────────────────────── */
+        navSwitchPage('records');
+    </script>
+</body>
+</html>
