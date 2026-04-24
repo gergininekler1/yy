@@ -55,7 +55,6 @@
 
         .card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--card-shadow); }
         
-        /* ── APP HEADER & TABS ── */
         .app-header {
             position: fixed; top: 0; left: 0; width: 100%; background: var(--bg-color); z-index: 1010;
             padding: calc(15px + env(safe-area-inset-top)) 20px 10px;
@@ -86,12 +85,10 @@
         .nav-item.active .icon { transform: scale(1.1); }
         .nav-item.active::after { width: 16px; }
 
-        /* ── PAGE TRANSITIONS ── */
         .page-container { padding: 0 20px 40px; display: none; animation: pageIn 0.3s ease; }
         .page-container.active { display: block; }
         @keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ── EDITOR ── */
         .note-box {
             padding: 20px; display: flex; flex-direction: column; position: relative;
             background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 12px;
@@ -141,7 +138,6 @@
         .recent-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
         .recent-scroll::-webkit-scrollbar { display: none; }
 
-        /* ── RECORDS PAGE ── */
         .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .search-bar {
             display: flex; align-items: center; background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; flex-grow: 1; margin-right: 12px;
@@ -220,6 +216,7 @@
         .ios-modal-body { flex-grow: 1; min-height: 0; padding: 20px; overflow-y: auto; font-size: 15px; line-height: 1.6; color: var(--text-main); white-space: pre-wrap; word-wrap: break-word; }
         .ios-modal-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; background: var(--surface-alt); flex-shrink: 0; }
 
+        /* TOAST FIX: Hata çıkartan silinmiş buton geri eklendi! */
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
             background: var(--text-main); color: var(--bg-color); padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
@@ -227,6 +224,11 @@
             pointer-events: none; white-space: nowrap; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .toast-action {
+            background: rgba(255,255,255,0.2); border: none; border-radius: 6px;
+            color: inherit; font-size: 13px; font-weight: 700; padding: 4px 10px;
+            cursor: pointer; font-family: inherit;
+        }
 
         /* GRAPH VIEW OVERLAY */
         #graphOverlay {
@@ -270,7 +272,10 @@
 
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
 
-    <div class="toast" id="toastEl"><span id="toastMsg"></span></div>
+    <div class="toast" id="toastEl">
+        <span id="toastMsg"></span>
+        <button class="toast-action" id="toastActionBtn" style="display:none;"></button>
+    </div>
 
     <div class="ios-modal" id="universalModal" onclick="closeUniversalModal(event)">
         <div class="ios-modal-content" onclick="event.stopPropagation()">
@@ -440,7 +445,6 @@
                 <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
                 <div class="recent-scroll" id="recentRecordsList"></div>
             </div>
-
         </div>
     </div>
 
@@ -466,7 +470,6 @@
             measurementId: "G-1F3HZ9EPDJ"
         };
         
-        // Firebase'i Başlat
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -475,20 +478,16 @@
         ───────────────────────────────────────── */
         function uploadToCloud() {
             showToast('☁️ Uploading to cloud...', null, null);
-            const dataToSync = {
-                notes: notes,
-                archive: archive,
-                counter: globalCounter
-            };
+            const dataToSync = { notes: notes, archive: archive, counter: globalCounter };
             
             database.ref('my_second_brain').set(dataToSync)
             .then(() => {
-                showToast('✅ Cloud backup successful!');
+                showToast('✅ Cloud backup successful!', null, null);
                 closePanels();
             })
             .catch((error) => {
                 alert("Firebase Upload Error: " + error.message);
-                showToast('❌ Error uploading');
+                showToast('❌ Error uploading', null, null);
             });
         }
 
@@ -498,28 +497,24 @@
             .then((snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    notes = data.notes || [];
-                    archive = data.archive || [];
-                    globalCounter = data.counter || 1;
+                    notes = data.notes || []; archive = data.archive || []; globalCounter = data.counter || 1;
                     
                     saveToLocal();
                     localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                     localStorage.setItem('chimptopus_v18_counter', globalCounter);
                     
-                    renderRecords();
-                    renderArchivePage();
-                    if(currentPage === 'records') navSwitchPage('records');
-                    else navSwitchPage(currentPage);
+                    renderRecords(); renderArchivePage();
+                    if(currentPage === 'records') navSwitchPage('records'); else navSwitchPage(currentPage);
                     
                     closePanels();
-                    showToast('✅ Successfully restored from Cloud!');
+                    showToast('✅ Successfully restored from Cloud!', null, null);
                 } else {
-                    showToast('⚠️ No data found in Cloud.');
+                    showToast('⚠️ No data found in Cloud.', null, null);
                 }
             })
             .catch((error) => {
                 alert("Firebase Download Error: " + error.message);
-                showToast('❌ Error downloading');
+                showToast('❌ Error downloading', null, null);
             });
         }
 
@@ -542,7 +537,6 @@
         let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
         let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
 
-        // Migrating 2-digit IDs to 3-digit IDs
         notes.forEach(n => { if (n.num && n.num.length === 2) n.num = '0' + n.num; });
         archive.forEach(a => { if (a.num && a.num.length === 2) a.num = '0' + a.num; });
 
@@ -568,18 +562,40 @@
         let swInterval; let swSeconds = 0; let swRunning = false;
 
         /* ─────────────────────────────────────────
-           TOAST & STATS
+           TOAST
         ───────────────────────────────────────── */
         let toastTimeout;
         function showToast(msg, actionLabel, actionFn) {
-            const el = document.getElementById('toastEl'); const msgEl = document.getElementById('toastMsg'); const btnEl = document.getElementById('toastActionBtn');
-            msgEl.innerText = msg;
-            if (actionLabel && actionFn) { btnEl.innerText = actionLabel; btnEl.style.display = 'inline-block'; btnEl.onclick = () => { actionFn(); hideToast(); }; } 
-            else { btnEl.style.display = 'none'; }
-            el.classList.add('show'); clearTimeout(toastTimeout); toastTimeout = setTimeout(hideToast, actionLabel ? 5000 : 2500);
-        }
-        function hideToast() { document.getElementById('toastEl').classList.remove('show'); }
+            const el = document.getElementById('toastEl');
+            const msgEl = document.getElementById('toastMsg');
+            const btnEl = document.getElementById('toastActionBtn');
 
+            if (msgEl) msgEl.innerText = msg;
+            
+            if (btnEl) {
+                if (actionLabel && actionFn) {
+                    btnEl.innerText = actionLabel;
+                    btnEl.style.display = 'inline-block';
+                    btnEl.onclick = () => { actionFn(); hideToast(); };
+                } else {
+                    btnEl.style.display = 'none';
+                }
+            }
+
+            if (el) {
+                el.classList.add('show');
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(hideToast, actionLabel ? 5000 : 2500);
+            }
+        }
+        function hideToast() {
+            const el = document.getElementById('toastEl');
+            if (el) el.classList.remove('show'); 
+        }
+
+        /* ─────────────────────────────────────────
+           STATS & BACKUP
+        ───────────────────────────────────────── */
         function renderStats() {
             const taslakCount  = notes.length; const archiveCount = archive.length;
             const totalWords   = notes.reduce((sum, n) => sum + (n.text.trim() ? n.text.trim().split(/\s+/).length : 0), 0);
@@ -640,7 +656,7 @@
             if (e) e.stopPropagation(); const n = notes.find(x => x.id === id); if (!n) return; closeUniversalModal();
             editingNoteId = null; switchPage('taslak', true);
             document.getElementById('noteInput').value = ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; updateWordProgress();
-            showToast('📋 Template loaded — ready to write');
+            showToast('📋 Template loaded', null, null);
         }
 
         /* ─────────────────────────────────────────
@@ -668,6 +684,7 @@
             else if (page === 'archive') { document.getElementById('pageArchive').classList.add('active'); renderArchivePage(); } 
             else {
                 document.getElementById('pageEditor').classList.add('active');
+                
                 document.getElementById('metaBlocksContainer').style.display = (page === 'taslak' || page === 'revize') ? 'flex' : 'none';
                 document.getElementById('topLinksBlock').style.display = (page === 'taslak' || page === 'revize') ? 'flex' : 'none';
                 document.getElementById('sizeControls').style.display = 'flex';
@@ -737,7 +754,7 @@
 
         function clearCurrentNote() {
             if (confirm("Are you sure you want to delete all content?")) {
-                document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; searchReference(); renderBacklinks(); updateWordProgress(); showToast('🧹 Content fully cleared');
+                document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; searchReference(); renderBacklinks(); updateWordProgress(); showToast('🧹 Content fully cleared', null, null);
             }
         }
 
@@ -785,6 +802,7 @@
             if (!val) { container.innerHTML = ''; return; }
             const ids = val.match(/\d+/g); if (!ids || ids.length === 0) { container.innerHTML = ''; return; }
             let html = ''; let foundAny = false;
+
             ids.forEach(id => {
                 const formattedId = id.padStart(3, '0'); const found = notes.find(n => n.num === formattedId) || archive.find(a => a.num === formattedId);
                 if (found) {
@@ -811,7 +829,6 @@
             if (query) { const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'); formatted = formatted.replace(regex, '<span class="highlight">$1</span>'); }
             return formatted;
         }
-
         function loadMention(num, event) { if (event) event.stopPropagation(); closeUniversalModal(); document.getElementById('refInput').value = num; searchReference(); }
 
         /* ─────────────────────────────────────────
@@ -829,7 +846,6 @@
         }
         function openGraphView() { document.getElementById('graphOverlay').style.display = 'flex'; graphActive = true; initGraph(); requestAnimationFrame(drawGraph); }
         function closeGraphView() { document.getElementById('graphOverlay').style.display = 'none'; graphActive = false; }
-
         const cvs = document.getElementById('graphCanvas');
         cvs.addEventListener('mousedown', e => { isDraggingGraph = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
         cvs.addEventListener('mousemove', e => { if(!isDraggingGraph) return; panX += e.clientX - lastMouseX; panY += e.clientY - lastMouseY; lastMouseX = e.clientX; lastMouseY = e.clientY; });
@@ -847,11 +863,9 @@
                 for(let j=i+1; j<gNodes.length; j++) { let n2 = gNodes[j]; let dx = n1.x - n2.x; let dy = n1.y - n2.y; let distSq = dx*dx + dy*dy; if(distSq === 0) distSq = 1; let force = repulsion / distSq; let dist = Math.sqrt(distSq); let fx = (dx/dist)*force; let fy = (dy/dist)*force; n1.vx += fx; n1.vy += fy; n2.vx -= fx; n2.vy -= fy; }
             }
             gEdges.forEach(e => { let dx = e.target.x - e.source.x; let dy = e.target.y - e.source.y; let dist = Math.sqrt(dx*dx + dy*dy); if(dist === 0) dist = 1; let force = (dist - 80) * k; let fx = (dx/dist)*force; let fy = (dy/dist)*force; e.source.vx += fx; e.source.vy += fy; e.target.vx -= fx; e.target.vy -= fy; });
-            
             ctx.save(); ctx.translate(panX, panY);
             ctx.strokeStyle = document.body.classList.contains('dark-mode') ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'; ctx.lineWidth = 2;
             gEdges.forEach(e => { ctx.beginPath(); ctx.moveTo(e.source.x, e.source.y); ctx.lineTo(e.target.x, e.target.y); ctx.stroke(); });
-            
             gNodes.forEach(n => {
                 n.x += n.vx; n.y += n.vy; n.vx *= damping; n.vy *= damping;
                 ctx.beginPath(); ctx.arc(n.x, n.y, 16, 0, 2*Math.PI); ctx.fillStyle = n.type === 'taslak' ? '#8e8e93' : '#30d158'; ctx.fill();
@@ -866,9 +880,9 @@
         ───────────────────────────────────────── */
         function handleAction(actionType) {
             pauseStopwatchSafe(); const text = document.getElementById('noteInput').value; if (!text.trim()) { alert('Please enter some text.'); return; }
-            const textRefs    = text.match(/@(\d{1,})/g) || []; const manualRefs  = document.getElementById('refInput').value.match(/\d+/g) || [];
+            const textRefs = text.match(/@(\d{1,})/g) || []; const manualRefs = document.getElementById('refInput').value.match(/\d+/g) || [];
             const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])]; const tags = extractTags(text);
-            const title     = document.getElementById('metaTitle').value.trim();
+            const title = document.getElementById('metaTitle').value.trim();
             const questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim()).filter(v => v !== '');
 
             if (actionType === 'save') {
@@ -885,13 +899,14 @@
                 if(archiveNote) { noteId = archiveNote.id; noteNum = archiveNote.num; notes = notes.filter(n => n.id !== editingNoteId); } else { globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); }
                 archive.unshift({ id: noteId, num: noteNum, text: text, title: title, refs: combinedRefs, tags: tags, date: new Date().toLocaleDateString(), spentSeconds: swSeconds });
                 localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); showStatus('Sent to Archive');
-                draftsMemory[currentPage] = ''; refsMemory[currentPage]   = ''; if (currentPage === 'taslak' || currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+                
+                draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; if (currentPage === 'taslak' || currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
                 localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory)); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
                 document.getElementById('noteInput').value = ''; document.getElementById('refInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = '';
                 navSwitchPage('archive'); saveToLocal(); return;
             }
             saveToLocal();
-            draftsMemory[currentPage] = ''; refsMemory[currentPage]   = ''; if (currentPage === 'taslak' || currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
+            draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; if (currentPage === 'taslak' || currentPage === 'revize') { metaMemory.title = ''; metaMemory.questions = []; }
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory)); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
             document.getElementById('noteInput').value = ''; document.getElementById('refInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = '';
             navSwitchPage('records');
@@ -953,7 +968,7 @@
             const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
             document.getElementById('modalTitle').innerText = 'Archived Block #' + item.num; document.getElementById('modalDate').innerHTML  = item.date + timeHtml; document.getElementById('modalBody').innerHTML  = formatMentionsAndHighlights(item.text);
             const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
-            document.getElementById('modalFooter').innerHTML = `<span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span><div style="display:flex; gap:15px;"><span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span><span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Copied')); closeUniversalModal();" title="Copy">content_copy</span></div>`;
+            document.getElementById('modalFooter').innerHTML = `<span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span><div style="display:flex; gap:15px;"><span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span><span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Copied', null, null)); closeUniversalModal();" title="Copy">content_copy</span></div>`;
             const modal = document.getElementById('universalModal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
         }
         function closeUniversalModal(e) { if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return; const modal = document.getElementById('universalModal'); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); }
@@ -966,20 +981,20 @@
                 const item = archive[index]; archive.splice(index, 1);
                 notes.unshift({ id: item.id, num: item.num, text: item.text, type: 'taslak', title: item.title, refs: item.refs, tags: item.tags, time: new Date().toLocaleDateString(), spentSeconds: item.spentSeconds || 0 });
                 localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
-                renderArchivePage(); showToast('♻️ Restored to Revise'); editNote(item.id); switchPage('revize');
+                renderArchivePage(); showToast('♻️ Restored to Revise', null, null); editNote(item.id); switchPage('revize');
             }
         }
 
         function insertTimestamp() { const ta = document.getElementById('noteInput'); const now = new Date(); ta.value += `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}] `; ta.focus(); updateWordProgress(); }
         function exportData() {
             const data = { notes, archive, counter: globalCounter }; const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
-            const a = document.createElement('a'); a.setAttribute('href', dataStr); a.setAttribute('download', 'chimptopus_v19_backup.json'); document.body.appendChild(a); a.click(); a.remove();
-            localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter); closePanels(); showToast('✅ Backup downloaded');
+            const a = document.createElement('a'); a.setAttribute('href', dataStr); a.setAttribute('download', 'chimptopus_v20_backup.json'); document.body.appendChild(a); a.click(); a.remove();
+            localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter); closePanels(); showToast('✅ Backup downloaded', null, null);
         }
         function importData(event) {
             const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
             reader.onload = function(e) {
-                try { const imported = JSON.parse(e.target.result); if (imported.notes && imported.archive) { notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter; saveToLocal(); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); localStorage.setItem('chimptopus_v18_counter', globalCounter); navSwitchPage('records'); closePanels(); showToast('✅ Backup imported'); } else { alert('Invalid format.'); } } catch (err) { alert('Read error.'); }
+                try { const imported = JSON.parse(e.target.result); if (imported.notes && imported.archive) { notes = imported.notes; archive = imported.archive; globalCounter = imported.counter || globalCounter; saveToLocal(); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); localStorage.setItem('chimptopus_v18_counter', globalCounter); navSwitchPage('records'); closePanels(); showToast('✅ Backup imported', null, null); } else { alert('Invalid format.'); } } catch (err) { alert('Read error.'); }
             }; reader.readAsText(file);
         }
         function togglePanel(id) { document.getElementById(id).classList.add('active'); document.getElementById('overlay').classList.add('active'); if (id === 'sideMenu') renderStats(); }
