@@ -42,12 +42,12 @@
 
         .dark-mode {
             --bg-color: #000000; 
-            --surface-color: #1c1c1e; 
-            --surface-alt: #2c2c2e; 
+            --surface-color: #242426; /* Kartlar ve kutular bir tık daha aydınlatıldı */
+            --surface-alt: #323234;   /* İçteki metin blokları da uyumlu olarak açıldı */
             --text-main: rgba(255,255,255,0.95); 
-            --text-muted: rgba(255,255,255,0.55);
-            --border-color: #38383a; 
-            --card-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+            --text-muted: rgba(255,255,255,0.6);
+            --border-color: #48484a; 
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.3); 
         }
 
         html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
@@ -706,7 +706,7 @@
         function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
 
         /* ─────────────────────────────────────────
-           HIGHLIGHT (FOSFORLU KALEM) ÖZELLİĞİ
+           HIGHLIGHT (FOSFORLU KALEM) - MOBİL UYUMLU 
         ───────────────────────────────────────── */
         function highlightSelection(noteId, isArchive) {
             const sel = window.getSelection();
@@ -722,16 +722,13 @@
             if (!note) return;
 
             if (note.text.includes(textToHighlight)) {
-                // Sadece ilk eşleşeni değiştirir, Markdown formatı "==" ekler
                 note.text = note.text.replace(textToHighlight, `==${textToHighlight}==`);
                 
                 saveToLocal();
                 if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 
-                // Modal UI'ı yenile
                 if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId);
                 
-                // Arka plan listelerini yenile
                 if (currentPage === 'records') renderRecords();
                 else if (currentPage === 'archive') renderArchivePage();
                 else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); }
@@ -782,7 +779,7 @@
         }
 
         /* ─────────────────────────────────────────
-           MODALS (FOSFORLU KALEM BUTONU EKLENDİ)
+           MODALS (Sorular Eklendi & Taşıma Sorunu Çözüldü & HIGHLIGHT EKLENDİ)
         ───────────────────────────────────────── */
         function openRecordModal(id) {
             const item = notes.find(a => a.id === id); if (!item) return;
@@ -793,10 +790,11 @@
             if (item.questions && item.questions.length > 0) { qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-main);">` + item.questions.map(q => `<li>${q}</li>`).join('') + `</ul></div>`; }
             document.getElementById('modalBody').innerHTML  = qHtml + formatMentionsAndHighlights(item.text);
 
+            // HIGHLIGHT İÇİN MOBİL TOUCH EVENTLERİ EKLENDİ (onmousedown & ontouchstart)
             document.getElementById('modalFooter').innerHTML = `
                 <div style="display:flex; gap:15px; align-items:center;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();" title="Delete">delete</span>
-                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onclick="highlightSelection(${item.id}, false)" title="Vurgula (Highlight)">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, false);" title="Vurgula (Highlight)">border_color</span>
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)" title="Use as Template">content_copy</span>
@@ -816,10 +814,11 @@
             document.getElementById('modalBody').innerHTML  = qHtml + formatMentionsAndHighlights(item.text);
             
             const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            
             document.getElementById('modalFooter').innerHTML = `
                 <div style="display:flex; gap:15px; align-items:center;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span>
-                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onclick="highlightSelection(${item.id}, true)" title="Vurgula (Highlight)">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, true);" title="Vurgula (Highlight)">border_color</span>
                 </div>
                 <div style="display:flex; gap:15px;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span>
@@ -857,12 +856,19 @@
             });
         }
         function resizeNoteBlock(mul) { document.getElementById('noteInput').style.height = (160 * mul) + 'px'; }
+        
+        // SORU EKLEME DÜZELTİLDİ (En üste eklenecek)
         function addQuestionInput(val = '') {
-            const container = document.getElementById('questionsContainer'); const row = document.createElement('div'); row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+            const container = document.getElementById('questionsContainer'); 
+            const row = document.createElement('div'); row.style.cssText = 'display:flex; gap:8px; align-items:center;';
             const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = val;
             const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => row.remove();
-            row.appendChild(input); row.appendChild(delBtn); container.appendChild(row);
+            row.appendChild(input); row.appendChild(delBtn); 
+            
+            if(container.firstChild) { container.insertBefore(row, container.firstChild); } 
+            else { container.appendChild(row); }
         }
+
         function clearCurrentNote() {
             if (confirm("Are you sure you want to delete all content?")) {
                 document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; searchReference(); renderBacklinks(); updateWordProgress(); showToast('🧹 Content fully cleared');
@@ -918,16 +924,11 @@
             const level = Math.floor(words / 50) + 1; const remainder = words % 50;
             document.getElementById('wordLevel').innerText = `Level ${level}`; document.getElementById('wordCountUI').innerText = `${remainder} / 50`; document.getElementById('wordProgress').style.width = (remainder / 50 * 100) + '%';
         }
-        
-        // HIGHLIGHT PARSER EKLENDİ (==metin==)
         function formatMentionsAndHighlights(text, query = '') {
             let formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             formatted = formatted.replace(/@(\d{1,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
             formatted = formatted.replace(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g, '<span class="tag-link">#$1</span>');
-            
-            // Fosforlu Kalem Render (==text==)
             formatted = formatted.replace(/==([^=]+)==/g, '<span style="background-color: rgba(48, 209, 88, 0.25); color: #30d158; padding: 0px 4px; border-radius: 4px; font-weight: 500;">$1</span>');
-            
             if (query) { const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'); formatted = formatted.replace(regex, '<span class="highlight">$1</span>'); }
             return formatted;
         }
