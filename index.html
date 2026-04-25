@@ -42,8 +42,8 @@
 
         .dark-mode {
             --bg-color: #000000; 
-            --surface-color: #242426; /* Kartlar ve kutular bir tık daha aydınlatıldı */
-            --surface-alt: #323234;   /* İçteki metin blokları da uyumlu olarak açıldı */
+            --surface-color: #242426; 
+            --surface-alt: #323234;   
             --text-main: rgba(255,255,255,0.95); 
             --text-muted: rgba(255,255,255,0.6);
             --border-color: #48484a; 
@@ -55,9 +55,13 @@
         body {
             background-color: var(--bg-color); color: var(--text-main);
             min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease, padding-top 0.3s ease;
             -webkit-tap-highlight-color: transparent; padding-top: calc(125px + env(safe-area-inset-top)); 
         }
+
+        /* ODAK MODU (FOCUS MODE) */
+        body.focus-mode .app-header, body.focus-mode .top-tabs { transform: translateY(-150%); opacity: 0; pointer-events: none; }
+        body.focus-mode { padding-top: calc(20px + env(safe-area-inset-top)) !important; }
 
         * { box-sizing: border-box; }
 
@@ -66,7 +70,7 @@
         .app-header {
             position: fixed; top: 0; left: 0; width: 100%; background: var(--bg-color); z-index: 1010;
             padding: calc(15px + env(safe-area-inset-top)) 20px 10px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .logo { font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
 
@@ -74,7 +78,7 @@
             position: fixed; top: calc(56px + env(safe-area-inset-top)); left: 0; width: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center;
-            padding: 8px 0; z-index: 1000;
+            padding: 8px 0; z-index: 1000; transition: transform 0.3s ease, opacity 0.3s ease;
         }
         body:not(.dark-mode) .top-tabs { background: rgba(242,242,247,0.88); }
 
@@ -114,12 +118,12 @@
         .timer-btn {
             font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
             background: var(--surface-alt); border: 1px solid var(--border-color);
-            color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; font-family: inherit;
         }
         .timer-btn:active { background: var(--border-color); }
         
         @keyframes pulseBorder { 0% { border-color: var(--border-color); } 50% { border-color: var(--primary-blue); } 100% { border-color: var(--border-color); } }
-        .sw-running { animation: pulseBorder 2s infinite; color: var(--primary-blue); }
+        .sw-running { animation: pulseBorder 2s infinite; color: var(--primary-blue); border-color: var(--primary-blue); }
 
         textarea {
             width: 100%; height: 160px; background-color: var(--surface-alt);
@@ -233,7 +237,6 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
 
-        /* GRAPH VIEW OVERLAY */
         #graphOverlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: var(--bg-color); z-index: 4000; display: none; flex-direction: column;
@@ -241,6 +244,10 @@
         #graphCanvasContainer { flex-grow: 1; position: relative; overflow: hidden; touch-action: none; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%); }
         #graphCanvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
         #graphCanvas:active { cursor: grabbing; }
+
+        /* CHECKBOX STİLLERİ İÇİN */
+        .q-row { display:flex; gap:8px; align-items:center; width:100%; }
+        .q-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); flex-shrink: 0; }
     </style>
 </head>
 <body class="dark-mode">
@@ -366,14 +373,21 @@
                         <span id="currentNoteIdDisplay" style="font-size:13px; font-weight:800; color:var(--primary-blue); background:rgba(0,122,255,0.15); padding:2px 8px; border-radius:6px; margin-left:4px;"></span>
                     </div>
                     <div style="display:flex; gap:10px; align-items:center;">
-                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-right:1px solid var(--border-color); padding-right:10px;">
+                        <button class="timer-btn" onclick="toggleFocusMode()" id="focusBtn" style="color:var(--text-main);">
+                            <span class="material-symbols-rounded" style="font-size:18px;">fullscreen</span> <span id="focusBtnText">Focus</span>
+                        </button>
+                        
+                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-left:1px solid var(--border-color); border-right:1px solid var(--border-color); padding:0 10px; margin-left:4px;">
                             <button class="timer-btn" onclick="resizeNoteBlock(1)">1x</button>
                             <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
                             <button class="timer-btn" onclick="resizeNoteBlock(3)">3x</button>
                         </div>
                         <div style="display:flex; gap:6px; align-items:center;">
                             <span id="swDisplay" style="font-size:14px; font-weight:700; font-variant-numeric: tabular-nums; color:var(--text-muted); margin-right:2px;">00:00</span>
-                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()"><span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span></button>
+                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()">
+                                <span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span> 
+                                <span id="swToggleText">Start</span>
+                            </button>
                             <span class="material-symbols-rounded action-icon" onclick="clearCurrentNote()" title="Delete All" style="font-size:22px; color:var(--danger-color); margin-left:6px;">delete_sweep</span>
                         </div>
                     </div>
@@ -406,7 +420,7 @@
                     </div>
                     <div id="metaInputsWrapper" style="display:flex; flex-direction:column; gap:8px;">
                         <input type="text" id="metaTitle" class="meta-input" placeholder="Title, Topic or Main Idea...">
-                        <button class="icon-btn" id="addQuestionBtn" onclick="addQuestionInput()" style="display:none; width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:var(--surface-alt); font-size:13px;">+ Add Question</button>
+                        <button class="icon-btn" id="addQuestionBtn" onclick="addQuestionInput()" style="display:none; width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:var(--surface-alt); font-size:13px; font-weight:600;">+ Add Question</button>
                         <div id="questionsContainer" style="display:none; flex-direction:column; gap:8px;"></div>
                     </div>
                 </div>
@@ -416,7 +430,19 @@
                     <span class="material-symbols-rounded action-icon" id="toggleEditorIcon" onclick="toggleEditorText()" style="font-size:20px;">visibility_off</span>
                 </div>
 
-                <div id="editorTextWrapper" style="display:flex; flex-direction:column; gap:15px;">
+                <div id="editorTextWrapper" style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px;">
+                        <button class="timer-btn" onclick="insertHeadingTemplate()" style="flex-shrink:0;">
+                            <span class="material-symbols-rounded" style="font-size:14px;">title</span> Başlık
+                        </button>
+                        <button class="timer-btn" onclick="insert5N1KTemplate()" style="flex-shrink:0;">
+                            <span class="material-symbols-rounded" style="font-size:14px;">psychology_alt</span> 5N1K
+                        </button>
+                        <button class="timer-btn" onclick="insertTimeTemplate()" style="flex-shrink:0;">
+                            <span class="material-symbols-rounded" style="font-size:14px;">schedule</span> Saat
+                        </button>
+                    </div>
+
                     <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
                     <div class="word-challenge">
                         <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
@@ -550,15 +576,15 @@
         }
 
         function toggleStopwatch() {
-            const btn = document.getElementById('swToggleBtn'); const icon = document.getElementById('swToggleIcon');
-            if (swRunning) { clearInterval(swInterval); swRunning = false; icon.innerText = 'play_arrow'; btn.classList.remove('sw-running'); } 
-            else { swInterval = setInterval(() => { swSeconds++; document.getElementById('swDisplay').innerText = formatTime(swSeconds); }, 1000); swRunning = true; icon.innerText = 'pause'; btn.classList.add('sw-running'); }
+            const btn = document.getElementById('swToggleBtn'); const icon = document.getElementById('swToggleIcon'); const txt = document.getElementById('swToggleText');
+            if (swRunning) { clearInterval(swInterval); swRunning = false; icon.innerText = 'play_arrow'; txt.innerText = 'Start'; btn.classList.remove('sw-running'); } 
+            else { swInterval = setInterval(() => { swSeconds++; document.getElementById('swDisplay').innerText = formatTime(swSeconds); }, 1000); swRunning = true; icon.innerText = 'pause'; txt.innerText = 'Stop'; btn.classList.add('sw-running'); }
         }
         function formatTime(sec) { if(!sec) return "00:00"; const m = Math.floor(sec / 60).toString().padStart(2, '0'); const s = (sec % 60).toString().padStart(2, '0'); return `${m}:${s}`; }
         function pauseStopwatchSafe() { if (swRunning) toggleStopwatch(); }
 
         /* ─────────────────────────────────────────
-           TAGS & TOGGLES
+           TAGS, TEMPLATES & TOGGLES
         ───────────────────────────────────────── */
         function extractTags(text) { return [...new Set((text.match(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g) || []).map(t => t.toLowerCase()))]; }
         function getAllTags() { return [...new Set(notes.concat(archive).flatMap(n => extractTags(n.text)))].sort(); }
@@ -568,6 +594,13 @@
             tags.forEach(tag => { html += `<div class="tag-chip ${currentTagFilter === tag ? 'active' : ''}" onclick="setTagFilter('${tag}')">${tag}</div>`; }); bar.innerHTML = html;
         }
         function setTagFilter(tag) { currentTagFilter = tag; renderTagFilterBar(); renderRecords(); }
+
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+            const isFocus = document.body.classList.contains('focus-mode');
+            document.getElementById('focusBtn').innerHTML = `<span class="material-symbols-rounded" style="font-size:18px;">${isFocus ? 'fullscreen_exit' : 'fullscreen'}</span> <span id="focusBtnText">${isFocus ? 'Exit' : 'Focus'}</span>`;
+            showToast(isFocus ? '🧘 Focus Mode On' : '🧘 Focus Mode Off', null, null);
+        }
 
         function toggleLinks() {
             isLinksVisible = !isLinksVisible; const wrapper = document.getElementById('linksWrapper'); const icon = document.getElementById('toggleLinksIcon');
@@ -583,6 +616,26 @@
         }
 
         /* ─────────────────────────────────────────
+           EDITOR TEMPLATE INSERTIONS
+        ───────────────────────────────────────── */
+        function insertAtCursor(myField, myValue) {
+            if (myField.selectionStart || myField.selectionStart == '0') {
+                var startPos = myField.selectionStart; var endPos = myField.selectionEnd;
+                myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+                myField.selectionStart = startPos + myValue.length; myField.selectionEnd = startPos + myValue.length;
+            } else { myField.value += myValue; }
+            handleInput(); myField.focus();
+        }
+        function insertHeadingTemplate() {
+            const ta = document.getElementById('noteInput'); const text = ta.value; const matches = text.match(/<baslik\.(\d+)>/g);
+            let nextNum = 1;
+            if (matches) { const nums = matches.map(m => parseInt(m.match(/\d+/)[0])); nextNum = Math.max(...nums) + 1; }
+            const tag = `\n<baslik.${String(nextNum).padStart(2, '0')}>\n`; insertAtCursor(ta, tag);
+        }
+        function insert5N1KTemplate() { insertAtCursor(document.getElementById('noteInput'), '\n<kim.nasil>\n<mekan.zaman>\n<hangi.ne>\n'); }
+        function insertTimeTemplate() { const now = new Date(); const tag = `<${now.getHours().toString().padStart(2,'0')}.${now.getMinutes().toString().padStart(2,'0')}>`; insertAtCursor(document.getElementById('noteInput'), tag + ' '); }
+
+        /* ─────────────────────────────────────────
            NAV & PAGE SWITCHING
         ───────────────────────────────────────── */
         function navSwitchPage(page) { if (['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); } editingNoteId = null; switchPage(page, false); }
@@ -590,7 +643,12 @@
             draftsMemory[currentPage] = document.getElementById('noteInput').value; refsMemory[currentPage] = document.getElementById('refInput').value;
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
             if (currentPage === 'taslak' || currentPage === 'revize') {
-                metaMemory.title = document.getElementById('metaTitle').value; metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim());
+                metaMemory.title = document.getElementById('metaTitle').value; 
+                // CHECKBOX DURUMUNU KAYDETME
+                metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer .q-row')).map(row => {
+                    const cb = row.querySelector('input[type="checkbox"]'); const txt = row.querySelector('input[type="text"]').value.trim();
+                    if(!txt) return ''; return (cb.checked ? '[x] ' : '[ ] ') + txt;
+                }).filter(v => v !== '');
                 localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
             }
         }
@@ -636,7 +694,7 @@
 
                 if (!editingNoteId) {
                     document.getElementById('noteInput').value = draftsMemory[page] || ''; document.getElementById('refInput').value = refsMemory[page] || '';
-                    swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
+                    swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; document.getElementById('swToggleIcon').innerText = 'play_arrow'; document.getElementById('swToggleText').innerText = 'Start';
                     document.getElementById('metaTitle').value = metaMemory.title || ''; document.getElementById('questionsContainer').innerHTML = '';
                     if (metaMemory.questions && metaMemory.questions.length > 0 && page === 'revize') { metaMemory.questions.forEach(q => addQuestionInput(q)); } else if (page === 'revize') { addQuestionInput(); }
                     searchReference(); renderBacklinks();
@@ -667,7 +725,10 @@
             const textRefs = text.match(/@(\d{1,})/g) || []; const manualRefs = document.getElementById('refInput').value.match(/\d+/g) || [];
             const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])]; const tags = extractTags(text);
             const title = document.getElementById('metaTitle').value.trim();
-            const questions = Array.from(document.querySelectorAll('#questionsContainer input')).map(i => i.value.trim()).filter(v => v !== '');
+            const questions = Array.from(document.querySelectorAll('#questionsContainer .q-row')).map(row => {
+                const cb = row.querySelector('input[type="checkbox"]'); const txt = row.querySelector('input[type="text"]').value.trim();
+                if(!txt) return ''; return (cb.checked ? '[x] ' : '[ ] ') + txt;
+            }).filter(v => v !== '');
 
             if (actionType === 'save') {
                 const formattedNum = getNextAvailableNum();
@@ -706,37 +767,36 @@
         function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
 
         /* ─────────────────────────────────────────
-           HIGHLIGHT (FOSFORLU KALEM) - MOBİL UYUMLU 
+           HIGHLIGHT (FOSFORLU KALEM VE SİLİCİ) 
         ───────────────────────────────────────── */
         function highlightSelection(noteId, isArchive) {
-            const sel = window.getSelection();
-            const textToHighlight = sel.toString().trim();
+            const sel = window.getSelection(); const textToHighlight = sel.toString().trim();
+            if (!textToHighlight) { showToast('⚠️ Lütfen vurgulamak için bir metin seçin.', null, null); return; }
             
-            if (!textToHighlight) {
-                showToast('⚠️ Lütfen vurgulamak için bir metin seçin.', null, null);
-                return;
-            }
-            
-            let list = isArchive ? archive : notes;
-            let note = list.find(n => n.id === noteId);
-            if (!note) return;
-
+            let list = isArchive ? archive : notes; let note = list.find(n => n.id === noteId); if (!note) return;
             if (note.text.includes(textToHighlight)) {
-                note.text = note.text.replace(textToHighlight, `==${textToHighlight}==`);
-                
-                saveToLocal();
+                note.text = note.text.replace(textToHighlight, `==${textToHighlight}==`); saveToLocal();
                 if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
-                
                 if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId);
-                
-                if (currentPage === 'records') renderRecords();
-                else if (currentPage === 'archive') renderArchivePage();
-                else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); }
-                
-                showToast('🖍️ Metin başarıyla vurgulandı!', null, null);
-            } else {
-                showToast('⚠️ Metin tam olarak eşleştirilemedi.', null, null);
-            }
+                if (currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage(); else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); }
+                showToast('🖍️ Vurgulandı', null, null);
+            } else { showToast('⚠️ Eşleşme hatası.', null, null); }
+        }
+
+        function removeHighlightSelection(noteId, isArchive) {
+            const sel = window.getSelection(); const textToHighlight = sel.toString().trim();
+            if (!textToHighlight) { showToast('⚠️ Lütfen vurgusunu kaldıracağınız metni seçin.', null, null); return; }
+            
+            let list = isArchive ? archive : notes; let note = list.find(n => n.id === noteId); if (!note) return;
+            // Eger metnin kendisi veya == ile sarılmış hali varsa sil
+            let targetMatch = `==${textToHighlight}==`;
+            if (note.text.includes(targetMatch)) {
+                note.text = note.text.replace(targetMatch, textToHighlight); saveToLocal();
+                if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
+                if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId);
+                if (currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage(); else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); }
+                showToast('🧹 Vurgu Silindi', null, null);
+            } else { showToast('⚠️ Seçilen metinde vurgu bulunamadı.', null, null); }
         }
 
         /* ─────────────────────────────────────────
@@ -779,7 +839,7 @@
         }
 
         /* ─────────────────────────────────────────
-           MODALS (Sorular Eklendi & Taşıma Sorunu Çözüldü & HIGHLIGHT EKLENDİ)
+           MODALS (Sorular Eklendi & CHECKBOX RENDER)
         ───────────────────────────────────────── */
         function openRecordModal(id) {
             const item = notes.find(a => a.id === id); if (!item) return;
@@ -787,14 +847,20 @@
             document.getElementById('modalTitle').innerText = 'Draft #' + item.num; document.getElementById('modalDate').innerHTML  = item.time + timeHtml; 
             
             let qHtml = '';
-            if (item.questions && item.questions.length > 0) { qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-main);">` + item.questions.map(q => `<li>${q}</li>`).join('') + `</ul></div>`; }
+            if (item.questions && item.questions.length > 0) { 
+                qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:0; list-style:none; font-size:13px; color:var(--text-main); display:flex; flex-direction:column; gap:4px;">` + 
+                item.questions.map(q => {
+                    let checked = q.startsWith('[x] '); let txt = q.replace(/^\[[x ]\] /, '');
+                    return `<li style="display:flex; align-items:center; gap:6px; ${checked ? 'text-decoration:line-through;opacity:0.5;' : ''}"><span class="material-symbols-rounded" style="font-size:16px; color:var(--primary-blue);">${checked ? 'check_box' : 'check_box_outline_blank'}</span> ${txt}</li>`;
+                }).join('') + `</ul></div>`; 
+            }
             document.getElementById('modalBody').innerHTML  = qHtml + formatMentionsAndHighlights(item.text);
 
-            // HIGHLIGHT İÇİN MOBİL TOUCH EVENTLERİ EKLENDİ (onmousedown & ontouchstart)
             document.getElementById('modalFooter').innerHTML = `
                 <div style="display:flex; gap:15px; align-items:center;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();" title="Delete">delete</span>
-                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, false);" title="Vurgula (Highlight)">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, false);" title="Vurgula">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onmousedown="event.preventDefault(); removeHighlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); removeHighlightSelection(${item.id}, false);" title="Vurguyu Temizle">format_color_reset</span>
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)" title="Use as Template">content_copy</span>
@@ -810,7 +876,13 @@
             document.getElementById('modalTitle').innerText = 'Archived Block #' + item.num; document.getElementById('modalDate').innerHTML  = item.date + timeHtml; 
             
             let qHtml = '';
-            if (item.questions && item.questions.length > 0) { qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:20px; font-size:13px; color:var(--text-main);">` + item.questions.map(q => `<li>${q}</li>`).join('') + `</ul></div>`; }
+            if (item.questions && item.questions.length > 0) { 
+                qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:0; list-style:none; font-size:13px; color:var(--text-main); display:flex; flex-direction:column; gap:4px;">` + 
+                item.questions.map(q => {
+                    let checked = q.startsWith('[x] '); let txt = q.replace(/^\[[x ]\] /, '');
+                    return `<li style="display:flex; align-items:center; gap:6px; ${checked ? 'text-decoration:line-through;opacity:0.5;' : ''}"><span class="material-symbols-rounded" style="font-size:16px; color:var(--color-archive);">${checked ? 'check_box' : 'check_box_outline_blank'}</span> ${txt}</li>`;
+                }).join('') + `</ul></div>`; 
+            }
             document.getElementById('modalBody').innerHTML  = qHtml + formatMentionsAndHighlights(item.text);
             
             const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
@@ -818,7 +890,8 @@
             document.getElementById('modalFooter').innerHTML = `
                 <div style="display:flex; gap:15px; align-items:center;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span>
-                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, true);" title="Vurgula (Highlight)">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, true);" title="Vurgula">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onmousedown="event.preventDefault(); removeHighlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); removeHighlightSelection(${item.id}, true);" title="Vurguyu Temizle">format_color_reset</span>
                 </div>
                 <div style="display:flex; gap:15px;">
                     <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span>
@@ -845,6 +918,10 @@
         /* ─────────────────────────────────────────
            DİĞER UTILS
         ───────────────────────────────────────── */
+        function useAsTemplate(id, e) {
+            if (e) e.stopPropagation(); const n = notes.find(x => x.id === id); if (!n) return; closeUniversalModal();
+            editingNoteId = null; switchPage('taslak', true); document.getElementById('noteInput').value = ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; updateWordProgress(); showToast('📋 Template loaded');
+        }
         function renderRecentRecords() {
             const container = document.getElementById('recentRecordsList'); container.innerHTML = ''; let list = notes.filter(n => n.type === 'taslak').slice(0, 10);
             if (list.length === 0) { container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No drafts yet.</div>`; return; }
@@ -857,14 +934,25 @@
         }
         function resizeNoteBlock(mul) { document.getElementById('noteInput').style.height = (160 * mul) + 'px'; }
         
-        // SORU EKLEME DÜZELTİLDİ (En üste eklenecek)
+        // CHECKBOX İLE SORU EKLEME YENİLENDİ
         function addQuestionInput(val = '') {
             const container = document.getElementById('questionsContainer'); 
-            const row = document.createElement('div'); row.style.cssText = 'display:flex; gap:8px; align-items:center;';
-            const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = val;
-            const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => row.remove();
-            row.appendChild(input); row.appendChild(delBtn); 
+            const row = document.createElement('div'); row.className = 'q-row';
             
+            let isChecked = false; let textVal = val;
+            if (val.startsWith('[x] ')) { isChecked = true; textVal = val.substring(4); } else if (val.startsWith('[ ] ')) { textVal = val.substring(4); }
+
+            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'q-checkbox'; cb.checked = isChecked;
+            const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = textVal;
+            
+            cb.onchange = () => { input.style.textDecoration = cb.checked ? 'line-through' : 'none'; input.style.opacity = cb.checked ? '0.5' : '1'; };
+            cb.onchange(); // Tetikle
+            
+            const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => row.remove();
+            
+            row.appendChild(cb); row.appendChild(input); row.appendChild(delBtn); 
+            
+            // EN ÜSTE EKLE (Butonun Altı)
             if(container.firstChild) { container.insertBefore(row, container.firstChild); } 
             else { container.appendChild(row); }
         }
@@ -883,6 +971,7 @@
             container.innerHTML = html;
         }
         function getAutoColorHex(type) { return type === 'taslak' ? '#8e8e93' : '#30d158'; }
+        
         function renderBacklinks() {
             const container = document.getElementById('backlinkContainer'); const cardsContainer = document.getElementById('backlinkCardsContainer');
             if (!editingNoteId) { container.style.display = 'none'; return; }
@@ -924,6 +1013,7 @@
             const level = Math.floor(words / 50) + 1; const remainder = words % 50;
             document.getElementById('wordLevel').innerText = `Level ${level}`; document.getElementById('wordCountUI').innerText = `${remainder} / 50`; document.getElementById('wordProgress').style.width = (remainder / 50 * 100) + '%';
         }
+        
         function formatMentionsAndHighlights(text, query = '') {
             let formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             formatted = formatted.replace(/@(\d{1,})/g, '<span class="mention-link" onclick="loadMention(\'$1\', event)">@$1</span>');
