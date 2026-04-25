@@ -63,6 +63,9 @@
 
         body.focus-mode .app-header, body.focus-mode .top-tabs { transform: translateY(-150%); opacity: 0; pointer-events: none; }
         body.focus-mode { padding-top: calc(20px + env(safe-area-inset-top)) !important; }
+        
+        /* HOME EKRANI İÇİN PADDING AYARI (Sekme barı gizleneceği için) */
+        body.home-active { padding-top: calc(75px + env(safe-area-inset-top)); }
 
         * { box-sizing: border-box; }
 
@@ -73,7 +76,9 @@
             padding: calc(15px + env(safe-area-inset-top)) 20px 10px;
             display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s ease, opacity 0.3s ease;
         }
-        .logo { font-size: 22px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        
+        /* LOGO TIKLANABİLİR */
+        .logo { font-size: 22px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 
         .top-tabs {
             position: fixed; top: calc(56px + env(safe-area-inset-top)); left: 0; width: 100%;
@@ -189,10 +194,8 @@
             max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        /* Center modallar için */
         .ios-modal.center-modal { align-items: center; }
         .ios-modal.center-modal .ios-modal-content { transform: scale(0.9); transition: transform 0.3s; }
-        
         .ios-modal.active .ios-modal-content { transform: translateY(0) scale(1); }
         
         .ios-modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--surface-color); }
@@ -245,14 +248,15 @@
         .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
         .empty-state-icon-wrap { width: 72px; height: 72px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px; }
 
-        /* DASHBOARD (HOME) ÖZEL STİLLERİ */
+        /* DASHBOARD (HOME) BOHEM MİNİMALİST BUTON STİLİ */
         .dash-hero-btn {
-            background: linear-gradient(135deg, var(--primary-blue), #bf5af2);
-            color: white; border: none; border-radius: 16px; padding: 20px; width: 100%;
-            display: flex; flex-direction: column; align-items: flex-start; gap: 8px; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,122,255,0.2); transition: transform 0.2s;
+            background: var(--surface-color); color: var(--text-main);
+            border: 1px dashed var(--border-color); border-radius: 16px; padding: 20px; width: 100%;
+            display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer;
+            box-shadow: var(--card-shadow); transition: transform 0.2s, border-color 0.2s;
         }
-        .dash-hero-btn:active { transform: scale(0.97); }
+        .dash-hero-btn:hover { border-color: var(--primary-blue); }
+        .dash-hero-btn:active { transform: scale(0.98); }
 
         /* SWIPE ANIMATION */
         .swipe-overlay {
@@ -264,12 +268,12 @@
 
     </style>
 </head>
-<body class="dark-mode">
+<body class="dark-mode home-active">
 
     <div class="swipe-overlay" id="swipeOverlay"><span class="material-symbols-rounded" style="font-size: 48px;">find_replace</span></div>
 
     <header class="app-header">
-        <div class="logo" id="mainLogo">
+        <div class="logo" id="mainLogo" onclick="navSwitchPage('home')">
             <span class="material-symbols-rounded" style="color:var(--primary-blue)">memory</span> Notes
         </div>
         <div style="display:flex; gap:5px;">
@@ -279,11 +283,7 @@
         </div>
     </header>
 
-    <nav class="top-tabs">
-        <div class="nav-item active" id="nav-home" onclick="navSwitchPage('home')">
-            <span class="material-symbols-rounded icon">space_dashboard</span>
-            <span class="label">Home</span>
-        </div>
+    <nav class="top-tabs" id="mainNavTabs">
         <div class="nav-item" id="nav-taslak" onclick="navSwitchPage('taslak')">
             <span class="material-symbols-rounded icon">edit_document</span>
             <span class="label">Draft</span>
@@ -451,30 +451,30 @@
 
     <div id="pageHome" class="page-container">
         <button class="dash-hero-btn" onclick="openNewProjectModal()">
-            <span class="material-symbols-rounded" style="font-size:32px;">add_circle</span>
-            <span style="font-size:18px; font-weight:800;">Yeni Proje / Fikir Oluştur</span>
+            <span class="material-symbols-rounded" style="font-size:32px; color:var(--primary-blue);">add_circle</span>
+            <span style="font-size:16px; font-weight:700;">Yeni Proje / Fikir Oluştur</span>
         </button>
 
         <div style="margin-top: 30px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="font-size:14px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:0;">Aktif Çalışmalarım</h3>
+                <h3 style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:0; letter-spacing:0.5px;">Aktif Çalışmalarım</h3>
             </div>
             <div class="recent-scroll" id="homeActiveProjectsList" style="padding-bottom:5px;"></div>
         </div>
 
         <div style="margin-top: 25px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="font-size:14px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:0;">Kütüphaneye Göz At</h3>
-                <span class="material-symbols-rounded action-icon" style="font-size:18px;" onclick="navSwitchPage('database')">arrow_forward</span>
+                <h3 style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin:0; letter-spacing:0.5px;">Kütüphaneye Göz At</h3>
             </div>
-            <div class="editor-island" style="padding:12px; cursor:pointer;" onclick="navSwitchPage('database')">
+            <div class="editor-island" style="padding:16px; cursor:pointer; align-items:center; flex-direction:row; justify-content:space-between;" onclick="navSwitchPage('database')">
                 <div style="display:flex; align-items:center; gap:12px; color:var(--text-muted);">
-                    <span class="material-symbols-rounded" style="font-size:24px; color:var(--primary-blue);">database</span>
+                    <span class="material-symbols-rounded" style="font-size:28px; color:var(--primary-blue);">database</span>
                     <div>
-                        <div style="font-weight:700; color:var(--text-main); font-size:14px;">Master Database</div>
+                        <div style="font-weight:700; color:var(--text-main); font-size:15px;">Master Database</div>
                         <div style="font-size:12px;">Tüm arşivlenmiş projelerine ulaş.</div>
                     </div>
                 </div>
+                <span class="material-symbols-rounded action-icon" style="font-size:20px;">arrow_forward_ios</span>
             </div>
         </div>
     </div>
@@ -574,7 +574,7 @@
         </div>
 
         <div id="recentRecordsContainer" style="margin-top: 30px; display: none;">
-            <h4 style="font-size:13px; font-weight:800; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
+            <h4 style="font-size:12px; font-weight:800; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
             <div class="recent-scroll" id="recentRecordsList"></div>
         </div>
     </div>
@@ -651,9 +651,16 @@
         function startNewProject() {
             const title = document.getElementById('npTitle').value.trim();
             closeNewProjectModal();
-            resetEditorUI();
+            resetEditorUI(); 
+            
+            // Aktarım Hatasının Çözümü (Bug Fix)
             if (title) document.getElementById('metaTitle').value = title;
             currentEditorCategory = npSelectedCategory;
+            
+            metaMemory.title = title;
+            metaMemory.category = npSelectedCategory;
+            localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+            
             renderEditorCategories();
             navSwitchPage('taslak');
         }
@@ -698,7 +705,6 @@
         editorPageEl.addEventListener('touchend', e => { 
             touchendX = e.changedTouches[0].screenX; 
             if (currentPage === 'taslak' && (touchendX > touchstartX + 80)) {
-                // Sola çekme (Swipe Right) işlemi gerçekleşti
                 handleSwipeToRevise();
             }
         }, {passive: true});
@@ -707,16 +713,14 @@
             const text = document.getElementById('noteInput').value; 
             if (!text.trim()) { showToast('⚠️ Boş taslak kaydırılamaz!'); return; }
             
-            // Görsel Şov
             const overlay = document.getElementById('swipeOverlay');
             overlay.classList.add('active');
             
             setTimeout(() => {
-                handleAction('transfer_revize', true); // Sessiz kayıt
+                handleAction('transfer_revize', true);
                 overlay.classList.remove('active');
             }, 300);
         }
-
 
         /* ─────────────────────────────────────────
            DATABASE FİLTRELERİ
@@ -837,7 +841,22 @@
         }
         function switchPage(page, saveCurrent = true) {
             if (saveCurrent && ['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); } pauseStopwatchSafe(); if (page !== 'taslak' && page !== 'database' && page !== 'home') resizeNoteBlock(1);
-            currentPage = page; document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active')); document.getElementById('nav-' + page).classList.add('active');
+            currentPage = page; 
+            
+            // HOME AKTİF İSE ALT SEKMELERİ GİZLE
+            if(page === 'home') {
+                document.body.classList.add('home-active');
+                document.getElementById('mainNavTabs').style.display = 'none';
+            } else {
+                document.body.classList.remove('home-active');
+                document.getElementById('mainNavTabs').style.display = 'flex';
+            }
+
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active')); 
+            
+            const activeNav = document.getElementById('nav-' + page);
+            if(activeNav) activeNav.classList.add('active');
             
             if (page === 'home') {
                 document.getElementById('pageHome').classList.add('active');
@@ -851,10 +870,10 @@
                 document.getElementById('pageEditor').classList.add('active');
                 if (page === 'taslak') { 
                     document.getElementById('analysisIsland').style.display = 'none';
-                    document.getElementById('recentRecordsContainer').style.display = 'none'; // Taslakta gizle
+                    document.getElementById('recentRecordsContainer').style.display = 'none'; 
                 } else { 
                     document.getElementById('analysisIsland').style.display = 'flex';
-                    document.getElementById('recentRecordsContainer').style.display = 'block'; // Revizede göster
+                    document.getElementById('recentRecordsContainer').style.display = 'block'; 
                 }
                 
                 document.getElementById('sizeControls').style.display = 'flex'; const idDisplay = document.getElementById('currentNoteIdDisplay');
@@ -1041,11 +1060,16 @@
             let allDB = [...notes, ...archive];
             
             if (dbStageFilter !== 'all') {
-                if (dbStageFilter === 'archive') { allDB = allDB.filter(n => n.type === 'archive' || !n.type); } 
-                else { allDB = allDB.filter(n => n.type === dbStageFilter); }
+                if (dbStageFilter === 'archive') {
+                    allDB = allDB.filter(n => n.type === 'archive' || !n.type);
+                } else {
+                    allDB = allDB.filter(n => n.type === dbStageFilter);
+                }
             }
 
-            if (dbCategoryFilter !== 'all') { allDB = allDB.filter(a => (a.category || 'genel') === dbCategoryFilter); }
+            if (dbCategoryFilter !== 'all') {
+                allDB = allDB.filter(a => (a.category || 'genel') === dbCategoryFilter);
+            }
 
             if (allDB.length === 0) { 
                 board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:var(--surface-alt);"><span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">database</span></div><h3>Veri Bulunamadı</h3><p>Seçili filtrelerde sonuç yok.</p></div>`; 
@@ -1104,7 +1128,7 @@
         function useAsTemplate(id, e) { if (e) e.stopPropagation(); const n = notes.find(x => x.id === id); if (!n) return; closeUniversalModal(); editingNoteId = null; switchPage('taslak', true); document.getElementById('noteInput').value = ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; updateWordProgress(); showToast('📋 Template loaded'); }
         function renderRecentRecords() { const container = document.getElementById('recentRecordsList'); container.innerHTML = ''; let list = notes.filter(n => n.type === 'taslak').slice(0, 10); if (list.length === 0) { container.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No drafts yet.</div>`; return; } list.forEach(item => { const color = 'var(--color-taslak)'; const title = item.title ? `<div style="font-weight:600; font-size:12px; color:var(--text-main); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>` : ''; const timeSnippet = item.spentSeconds ? `<span style="font-size:10px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:2px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(item.spentSeconds)}</span>` : ''; const html = `<div class="card" style="min-width:130px; max-width:130px; padding:12px; border-left:3px solid ${color}; cursor:pointer;" onclick="openRecordModal(${item.id})"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><div style="font-size:11px; color:var(--text-muted); font-weight:700;">#${item.num}</div>${timeSnippet}</div>${title}<div style="font-size:11px; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${item.text}</div></div>`; container.innerHTML += html; }); }
         function resizeNoteBlock(mul) { document.getElementById('noteInput').style.height = (160 * mul) + 'px'; }
-        function addQuestionInput(val = '') { const container = document.getElementById('questionsContainer'); const row = document.createElement('div'); row.className = 'q-row'; let isChecked = false; let textVal = val; if (val.startsWith('[x] ')) { isChecked = true; textVal = val.substring(4); } else if (val.startsWith('[ ] ')) { textVal = val.substring(4); } const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'q-checkbox'; cb.checked = isChecked; const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = textVal; cb.onchange = () => { input.style.textDecoration = cb.checked ? 'line-through' : 'none'; input.style.opacity = cb.checked ? '0.5' : '1'; }; cb.onchange(); const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => { row.remove(); saveDraftMemory(); }; row.appendChild(cb); row.appendChild(input); row.appendChild(delBtn); if(container.firstChild) { container.insertBefore(row, container.firstChild); } else { container.appendChild(row); } }
+        function addQuestionInput(val = '') { const container = document.getElementById('questionsContainer'); const row = document.createElement('div'); row.className = 'q-row'; let isChecked = false; let textVal = val; if (val.startsWith('[x] ')) { isChecked = true; textVal = val.substring(4); } else if (val.startsWith('[ ] ')) { textVal = val.substring(4); } const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'q-checkbox'; cb.checked = isChecked; const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = textVal; cb.onchange = () => { input.style.textDecoration = cb.checked ? 'line-through' : 'none'; input.style.opacity = cb.checked ? '0.5' : '1'; }; cb.onchange(); const delBtn = document.createElement('button'); delBtn.className = 'ios-close-btn'; delBtn.innerHTML = '<span class="material-symbols-rounded" style="color:var(--danger-color)">close</span>'; delBtn.onclick = () => { row.remove(); saveDraftMemory(); }; row.appendChild(cb); row.appendChild(input); row.appendChild(delBtn); if(container.firstChild) { container.insertBefore(row, container.firstChild); } else { container.appendChild(row); } }
         function clearCurrentNote() { if (confirm("Metin alanı temizlenecek emin misin?")) { document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; searchReference(); renderBacklinks(); updateWordProgress(); suggestConnections(); showToast('🧹 Content fully cleared'); } }
         function renderEditorButtons(page) { const container = document.getElementById('editorActions'); let html = ''; if (page === 'taslak') { if (editingNoteId) { html = `<button class="btn-secondary" onclick="handleAction('update')">Update</button><button class="btn-primary" style="background:var(--color-revize)" onclick="handleAction('transfer_revize')">Move to Revise</button>`; } else { html = `<button class="btn-primary" style="background:var(--color-taslak)" onclick="handleAction('save')">Save Draft</button>`; } } else if (page === 'revize') { html = `<button class="btn-primary" style="background:var(--color-archive)" onclick="handleAction('archive')">Move to Archive</button>`; } container.innerHTML = html; }
         function getAutoColorHex(type) { return type === 'taslak' ? '#8e8e93' : '#30d158'; }
