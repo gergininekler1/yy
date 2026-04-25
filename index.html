@@ -119,6 +119,7 @@
             font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
             background: var(--surface-alt); border: 1px solid var(--border-color);
             color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; font-family: inherit;
+            white-space: nowrap;
         }
         .timer-btn:active { background: var(--border-color); }
         
@@ -245,7 +246,6 @@
         #graphCanvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
         #graphCanvas:active { cursor: grabbing; }
 
-        /* CHECKBOX STİLLERİ İÇİN */
         .q-row { display:flex; gap:8px; align-items:center; width:100%; }
         .q-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); flex-shrink: 0; }
     </style>
@@ -372,12 +372,12 @@
                         <span id="boxLabel" style="font-size:16px; font-weight:700; color:var(--text-main)">Draft</span>
                         <span id="currentNoteIdDisplay" style="font-size:13px; font-weight:800; color:var(--primary-blue); background:rgba(0,122,255,0.15); padding:2px 8px; border-radius:6px; margin-left:4px;"></span>
                     </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
                         <button class="timer-btn" onclick="toggleFocusMode()" id="focusBtn" style="color:var(--text-main);">
                             <span class="material-symbols-rounded" style="font-size:18px;">fullscreen</span> <span id="focusBtnText">Focus</span>
                         </button>
                         
-                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-left:1px solid var(--border-color); border-right:1px solid var(--border-color); padding:0 10px; margin-left:4px;">
+                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-left:1px solid var(--border-color); border-right:1px solid var(--border-color); padding:0 6px;">
                             <button class="timer-btn" onclick="resizeNoteBlock(1)">1x</button>
                             <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
                             <button class="timer-btn" onclick="resizeNoteBlock(3)">3x</button>
@@ -644,7 +644,6 @@
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
             if (currentPage === 'taslak' || currentPage === 'revize') {
                 metaMemory.title = document.getElementById('metaTitle').value; 
-                // CHECKBOX DURUMUNU KAYDETME
                 metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer .q-row')).map(row => {
                     const cb = row.querySelector('input[type="checkbox"]'); const txt = row.querySelector('input[type="text"]').value.trim();
                     if(!txt) return ''; return (cb.checked ? '[x] ' : '[ ] ') + txt;
@@ -767,7 +766,7 @@
         function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
 
         /* ─────────────────────────────────────────
-           HIGHLIGHT (FOSFORLU KALEM VE SİLİCİ) 
+           HIGHLIGHT (FOSFORLU KALEM) VE SİLİCİ
         ───────────────────────────────────────── */
         function highlightSelection(noteId, isArchive) {
             const sel = window.getSelection(); const textToHighlight = sel.toString().trim();
@@ -788,7 +787,6 @@
             if (!textToHighlight) { showToast('⚠️ Lütfen vurgusunu kaldıracağınız metni seçin.', null, null); return; }
             
             let list = isArchive ? archive : notes; let note = list.find(n => n.id === noteId); if (!note) return;
-            // Eger metnin kendisi veya == ile sarılmış hali varsa sil
             let targetMatch = `==${textToHighlight}==`;
             if (note.text.includes(targetMatch)) {
                 note.text = note.text.replace(targetMatch, textToHighlight); saveToLocal();
@@ -934,7 +932,6 @@
         }
         function resizeNoteBlock(mul) { document.getElementById('noteInput').style.height = (160 * mul) + 'px'; }
         
-        // CHECKBOX İLE SORU EKLEME YENİLENDİ
         function addQuestionInput(val = '') {
             const container = document.getElementById('questionsContainer'); 
             const row = document.createElement('div'); row.className = 'q-row';
@@ -946,13 +943,12 @@
             const input = document.createElement('input'); input.type = 'text'; input.className = 'meta-input meta-input-secondary'; input.style.marginBottom = '0'; input.placeholder = 'Question, keyword etc...'; input.value = textVal;
             
             cb.onchange = () => { input.style.textDecoration = cb.checked ? 'line-through' : 'none'; input.style.opacity = cb.checked ? '0.5' : '1'; };
-            cb.onchange(); // Tetikle
+            cb.onchange(); 
             
             const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => row.remove();
             
             row.appendChild(cb); row.appendChild(input); row.appendChild(delBtn); 
             
-            // EN ÜSTE EKLE (Butonun Altı)
             if(container.firstChild) { container.insertBefore(row, container.firstChild); } 
             else { container.appendChild(row); }
         }
