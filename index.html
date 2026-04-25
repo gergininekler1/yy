@@ -7,8 +7,11 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <style>
-        /* --- CSS DEĞİŞKENLERİ (AYDINLIK TEMA - VARSAYILAN) --- */
+        /* --- CSS DEĞİŞKENLERİ --- */
         :root {
             --bg-base: #f5f5f7;
             --bg-gradient: linear-gradient(135deg, #eef0f5, #ffffff);
@@ -17,7 +20,7 @@
             --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
             --text-primary: #1d1d1f;
             --text-secondary: #86868b;
-            --accent: #007AFF; /* Varsayılan Vurgu */
+            --accent: #007AFF; 
             --danger: #FF3B30;
             --success: #34C759;
             --radius-lg: 24px;
@@ -26,7 +29,6 @@
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* --- DARK MODE TEMA DEĞİŞKENLERİ --- */
         [data-theme="dark"] {
             --bg-base: #121212;
             --bg-gradient: linear-gradient(135deg, #1e1e1e, #121212);
@@ -41,12 +43,10 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; transition: background 0.4s ease; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
 
-        /* --- GLASSMORPHISM --- */
         .glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: var(--glass-shadow); }
 
         /* --- HEADER & İKONLAR --- */
@@ -54,19 +54,17 @@
         .logo { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
         .logo svg { stroke: var(--accent); width: 28px; height: 28px; }
         
-        .header-controls { display: flex; align-items: center; gap: 12px; }
-        
-        /* Minimal Renk Seçici */
-        .color-menu { position: relative; display: inline-block; }
-        .icon-btn { background: transparent; border: none; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 50%; transition: 0.2s; }
+        .header-controls { display: flex; align-items: center; gap: 6px; }
+        .icon-btn { background: transparent; border: none; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 50%; transition: 0.2s; }
         .icon-btn:hover { background: rgba(150,150,150,0.1); color: var(--accent); }
+        
+        .color-menu { position: relative; display: inline-block; }
         .color-dropdown { position: absolute; top: 120%; right: 0; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); padding: 8px; border-radius: 12px; display: none; gap: 6px; flex-direction: row; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .color-menu:hover .color-dropdown { display: flex; }
         .color-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
         .color-dot:hover { transform: scale(1.3); }
         .color-dot.active { border-color: var(--text-primary); }
 
-        /* ID Rozeti (Sağ Üst Köşe) */
         .note-badge { position: absolute; top: 20px; right: 24px; background: rgba(150,150,150,0.1); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; }
 
         /* --- BUTONLAR --- */
@@ -84,32 +82,32 @@
         .page.active { display: block; opacity: 1; transform: translateY(0); animation: slideUp 0.4s forwards; }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* --- KARTLAR --- */
+        /* --- KARTLAR & CHIPS --- */
         .section-title { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
         .horizontal-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x mandatory; margin-left: -24px; padding-left: 24px; padding-right: 24px; }
         .card { flex: 0 0 130px; height: 130px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; scroll-snap-align: start; cursor: pointer; overflow: hidden; transition: var(--transition); border: 1px solid rgba(150,150,150,0.1); }
         .card:hover { border-color: var(--accent); transform: scale(0.98); }
         .card-tag { font-size: 0.7rem; font-weight: 600; color: var(--accent); }
         .card-content { font-size: 0.8rem; line-height: 1.4; color: var(--text-primary); margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-        
         .card.new-card { align-items: center; justify-content: center; background: rgba(150,150,150,0.05); border: 2px dashed rgba(150,150,150,0.3); color: var(--text-secondary); }
         .card.new-card:hover { color: var(--accent); border-color: var(--accent); background: rgba(150,150,150,0.1); }
 
-        /* --- CHIPS --- */
         .chip-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
         .chip { padding: 10px 16px; border-radius: 30px; font-size: 0.8rem; font-weight: 500; background: rgba(150,150,150,0.1); color: var(--text-secondary); cursor: pointer; transition: 0.2s; white-space: nowrap; border: 1px solid transparent; }
         .chip.active { background: var(--accent); color: #fff; }
 
-        /* --- FORM ELEMANLARI (GÜNCEL) --- */
+        /* --- FORM ELEMANLARI --- */
         .input-group { margin-bottom: 24px; }
         textarea, input[type="text"] { width: 100%; background: var(--glass-bg); border: 1px solid rgba(150,150,150,0.2); color: var(--text-primary); padding: 16px; border-radius: var(--radius-md); font-size: 0.95rem; outline: none; resize: none; transition: 0.2s; line-height: 1.5; }
         textarea:focus, input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
         
-        /* GÖRSELDEKİ HATA İÇİN DÜZELTİLMİŞ ALAN */
+        /* ÖNEMLİ DÜZELTME: Kaynak Metni Artık Kaydırılabilir */
+        #sourceText { height: 180px; overflow-y: auto; }
         #finalText { min-height: 200px; display: block; }
 
         /* --- BAĞLANTILI BLOKLAR --- */
-        .link-preview-box { background: rgba(150,150,150,0.05); padding: 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); margin-top: 10px; font-size: 0.85rem; }
+        .link-preview-box { background: var(--glass-bg); padding: 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); margin-top: 10px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border: 1px solid rgba(150,150,150,0.1); }
+        .link-preview-box:hover { background: rgba(150,150,150,0.1); transform: translateX(4px); }
         .link-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; color: var(--text-secondary); }
 
         /* --- DİĞER --- */
@@ -129,12 +127,22 @@
         .nav-footer { display: flex; justify-content: space-between; margin-top: 32px; padding-top: 16px; }
 
         /* --- MODALLAR --- */
-        dialog { margin: auto; width: 100%; max-width: 600px; height: 100vh; max-height: 100vh; background: var(--bg-base); border: none; padding: 0; z-index: 200; display: none; flex-direction: column; color: var(--text-primary); }
+        dialog { margin: auto; width: 100%; max-width: 700px; height: 100vh; max-height: 100vh; background: var(--bg-base); border: none; padding: 0; z-index: 200; display: none; flex-direction: column; color: var(--text-primary); }
         dialog[open] { display: flex; animation: slideUp 0.3s forwards; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid rgba(150,150,150,0.1); background: var(--glass-bg); }
         .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
 
+        /* Okuma Görünümü */
+        .read-section { margin-bottom: 32px; }
+        .read-section h3 { font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .read-box { background: var(--glass-bg); padding: 20px; border-radius: var(--radius-md); font-size: 1rem; line-height: 1.6; border: 1px solid rgba(150,150,150,0.1); }
+        .read-cores { list-style: none; }
+        .read-cores li { position: relative; padding-left: 20px; margin-bottom: 12px; line-height: 1.5; }
+        .read-cores li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: bold; font-size: 1.2rem; top: -2px; }
+
+        /* Bulut Paneli */
+        .cloud-panel { background: rgba(0, 122, 255, 0.05); border: 1px dashed var(--accent); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;}
     </style>
 </head>
 <body>
@@ -142,12 +150,7 @@
     <header class="glass">
         <div class="logo">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="9" r="4"></circle>
-                <path d="M10 13c-2.5 0-4 2.5-4 5"></path>
-                <path d="M14 13c2.5 0 4 2.5 4 5"></path>
-                <path d="M7 16c-1.5 0-3 1.5-3 3"></path>
-                <path d="M17 16c1.5 0 3 1.5 3 3"></path>
-                <path d="M12 13v6"></path>
+                <circle cx="12" cy="9" r="4"></circle><path d="M10 13c-2.5 0-4 2.5-4 5"></path><path d="M14 13c2.5 0 4 2.5 4 5"></path><path d="M7 16c-1.5 0-3 1.5-3 3"></path><path d="M17 16c1.5 0 3 1.5 3 3"></path><path d="M12 13v6"></path>
             </svg>
             Chimptopus
         </div>
@@ -161,7 +164,9 @@
             <button class="icon-btn" onclick="toggleTheme()" title="Gece/Gündüz Modu">
                 <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             </button>
-            <button class="btn btn-sm" onclick="dbManager.open()">Veritabanı</button>
+            <button class="icon-btn" onclick="dbManager.open()" title="Veritabanı">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+            </button>
         </div>
     </header>
 
@@ -175,7 +180,7 @@
             <div style="margin-top: 32px;">
                 <div class="input-group">
                     <label class="section-title">Yeni Kaynak Enjekte Et</label>
-                    <textarea id="sourceText" rows="6" placeholder="Ham metni, köşe yazısını veya fikri buraya bırak..." oninput="uiHelpers.autoResize(this); appController.autoSaveDraft()"></textarea>
+                    <textarea id="sourceText" placeholder="Ham metni, köşe yazısını veya fikri buraya bırak..." oninput="appController.autoSaveDraft()"></textarea>
                 </div>
                 
                 <div class="input-group">
@@ -246,6 +251,18 @@
             <button class="btn btn-danger btn-sm" onclick="dbManager.close()">Kapat</button>
         </div>
         <div class="modal-body">
+            
+            <div class="cloud-panel">
+                <div>
+                    <h3 style="font-size:0.9rem; margin-bottom:4px;">Bulut Senkronizasyonu</h3>
+                    <p style="font-size:0.75rem; color:var(--text-secondary);">Verilerini Firebase ile güvende tut.</p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-sm" onclick="firebaseManager.backup()">Yedekle</button>
+                    <button class="btn btn-sm btn-primary" onclick="firebaseManager.restore()">Geri Yükle</button>
+                </div>
+            </div>
+
             <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
                 <div class="chip-group" id="dbFolderTabs" style="padding:0;"></div>
                 <button class="btn btn-sm" onclick="dbManager.createNewFolder()">+ Klasör</button>
@@ -254,7 +271,79 @@
         </div>
     </dialog>
 
+    <dialog id="previewModal">
+        <div class="modal-header">
+            <div class="logo" style="font-size: 1.1rem;"><span id="previewIdBadge" style="margin-right: 5px;"></span>Önizleme</div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn btn-sm btn-primary" id="btnEditNote">Düzenle</button>
+                <button class="btn btn-sm btn-danger" id="btnDeleteNote">Sil</button>
+                <button class="btn btn-sm" style="background: rgba(150,150,150,0.2);" onclick="document.getElementById('previewModal').close()">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="read-section" id="previewSynthesisBlock">
+                <h3>Sentez / Yaratım</h3>
+                <div class="read-box" id="previewSynthesis" style="border-left: 4px solid var(--accent); font-weight: 500;"></div>
+            </div>
+            <div class="read-section">
+                <h3>Çekirdek Fikirler</h3>
+                <ul class="read-cores" id="previewCores"></ul>
+            </div>
+            <div class="read-section">
+                <h3>Kaynak Metin</h3>
+                <div class="read-box" id="previewSource" style="color: var(--text-secondary); font-size: 0.9rem;"></div>
+            </div>
+        </div>
+    </dialog>
+
     <script>
+        // --- FIREBASE KURULUMU ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvkn0pkYJPMNcnUYEaFElyrFUOmEumD30",
+            authDomain: "gergininekler11.firebaseapp.com",
+            databaseURL: "https://gergininekler11-default-rtdb.firebaseio.com",
+            projectId: "gergininekler11",
+            storageBucket: "gergininekler11.firebasestorage.app",
+            messagingSenderId: "75194866682",
+            appId: "1:75194866682:web:d390dc7fea8bd47fbde243",
+            measurementId: "G-1F3HZ9EPDJ"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const cloudDB = firebase.database();
+
+        const firebaseManager = {
+            backup: async () => {
+                try {
+                    await cloudDB.ref('chimptopus_data/user_default').set({
+                        notes: state.notes,
+                        folders: state.folders
+                    });
+                    alert('Verileriniz başarıyla buluta yedeklendi! ☁️');
+                } catch (error) {
+                    alert('Yedekleme Hatası: ' + error.message);
+                }
+            },
+            restore: async () => {
+                if(!confirm("Buluttaki veriler mevcut yerel verilerinizin üzerine yazılacak. Emin misiniz?")) return;
+                try {
+                    const snapshot = await cloudDB.ref('chimptopus_data/user_default').once('value');
+                    const data = snapshot.val();
+                    if(data) {
+                        state.notes = data.notes || [];
+                        state.folders = data.folders || [{id: 'genel', name: 'Genel'}];
+                        db.save();
+                        alert('Veriler buluttan başarıyla çekildi. Sayfa yenileniyor...');
+                        location.reload();
+                    } else {
+                        alert('Bulutta kayıtlı bir yedek bulunamadı.');
+                    }
+                } catch (error) {
+                    alert('Geri Yükleme Hatası: ' + error.message);
+                }
+            }
+        };
+
         const colors = ['#007AFF', '#FF3B30', '#34C759', '#AF52DE', '#FF9500'];
 
         const state = {
@@ -276,7 +365,6 @@
             getNote: (id) => state.notes.find(n => n.id === id),
             getNoteByDisplayId: (did) => state.notes.find(n => n.displayId === did),
             
-            // Kimlik (ID) Algoritması: Silinenleri Doldur
             generateDisplayId: () => {
                 const used = state.notes.map(n => parseInt(n.displayId.replace('#', ''))).filter(n => !isNaN(n)).sort((a,b)=>a-b);
                 let next = 1;
@@ -305,6 +393,16 @@
                 }
                 uiHelpers.updateBadge();
                 db.save();
+            },
+            
+            deleteNote: (id) => {
+                if(confirm("Bu istasyonu kalıcı olarak silmek istediğine emin misin?")) {
+                    state.notes = state.notes.filter(n => n.id !== id);
+                    if(state.currentId === id) appController.startNewNote();
+                    db.save();
+                    document.getElementById('previewModal').close();
+                    dbManager.renderGrid();
+                }
             }
         };
 
@@ -336,7 +434,6 @@
 
         // --- TEMA VE RENK ---
         function initTheme() {
-            // Renk Seçici
             const savedColor = localStorage.getItem('ch_accent') || '#007AFF';
             document.documentElement.style.setProperty('--accent', savedColor);
             const picker = document.getElementById('colorPicker');
@@ -353,7 +450,6 @@
                 picker.appendChild(dot);
             });
 
-            // Dark Mode
             const savedTheme = localStorage.getItem('ch_theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
@@ -386,7 +482,6 @@
 
             autoSaveDraft: () => db.saveDraft(),
 
-            // YENİ: Artı Butonu ile Yeni İstasyon
             startNewNote: () => {
                 state.currentId = null;
                 state.currentDisplayId = null;
@@ -469,7 +564,6 @@
                 state.currentFolderId = note.folderId || 'genel';
                 
                 document.getElementById('sourceText').value = note.source;
-                uiHelpers.autoResize(document.getElementById('sourceText'));
                 uiHelpers.updateBadge();
                 
                 document.querySelectorAll('#sourceTagGroup .chip').forEach(c => {
@@ -479,6 +573,7 @@
                 state.currentTag = note.tag;
 
                 document.getElementById('dbModal').close();
+                document.getElementById('previewModal').close();
                 uiHelpers.switchPage(1);
             },
 
@@ -486,7 +581,6 @@
                 const shelf = document.getElementById('activeNotesShelf');
                 const actives = state.notes.filter(n => n.status === 'active');
                 
-                // EN BAŞA ARTI (+) KARTI EKLİYORUZ
                 let html = `
                     <div class="card new-card glass" onclick="appController.startNewNote()">
                         <div style="font-size: 2rem; margin-bottom: 5px;">+</div>
@@ -495,7 +589,7 @@
                 `;
 
                 html += actives.map(n => `
-                    <div class="card glass" onclick="appController.loadNoteForEdit('${n.id}')">
+                    <div class="card glass" onclick="dbManager.openPreview('${n.id}')">
                         <div style="display:flex; justify-content:space-between;">
                             <span class="card-tag">${n.tag}</span>
                             <span style="font-size:0.7rem; color:var(--text-secondary);">${n.displayId}</span>
@@ -513,11 +607,10 @@
                 `).join('');
             },
 
-            // YENİ: Bağlantılı Bloklar Algoritması
             addLink: () => {
                 const input = document.getElementById('linkInput');
                 let val = input.value.trim().toUpperCase();
-                if(!val.startsWith('#')) val = '#' + val; // # unuttuysa ekle
+                if(!val.startsWith('#')) val = '#' + val;
 
                 const targetNote = db.getNoteByDisplayId(val);
                 if(!targetNote) return alert('Bu kimliğe ait bir not bulunamadı!');
@@ -541,14 +634,15 @@
                     return;
                 }
 
+                // YENİ: Tıklayınca Önizleme Açılır
                 container.innerHTML = note.links.map(linkId => {
                     const linked = db.getNote(linkId);
                     if(!linked) return '';
                     return `
-                        <div class="link-preview-box">
+                        <div class="link-preview-box" onclick="dbManager.openPreview('${linked.id}')">
                             <div class="link-header">
                                 <span>${linked.displayId} - ${linked.tag}</span>
-                                <button class="btn btn-sm btn-danger" style="padding:2px 6px;" onclick="appController.removeLink('${linked.id}')">✕</button>
+                                <button class="btn btn-sm btn-danger" style="padding:2px 6px;" onclick="event.stopPropagation(); appController.removeLink('${linked.id}')">✕</button>
                             </div>
                             <div style="color:var(--text-primary); opacity:0.9;">
                                 ${uiHelpers.escapeHtml((linked.synthesis || linked.source).substring(0, 100))}...
@@ -582,13 +676,14 @@
                 `).join('');
             },
             switchFolder: (id) => { state.dbActiveFolder = id; dbManager.renderFolderTabs(); dbManager.renderGrid(); },
+            
             renderGrid: () => {
                 const grid = document.getElementById('dbGrid');
                 const filtered = state.notes.filter(n => n.folderId === state.dbActiveFolder && n.status === 'archived');
                 if (filtered.length === 0) return grid.innerHTML = '<div style="color:var(--text-secondary); grid-column:1/-1;">Bu klasör boş.</div>';
                 
                 grid.innerHTML = filtered.map(n => `
-                    <div class="card glass" onclick="appController.loadNoteForEdit('${n.id}')">
+                    <div class="card glass" onclick="dbManager.openPreview('${n.id}')">
                         <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                             <span class="card-tag">${n.tag}</span>
                             <span style="font-size:0.7rem; font-weight:bold; color:var(--text-secondary);">${n.displayId}</span>
@@ -596,6 +691,41 @@
                         <div class="card-content">${uiHelpers.escapeHtml(n.synthesis || n.source)}</div>
                     </div>
                 `).join('');
+            },
+
+            // TAM EKRAN ÖNİZLEME FONKSİYONU
+            openPreview: (id) => {
+                const note = db.getNote(id);
+                if (!note) return;
+
+                const modal = document.getElementById('previewModal');
+                document.getElementById('previewIdBadge').innerText = note.displayId;
+                
+                // Sentez
+                const synthBlock = document.getElementById('previewSynthesisBlock');
+                if (note.synthesis) {
+                    synthBlock.style.display = 'block';
+                    document.getElementById('previewSynthesis').innerHTML = uiHelpers.escapeHtml(note.synthesis).replace(/\n/g, '<br>');
+                } else {
+                    synthBlock.style.display = 'none';
+                }
+
+                // Çekirdekler
+                const coresUl = document.getElementById('previewCores');
+                if(note.cores && note.cores.length > 0) {
+                    coresUl.innerHTML = note.cores.map(c => `<li>${uiHelpers.escapeHtml(c)}</li>`).join('');
+                } else {
+                    coresUl.innerHTML = '<li style="opacity:0.5;">Çekirdek eklenmemiş.</li>';
+                }
+
+                // Kaynak
+                document.getElementById('previewSource').innerHTML = uiHelpers.escapeHtml(note.source).replace(/\n/g, '<br>');
+
+                // Butonlar
+                document.getElementById('btnEditNote').onclick = () => appController.loadNoteForEdit(id);
+                document.getElementById('btnDeleteNote').onclick = () => db.deleteNote(id);
+
+                modal.showModal();
             }
         };
 
