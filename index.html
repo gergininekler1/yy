@@ -157,7 +157,7 @@
 
         .tag-filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; margin-bottom: 4px; }
         .tag-filter-bar::-webkit-scrollbar { display: none; }
-        .tag-chip { flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; box-shadow: var(--card-shadow); }
+        .tag-chip { flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; box-shadow: var(--card-shadow); display:flex; align-items:center; gap:4px; }
         .tag-chip.active { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); }
         .tag-chip:active { opacity: 0.8; }
 
@@ -243,6 +243,10 @@
         .mind-card-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
         .mind-q-block { font-size: 13px; line-height: 1.5; color: var(--text-main); background: var(--surface-alt); padding: 10px; border-radius: 8px; }
         .mind-q-tag { color: var(--primary-blue); font-weight: 800; font-family: monospace; display: block; margin-bottom: 2px; }
+
+        /* SEMANTİK ÖNİZLEME MODALI */
+        #semanticPreviewModal .ios-modal-content { max-width: 450px; }
+        .semantic-highlight-word { background-color: #ffcc00; color: #000; font-weight: bold; padding: 0 3px; border-radius: 3px; }
 
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
@@ -335,6 +339,25 @@
             </div>
 
             <div class="ios-modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <div class="ios-modal" id="semanticPreviewModal" onclick="closeSemanticPreviewModal(event)">
+        <div class="ios-modal-content" onclick="event.stopPropagation()">
+            <div class="ios-modal-header">
+                <div>
+                    <div style="font-weight:700; font-size:16px; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                        <span class="material-symbols-rounded" style="color:#ffcc00;">wb_incandescent</span> Akıllı Eşleşme
+                    </div>
+                    <div id="semanticPreviewTitle" style="font-size:12px; color:var(--text-muted); margin-top:4px;"></div>
+                </div>
+            </div>
+            <div class="ios-modal-body" id="semanticPreviewBody" style="font-size:14px; background:var(--surface-alt);">
+                </div>
+            <div class="ios-modal-footer" style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn-secondary" onclick="closeSemanticPreviewModal()">İptal</button>
+                <button class="btn-primary" id="semanticConnectBtn">🔗 Bağla</button>
+            </div>
         </div>
     </div>
 
@@ -517,7 +540,12 @@
                     <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-top:20px; overflow-x:auto; scrollbar-width:none; padding-bottom:5px;">
+                    <span style="font-size:10px; font-weight:800; color:var(--text-muted); flex-shrink:0;">KATEGORİ:</span>
+                    <div id="editorCatChips" style="display:flex; gap:6px;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                     <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Undo" style="font-size:20px;">undo</span>
                     <div id="editorActions" style="display:flex; gap:8px;"></div>
                 </div>
@@ -531,8 +559,8 @@
     </div>
 
     <div id="pageArchive" class="page-container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="font-weight:600; font-size:24px; margin:0;">Archive <span style="font-size:14px; font-weight:500; color:var(--text-muted);">(Database)</span></h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2 style="font-weight:600; font-size:24px; margin:0;">Archive</h2>
             <div style="display:flex; gap:8px;">
                 <select id="archiveSortSelect" class="meta-input" style="padding: 6px 10px; font-size: 12px; height: auto;" onchange="renderArchivePage()">
                     <option value="newest">En Yeniler</option>
@@ -541,10 +569,45 @@
                 </select>
             </div>
         </div>
+        <div id="archiveCatFilters" class="tag-filter-bar" style="margin-bottom:15px;"></div>
+        
         <div id="archiveBoard" style="display:flex; flex-direction:column;"></div>
     </div>
 
     <script>
+        /* ─────────────────────────────────────────
+           KATEGORİ TANIMLAMALARI (MACRO)
+        ───────────────────────────────────────── */
+        const CATEGORIES = {
+            'genel': '📂 Genel',
+            'fikir': '🧠 Fikir / Karalama',
+            'medya': '📚 Kitap / Film',
+            'yazi': '✍️ Köşe Yazısı',
+            'proje': '⚙️ Proje / Teknik'
+        };
+        let currentEditorCategory = 'genel';
+        let archiveCategoryFilter = 'all';
+
+        function renderEditorCategories() {
+            const container = document.getElementById('editorCatChips');
+            container.innerHTML = '';
+            for (const [key, label] of Object.entries(CATEGORIES)) {
+                const isActive = currentEditorCategory === key;
+                container.innerHTML += `<div class="tag-chip ${isActive ? 'active' : ''}" onclick="selectEditorCategory('${key}')" style="padding:4px 10px; font-size:11px;">${label}</div>`;
+            }
+        }
+        function selectEditorCategory(key) { currentEditorCategory = key; renderEditorCategories(); }
+
+        function renderArchiveCategories() {
+            const container = document.getElementById('archiveCatFilters');
+            container.innerHTML = `<div class="tag-chip ${archiveCategoryFilter === 'all' ? 'active' : ''}" onclick="selectArchiveCategory('all')">Tümü</div>`;
+            for (const [key, label] of Object.entries(CATEGORIES)) {
+                const isActive = archiveCategoryFilter === key;
+                container.innerHTML += `<div class="tag-chip ${isActive ? 'active' : ''}" onclick="selectArchiveCategory('${key}')">${label}</div>`;
+            }
+        }
+        function selectArchiveCategory(key) { archiveCategoryFilter = key; renderArchiveCategories(); renderArchivePage(); }
+
         /* ─────────────────────────────────────────
            TOGGLE ISLANDS & MODALS
         ───────────────────────────────────────── */
@@ -566,17 +629,23 @@
         ───────────────────────────────────────── */
         if (localStorage.getItem('chimptopus_theme') === 'light') { document.body.classList.remove('dark-mode'); }
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('chimptopus_theme', isDark ? 'dark' : 'light'); document.getElementById('themeIcon').innerText = isDark ? 'light_mode' : 'dark_mode'; }
-        window.onload = () => { document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode'; navSwitchPage('records');};
+        window.onload = () => { 
+            document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode'; 
+            renderEditorCategories();
+            renderArchiveCategories();
+            navSwitchPage('records');
+        };
 
         let notes        = JSON.parse(localStorage.getItem('chimptopus_v18_notes'))   || [];
         let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
         let globalCounter = parseInt(localStorage.getItem('chimptopus_v18_counter'))  || 1;
 
-        notes.forEach(n => { if (n.num && n.num.length === 2) n.num = '0' + n.num; }); archive.forEach(a => { if (a.num && a.num.length === 2) a.num = '0' + a.num; });
+        notes.forEach(n => { if (n.num && n.num.length === 2) n.num = '0' + n.num; if(!n.category) n.category = 'genel'; }); 
+        archive.forEach(a => { if (a.num && a.num.length === 2) a.num = '0' + a.num; if(!a.category) a.category = 'genel'; });
 
         let draftsMemory = JSON.parse(localStorage.getItem('chimptopus_v18_drafts')) || { taslak:'', revize:'' };
         let refsMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_refs'))   || { taslak:'', revize:'' };
-        let metaMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_meta'))   || { title:'', questions:[] };
+        let metaMemory   = JSON.parse(localStorage.getItem('chimptopus_v18_meta'))   || { title:'', questions:[], category: 'genel' };
 
         let currentPage   = 'records'; let editingNoteId = null; let textHistory   = []; let currentTagFilter = null; let globalSearchFilter = 'all'; let swInterval; let swSeconds = 0; let swRunning = false;
 
@@ -618,6 +687,25 @@
         function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
 
         /* ─────────────────────────────────────────
+           EDITOR TEMPLATE INSERTIONS
+        ───────────────────────────────────────── */
+        function insertAtCursor(myField, myValue) {
+            if (myField.selectionStart || myField.selectionStart == '0') {
+                var startPos = myField.selectionStart; var endPos = myField.selectionEnd;
+                myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+                myField.selectionStart = startPos + myValue.length; myField.selectionEnd = startPos + myValue.length;
+            } else { myField.value += myValue; }
+            handleInput(); myField.focus();
+        }
+        function insertHeadingTemplate() {
+            const ta = document.getElementById('noteInput'); const text = ta.value; const matches = text.match(/<baslik\.(\d+)>/g);
+            let nextNum = 1;
+            if (matches) { const nums = matches.map(m => parseInt(m.match(/\d+/)[0])); nextNum = Math.max(...nums) + 1; }
+            const tag = `\n<baslik.${String(nextNum).padStart(2, '0')}>\n`; insertAtCursor(ta, tag);
+        }
+        function insert5N1KTemplate() { insertAtCursor(document.getElementById('noteInput'), '\n<odak.durum>\n<atmosfer.zaman>\n<durtu.neden>\n<eylem.tarz>\n<etki.hedef>\n'); }
+
+        /* ─────────────────────────────────────────
            NAV, PAGE SWITCHING & RESET
         ───────────────────────────────────────── */
         function navSwitchPage(page) { if (['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); } editingNoteId = null; switchPage(page, false); }
@@ -625,18 +713,21 @@
             draftsMemory[currentPage] = document.getElementById('noteInput').value; refsMemory[currentPage] = document.getElementById('refInput').value;
             localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
             if (currentPage === 'taslak' || currentPage === 'revize') {
-                metaMemory.title = document.getElementById('metaTitle').value; metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer .q-row')).map(row => { const cb = row.querySelector('input[type="checkbox"]'); const txt = row.querySelector('input[type="text"]').value.trim(); if(!txt) return ''; return (cb.checked ? '[x] ' : '[ ] ') + txt; }).filter(v => v !== ''); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+                metaMemory.title = document.getElementById('metaTitle').value; metaMemory.category = currentEditorCategory;
+                metaMemory.questions = Array.from(document.querySelectorAll('#questionsContainer .q-row')).map(row => { const cb = row.querySelector('input[type="checkbox"]'); const txt = row.querySelector('input[type="text"]').value.trim(); if(!txt) return ''; return (cb.checked ? '[x] ' : '[ ] ') + txt; }).filter(v => v !== ''); 
+                localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
             }
         }
         function switchPage(page, saveCurrent = true) {
             if (saveCurrent && ['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); } pauseStopwatchSafe(); if (page !== 'taslak') resizeNoteBlock(1);
             currentPage = page; document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active')); document.getElementById('nav-' + page).classList.add('active');
-            if (page === 'records') { document.getElementById('pageRecords').classList.add('active'); renderRecords(); } else if (page === 'archive') { document.getElementById('pageArchive').classList.add('active'); renderArchivePage(); } else {
+            if (page === 'records') { document.getElementById('pageRecords').classList.add('active'); renderRecords(); } else if (page === 'archive') { document.getElementById('pageArchive').classList.add('active'); renderArchiveCategories(); renderArchivePage(); } else {
                 document.getElementById('pageEditor').classList.add('active');
                 if (page === 'taslak') { document.getElementById('analysisIsland').style.display = 'none'; } else { document.getElementById('analysisIsland').style.display = 'flex'; }
                 document.getElementById('sizeControls').style.display = 'flex'; const idDisplay = document.getElementById('currentNoteIdDisplay');
-                if (editingNoteId) { let n = notes.find(x => x.id === editingNoteId) || archive.find(x => x.id === editingNoteId); document.getElementById('boxLabel').innerText = 'Edit'; idDisplay.innerText = n ? '#' + n.num : ''; } else { document.getElementById('boxLabel').innerText = 'New ' + (page === 'taslak' ? 'Draft' : 'Revise'); idDisplay.innerText = '#' + getNextAvailableNum(); }
+                if (editingNoteId) { let n = notes.find(x => x.id === editingNoteId) || archive.find(x => x.id === editingNoteId); document.getElementById('boxLabel').innerText = 'Edit'; idDisplay.innerText = n ? '#' + n.num : ''; currentEditorCategory = n ? (n.category || 'genel') : 'genel'; } else { document.getElementById('boxLabel').innerText = 'New ' + (page === 'taslak' ? 'Draft' : 'Revise'); idDisplay.innerText = '#' + getNextAvailableNum(); currentEditorCategory = metaMemory.category || 'genel'; }
                 document.getElementById('stageBadge').style.background = page === 'taslak' ? 'var(--color-taslak)' : 'var(--color-revize)';
+                renderEditorCategories();
                 if (!editingNoteId) {
                     document.getElementById('noteInput').value = draftsMemory[page] || ''; document.getElementById('refInput').value = refsMemory[page] || ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; document.getElementById('metaTitle').value = metaMemory.title || ''; document.getElementById('questionsContainer').innerHTML = '';
                     if (metaMemory.questions && metaMemory.questions.length > 0 && page === 'revize') { metaMemory.questions.forEach(q => addQuestionInput(q)); } else if (page === 'revize') { addQuestionInput(); } searchReference(); renderBacklinks();
@@ -654,19 +745,20 @@
         ───────────────────────────────────────── */
         function resetEditorUI() {
             editingNoteId = null; document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('refInput').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; if (swRunning) toggleStopwatch(); document.getElementById('currentNoteIdDisplay').innerText = '#' + getNextAvailableNum(); document.getElementById('boxLabel').innerText = 'New ' + (currentPage === 'taslak' ? 'Draft' : 'Revise');
-            draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; metaMemory.title = ''; metaMemory.questions = []; localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory)); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+            currentEditorCategory = 'genel'; renderEditorCategories();
+            draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; metaMemory.title = ''; metaMemory.questions = []; metaMemory.category = 'genel'; localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory)); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
             searchReference(); renderBacklinks(); updateWordProgress(); renderRecentRecords(); suggestConnections();
         }
 
         function handleAction(actionType) {
             pauseStopwatchSafe(); const text = document.getElementById('noteInput').value; if (!text.trim()) { showToast('⚠️ Metin alanı boş!'); return; }
             const textRefs = text.match(/@(\d{1,})/g) || []; const manualRefs = document.getElementById('refInput').value.match(/\d+/g) || []; const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])]; const tags = extractTags(text); const title = document.getElementById('metaTitle').value.trim(); const questions = Array.from(document.querySelectorAll('#questionsContainer .q-row')).map(row => { const cb = row.querySelector('input[type="checkbox"]'); const txt = row.querySelector('input[type="text"]').value.trim(); if(!txt) return ''; return (cb.checked ? '[x] ' : '[ ] ') + txt; }).filter(v => v !== '');
-            if (actionType === 'save') { const formattedNum = getNextAvailableNum(); notes.unshift({ id: Date.now(), num: formattedNum, text, type: currentPage, title, questions, refs: combinedRefs, tags, time: new Date().toLocaleDateString(), spentSeconds: swSeconds }); globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); saveToLocal(); checkBackupReminder(); resetEditorUI(); showToast('✅ Note Saved Successfully!'); return; } else if (actionType === 'update') { const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.refs = combinedRefs; n.tags = tags; n.spentSeconds = swSeconds; if (currentPage === 'taslak' || currentPage === 'revize') { n.title = title; n.questions = questions; } } saveToLocal(); showToast('✅ Updated Successfully!'); resetEditorUI(); navSwitchPage('records'); return; } else if (actionType === 'transfer_revize') { const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.spentSeconds = swSeconds; n.title = title; n.questions = questions; } saveToLocal(); showToast('🚀 Moved to Revise'); switchPage('revize'); return; } else if (actionType === 'archive') { let archiveNote = notes.find(x => x.id === editingNoteId); let noteId = Date.now(); let noteNum = getNextAvailableNum(); if(archiveNote) { noteId = archiveNote.id; noteNum = archiveNote.num; notes = notes.filter(n => n.id !== editingNoteId); } else { globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); } archive.unshift({ id: noteId, num: noteNum, text: text, title: title, questions: questions, refs: combinedRefs, tags: tags, date: new Date().toLocaleDateString(), spentSeconds: swSeconds }); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); saveToLocal(); showToast('📦 Sent to Archive'); resetEditorUI(); navSwitchPage('archive'); return; }
+            if (actionType === 'save') { const formattedNum = getNextAvailableNum(); notes.unshift({ id: Date.now(), num: formattedNum, text, type: currentPage, title, questions, refs: combinedRefs, tags, category: currentEditorCategory, time: new Date().toLocaleDateString(), spentSeconds: swSeconds }); globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); saveToLocal(); checkBackupReminder(); resetEditorUI(); showToast('✅ Note Saved Successfully!'); return; } else if (actionType === 'update') { const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.refs = combinedRefs; n.tags = tags; n.category = currentEditorCategory; n.spentSeconds = swSeconds; if (currentPage === 'taslak' || currentPage === 'revize') { n.title = title; n.questions = questions; } } saveToLocal(); showToast('✅ Updated Successfully!'); resetEditorUI(); navSwitchPage('records'); return; } else if (actionType === 'transfer_revize') { const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.category = currentEditorCategory; n.spentSeconds = swSeconds; n.title = title; n.questions = questions; } saveToLocal(); showToast('🚀 Moved to Revise'); switchPage('revize'); return; } else if (actionType === 'archive') { let archiveNote = notes.find(x => x.id === editingNoteId); let noteId = Date.now(); let noteNum = getNextAvailableNum(); if(archiveNote) { noteId = archiveNote.id; noteNum = archiveNote.num; notes = notes.filter(n => n.id !== editingNoteId); } else { globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); } archive.unshift({ id: noteId, num: noteNum, text: text, title: title, questions: questions, refs: combinedRefs, tags: tags, category: currentEditorCategory, date: new Date().toLocaleDateString(), spentSeconds: swSeconds }); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); saveToLocal(); showToast('📦 Sent to Archive'); resetEditorUI(); navSwitchPage('archive'); return; }
         }
         function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
 
         /* ─────────────────────────────────────────
-           YENİ: AKILLI ANLAMSAL BAĞLANTI ÖNERİSİ
+           YENİ: AKILLI BAĞLANTI ÖNİZLEMESİ (SEMANTIC PREVIEW)
         ───────────────────────────────────────── */
         const trStopWords = ['ve', 'ile', 'ama', 'fakat', 'lakin', 'için', 'gibi', 'kadar', 'çünkü', 'oysa', 'eğer', 'ya', 'da', 'de', 'ki', 'bu', 'şu', 'o', 'bir', 'bazı', 'tüm', 'bütün', 'her', 'hiç', 'çok', 'daha', 'en', 'ise', 'olan', 'olarak', 'var', 'yok', 'mı', 'mi', 'mu', 'mü', 'ne', 'nasıl', 'niçin', 'neden', 'kim', 'hangi', 'şeyi', 'şeye'];
 
@@ -690,17 +782,61 @@
             allNotes.forEach(n => {
                 const nWords = getMeaningfulWords((n.title || '') + ' ' + n.text);
                 const intersection = currentWords.filter(w => nWords.includes(w));
-                if (intersection.length >= 3) { suggestions.push({ note: n, matches: intersection.length }); }
+                if (intersection.length >= 3) { suggestions.push({ note: n, intersection }); }
             });
 
-            suggestions.sort((a, b) => b.matches - a.matches);
+            suggestions.sort((a, b) => b.intersection.length - a.intersection.length);
             suggestions = suggestions.slice(0, 4); // Top 4
 
             if (suggestions.length > 0) {
                 let html = '';
-                suggestions.forEach(s => { html += `<span class="mention-link" style="background:transparent; padding:0; margin-right:12px; border-bottom:1px dashed var(--primary-blue);" onclick="loadMention('${s.note.num}', event)">#${s.note.num} (${s.matches} kelime)</span>`; });
+                suggestions.forEach(s => { 
+                    const intersectionStr = JSON.stringify(s.intersection).replace(/"/g, '&quot;');
+                    html += `<span class="mention-link" style="background:transparent; padding:0; margin-right:12px; border-bottom:1px dashed var(--primary-blue);" onclick="openSemanticPreview(${s.note.id}, '${intersectionStr}')">#${s.note.num} (${s.intersection.length} ortak kelime)</span>`; 
+                });
                 linksSpan.innerHTML = html; container.style.display = 'block';
             } else { container.style.display = 'none'; }
+        }
+
+        function openSemanticPreview(noteId, intersectionStr) {
+            const intersectionWords = JSON.parse(intersectionStr.replace(/&quot;/g, '"'));
+            const note = [...notes, ...archive].find(n => n.id === noteId);
+            if (!note) return;
+
+            document.getElementById('semanticPreviewTitle').innerText = "Ortak Kelimeler: " + intersectionWords.join(', ');
+            
+            let highlightedText = formatMentionsAndHighlights(note.text);
+            intersectionWords.forEach(w => {
+                const regex = new RegExp(`(?<=^|[^a-zA-ZğüşıöçĞÜŞİÖÇ])(${w})(?=[^a-zA-ZğüşıöçĞÜŞİÖÇ]|$)`, 'gi');
+                highlightedText = highlightedText.replace(regex, '<mark class="semantic-highlight-word">$1</mark>');
+            });
+            
+            document.getElementById('semanticPreviewBody').innerHTML = highlightedText;
+            
+            document.getElementById('semanticConnectBtn').onclick = () => {
+                connectSemanticNote(note.num);
+            };
+
+            const modal = document.getElementById('semanticPreviewModal');
+            modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeSemanticPreviewModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return; 
+            const modal = document.getElementById('semanticPreviewModal'); 
+            modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); 
+        }
+
+        function connectSemanticNote(num) {
+            const refInput = document.getElementById('refInput');
+            let currentRefs = refInput.value.split(',').map(s => s.trim()).filter(s => s);
+            if (!currentRefs.includes(num)) {
+                currentRefs.push(num);
+                refInput.value = currentRefs.join(', ');
+                searchReference();
+                showToast('🔗 Bağlantı Eklendi');
+            }
+            closeSemanticPreviewModal();
         }
 
         function handleInput() { 
@@ -737,10 +873,10 @@
         function closeUniversalModal(e) { if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return; const modal = document.getElementById('universalModal'); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); }
         function deleteNote(id) { if (confirm('Emin misin?')) { notes = notes.filter(n => n.id !== id); localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); renderRecords(); } }
         function deleteArchive(id) { if (confirm('Kalıcı olarak silinecek?')) { archive = archive.filter(a => a.id !== id); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); renderArchivePage(); } }
-        function restoreToRevize(id) { const index = archive.findIndex(a => a.id === id); if (index > -1) { const item = archive[index]; archive.splice(index, 1); notes.unshift({ id: item.id, num: item.num, text: item.text, type: 'revize', title: item.title, questions: item.questions || [], refs: item.refs, tags: item.tags, time: new Date().toLocaleDateString(), spentSeconds: item.spentSeconds || 0 }); localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); renderArchivePage(); showToast('♻️ Restored to Revise'); editNote(item.id); switchPage('revize'); } }
+        function restoreToRevize(id) { const index = archive.findIndex(a => a.id === id); if (index > -1) { const item = archive[index]; archive.splice(index, 1); notes.unshift({ id: item.id, num: item.num, text: item.text, type: 'revize', title: item.title, questions: item.questions || [], refs: item.refs, tags: item.tags, category: item.category || 'genel', time: new Date().toLocaleDateString(), spentSeconds: item.spentSeconds || 0 }); localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); renderArchivePage(); showToast('♻️ Restored to Revise'); editNote(item.id); switchPage('revize'); } }
 
         /* ─────────────────────────────────────────
-           YENİ RENDER ARCHIVE (MINIMALIST VERİTABANI)
+           YENİ RENDER ARCHIVE (MINIMALIST VERİTABANI + KATEGORİ)
         ───────────────────────────────────────── */
         function countConnections(note) {
             let count = (note.refs || []).length; const all = [...notes, ...archive];
@@ -751,10 +887,19 @@
 
         function renderArchivePage() {
             const board = document.getElementById('archiveBoard'); board.innerHTML = '';
-            if (archive.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);"><span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span></div><h3>Archive Empty</h3></div>`; return; }
+            
+            let filteredArchive = archive;
+            if (archiveCategoryFilter !== 'all') {
+                filteredArchive = archive.filter(a => a.category === archiveCategoryFilter);
+            }
+
+            if (filteredArchive.length === 0) { 
+                board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);"><span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span></div><h3>Archive Empty</h3><p>${archiveCategoryFilter !== 'all' ? 'Bu kategoride not yok.' : ''}</p></div>`; 
+                return; 
+            }
             
             const sortMode = document.getElementById('archiveSortSelect')?.value || 'newest';
-            let sortedArchive = [...archive];
+            let sortedArchive = [...filteredArchive];
             
             if (sortMode === 'oldest') { sortedArchive.reverse(); } 
             else if (sortMode === 'connected') {
@@ -772,10 +917,13 @@
                 
                 const titleText = a.title ? `<span style="font-weight:700; color:var(--text-main); margin-right:6px;">${a.title}</span>` : '';
                 const plainText = a.text.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 45) + '...';
+                
+                const catIcon = CATEGORIES[a.category || 'genel'].split(' ')[0]; // Emojiyi al
 
                 row.innerHTML = `
                     <div style="display:flex; align-items:center; gap:12px; flex-grow:1; overflow:hidden;">
                         <span style="font-weight:800; font-size:12px; color:var(--color-archive); background:rgba(48,209,88,0.1); padding:4px 8px; border-radius:6px; flex-shrink:0;">#${a.num}</span>
+                        <span style="font-size:14px;" title="${CATEGORIES[a.category || 'genel']}">${catIcon}</span>
                         <div style="font-size:13px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                             ${titleText} ${plainText}
                         </div>
