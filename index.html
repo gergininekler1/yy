@@ -42,11 +42,11 @@
 
         .dark-mode {
             --bg-color: #000000; 
-            --surface-color: #242426; 
-            --surface-alt: #323234;   
+            --surface-color: #1c1c1e; 
+            --surface-alt: #2c2c2e;   
             --text-main: rgba(255,255,255,0.95); 
             --text-muted: rgba(255,255,255,0.6);
-            --border-color: #48484a; 
+            --border-color: #38383a; 
             --card-shadow: 0 4px 15px rgba(0,0,0,0.3); 
         }
 
@@ -101,10 +101,14 @@
         .page-container.active { display: block; }
         @keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .note-box {
-            padding: 20px; display: flex; flex-direction: column; position: relative;
-            background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px;
-            box-shadow: var(--card-shadow);
+        /* YENİ ADACIK TASARIMI (ISLANDS) */
+        .editor-island { 
+            padding: 16px; margin-bottom: 15px; display: flex; flex-direction: column; 
+            border-radius: 16px; background: var(--surface-color); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); 
+        }
+        .island-title { 
+            font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; 
+            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; 
         }
 
         .meta-input {
@@ -115,13 +119,15 @@
         .meta-input::placeholder { color: var(--text-muted); font-weight: 400; }
         .meta-input-secondary { font-weight: 400; font-size: 13px; }
 
+        /* KOMPAKT BUTON TASARIMLARI */
         .timer-btn {
-            font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
+            font-size: 12px; font-weight: 600; padding: 8px; border-radius: 8px;
             background: var(--surface-alt); border: 1px solid var(--border-color);
-            color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; font-family: inherit;
-            white-space: nowrap;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; font-family: inherit;
+            white-space: nowrap; height: 36px;
         }
-        .timer-btn:active { background: var(--border-color); }
+        .timer-btn:active { background: var(--border-color); transform: scale(0.96); }
+        .timer-btn .material-symbols-rounded { font-size: 18px; }
         
         @keyframes pulseBorder { 0% { border-color: var(--border-color); } 50% { border-color: var(--primary-blue); } 100% { border-color: var(--border-color); } }
         .sw-running { animation: pulseBorder 2s infinite; color: var(--primary-blue); border-color: var(--primary-blue); }
@@ -153,10 +159,6 @@
         .recent-scroll::-webkit-scrollbar { display: none; }
 
         .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .search-bar {
-            display: flex; align-items: center; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; flex-grow: 1; margin-right: 12px; box-shadow: var(--card-shadow);
-        }
-        .search-bar input { border: none; background: transparent; outline: none; color: var(--text-main); font-size: 15px; width: 100%; margin-left: 8px; font-family: inherit; }
 
         .tag-filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; margin-bottom: 4px; }
         .tag-filter-bar::-webkit-scrollbar { display: none; }
@@ -175,6 +177,16 @@
         .mention-link { color: var(--primary-blue); cursor: pointer; font-weight: 500; text-decoration: none; background: rgba(0,122,255,0.15); padding: 2px 6px; border-radius: 4px; }
         .tag-link { color: #bf5af2; cursor: pointer; font-weight: 600; background: rgba(191,90,242,0.15); padding: 2px 6px; border-radius: 4px; font-size: inherit; }
         .highlight { background-color: rgba(48,209,88,0.25); color: #30d158; border-radius: 4px; padding: 0 4px; font-weight: 500; }
+
+        /* GLOBAL SEARCH MODAL */
+        #searchOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-color); z-index: 5000; display: none; flex-direction: column;
+            padding: calc(20px + env(safe-area-inset-top)) 20px 20px;
+        }
+        .search-header { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+        .search-input-wrap { flex-grow: 1; background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 12px; display: flex; align-items: center; padding: 0 15px; box-shadow: var(--card-shadow); }
+        .search-input-wrap input { background: transparent; border: none; outline: none; padding: 15px 0; color: var(--text-main); width: 100%; font-size: 16px; font-family: inherit;}
 
         /* ── SIDE PANEL & MODALS ── */
         .side-panel {
@@ -249,12 +261,6 @@
         .q-row { display:flex; gap:8px; align-items:center; width:100%; }
         .q-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); flex-shrink: 0; }
         
-        .section-divider {
-            border: 0;
-            border-top: 1px solid var(--border-color);
-            margin: 0 0 15px 0;
-            width: 100%;
-        }
     </style>
 </head>
 <body class="dark-mode">
@@ -262,6 +268,7 @@
     <header class="app-header">
         <div class="logo" id="mainLogo">📝 Notes</div>
         <div style="display:flex; gap:5px;">
+            <button class="icon-btn" onclick="openSearchView()"><span class="material-symbols-rounded">search</span></button>
             <button class="icon-btn" onclick="openGraphView()" title="Mind Map"><span class="material-symbols-rounded">account_tree</span></button>
             <button class="icon-btn" onclick="toggleDarkMode()"><span class="material-symbols-rounded" id="themeIcon">light_mode</span></button>
             <button class="icon-btn" onclick="togglePanel('sideMenu')"><span class="material-symbols-rounded">more_horiz</span></button>
@@ -287,6 +294,23 @@
         </div>
     </nav>
 
+    <div id="searchOverlay">
+        <div class="search-header">
+            <div class="search-input-wrap">
+                <span class="material-symbols-rounded" style="color:var(--text-muted)">search</span>
+                <input type="text" id="globalSearchInput" placeholder="Search across all notes..." oninput="renderSearchResults()">
+            </div>
+            <button class="icon-btn" onclick="closeSearchView()"><span class="material-symbols-rounded">close</span></button>
+        </div>
+        <div class="tag-filter-bar" id="searchFilters">
+            <div class="tag-chip active" onclick="setSearchFilter('all', event)">All</div>
+            <div class="tag-chip" onclick="setSearchFilter('taslak', event)">Drafts</div>
+            <div class="tag-chip" onclick="setSearchFilter('revize', event)">Revise</div>
+            <div class="tag-chip" onclick="setSearchFilter('archive', event)">Archive</div>
+        </div>
+        <div id="searchResultList" style="flex-grow:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding-bottom: 20px;"></div>
+    </div>
+
     <div class="menu-overlay" id="overlay" onclick="closePanels()"></div>
     <div class="toast" id="toastEl"><span id="toastMsg"></span></div>
 
@@ -300,6 +324,14 @@
                 <span class="material-symbols-rounded" style="cursor:pointer; color:var(--text-muted);" onclick="closeUniversalModal(event)">close</span>
             </div>
             <div class="ios-modal-body" id="modalBody"></div>
+            
+            <div id="modalLinksContainer" style="padding:0 20px 15px; display:none; flex-direction:column; gap:10px; background:var(--surface-color);">
+                <div style="font-size:11px; font-weight:800; color:var(--primary-blue); border-top:1px dashed var(--border-color); padding-top:15px; display:flex; align-items:center; gap:4px;">
+                    <span class="material-symbols-rounded" style="font-size:16px;">link</span> CONNECTIONS
+                </div>
+                <div id="modalLinksList" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+
             <div class="ios-modal-footer" id="modalFooter"></div>
         </div>
     </div>
@@ -359,126 +391,107 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 style="font-weight:600; font-size:24px; margin:0;">Records <span style="font-size:14px; font-weight:500; color:var(--text-muted);">(Drafts)</span></h2>
         </div>
-        <div class="controls-row">
-            <div class="search-bar" style="margin:0; width:100%;">
-                <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">search</span>
-                <input type="text" id="searchInput" placeholder="Search notes..." oninput="renderRecords()">
-            </div>
-        </div>
         <div class="tag-filter-bar" id="tagFilterBar"></div>
         <div id="recordsBoard"></div>
     </div>
 
     <div id="pageEditor" class="page-container">
-        <div class="editor-section">
-            <div class="note-box" id="editorWorkspace">
+        
+        <div class="editor-island" style="padding: 12px 16px;">
+            <div class="island-title" style="margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div id="stageBadge" style="width:12px; height:12px; border-radius:50%; background:var(--color-taslak)"></div>
+                    <span id="boxLabel" style="font-size:14px;">Draft</span>
+                    <span id="currentNoteIdDisplay" style="font-size:13px; font-weight:800; color:var(--primary-blue); background:rgba(0,122,255,0.15); padding:2px 8px; border-radius:6px;"></span>
+                </div>
+            </div>
+            
+            <div style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; align-items:center; scrollbar-width:none;">
+                <button class="timer-btn" style="width:36px; padding:0;" onclick="toggleFocusMode()"><span class="material-symbols-rounded">fullscreen</span></button>
                 
-                <div style="display:flex; flex-direction:column; align-items:flex-start; margin-bottom:15px; gap:10px;">
-                    <div style="display:flex; align-items:center; gap:8px; width:100%;">
-                        <div id="stageBadge" style="width:12px; height:12px; border-radius:50%; background:var(--color-taslak)"></div>
-                        <span id="boxLabel" style="font-size:16px; font-weight:700; color:var(--text-main)">Draft</span>
-                        <span id="currentNoteIdDisplay" style="font-size:13px; font-weight:800; color:var(--primary-blue); background:rgba(0,122,255,0.15); padding:2px 8px; border-radius:6px; margin-left:4px;"></span>
+                <div id="sizeControls" style="display:flex; gap:4px; border-left:1px solid var(--border-color); border-right:1px solid var(--border-color); padding:0 6px;">
+                    <button class="timer-btn" style="width:36px; padding:0;" onclick="resizeNoteBlock(1)">1x</button>
+                    <button class="timer-btn" style="width:36px; padding:0;" onclick="resizeNoteBlock(2)">2x</button>
+                    <button class="timer-btn" style="width:36px; padding:0;" onclick="resizeNoteBlock(3)">3x</button>
+                </div>
+                
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <span id="swDisplay" style="font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--text-muted); margin:0 2px;">00:00</span>
+                    <button class="timer-btn" style="width:36px; padding:0;" id="swToggleBtn" onclick="toggleStopwatch()">
+                        <span class="material-symbols-rounded" id="swToggleIcon">play_arrow</span> 
+                    </button>
+                    <button class="timer-btn" style="width:36px; padding:0; color:var(--danger-color);" onclick="clearCurrentNote()">
+                        <span class="material-symbols-rounded">delete_sweep</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="editor-island" id="analysisIsland">
+            <div class="island-title">
+                <span>Analysis & Questions</span>
+                <span class="material-symbols-rounded action-icon" style="font-size:18px;" onclick="toggleIsland('analysisContent', this)">visibility_off</span>
+            </div>
+            
+            <div id="analysisContent" style="display:flex; flex-direction:column;">
+                
+                <div class="ref-input-container">
+                    <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
+                    <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 001, 004)" oninput="searchReference()">
+                </div>
+                <div id="refCardsContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;"></div>
+                
+                <div id="backlinkContainer" style="display:none; flex-direction:column; margin-top:10px; padding-bottom:12px;">
+                    <div style="font-size:11px; font-weight:700; color:var(--primary-blue); margin-bottom:10px; display:flex; align-items:center; gap:4px;">
+                        <span class="material-symbols-rounded" style="font-size:16px;">keyboard_return</span> LINKED FROM
                     </div>
-                    
-                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-start; width:100%;">
-                        <button class="timer-btn" onclick="toggleFocusMode()" id="focusBtn" style="color:var(--text-main);">
-                            <span class="material-symbols-rounded" style="font-size:18px;">fullscreen</span> <span id="focusBtnText">Focus</span>
-                        </button>
-                        
-                        <div id="sizeControls" style="display:none; gap:4px; align-items:center; border-left:1px solid var(--border-color); border-right:1px solid var(--border-color); padding:0 6px;">
-                            <button class="timer-btn" onclick="resizeNoteBlock(1)">1x</button>
-                            <button class="timer-btn" onclick="resizeNoteBlock(2)">2x</button>
-                            <button class="timer-btn" onclick="resizeNoteBlock(3)">3x</button>
-                        </div>
-                        <div style="display:flex; gap:6px; align-items:center;">
-                            <span id="swDisplay" style="font-size:14px; font-weight:700; font-variant-numeric: tabular-nums; color:var(--text-muted); margin-right:2px;">00:00</span>
-                            <button class="timer-btn" id="swToggleBtn" onclick="toggleStopwatch()">
-                                <span class="material-symbols-rounded" id="swToggleIcon" style="font-size:18px;">play_arrow</span> 
-                                <span id="swToggleText">Start</span>
-                            </button>
-                            <span class="material-symbols-rounded action-icon" onclick="clearCurrentNote()" title="Delete All" style="font-size:22px; color:var(--danger-color); margin-left:6px;">delete_sweep</span>
-                        </div>
-                    </div>
+                    <div id="backlinkCardsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+                
+                <hr style="border:0; border-top:1px dashed var(--border-color); margin:15px 0;">
+
+                <input type="text" id="metaTitle" class="meta-input" style="margin-bottom:12px;" placeholder="Core Idea / Main Title">
+                
+                <button class="icon-btn" onclick="addQuestionInput()" style="width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:var(--surface-alt); font-size:13px; font-weight:600; margin-bottom:10px;">+ Add Question/Keyword</button>
+                <div id="questionsContainer" style="display:flex; flex-direction:column; gap:8px; margin-bottom:4px;"></div>
+            </div>
+        </div>
+
+        <div class="editor-island">
+            <div class="island-title">
+                <span>Editor</span>
+                <span class="material-symbols-rounded action-icon" style="font-size:18px;" onclick="toggleIsland('editorContent', this)">visibility_off</span>
+            </div>
+            
+            <div id="editorContent" style="display:flex; flex-direction:column;">
+                <div style="display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; margin-bottom:10px;">
+                    <button class="timer-btn" style="padding:0 12px; width:auto;" onclick="insertHeadingTemplate()">
+                        <span class="material-symbols-rounded" style="font-size:14px;">title</span> Başlık
+                    </button>
+                    <button class="timer-btn" style="padding:0 12px; width:auto;" onclick="insert5N1KTemplate()">
+                        <span class="material-symbols-rounded" style="font-size:14px;">psychology_alt</span> 5N1K
+                    </button>
                 </div>
 
-                <div id="topLinksBlockWrapper" style="display:none;">
-                    <div id="topLinksBlock" style="display:flex; flex-direction:column; gap:10px; margin-bottom:15px; padding:12px; background:var(--surface-alt); border:1px solid var(--border-color); border-radius:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 4px; margin-bottom: 4px;">
-                            <span style="font-size:12px; font-weight:700; color:var(--text-muted);">LINKED BLOCKS</span>
-                            <span class="material-symbols-rounded action-icon" id="toggleLinksIcon" onclick="toggleLinks()" style="font-size:20px;">visibility_off</span>
-                        </div>
-                        <div id="linksWrapper" style="display:flex; flex-direction:column; gap:10px;">
-                            <div class="ref-input-container" style="margin-top:0; background: var(--surface-color);">
-                                <span class="material-symbols-rounded" style="color:var(--text-muted); font-size:18px;">link</span>
-                                <input type="text" id="refInput" placeholder="Linked note IDs (Ex: 001, 004)" oninput="searchReference()">
-                            </div>
-                            <div id="refCardsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
-                            <div id="backlinkContainer" style="display:none; flex-direction:column; margin-top:8px; padding-top:12px; border-top:1px dashed var(--border-color);">
-                                <div style="font-size:11px; font-weight:700; color:var(--primary-blue); margin-bottom:10px; display:flex; align-items:center; gap:4px;">
-                                    <span class="material-symbols-rounded" style="font-size:16px;">keyboard_return</span> LINKED FROM (BACKLINKS)
-                                </div>
-                                <div id="backlinkCardsContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="section-divider">
-                </div>
-
-                <div id="metaBlocksContainerWrapper" style="display:none;">
-                    <div id="metaBlocksContainer" style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 4px;">
-                            <span id="metaTitleLabel" style="font-size:12px; font-weight:700; color:var(--text-muted);">TITLE</span>
-                            <span class="material-symbols-rounded action-icon" id="toggleMetaIcon" onclick="toggleMeta()" style="font-size:20px;">visibility_off</span>
-                        </div>
-                        <div id="metaInputsWrapper" style="display:flex; flex-direction:column; gap:8px;">
-                            <input type="text" id="metaTitle" class="meta-input" placeholder="Title, Topic or Main Idea...">
-                            <button class="icon-btn" id="addQuestionBtn" onclick="addQuestionInput()" style="display:none; width:100%; height:36px; border-radius:8px; border:1px dashed var(--border-color); background:var(--surface-alt); font-size:13px; font-weight:600;">+ Add Question</button>
-                            <div id="questionsContainer" style="display:none; flex-direction:column; gap:8px;"></div>
-                        </div>
-                    </div>
-                    <hr class="section-divider">
-                </div>
-
-                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 4px; margin-bottom:8px;">
-                    <span style="font-size:12px; font-weight:700; color:var(--text-muted);">TEXT EDITOR</span>
-                    <span class="material-symbols-rounded action-icon" id="toggleEditorIcon" onclick="toggleEditorText()" style="font-size:20px;">visibility_off</span>
-                </div>
-
-                <div id="editorTextWrapper" style="display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px;">
-                        <button class="timer-btn" onclick="insertHeadingTemplate()" style="flex-shrink:0;">
-                            <span class="material-symbols-rounded" style="font-size:14px;">title</span> Başlık
-                        </button>
-                        <button class="timer-btn" onclick="insert5N1KTemplate()" style="flex-shrink:0;">
-                            <span class="material-symbols-rounded" style="font-size:14px;">psychology_alt</span> 5N1K
-                        </button>
-                        <button class="timer-btn" onclick="insertTimeTemplate()" style="flex-shrink:0;">
-                            <span class="material-symbols-rounded" style="font-size:14px;">schedule</span> Saat
-                        </button>
-                    </div>
-
-                    <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
-                    <div class="word-challenge">
-                        <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
-                        <span id="wordLevel" style="font-weight:700; color:var(--primary-blue)">Level 1</span>
-                        <span id="wordCountUI" style="margin-left:auto; font-size:12px; font-weight:600; color:var(--text-muted);">0 / 50</span>
-                        <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
-                    </div>
+                <textarea id="noteInput" placeholder="Type your text here... (#tag @001)" oninput="handleInput()"></textarea>
+                
+                <div class="word-challenge">
+                    <span class="material-symbols-rounded" style="font-size:18px; color:var(--primary-blue);">military_tech</span>
+                    <span id="wordLevel" style="font-weight:700; color:var(--primary-blue)">Level 1</span>
+                    <span id="wordCountUI" style="margin-left:auto; font-size:12px; font-weight:600; color:var(--text-muted);">0 / 50</span>
+                    <div class="progress-bar-container"><div class="progress-bar" id="wordProgress"></div></div>
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span id="statusMsg" style="color:var(--text-muted); font-size:12px;"></span>
-                        <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Undo" style="font-size:18px;">undo</span>
-                    </div>
+                    <span class="material-symbols-rounded action-icon" onclick="undoText()" title="Undo" style="font-size:20px;">undo</span>
                     <div id="editorActions" style="display:flex; gap:8px;"></div>
                 </div>
             </div>
+        </div>
 
-            <div id="recentRecordsContainer" style="margin-top: 30px;">
-                <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
-                <div class="recent-scroll" id="recentRecordsList"></div>
-            </div>
+        <div id="recentRecordsContainer" style="margin-top: 30px;">
+            <h4 style="font-size:13px; font-weight:700; margin:0 0 10px 0; color:var(--text-muted); text-transform:uppercase;">Recent Drafts</h4>
+            <div class="recent-scroll" id="recentRecordsList"></div>
         </div>
     </div>
 
@@ -490,6 +503,20 @@
     </div>
 
     <script>
+        /* ─────────────────────────────────────────
+           TOGGLE ISLANDS VISIBILITY (YENİ FONKSİYON)
+        ───────────────────────────────────────── */
+        function toggleIsland(contentId, iconEl) {
+            const content = document.getElementById(contentId);
+            if (content.style.display === 'none') {
+                content.style.display = 'flex';
+                iconEl.innerText = 'visibility_off';
+            } else {
+                content.style.display = 'none';
+                iconEl.innerText = 'visibility';
+            }
+        }
+
         /* ─────────────────────────────────────────
            FIREBASE INITIALIZATION
         ───────────────────────────────────────── */
@@ -533,7 +560,7 @@
             document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('chimptopus_theme', isDark ? 'dark' : 'light'); document.getElementById('themeIcon').innerText = isDark ? 'light_mode' : 'dark_mode';
         }
-        window.onload = () => { document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode'; };
+        window.onload = () => { document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode'; navSwitchPage('records');};
 
         let notes        = JSON.parse(localStorage.getItem('chimptopus_v18_notes'))   || [];
         let archive      = JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [];
@@ -548,12 +575,9 @@
 
         let currentPage   = 'records'; let editingNoteId = null; let textHistory   = [];
         let currentTagFilter = null; 
-        let isMetaVisible = true; let isEditorVisible = true; let isLinksVisible = true;
+        let globalSearchFilter = 'all';
         let swInterval; let swSeconds = 0; let swRunning = false;
 
-        /* ─────────────────────────────────────────
-           AKILLI KİMLİK (ID GAP FILLER)
-        ───────────────────────────────────────── */
         function getNextAvailableNum() {
             const allNotes = [...notes, ...archive];
             const usedNums = allNotes.map(n => parseInt(n.num, 10)).filter(n => !isNaN(n));
@@ -590,15 +614,15 @@
         }
 
         function toggleStopwatch() {
-            const btn = document.getElementById('swToggleBtn'); const icon = document.getElementById('swToggleIcon'); const txt = document.getElementById('swToggleText');
-            if (swRunning) { clearInterval(swInterval); swRunning = false; icon.innerText = 'play_arrow'; txt.innerText = 'Start'; btn.classList.remove('sw-running'); } 
-            else { swInterval = setInterval(() => { swSeconds++; document.getElementById('swDisplay').innerText = formatTime(swSeconds); }, 1000); swRunning = true; icon.innerText = 'pause'; txt.innerText = 'Stop'; btn.classList.add('sw-running'); }
+            const btn = document.getElementById('swToggleBtn'); const icon = document.getElementById('swToggleIcon'); 
+            if (swRunning) { clearInterval(swInterval); swRunning = false; icon.innerText = 'play_arrow'; btn.classList.remove('sw-running'); } 
+            else { swInterval = setInterval(() => { swSeconds++; document.getElementById('swDisplay').innerText = formatTime(swSeconds); }, 1000); swRunning = true; icon.innerText = 'pause'; btn.classList.add('sw-running'); }
         }
         function formatTime(sec) { if(!sec) return "00:00"; const m = Math.floor(sec / 60).toString().padStart(2, '0'); const s = (sec % 60).toString().padStart(2, '0'); return `${m}:${s}`; }
         function pauseStopwatchSafe() { if (swRunning) toggleStopwatch(); }
 
         /* ─────────────────────────────────────────
-           TAGS & TOGGLES
+           TAGS & GLOBAL SEARCH
         ───────────────────────────────────────── */
         function extractTags(text) { return [...new Set((text.match(/#([a-zA-ZğüşıöçĞÜŞİÖÇ_][a-zA-ZğüşıöçĞÜŞİÖÇ0-9_]*)/g) || []).map(t => t.toLowerCase()))]; }
         function getAllTags() { return [...new Set(notes.concat(archive).flatMap(n => extractTags(n.text)))].sort(); }
@@ -609,25 +633,37 @@
         }
         function setTagFilter(tag) { currentTagFilter = tag; renderTagFilterBar(); renderRecords(); }
 
-        function toggleFocusMode() {
-            document.body.classList.toggle('focus-mode');
-            const isFocus = document.body.classList.contains('focus-mode');
-            document.getElementById('focusBtn').innerHTML = `<span class="material-symbols-rounded" style="font-size:18px;">${isFocus ? 'fullscreen_exit' : 'fullscreen'}</span> <span id="focusBtnText">${isFocus ? 'Exit' : 'Focus'}</span>`;
-            showToast(isFocus ? '🧘 Focus Mode On' : '🧘 Focus Mode Off', null, null);
+        function openSearchView() { document.getElementById('searchOverlay').style.display = 'flex'; document.getElementById('globalSearchInput').focus(); renderSearchResults(); }
+        function closeSearchView() { document.getElementById('searchOverlay').style.display = 'none'; }
+        function setSearchFilter(filter, event) {
+            globalSearchFilter = filter;
+            document.querySelectorAll('#searchFilters .tag-chip').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderSearchResults();
+        }
+        function renderSearchResults() {
+            const query = (document.getElementById('globalSearchInput').value || '').toLowerCase();
+            const list = document.getElementById('searchResultList'); list.innerHTML = '';
+            
+            let allItems = [...notes, ...archive];
+            if (globalSearchFilter !== 'all') { allItems = allItems.filter(n => (n.type || 'archive') === globalSearchFilter); }
+            
+            let filtered = allItems;
+            if (query) { filtered = allItems.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query) || (n.title && n.title.toLowerCase().includes(query))); }
+            
+            if (filtered.length === 0) { list.innerHTML = `<div class="empty-state"><h3>No results found</h3></div>`; return; }
+            
+            filtered.forEach(n => {
+                const color = n.type === 'taslak' ? 'var(--color-taslak)' : (n.type === 'revize' ? 'var(--color-revize)' : 'var(--color-archive)');
+                const card = document.createElement('div');
+                card.className = 'card note-card'; card.style.borderLeft = `4px solid ${color}`;
+                card.innerHTML = `<div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:5px;"><span>#${n.num}</span><span style="text-transform:uppercase">${n.type || 'archive'}</span></div><div style="font-weight:700; font-size:14px; margin-bottom:4px; color:var(--text-main);">${n.title || 'Untitled'}</div><div style="font-size:12px; color:var(--text-muted); display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${n.text}</div>`;
+                card.onclick = () => { closeSearchView(); (n.type === 'archive' || !n.type) ? openArchiveModal(n.id) : openRecordModal(n.id); };
+                list.appendChild(card);
+            });
         }
 
-        function toggleLinks() {
-            isLinksVisible = !isLinksVisible; const wrapper = document.getElementById('linksWrapper'); const icon = document.getElementById('toggleLinksIcon');
-            if (isLinksVisible) { wrapper.style.display = 'flex'; icon.innerText = 'visibility_off'; } else { wrapper.style.display = 'none'; icon.innerText = 'visibility'; }
-        }
-        function toggleMeta() {
-            isMetaVisible = !isMetaVisible; const wrapper = document.getElementById('metaInputsWrapper'); const icon = document.getElementById('toggleMetaIcon');
-            if (isMetaVisible) { wrapper.style.display = 'flex'; icon.innerText = 'visibility_off'; } else { wrapper.style.display = 'none'; icon.innerText = 'visibility'; }
-        }
-        function toggleEditorText() {
-            isEditorVisible = !isEditorVisible; const wrapper = document.getElementById('editorTextWrapper'); const icon = document.getElementById('toggleEditorIcon');
-            if (isEditorVisible) { wrapper.style.display = 'flex'; icon.innerText = 'visibility_off'; } else { wrapper.style.display = 'none'; icon.innerText = 'visibility'; }
-        }
+        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
 
         /* ─────────────────────────────────────────
            EDITOR TEMPLATE INSERTIONS
@@ -647,10 +683,9 @@
             const tag = `\n<baslik.${String(nextNum).padStart(2, '0')}>\n`; insertAtCursor(ta, tag);
         }
         function insert5N1KTemplate() { insertAtCursor(document.getElementById('noteInput'), '\n<kim.nasil>\n<mekan.zaman>\n<hangi.ne>\n'); }
-        function insertTimeTemplate() { const now = new Date(); const tag = `<${now.getHours().toString().padStart(2,'0')}.${now.getMinutes().toString().padStart(2,'0')}>`; insertAtCursor(document.getElementById('noteInput'), tag + ' '); }
 
         /* ─────────────────────────────────────────
-           NAV & PAGE SWITCHING
+           NAV, PAGE SWITCHING & RESET
         ───────────────────────────────────────── */
         function navSwitchPage(page) { if (['taslak', 'revize'].includes(currentPage)) { saveDraftMemory(); } editingNoteId = null; switchPage(page, false); }
         function saveDraftMemory() {
@@ -678,20 +713,11 @@
             else if (page === 'archive') { document.getElementById('pageArchive').classList.add('active'); renderArchivePage(); } 
             else {
                 document.getElementById('pageEditor').classList.add('active');
-                document.getElementById('metaBlocksContainerWrapper').style.display = 'block';
-                document.getElementById('metaBlocksContainer').style.display = 'flex';
                 
                 if (page === 'taslak') {
-                    document.getElementById('topLinksBlockWrapper').style.display = 'none'; 
-                    document.getElementById('questionsContainer').style.display = 'none';
-                    document.getElementById('addQuestionBtn').style.display = 'none';
-                    document.getElementById('metaTitleLabel').innerText = 'TITLE';
+                    document.getElementById('analysisIsland').style.display = 'none'; 
                 } else {
-                    document.getElementById('topLinksBlockWrapper').style.display = 'block';
-                    document.getElementById('topLinksBlock').style.display = 'flex';
-                    document.getElementById('questionsContainer').style.display = 'flex';
-                    document.getElementById('addQuestionBtn').style.display = 'block';
-                    document.getElementById('metaTitleLabel').innerText = 'TITLE AND QUESTIONS';
+                    document.getElementById('analysisIsland').style.display = 'flex';
                 }
 
                 document.getElementById('sizeControls').style.display = 'flex';
@@ -709,7 +735,7 @@
 
                 if (!editingNoteId) {
                     document.getElementById('noteInput').value = draftsMemory[page] || ''; document.getElementById('refInput').value = refsMemory[page] || '';
-                    swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00"; document.getElementById('swToggleIcon').innerText = 'play_arrow'; document.getElementById('swToggleText').innerText = 'Start';
+                    swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
                     document.getElementById('metaTitle').value = metaMemory.title || ''; document.getElementById('questionsContainer').innerHTML = '';
                     if (metaMemory.questions && metaMemory.questions.length > 0 && page === 'revize') { metaMemory.questions.forEach(q => addQuestionInput(q)); } else if (page === 'revize') { addQuestionInput(); }
                     searchReference(); renderBacklinks();
@@ -730,12 +756,35 @@
         }
 
         /* ─────────────────────────────────────────
-           KAYDETME VE KESİN SIFIRLAMA
+           KUSURSUZ KAYDETME VE SIFIRLAMA
         ───────────────────────────────────────── */
+        function resetEditorUI() {
+            editingNoteId = null;
+            document.getElementById('noteInput').value = '';
+            document.getElementById('metaTitle').value = '';
+            document.getElementById('refInput').value = '';
+            document.getElementById('questionsContainer').innerHTML = '';
+            addQuestionInput(); 
+            
+            swSeconds = 0;
+            document.getElementById('swDisplay').innerText = "00:00";
+            if (swRunning) toggleStopwatch();
+            
+            document.getElementById('currentNoteIdDisplay').innerText = '#' + getNextAvailableNum();
+            document.getElementById('boxLabel').innerText = 'New ' + (currentPage === 'taslak' ? 'Draft' : 'Revise');
+            
+            draftsMemory[currentPage] = ''; refsMemory[currentPage] = ''; metaMemory.title = ''; metaMemory.questions = [];
+            localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory));
+            localStorage.setItem('chimptopus_v18_refs', JSON.stringify(refsMemory));
+            localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
+            
+            searchReference(); renderBacklinks(); updateWordProgress(); renderRecentRecords();
+        }
+
         function handleAction(actionType) {
             pauseStopwatchSafe(); 
             const text = document.getElementById('noteInput').value; 
-            if (!text.trim()) { alert('Please enter some text.'); return; }
+            if (!text.trim()) { showToast('⚠️ Metin alanı boş!'); return; }
             
             const textRefs = text.match(/@(\d{1,})/g) || []; const manualRefs = document.getElementById('refInput').value.match(/\d+/g) || [];
             const combinedRefs = [...new Set([...textRefs.map(r => r.replace('@', '')), ...manualRefs])]; const tags = extractTags(text);
@@ -748,74 +797,49 @@
             if (actionType === 'save') {
                 const formattedNum = getNextAvailableNum();
                 notes.unshift({ id: Date.now(), num: formattedNum, text, type: currentPage, title, questions, refs: combinedRefs, tags, time: new Date().toLocaleDateString(), spentSeconds: swSeconds });
-                globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); saveToLocal(); showStatus('Saved'); checkBackupReminder(); 
+                globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); saveToLocal(); checkBackupReminder(); 
                 
-                editingNoteId = null; document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
-                draftsMemory['taslak'] = ''; draftsMemory['revize'] = ''; metaMemory.title = ''; metaMemory.questions = [];
-                localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify({taslak:'', revize:''})); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
-                document.getElementById('currentNoteIdDisplay').innerText = '#' + getNextAvailableNum();
-                updateWordProgress(); renderRecentRecords(); searchReference(); renderBacklinks();
-                switchPage('taslak', false); return;
+                resetEditorUI(); 
+                showToast('✅ Note Saved Successfully!');
+                return;
             } 
             else if (actionType === 'update') {
                 const n = notes.find(x => x.id === editingNoteId);
                 if (n) { n.text = text; n.refs = combinedRefs; n.tags = tags; n.spentSeconds = swSeconds; if (currentPage === 'taslak' || currentPage === 'revize') { n.title = title; n.questions = questions; } } 
-                saveToLocal(); showStatus('Updated'); navSwitchPage('records'); return;
+                saveToLocal(); showToast('✅ Updated Successfully!'); resetEditorUI(); navSwitchPage('records'); return;
             } 
             else if (actionType === 'transfer_revize') {
                 const n = notes.find(x => x.id === editingNoteId); if (n) { n.text = text; n.spentSeconds = swSeconds; n.title = title; n.questions = questions; } 
-                saveToLocal(); showStatus('Moved to Revise'); switchPage('revize'); return;
+                saveToLocal(); showToast('🚀 Moved to Revise'); switchPage('revize'); return;
             } 
             else if (actionType === 'archive') {
                 let archiveNote = notes.find(x => x.id === editingNoteId); let noteId = Date.now(); let noteNum = getNextAvailableNum();
                 if(archiveNote) { noteId = archiveNote.id; noteNum = archiveNote.num; notes = notes.filter(n => n.id !== editingNoteId); } else { globalCounter++; localStorage.setItem('chimptopus_v18_counter', globalCounter); }
                 archive.unshift({ id: noteId, num: noteNum, text: text, title: title, questions: questions, refs: combinedRefs, tags: tags, date: new Date().toLocaleDateString(), spentSeconds: swSeconds });
-                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); saveToLocal(); showStatus('Sent to Archive');
+                localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); saveToLocal(); showToast('📦 Sent to Archive');
                 
-                editingNoteId = null; document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; swSeconds = 0; document.getElementById('swDisplay').innerText = "00:00";
-                draftsMemory['taslak'] = ''; draftsMemory['revize'] = ''; metaMemory.title = ''; metaMemory.questions = [];
-                localStorage.setItem('chimptopus_v18_drafts', JSON.stringify(draftsMemory)); localStorage.setItem('chimptopus_v18_refs', JSON.stringify({taslak:'', revize:''})); localStorage.setItem('chimptopus_v18_meta', JSON.stringify(metaMemory));
-                navSwitchPage('archive'); return;
+                resetEditorUI(); navSwitchPage('archive'); return;
             }
         }
 
         function saveToLocal() { localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); }
 
         /* ─────────────────────────────────────────
-           HIGHLIGHT (AKILLI FOSFORLU KALEM VE SİLİCİ) 
+           HIGHLIGHT (AKILLI FOSFORLU KALEM) 
         ───────────────────────────────────────── */
         function highlightSelection(noteId, isArchive) {
             const sel = window.getSelection(); const textToHighlight = sel.toString().trim();
-            if (!textToHighlight) { showToast('⚠️ Lütfen vurgulamak için bir metin seçin.', null, null); return; }
-            
+            if (!textToHighlight) { showToast('⚠️ Lütfen metin seçin.', null, null); return; }
             let list = isArchive ? archive : notes; let note = list.find(n => n.id === noteId); if (!note) return;
-            if (note.text.includes(textToHighlight)) {
-                note.text = note.text.replace(textToHighlight, `==${textToHighlight}==`); saveToLocal();
-                if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
-                if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId);
-                if (currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage(); else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); }
-                showToast('🖍️ Vurgulandı', null, null);
-            } else { showToast('⚠️ Eşleşme hatası.', null, null); }
+            if (note.text.includes(textToHighlight)) { note.text = note.text.replace(textToHighlight, `==${textToHighlight}==`); saveToLocal(); if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId); if (currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage(); else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); } showToast('🖍️ Vurgulandı', null, null); }
         }
 
         function removeHighlightSelection(noteId, isArchive) {
             const sel = window.getSelection(); const textToHighlight = sel.toString().trim();
-            if (!textToHighlight) { showToast('⚠️ Lütfen vurgusunu kaldıracağınız metnin içinden bir parça seçin.', null, null); return; }
-            
+            if (!textToHighlight) { showToast('⚠️ Metin seçin.', null, null); return; }
             let list = isArchive ? archive : notes; let note = list.find(n => n.id === noteId); if (!note) return;
-            
-            const safeText = textToHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            let regex = new RegExp(`==([^=]*?${safeText}[^=]*?)==`, 'g');
-            
-            if (regex.test(note.text)) {
-                note.text = note.text.replace(regex, '$1'); saveToLocal();
-                if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
-                if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId);
-                if (currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage(); else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); }
-                showToast('🧹 Vurgu Silindi', null, null);
-            } else { 
-                showToast('⚠️ Seçilen metin yeşil bir vurgunun içinde bulunamadı.', null, null); 
-            }
+            const safeText = textToHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); let regex = new RegExp(`==([^=]*?${safeText}[^=]*?)==`, 'g');
+            if (regex.test(note.text)) { note.text = note.text.replace(regex, '$1'); saveToLocal(); if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId); if (currentPage === 'records') renderRecords(); else if (currentPage === 'archive') renderArchivePage(); else if (currentPage === 'taslak' || currentPage === 'revize') { searchReference(); renderBacklinks(); } showToast('🧹 Vurgu Silindi', null, null); }
         }
 
         /* ─────────────────────────────────────────
@@ -823,30 +847,23 @@
         ───────────────────────────────────────── */
         function createCardHTML(n, isList = false) {
             const borderColor = n.type ? getAutoColorHex(n.type) : 'var(--color-archive)';
-            if (isList) {
-                let tagPills = ''; const tags = n.tags || extractTags(n.text); if (tags.length > 0) { tagPills = `<div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">` + tags.map(t => `<span class="inline-tag-pill">${t}</span>`).join('') + `</div>`; }
-                const timeLabel = n.time || n.date || ''; const timerHtml = n.spentSeconds ? `<span style="font-weight:600; display:flex; align-items:center; gap:2px; margin-left:8px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(n.spentSeconds)}</span>` : '';
-                return `<div class="card note-card" style="border-left: 4px solid ${borderColor}; padding-left: 14px;" onclick="openRecordModal(${n.id})"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span></div>${n.title ? `<div class="card-title">${n.title}</div>` : ''}<p class="${n.title ? 'card-body' : 'card-body-full'}">${formatMentionsAndHighlights(n.text)}</p>${tagPills}<div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:10px; margin-top:12px;"><span style="font-size:12px; color:var(--text-muted); display:flex; align-items:center;">${timeLabel} ${timerHtml}</span></div></div>`;
-            } else {
-                const timerHtml = n.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(n.spentSeconds)}</div>` : '';
-                return `<div class="card note-card" style="min-height:110px; padding:12px; border-left:4px solid ${borderColor}; padding-left:11px;" onclick="openRecordModal(${n.id})"><div style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span><div style="width:8px; height:8px; border-radius:50%; background:${borderColor}"></div></div><div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${n.title ? `<b style="color:var(--text-main)">${n.title}</b><br>` : ''}${n.text}</div>${timerHtml}</div>`;
-            }
+            const timerHtml = n.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(n.spentSeconds)}</div>` : '';
+            return `<div class="card note-card" style="min-height:110px; padding:12px; border-left:4px solid ${borderColor}; padding-left:11px;" onclick="openRecordModal(${n.id})"><div style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-size:13px; font-weight:600; color:var(--text-muted);">#${n.num}</span><div style="width:8px; height:8px; border-radius:50%; background:${borderColor}"></div></div><div style="font-size:12px; line-height:1.4; color:var(--text-muted); margin-top:8px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;">${n.title ? `<b style="color:var(--text-main)">${n.title}</b><br>` : ''}${n.text}</div>${timerHtml}</div>`;
         }
 
         function renderRecords() {
             const board = document.getElementById('recordsBoard'); board.innerHTML = '';
-            const query = (document.getElementById('searchInput')?.value || '').toLowerCase(); let filtered = notes.filter(n => n.type === 'taslak');
-            if (query) { filtered = filtered.filter(n => n.text.toLowerCase().includes(query) || n.num.includes(query) || (n.title && n.title.toLowerCase().includes(query))); }
+            let filtered = notes.filter(n => n.type === 'taslak');
             if (currentTagFilter) { filtered = filtered.filter(n => (n.tags || extractTags(n.text)).includes(currentTagFilter)); }
             renderTagFilterBar();
-            if (filtered.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:var(--surface-alt);"><span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span></div><h3>No Drafts Found</h3><p>${currentTagFilter ? `No notes in tag "${currentTagFilter}".` : 'No drafts match your search or saved.'}</p></div>`; return; }
+            if (filtered.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:var(--surface-alt);"><span class="material-symbols-rounded" style="color:var(--text-muted); font-size:36px;">search_off</span></div><h3>No Drafts</h3><p>Your workspace is clear.</p></div>`; return; }
             const container = document.createElement('div'); container.className = 'archive-grid';
             filtered.forEach(n => { const wrap = document.createElement('div'); wrap.innerHTML = createCardHTML(n, false); container.appendChild(wrap.firstElementChild); }); board.appendChild(container);
         }
 
         function renderArchivePage() {
             const board = document.getElementById('archiveBoard'); board.innerHTML = '';
-            if (archive.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);"><span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span></div><h3>Archive Empty</h3><p>You can move notes in the revision stage here by archiving them.</p></div>`; return; }
+            if (archive.length === 0) { board.innerHTML = `<div class="empty-state"><div class="empty-state-icon-wrap" style="background:rgba(48,209,88,0.1);"><span class="material-symbols-rounded" style="color:var(--color-archive); font-size:36px;">inventory_2</span></div><h3>Archive Empty</h3></div>`; return; }
             const container = document.createElement('div'); container.className = 'archive-grid';
             archive.forEach(a => {
                 const timerHtml = a.spentSeconds ? `<div style="font-weight:600; display:flex; align-items:center; gap:2px; color:var(--text-main); margin-top:6px;"><span class="material-symbols-rounded" style="font-size:12px;">timer</span>${formatTime(a.spentSeconds)}</div>` : '';
@@ -860,6 +877,30 @@
         /* ─────────────────────────────────────────
            MODALS
         ───────────────────────────────────────── */
+        function renderConnectionsInModal(note) {
+            const container = document.getElementById('modalLinksContainer');
+            const list = document.getElementById('modalLinksList');
+            list.innerHTML = '';
+            
+            const all = [...notes, ...archive];
+            const connections = all.filter(n => n.id !== note.id && (n.refs?.includes(note.num) || (note.refs && note.refs.includes(n.num)) || n.text.includes('@'+note.num) || note.text.includes('@'+n.num)));
+            
+            if (connections.length > 0) {
+                container.style.display = 'flex';
+                connections.forEach(c => {
+                    const color = c.type === 'taslak' ? 'var(--color-taslak)' : (c.type === 'revize' ? 'var(--color-revize)' : 'var(--color-archive)');
+                    const item = document.createElement('div');
+                    item.className = 'card';
+                    item.style.padding = '10px'; item.style.borderLeft = `3px solid ${color}`; item.style.cursor = 'pointer';
+                    item.innerHTML = `<div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">#${c.num}</div><div style="font-size:13px; color:var(--text-main); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${formatMentionsAndHighlights(c.text)}</div>`;
+                    item.onclick = (e) => { e.stopPropagation(); closeUniversalModal(); (c.type === 'archive' || !c.type) ? openArchiveModal(c.id) : openRecordModal(c.id); };
+                    list.appendChild(item);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
         function openRecordModal(id) {
             const item = notes.find(a => a.id === id); if (!item) return;
             const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
@@ -867,22 +908,24 @@
             
             let qHtml = '';
             if (item.questions && item.questions.length > 0) { 
-                qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:0; list-style:none; font-size:13px; color:var(--text-main); display:flex; flex-direction:column; gap:4px;">` + 
+                qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS</div><ul style="margin:0; padding-left:0; list-style:none; font-size:13px; color:var(--text-main); display:flex; flex-direction:column; gap:4px;">` + 
                 item.questions.map(q => {
                     let checked = q.startsWith('[x] '); let txt = q.replace(/^\[[x ]\] /, '');
                     return `<li style="display:flex; align-items:center; gap:6px; ${checked ? 'text-decoration:line-through;opacity:0.5;' : ''}"><span class="material-symbols-rounded" style="font-size:16px; color:var(--primary-blue);">${checked ? 'check_box' : 'check_box_outline_blank'}</span> ${txt}</li>`;
                 }).join('') + `</ul></div>`; 
             }
             document.getElementById('modalBody').innerHTML  = qHtml + formatMentionsAndHighlights(item.text);
+            
+            renderConnectionsInModal(item);
 
             document.getElementById('modalFooter').innerHTML = `
                 <div style="display:flex; gap:15px; align-items:center;">
-                    <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();" title="Delete">delete</span>
-                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, false);" title="Vurgula">border_color</span>
-                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onmousedown="event.preventDefault(); removeHighlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); removeHighlightSelection(${item.id}, false);" title="Vurguyu Temizle">format_color_reset</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteNote(${item.id}); closeUniversalModal();">delete</span>
+                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, false);">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onmousedown="event.preventDefault(); removeHighlightSelection(${item.id}, false);" ontouchstart="event.preventDefault(); removeHighlightSelection(${item.id}, false);">format_color_reset</span>
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
-                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)" title="Use as Template">content_copy</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onclick="useAsTemplate(${item.id}, event)">content_copy</span>
                     <button class="btn-primary" style="padding:6px 16px; border-radius:20px;" onclick="editNote(${item.id}); closeUniversalModal();">Edit</button>
                 </div>
             `;
@@ -892,11 +935,11 @@
         function openArchiveModal(id) {
             const item = archive.find(a => a.id === id); if (!item) return;
             const timeHtml = item.spentSeconds ? `<span style="display:inline-flex; align-items:center; gap:2px; margin-left:6px; color:var(--text-main);"><span class="material-symbols-rounded" style="font-size:14px;">timer</span>${formatTime(item.spentSeconds)}</span>` : '';
-            document.getElementById('modalTitle').innerText = 'Archived Block #' + item.num; document.getElementById('modalDate').innerHTML  = item.date + timeHtml; 
+            document.getElementById('modalTitle').innerText = 'Archived #' + item.num; document.getElementById('modalDate').innerHTML  = item.date + timeHtml; 
             
             let qHtml = '';
             if (item.questions && item.questions.length > 0) { 
-                qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS & KEYWORDS</div><ul style="margin:0; padding-left:0; list-style:none; font-size:13px; color:var(--text-main); display:flex; flex-direction:column; gap:4px;">` + 
+                qHtml = `<div style="margin-bottom:15px; padding:10px; background:var(--surface-alt); border-radius:8px; border:1px dashed var(--border-color);"><div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:5px;">QUESTIONS</div><ul style="margin:0; padding-left:0; list-style:none; font-size:13px; color:var(--text-main); display:flex; flex-direction:column; gap:4px;">` + 
                 item.questions.map(q => {
                     let checked = q.startsWith('[x] '); let txt = q.replace(/^\[[x ]\] /, '');
                     return `<li style="display:flex; align-items:center; gap:6px; ${checked ? 'text-decoration:line-through;opacity:0.5;' : ''}"><span class="material-symbols-rounded" style="font-size:16px; color:var(--color-archive);">${checked ? 'check_box' : 'check_box_outline_blank'}</span> ${txt}</li>`;
@@ -904,25 +947,26 @@
             }
             document.getElementById('modalBody').innerHTML  = qHtml + formatMentionsAndHighlights(item.text);
             
-            const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+            renderConnectionsInModal(item);
             
+            const textSafe = item.text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
             document.getElementById('modalFooter').innerHTML = `
                 <div style="display:flex; gap:15px; align-items:center;">
-                    <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();" title="Delete Permanently">delete</span>
-                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, true);" title="Vurgula">border_color</span>
-                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onmousedown="event.preventDefault(); removeHighlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); removeHighlightSelection(${item.id}, true);" title="Vurguyu Temizle">format_color_reset</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--danger-color);" onclick="deleteArchive(${item.id}); closeUniversalModal();">delete</span>
+                    <span class="material-symbols-rounded action-icon" style="color:#30d158;" onmousedown="event.preventDefault(); highlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); highlightSelection(${item.id}, true);">border_color</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-muted);" onmousedown="event.preventDefault(); removeHighlightSelection(${item.id}, true);" ontouchstart="event.preventDefault(); removeHighlightSelection(${item.id}, true);">format_color_reset</span>
                 </div>
                 <div style="display:flex; gap:15px;">
-                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();" title="Restore to Revise">restore_page</span>
-                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Copied')); closeUniversalModal();" title="Copy">content_copy</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--text-main);" onclick="restoreToRevize(${item.id}); closeUniversalModal();">restore_page</span>
+                    <span class="material-symbols-rounded action-icon" style="color:var(--primary-blue);" onclick="navigator.clipboard.writeText('${textSafe}').then(() => showToast('📋 Copied')); closeUniversalModal();">content_copy</span>
                 </div>
             `;
             const modal = document.getElementById('universalModal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
         }
 
         function closeUniversalModal(e) { if (e && e.target !== e.currentTarget && !e.target.classList.contains('close')) return; const modal = document.getElementById('universalModal'); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); }
-        function deleteNote(id) { if (confirm('Are you sure you want to delete?')) { notes = notes.filter(n => n.id !== id); localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); renderRecords(); } }
-        function deleteArchive(id) { if (confirm('Delete permanently?')) { archive = archive.filter(a => a.id !== id); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); renderArchivePage(); } }
+        function deleteNote(id) { if (confirm('Emin misin?')) { notes = notes.filter(n => n.id !== id); localStorage.setItem('chimptopus_v18_notes', JSON.stringify(notes)); renderRecords(); } }
+        function deleteArchive(id) { if (confirm('Kalıcı olarak silinecek?')) { archive = archive.filter(a => a.id !== id); localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive)); renderArchivePage(); } }
         
         function restoreToRevize(id) {
             const index = archive.findIndex(a => a.id === id);
@@ -975,7 +1019,7 @@
         }
 
         function clearCurrentNote() {
-            if (confirm("Are you sure you want to delete all content?")) {
+            if (confirm("Metin alanı temizlenecek emin misin?")) {
                 document.getElementById('noteInput').value = ''; document.getElementById('metaTitle').value = ''; document.getElementById('questionsContainer').innerHTML = ''; addQuestionInput(); document.getElementById('refInput').value = ''; searchReference(); renderBacklinks(); updateWordProgress(); showToast('🧹 Content fully cleared');
             }
         }
@@ -1106,9 +1150,8 @@
 
         function togglePanel(id) { document.getElementById(id).classList.add('active'); document.getElementById('overlay').classList.add('active'); if (id === 'sideMenu') renderStats(); }
         function closePanels() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-        function clearAll() { if (confirm('Are you sure you want to reset the entire system?')) { localStorage.clear(); location.reload(); } }
+        function clearAll() { if (confirm('Her şeyi sıfırlamak istediğine emin misin?')) { localStorage.clear(); location.reload(); } }
 
-        navSwitchPage('records');
     </script>
 </body>
 </html>
