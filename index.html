@@ -1148,6 +1148,104 @@
         function closePanels() { document.getElementById('sideMenu').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
         function clearAll() { if (confirm('Her şeyi sıfırlamak istediğine emin misin?')) { localStorage.clear(); location.reload(); } }
 
+/* ─────────────────────────────────────────
+   FIREBASE BULUT YEDEKLEME SİSTEMİ
+───────────────────────────────────────── */
+
+// 1. Firebase Ayarları (Senin verdiğin config)
+const firebaseConfig = {
+  apiKey: "AIzaSyDvkn0pkYJPMNcnUYEaFElyrFUOmEumD30",
+  authDomain: "gergininekler11.firebaseapp.com",
+  databaseURL: "https://gergininekler11-default-rtdb.firebaseio.com",
+  projectId: "gergininekler11",
+  storageBucket: "gergininekler11.firebasestorage.app",
+  messagingSenderId: "75194866682",
+  appId: "1:75194866682:web:d390dc7fea8bd47fbde243",
+  measurementId: "G-1F3HZ9EPDJ"
+};
+
+// 2. Firebase'i Başlat
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// 3. Buluta Yedekle Butonu Fonksiyonu
+function uploadToCloud() {
+    showToast('Buluta yedekleniyor... Lütfen bekleyin.', null, null);
+    
+    // LocalStorage'daki tüm verilerimizi tek bir pakette topluyoruz
+    const dataToBackup = {
+        notes: JSON.parse(localStorage.getItem('chimptopus_v18_notes')) || [],
+        archive: JSON.parse(localStorage.getItem('chimptopus_v18_archive')) || [],
+        folders: JSON.parse(localStorage.getItem('chimptopus_v18_folders')) || [{id:'f_default', name:'Kişisel Notlar'}],
+        counter: localStorage.getItem('chimptopus_v18_counter') || 1,
+        lastBackupDate: new Date().toISOString()
+    };
+
+    // Firebase'e "chimptopus_backup" adında bir klasöre kaydediyoruz
+    database.ref('chimptopus_backup').set(dataToBackup)
+    .then(() => {
+        showToast('✅ Tüm veriler buluta başarıyla yedeklendi!');
+        localStorage.setItem('chimptopus_v19_lastBackupAt', globalCounter); // Yedekleme hatırlatıcısı için sayacı sıfırla
+    })
+    .catch((error) => {
+        console.error("Yedekleme hatası:", error);
+        showToast('❌ Yedekleme başarısız oldu!');
+    });
+}
+
+// 4. Buluttan Geri Yükle Butonu Fonksiyonu (Senaryo A)
+function downloadFromCloud() {
+    const onay = confirm("DİKKAT: Buluttaki veriler indirilecek ve cihazındaki şu anki tüm notlar SİLİNECEK. Üzerine yazmak istediğine emin misin?");
+    
+    if (!onay) return; // Kullanıcı iptal ederse durdur
+    
+    showToast('Buluttan indiriliyor...', null, null);
+    
+    database.ref('chimptopus_backup').once('value').then((snapshot) => {
+        const data = snapshot.val();
+        
+        if (data) {
+            // Veri varsa cihazın hafızasına (localStorage) yazdırıyoruz
+            if(data.notes) localStorage.setItem('chimptopus_v18_notes', JSON.stringify(data.notes));
+            if(data.archive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(data.archive));
+            if(data.folders) localStorage.setItem('chimptopus_v18_folders', JSON.stringify(data.folders));
+            if(data.counter) localStorage.setItem('chimptopus_v18_counter', data.counter);
+            
+            showToast('✅ Veriler geri yüklendi! Sayfa yenileniyor...');
+            // Verilerin ekrana yansıması için 1.5 saniye sonra sayfayı otomatik yenile
+            setTimeout(() => location.reload(), 1500); 
+        } else {
+            showToast('⚠️ Bulutta hiç yedek bulunamadı. Önce yedek almalısın.');
+        }
+    }).catch((error) => {
+        console.error("İndirme hatası:", error);
+        showToast('❌ İndirme başarısız oldu!');
+    });
+}
+
+
+/* ─────────────────────────────────────────
+   KAYDIRMA (SWIPE) HATASI DÜZELTMESİ
+───────────────────────────────────────── */
+// Mevcut kodundaki 'touchstart' ve 'touchend' event listener'larını silip şununla değiştirebilirsin:
+
+let touchstartY = 0; let touchendY = 0; // Y ekseni eklendi
+
+editorPageEl.addEventListener('touchstart', e => { 
+    touchstartX = e.changedTouches[0].screenX; 
+    touchstartY = e.changedTouches[0].screenY; // Parmağın ilk değdiği dikey nokta
+}, {passive: true});
+
+editorPageEl.addEventListener('touchend', e => { 
+    touchendX = e.changedTouches[0].screenX; 
+    touchendY = e.changedTouches[0].screenY; // Parmağın kalktığı dikey nokta
+    
+    // Sadece X ekseninde 80px sağa kaydırma var VE Y ekseninde (aşağı/yukarı) 50px'den az sapma varsa tetikle
+    if (currentPage === 'taslak' && (touchendX > touchstartX + 80) && Math.abs(touchendY - touchstartY) < 50) { 
+        handleSwipeToRevise(); 
+    }
+}, {passive: true});
+
     </script>
 </body>
 </html>
