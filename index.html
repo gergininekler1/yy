@@ -249,7 +249,6 @@
         .q-row { display:flex; gap:8px; align-items:center; width:100%; }
         .q-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); flex-shrink: 0; }
         
-        /* BÖLÜM ÇİZGİLERİ (DIVIDER) */
         .section-divider {
             border: 0;
             border-top: 1px solid var(--border-color);
@@ -374,14 +373,14 @@
         <div class="editor-section">
             <div class="note-box" id="editorWorkspace">
                 
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
-                    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                <div style="display:flex; flex-direction:column; align-items:flex-start; margin-bottom:15px; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:8px; width:100%;">
                         <div id="stageBadge" style="width:12px; height:12px; border-radius:50%; background:var(--color-taslak)"></div>
                         <span id="boxLabel" style="font-size:16px; font-weight:700; color:var(--text-main)">Draft</span>
                         <span id="currentNoteIdDisplay" style="font-size:13px; font-weight:800; color:var(--primary-blue); background:rgba(0,122,255,0.15); padding:2px 8px; border-radius:6px; margin-left:4px;"></span>
                     </div>
                     
-                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; flex-grow:1;">
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-start; width:100%;">
                         <button class="timer-btn" onclick="toggleFocusMode()" id="focusBtn" style="color:var(--text-main);">
                             <span class="material-symbols-rounded" style="font-size:18px;">fullscreen</span> <span id="focusBtnText">Focus</span>
                         </button>
@@ -679,17 +678,17 @@
             else if (page === 'archive') { document.getElementById('pageArchive').classList.add('active'); renderArchivePage(); } 
             else {
                 document.getElementById('pageEditor').classList.add('active');
+                document.getElementById('metaBlocksContainerWrapper').style.display = 'block';
+                document.getElementById('metaBlocksContainer').style.display = 'flex';
                 
-                // Show/hide containers and dividers
                 if (page === 'taslak') {
                     document.getElementById('topLinksBlockWrapper').style.display = 'none'; 
-                    document.getElementById('metaBlocksContainerWrapper').style.display = 'block';
                     document.getElementById('questionsContainer').style.display = 'none';
                     document.getElementById('addQuestionBtn').style.display = 'none';
                     document.getElementById('metaTitleLabel').innerText = 'TITLE';
                 } else {
                     document.getElementById('topLinksBlockWrapper').style.display = 'block';
-                    document.getElementById('metaBlocksContainerWrapper').style.display = 'block';
+                    document.getElementById('topLinksBlock').style.display = 'flex';
                     document.getElementById('questionsContainer').style.display = 'flex';
                     document.getElementById('addQuestionBtn').style.display = 'block';
                     document.getElementById('metaTitleLabel').innerText = 'TITLE AND QUESTIONS';
@@ -805,12 +804,10 @@
             
             let list = isArchive ? archive : notes; let note = list.find(n => n.id === noteId); if (!note) return;
             
-            // Güvenli kelime arama (Regex). Seçtiğin kelimenin içinde bulunduğu == .. == bloğunu arar.
             const safeText = textToHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             let regex = new RegExp(`==([^=]*?${safeText}[^=]*?)==`, 'g');
             
             if (regex.test(note.text)) {
-                // Bulunan bloğun etrafındaki == işaretlerini kaldırarak serbest bırakır.
                 note.text = note.text.replace(regex, '$1'); saveToLocal();
                 if (isArchive) localStorage.setItem('chimptopus_v18_archive', JSON.stringify(archive));
                 if (isArchive) openArchiveModal(noteId); else openRecordModal(noteId);
@@ -972,7 +969,9 @@
             const delBtn = document.createElement('span'); delBtn.className = 'material-symbols-rounded action-icon'; delBtn.style.color = 'var(--danger-color)'; delBtn.innerText = 'do_not_disturb_on'; delBtn.onclick = () => row.remove();
             
             row.appendChild(cb); row.appendChild(input); row.appendChild(delBtn); 
-            container.appendChild(row); 
+            
+            if(container.firstChild) { container.insertBefore(row, container.firstChild); } 
+            else { container.appendChild(row); }
         }
 
         function clearCurrentNote() {
