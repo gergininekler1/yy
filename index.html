@@ -3,459 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bohem & Fütüristik Not Sistemi</title>
+    <title>Pro Node | Bohem & Fütüristik</title>
     <style>
-        /* CSS DEĞİŞKENLERİ - Renk paleti ve tasarım dili */
+        /* --- CSS DEĞİŞKENLERİ: Premium Renk ve Tasarım Sistemi --- */
         :root {
-            --bg-color: #1a1a17; /* Koyu bohem toprak/zeytin tonu */
-            --glass-bg: rgba(230, 220, 200, 0.05); /* Fütüristik cam şeffaflığı */
-            --glass-border: rgba(230, 220, 200, 0.1);
-            --text-main: #e8e3d8;
-            --text-muted: #a39e93;
-            --accent: #d4a373; /* Bohem vurgu rengi */
-            --danger: #e07a5f;
-            --success: #81b29a;
-            --radius: 16px;
+            --bg-base: #111110;
+            --bg-gradient: radial-gradient(circle at top left, #23221e, #111110);
+            --glass-bg: rgba(230, 220, 200, 0.03);
+            --glass-border: rgba(230, 220, 200, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --text-primary: #f0ebe1;
+            --text-secondary: #8c887d;
+            --accent-gold: #cba36d;
+            --accent-hover: #e0b67d;
+            --danger: #d96c6c;
+            --success: #6eb897;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* GENEL SIFIRLAMA VE YAPI */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        /* --- TEMEL SIFIRLAMA VE TİPOGRAFİ --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { 
-            background: linear-gradient(135deg, var(--bg-color), #2c2a26); 
-            color: var(--text-main); 
+            background: var(--bg-gradient); 
+            color: var(--text-primary); 
             min-height: 100vh; 
             overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* GLASSMORPHISM (Cam Efekti) SINIFI */
+        /* Özel Scrollbar (Tasarım bütünlüğü için) */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(203, 163, 109, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(203, 163, 109, 0.6); }
+
+        /* --- GLASSMORPHISM MIXIN --- */
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
+            border-radius: var(--radius-md);
+            box-shadow: var(--glass-shadow);
         }
 
-        /* HEADER */
+        /* --- HEADER --- */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-radius: 0 0 var(--radius) var(--radius);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 24px; position: sticky; top: 0; z-index: 100;
+            border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg);
+            border-top: none;
         }
-        header h1 { font-size: 1.2rem; font-weight: 300; letter-spacing: 1px; }
+        .logo { font-size: 1.4rem; font-weight: 200; letter-spacing: 2px; }
+        .logo span { color: var(--accent-gold); font-weight: 500; }
 
-        /* BUTONLAR */
-        button {
-            background: rgba(212, 163, 115, 0.15);
-            color: var(--accent);
-            border: 1px solid rgba(212, 163, 115, 0.3);
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
+        /* --- BUTONLAR --- */
+        .btn {
+            background: rgba(203, 163, 109, 0.1); color: var(--accent-gold);
+            border: 1px solid rgba(203, 163, 109, 0.2);
+            padding: 12px 20px; border-radius: var(--radius-sm);
+            font-size: 0.9rem; font-weight: 500; cursor: pointer;
+            transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
-        button:hover { background: rgba(212, 163, 115, 0.3); }
-        .btn-danger { color: var(--danger); border-color: rgba(224, 122, 95, 0.3); background: rgba(224, 122, 95, 0.1); }
-        .btn-success { color: var(--success); border-color: rgba(129, 178, 154, 0.3); background: rgba(129, 178, 154, 0.1); width: 100%; margin-top: 15px;}
-        .btn-icon { padding: 6px 10px; font-size: 0.8rem; }
+        .btn:hover, .btn:active { background: rgba(203, 163, 109, 0.25); transform: translateY(-1px); }
+        .btn-sm { padding: 8px 14px; font-size: 0.8rem; }
+        .btn-danger { color: var(--danger); background: rgba(217, 108, 108, 0.1); border-color: rgba(217, 108, 108, 0.2); }
+        .btn-danger:hover { background: rgba(217, 108, 108, 0.25); }
+        .btn-success { color: var(--success); background: rgba(110, 184, 151, 0.1); border-color: rgba(110, 184, 151, 0.2); width: 100%; margin-top: 24px; padding: 16px; font-size: 1rem;}
+        .btn-success:hover { background: rgba(110, 184, 151, 0.25); }
 
-        /* SAYFA YAPISI */
-        main { padding: 20px; padding-bottom: 80px; }
-        .page { display: none; animation: fadeIn 0.4s ease forwards; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- SAYFA MİMARİSİ VE ANİMASYONLAR --- */
+        main { padding: 24px; padding-bottom: 100px; max-width: 800px; margin: 0 auto; }
+        .page { display: none; opacity: 0; transform: translateY(15px); transition: opacity 0.4s ease, transform 0.4s ease; }
+        .page.active { display: block; opacity: 1; transform: translateY(0); animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* NETFLIX TARZI KARTLAR (Yatay Kaydırma) */
-        .card-row-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;}
-        .netflix-row {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding-bottom: 15px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none; /* Firefox */
+        /* --- NETFLIX TARZI KARTLAR --- */
+        .section-title { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;}
+        .horizontal-scroll {
+            display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px;
+            scroll-snap-type: x mandatory; margin-left: -24px; padding-left: 24px; padding-right: 24px;
         }
-        .netflix-row::-webkit-scrollbar { display: none; } /* Chrome/Safari */
-        .square-card {
-            flex: 0 0 110px;
-            height: 110px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            scroll-snap-align: start;
-            cursor: pointer;
-            font-size: 0.8rem;
-            overflow: hidden;
-            position: relative;
+        .card {
+            flex: 0 0 130px; height: 130px; padding: 16px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            scroll-snap-align: start; cursor: pointer; position: relative; overflow: hidden;
+            transition: var(--transition);
         }
-        .square-card::after { /* Uzun metinler için solma efekti */
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 30px;
-            background: linear-gradient(transparent, var(--bg-color));
-        }
-        .card-tag { font-size: 0.65rem; color: var(--accent); }
+        .card:hover { border-color: rgba(203, 163, 109, 0.4); transform: scale(0.98); }
+        .card-tag { font-size: 0.65rem; padding: 4px 8px; background: rgba(203, 163, 109, 0.15); border-radius: 4px; color: var(--accent-gold); align-self: flex-start; }
+        .card-content { font-size: 0.85rem; line-height: 1.4; color: var(--text-primary); margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* FORM ELEMANLARI (Input, Textarea, Select) */
+        /* --- FORM VE GİRDİ ELEMANLARI --- */
+        .input-group { margin-bottom: 24px; }
         textarea, select, input[type="text"] {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            outline: none;
-            resize: none;
+            width: 100%; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border);
+            color: var(--text-primary); padding: 16px; border-radius: var(--radius-md);
+            font-size: 0.95rem; outline: none; resize: none; transition: var(--transition);
+            line-height: 1.5;
         }
-        textarea:focus, select:focus { border-color: var(--accent); }
-        .scrollable-block { max-height: 200px; overflow-y: auto; padding: 15px; margin-bottom: 15px; font-size: 0.9rem; line-height: 1.5; color: var(--text-muted); }
+        textarea:focus, select:focus { border-color: var(--accent-gold); background: rgba(0, 0, 0, 0.25); }
+        textarea::placeholder { color: var(--text-secondary); opacity: 0.5; }
         
+        /* Oku-Sadece Alan (Scrollable) */
+        .preview-box { max-height: 250px; overflow-y: auto; padding: 20px; font-size: 0.95rem; line-height: 1.6; color: rgba(240, 235, 225, 0.8); margin-bottom: 32px; }
+
         /* ÇEKİRDEK BLOKLARI */
-        .core-block { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
-        .core-block textarea { margin-bottom: 0; flex: 1; height: 60px; }
-        
-        /* CHECKBOX TASARIMI (Aşama 3 için) */
-        .checkbox-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px; }
-        .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); }
-        .checkbox-row span { font-size: 0.9rem; transition: 0.3s; }
-        .checkbox-row input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--text-muted); opacity: 0.5; }
+        .core-list { display: flex; flex-direction: column; gap: 16px; }
+        .core-item { display: flex; gap: 12px; align-items: flex-start; animation: slideUp 0.3s ease; }
+        .core-item textarea { margin-bottom: 0; min-height: 56px; overflow: hidden; }
 
-        /* ALT NAVİGASYON (İleri / Geri) */
-        .bottom-nav { display: flex; justify-content: space-between; margin-top: 20px; }
-
-        /* DATABASE MODAL */
-        #dbModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(26, 26, 23, 0.95);
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            padding: 20px;
+        /* CHECKBOX TASARIMI */
+        .checklist { display: flex; flex-direction: column; gap: 12px; }
+        .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; cursor: pointer; transition: var(--transition); }
+        .check-item:hover { background: rgba(255,255,255,0.05); }
+        .check-item input[type="checkbox"] { 
+            appearance: none; width: 20px; height: 20px; border: 1px solid var(--text-secondary); border-radius: 4px; 
+            outline: none; cursor: pointer; position: relative; flex-shrink: 0; margin-top: 2px;
         }
-        .db-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .db-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .db-tab { flex: 1; text-align: center; padding: 10px; border-bottom: 2px solid transparent; color: var(--text-muted); cursor: pointer;}
-        .db-tab.active { border-color: var(--accent); color: var(--text-main); }
-        .db-filters { display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; scrollbar-width: none; }
-        .db-filters::-webkit-scrollbar { display: none; }
-        .db-filter-chip { padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; cursor: pointer; white-space: nowrap; border: 1px solid var(--glass-border); }
-        .db-filter-chip.active { background: var(--accent); color: var(--bg-color); }
-        .db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; overflow-y: auto; align-content: start;}
+        .check-item input[type="checkbox"]:checked { background: var(--accent-gold); border-color: var(--accent-gold); }
+        .check-item input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 12px; font-weight: bold; }
+        .check-item span { font-size: 0.95rem; line-height: 1.5; transition: var(--transition); }
+        .check-item input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--text-secondary); opacity: 0.4; }
 
+        /* --- NAVİGASYON --- */
+        .nav-footer { display: flex; justify-content: space-between; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--glass-border); }
+
+        /* --- DATABASE MODAL --- */
+        dialog {
+            margin: auto; width: 100%; max-width: 600px; height: 100vh; max-height: 100vh;
+            background: rgba(17, 17, 16, 0.98); border: none; color: var(--text-primary);
+            padding: 0; flex-direction: column; z-index: 200; backdrop-filter: blur(20px);
+        }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+        dialog[open] { display: flex; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid var(--glass-border); }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        
+        .tabs { display: flex; gap: 8px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 24px; }
+        .tab { flex: 1; text-align: center; padding: 10px; border-radius: 6px; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition); }
+        .tab.active { background: rgba(203, 163, 109, 0.15); color: var(--accent-gold); }
+
+        .filters { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 8px; }
+        .filter-chip { padding: 6px 16px; font-size: 0.8rem; border-radius: 20px; cursor: pointer; white-space: nowrap; border: 1px solid var(--glass-border); color: var(--text-secondary); transition: var(--transition); }
+        .filter-chip.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); font-weight: 500;}
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+
+        /* --- TOAST BİLDİRİMLERİ --- */
+        #toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { padding: 12px 24px; border-radius: 30px; font-size: 0.9rem; font-weight: 500; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; text-align: center; }
+        .toast.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
     <header class="glass">
-        <h1>N<span style="color: var(--accent);">.</span></h1>
-        <button onclick="openDatabase()">Database</button>
+        <div class="logo">Pro<span>Node</span></div>
+        <button class="btn btn-sm" onclick="dbManager.open()">Veritabanı</button>
     </header>
 
     <main>
-        <div id="page1" class="page active">
-            <div class="card-row-title">Kaldığın Yerden Devam Et</div>
-            <div class="netflix-row" id="activeNotesRow">
+        <section id="stage1" class="page active">
+            <div class="section-title">Aktif İstasyonlar</div>
+            <div class="horizontal-scroll" id="activeNotesShelf">
                 </div>
 
-            <div style="margin-top: 30px;">
-                <label class="card-row-title">Yeni Kaynak Notu</label>
-                <textarea id="sourceText" rows="6" placeholder="İlham verici metni veya kaynak yazıyı buraya yapıştır..."></textarea>
+            <div style="margin-top: 40px;">
+                <div class="input-group">
+                    <label class="section-title">Yeni Kaynak Enjekte Et</label>
+                    <textarea id="sourceText" rows="5" placeholder="Ham metni, köşe yazısını veya fikri buraya bırak..." oninput="uiHelpers.autoResize(this)"></textarea>
+                </div>
                 
-                <label class="card-row-title">Kategori / Etiket</label>
-                <select id="sourceTag">
-                    <option value="Makale">Makale</option>
-                    <option value="Kitap">Kitap</option>
-                    <option value="Video">Video</option>
-                    <option value="Film">Film</option>
-                    <option value="Fikir">Kişisel Fikir</option>
-                </select>
+                <div class="input-group">
+                    <label class="section-title">Materyal Tipi</label>
+                    <select id="sourceTag">
+                        <option value="Makale">Makale</option>
+                        <option value="Kitap">Kitap</option>
+                        <option value="Video">Video</option>
+                        <option value="Film">Film</option>
+                        <option value="Fikir">Kişisel Fikir</option>
+                    </select>
+                </div>
 
-                <div class="bottom-nav" style="justify-content: flex-end;">
-                    <button onclick="goToStage2()">İleri ➔</button>
+                <div class="nav-footer" style="justify-content: flex-end;">
+                    <button class="btn" onclick="appController.nextToStage2()">İleri Çözümleme ➔</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="page2" class="page">
-            <div class="card-row-title">Kaynak Önizleme</div>
-            <div class="glass scrollable-block" id="sourcePreview">
-                </div>
+        <section id="stage2" class="page">
+            <div class="section-title">Kaynak Veri</div>
+            <div class="glass preview-box" id="sourcePreview"></div>
 
-            <div class="card-row-title" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>Çekirdek Notlar</span>
-                <button class="btn-icon" onclick="addCoreField()">+ Yeni Ekle</button>
+            <div class="section-title">
+                <span>Çıkarılan Çekirdekler</span>
+                <button class="btn btn-sm" onclick="appController.addCoreBlock()">+ Ekle</button>
             </div>
             
-            <div id="coreContainer">
+            <div class="core-list" id="coresList">
                 </div>
 
-            <div class="bottom-nav">
-                <button onclick="goToPage(1)">&#8592; Geri</button>
-                <button onclick="goToStage3()">İleri ➔</button>
+            <div class="nav-footer">
+                <button class="btn" onclick="uiHelpers.switchPage(1)">&#8592; Kaynağa Dön</button>
+                <button class="btn" onclick="appController.nextToStage3()">Sentezle ➔</button>
             </div>
-        </div>
+        </section>
 
-        <div id="page3" class="page">
-            <div class="card-row-title">Çekirdek Referanslar</div>
-            <div class="glass scrollable-block" id="coreChecklistContainer" style="padding: 10px;">
+        <section id="stage3" class="page">
+            <div class="section-title">Yapı Taşları (Çekirdekler)</div>
+            <div class="glass checklist preview-box" id="coreChecklist">
                 </div>
 
-            <div class="card-row-title" style="margin-top: 20px;">Yaratım Alanı</div>
-            <textarea id="finalCreationText" rows="10" placeholder="Çekirdekleri kullanarak asıl fikrini burada yarat..."></textarea>
-
-            <div class="bottom-nav">
-                <button onclick="goToPage(2)">&#8592; Geri</button>
+            <div class="input-group" style="margin-top: 32px;">
+                <label class="section-title">Sentez & Yaratım Alanı</label>
+                <textarea id="finalText" rows="8" placeholder="Kendi özgün metnini buraya inşa et..." oninput="uiHelpers.autoResize(this)"></textarea>
             </div>
-            <button class="btn-success" onclick="finishNote()">Arşive At / Tamamla</button>
-        </div>
+
+            <div class="nav-footer" style="border-top: none;">
+                <button class="btn" onclick="uiHelpers.switchPage(2)">&#8592; Çekirdeklere Dön</button>
+            </div>
+            <button class="btn btn-success" onclick="appController.archiveNote()">✦ Sentezi Tamamla ve Arşivle</button>
+        </section>
     </main>
 
-    <div id="dbModal">
-        <div class="db-header">
-            <h2>Database</h2>
-            <button class="btn-icon btn-danger" onclick="closeDatabase()">Kapat</button>
+    <dialog id="dbModal">
+        <div class="modal-header">
+            <div class="logo" style="font-size: 1.2rem;">Veri<span>Tabanı</span></div>
+            <button class="btn btn-danger btn-sm" onclick="dbManager.close()">Kapat</button>
         </div>
         
-        <div class="db-tabs">
-            <div class="db-tab active" onclick="switchDbTab('active')" id="tab-active">Aktif</div>
-            <div class="db-tab" onclick="switchDbTab('archived')" id="tab-archived">Arşivlenenler</div>
+        <div class="modal-body">
+            <div class="tabs">
+                <div class="tab active" onclick="dbManager.switchTab('active')" id="tab-active">Çalışılanlar</div>
+                <div class="tab" onclick="dbManager.switchTab('archived')" id="tab-archived">Arşivlenmiş</div>
+            </div>
+
+            <div class="filters" id="dbFilters"></div>
+
+            <div class="grid" id="dbGrid"></div>
         </div>
+    </dialog>
 
-        <div class="db-filters" id="dbFilters">
-            </div>
-
-        <div class="db-grid" id="dbGrid">
-            </div>
-    </div>
+    <div id="toast-container"></div>
 
     <script>
-        // VERİ TABANI SİMÜLASYONU VE STATE YÖNETİMİ
-        let notes = JSON.parse(localStorage.getItem('bohemNotes')) || [];
-        let currentNoteId = null;
-        let currentDbTab = 'active';
-        let currentDbFilter = 'Hepsi';
-
-        const tags = ['Hepsi', 'Makale', 'Kitap', 'Video', 'Film', 'Fikir'];
-
-        // UYGULAMA BAŞLATMA
-        window.onload = () => {
-            renderActiveCardsRow();
-            setupDbFilters();
+        // --- DATA LAYER ---
+        const state = {
+            notes: JSON.parse(localStorage.getItem('proNodeData')) || [],
+            currentId: null,
+            dbTab: 'active',
+            dbFilter: 'Tümü',
+            tags: ['Tümü', 'Makale', 'Kitap', 'Video', 'Film', 'Fikir']
         };
 
-        // --- SAYFA GEÇİŞ VE YÖNLENDİRME FONKSİYONLARI ---
-        function goToPage(pageNum) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(`page${pageNum}`).classList.add('active');
-        }
-
-        function goToStage2() {
-            const sourceText = document.getElementById('sourceText').value.trim();
-            const tag = document.getElementById('sourceTag').value;
-
-            if (!sourceText) {
-                alert("Lütfen ilerlemeden önce bir kaynak notu girin.");
-                return;
+        const db = {
+            save: () => localStorage.setItem('proNodeData', JSON.stringify(state.notes)),
+            getNote: (id) => state.notes.find(n => n.id === id),
+            createOrUpdate: (source, tag) => {
+                if (!state.currentId) {
+                    state.currentId = Date.now().toString();
+                    state.notes.unshift({ id: state.currentId, source, tag, cores: [], synthesis: '', status: 'active', date: new Date().toISOString() });
+                } else {
+                    const note = db.getNote(state.currentId);
+                    note.source = source; note.tag = tag;
+                }
+                db.save();
             }
+        };
 
-            // Yeni not oluştur veya mevcut olanı güncelle
-            if (!currentNoteId) {
-                currentNoteId = Date.now().toString();
-                notes.push({ id: currentNoteId, source: sourceText, tag: tag, cores: [], creation: '', status: 'active' });
-            } else {
-                const note = notes.find(n => n.id === currentNoteId);
-                note.source = sourceText;
-                note.tag = tag;
+        // --- UI HELPERS ---
+        const uiHelpers = {
+            switchPage: (num) => {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`stage${num}`).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+            autoResize: (el) => {
+                el.style.height = 'auto';
+                el.style.height = (el.scrollHeight) + 'px';
+            },
+            toast: (msg) => {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast glass';
+                toast.textContent = msg;
+                container.appendChild(toast);
+                
+                requestAnimationFrame(() => toast.classList.add('show'));
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
+            },
+            escapeHtml: (unsafe) => {
+                return (unsafe || '').replace(/[&<"'>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
             }
-            saveData();
+        };
 
-            // 2. Aşama arayüzünü hazırla
-            document.getElementById('sourcePreview').innerText = sourceText;
-            renderCoreFields();
-            goToPage(2);
-        }
+        // --- APP CONTROLLER ---
+        const appController = {
+            init: () => {
+                appController.renderActiveShelf();
+                dbManager.renderFilters();
+            },
 
-        function goToStage3() {
-            // Çekirdekleri topla
-            const coreInputs = document.querySelectorAll('.core-input');
-            const cores = Array.from(coreInputs).map(input => input.value.trim()).filter(val => val !== "");
-            
-            const note = notes.find(n => n.id === currentNoteId);
-            note.cores = cores;
-            saveData();
+            nextToStage2: () => {
+                const source = document.getElementById('sourceText').value.trim();
+                const tag = document.getElementById('sourceTag').value;
+                if (!source) return uiHelpers.toast('Lütfen önce bir kaynak metin girin.');
 
-            // 3. Aşama arayüzünü hazırla
-            const checklistContainer = document.getElementById('coreChecklistContainer');
-            checklistContainer.innerHTML = '';
-            
-            if(cores.length === 0) {
-                checklistContainer.innerHTML = '<span style="color:#a39e93; font-size:0.8rem;">Hiç çekirdek eklenmedi.</span>';
-            } else {
-                cores.forEach((core, index) => {
-                    checklistContainer.innerHTML += `
-                        <label class="checkbox-row glass">
+                db.createOrUpdate(source, tag);
+                document.getElementById('sourcePreview').innerHTML = uiHelpers.escapeHtml(source).replace(/\n/g, '<br>');
+                appController.renderCores();
+                uiHelpers.switchPage(2);
+            },
+
+            addCoreBlock: (val = "") => {
+                const list = document.getElementById('coresList');
+                const div = document.createElement('div');
+                div.className = 'core-item';
+                div.innerHTML = `
+                    <textarea class="glass" placeholder="Anahtar kelime / çekirdek fikir..." oninput="uiHelpers.autoResize(this)">${uiHelpers.escapeHtml(val)}</textarea>
+                    <button class="btn btn-danger" style="padding: 16px;" onclick="this.parentElement.remove()">✕</button>
+                `;
+                list.appendChild(div);
+                // Yeni eklenen textareayı boyutlandır
+                const newTextarea = div.querySelector('textarea');
+                uiHelpers.autoResize(newTextarea);
+                newTextarea.focus();
+            },
+
+            renderCores: () => {
+                document.getElementById('coresList').innerHTML = '';
+                const note = db.getNote(state.currentId);
+                if (note.cores && note.cores.length > 0) {
+                    note.cores.forEach(c => appController.addCoreBlock(c));
+                } else {
+                    appController.addCoreBlock();
+                }
+            },
+
+            nextToStage3: () => {
+                const coreNodes = document.querySelectorAll('#coresList textarea');
+                const cores = Array.from(coreNodes).map(n => n.value.trim()).filter(v => v !== "");
+                
+                const note = db.getNote(state.currentId);
+                note.cores = cores;
+                db.save();
+
+                const checklist = document.getElementById('coreChecklist');
+                checklist.innerHTML = cores.length === 0 
+                    ? '<div style="opacity:0.5; font-size:0.9rem;">Çıkarılmış çekirdek bulunamadı.</div>' 
+                    : cores.map(c => `
+                        <label class="check-item glass">
                             <input type="checkbox">
-                            <span>${core}</span>
+                            <span>${uiHelpers.escapeHtml(c)}</span>
                         </label>
-                    `;
-                });
-            }
+                    `).join('');
 
-            document.getElementById('finalCreationText').value = note.creation || '';
-            goToPage(3);
-        }
+                const finalEl = document.getElementById('finalText');
+                finalEl.value = note.synthesis || '';
+                uiHelpers.autoResize(finalEl);
+                uiHelpers.switchPage(3);
+            },
 
-        function finishNote() {
-            const finalText = document.getElementById('finalCreationText').value.trim();
-            const note = notes.find(n => n.id === currentNoteId);
-            note.creation = finalText;
-            note.status = 'archived'; // Statüyü tamamlandı olarak değiştir
-            saveData();
-            
-            alert("Harika! Notun başarıyla arşivlendi.");
-            resetApp();
-        }
+            archiveNote: () => {
+                const note = db.getNote(state.currentId);
+                note.synthesis = document.getElementById('finalText').value.trim();
+                note.status = 'archived';
+                db.save();
+                
+                uiHelpers.toast('✦ Not başarıyla arşivlendi!');
+                appController.resetApp();
+            },
 
-        // --- DOM MANİPÜLASYONU (Çekirdekler ve Kartlar) ---
-        function addCoreField(value = "") {
-            const container = document.getElementById('coreContainer');
-            const div = document.createElement('div');
-            div.className = 'core-block';
-            div.innerHTML = `
-                <textarea class="core-input glass" placeholder="Anahtar kelime veya ilham verici bir cümle yaz...">${value}</textarea>
-                <button class="btn-icon btn-danger" onclick="this.parentElement.remove()">X</button>
-            `;
-            container.appendChild(div);
-        }
-
-        function renderCoreFields() {
-            const container = document.getElementById('coreContainer');
-            container.innerHTML = ''; // Temizle
-            const note = notes.find(n => n.id === currentNoteId);
-            
-            if (note.cores && note.cores.length > 0) {
-                note.cores.forEach(core => addCoreField(core));
-            } else {
-                addCoreField(); // Varsayılan olarak 1 tane boş aç
-            }
-        }
-
-        function renderActiveCardsRow() {
-            const row = document.getElementById('activeNotesRow');
-            row.innerHTML = '';
-            const activeNotes = notes.filter(n => n.status === 'active');
-
-            if (activeNotes.length === 0) {
-                row.innerHTML = '<span style="font-size:0.8rem; color:var(--text-muted);">Henüz üzerinde çalışılan bir not yok.</span>';
-                return;
-            }
-
-            activeNotes.forEach(note => {
-                const card = document.createElement('div');
-                card.className = 'square-card glass';
-                card.onclick = () => loadNote(note.id);
-                card.innerHTML = `
-                    <span class="card-tag">${note.tag}</span>
-                    <div style="margin-top:5px; overflow:hidden;">${note.source.substring(0, 40)}...</div>
-                `;
-                row.appendChild(card);
-            });
-        }
-
-        // --- DATABASE EKRANI FONKSİYONLARI ---
-        function openDatabase() {
-            document.getElementById('dbModal').style.display = 'flex';
-            renderDbCards();
-        }
-
-        function closeDatabase() {
-            document.getElementById('dbModal').style.display = 'none';
-        }
-
-        function switchDbTab(tab) {
-            currentDbTab = tab;
-            document.getElementById('tab-active').classList.remove('active');
-            document.getElementById('tab-archived').classList.remove('active');
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            renderDbCards();
-        }
-
-        function setupDbFilters() {
-            const filterContainer = document.getElementById('dbFilters');
-            filterContainer.innerHTML = '';
-            tags.forEach(tag => {
-                const chip = document.createElement('div');
-                chip.className = `db-filter-chip ${tag === currentDbFilter ? 'active' : ''}`;
-                chip.innerText = tag;
-                chip.onclick = () => {
-                    currentDbFilter = tag;
-                    setupDbFilters(); // Görünümü güncelle
-                    renderDbCards();
-                };
-                filterContainer.appendChild(chip);
-            });
-        }
-
-        function renderDbCards() {
-            const grid = document.getElementById('dbGrid');
-            grid.innerHTML = '';
-            
-            let filteredNotes = notes.filter(n => n.status === currentDbTab);
-            if (currentDbFilter !== 'Hepsi') {
-                filteredNotes = filteredNotes.filter(n => n.tag === currentDbFilter);
-            }
-
-            if (filteredNotes.length === 0) {
-                grid.innerHTML = '<div style="color:var(--text-muted); font-size:0.9rem; grid-column: 1 / -1;">Bu kategoride not bulunamadı.</div>';
-                return;
-            }
-
-            filteredNotes.forEach(note => {
-                const card = document.createElement('div');
-                card.className = 'square-card glass';
-                card.onclick = () => {
-                    loadNote(note.id);
-                    closeDatabase();
-                };
-                card.innerHTML = `
-                    <span class="card-tag">${note.tag}</span>
-                    <div style="margin-top:5px; overflow:hidden;">${(note.creation || note.source).substring(0, 40)}...</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // --- YARDIMCI FONKSİYONLAR ---
-        function saveData() {
-            localStorage.setItem('bohemNotes', JSON.stringify(notes));
-            renderActiveCardsRow(); // Ana sayfadaki kartları güncelle
-        }
-
-        function loadNote(id) {
-            const note = notes.find(n => n.id === id);
-            if(note) {
-                currentNoteId = note.id;
+            loadNote: (id) => {
+                const note = db.getNote(id);
+                if (!note) return;
+                state.currentId = note.id;
                 document.getElementById('sourceText').value = note.source;
                 document.getElementById('sourceTag').value = note.tag;
-                goToPage(1);
-            }
-        }
+                uiHelpers.autoResize(document.getElementById('sourceText'));
+                uiHelpers.switchPage(1);
+            },
 
-        function resetApp() {
-            currentNoteId = null;
-            document.getElementById('sourceText').value = '';
-            document.getElementById('sourceTag').value = 'Makale';
-            document.getElementById('finalCreationText').value = '';
-            goToPage(1);
-            renderActiveCardsRow();
-        }
+            resetApp: () => {
+                state.currentId = null;
+                document.getElementById('sourceText').value = '';
+                document.getElementById('sourceText').style.height = 'auto';
+                document.getElementById('sourceTag').value = 'Makale';
+                document.getElementById('finalText').value = '';
+                uiHelpers.switchPage(1);
+                appController.renderActiveShelf();
+            },
+
+            renderActiveShelf: () => {
+                const shelf = document.getElementById('activeNotesShelf');
+                const actives = state.notes.filter(n => n.status === 'active');
+                
+                if (actives.length === 0) {
+                    shelf.innerHTML = '<div style="color:var(--text-secondary); font-size:0.85rem; padding: 10px 0;">Şu an aktif bir istasyon yok.</div>';
+                    return;
+                }
+
+                shelf.innerHTML = actives.map(n => `
+                    <div class="card glass" onclick="appController.loadNote('${n.id}')">
+                        <span class="card-tag">${n.tag}</span>
+                        <div class="card-content">${uiHelpers.escapeHtml(n.source)}</div>
+                    </div>
+                `).join('');
+            }
+        };
+
+        // --- DATABASE MANAGER ---
+        const dbManager = {
+            modal: document.getElementById('dbModal'),
+            
+            open: () => {
+                dbManager.modal.showModal();
+                dbManager.renderGrid();
+            },
+            close: () => dbManager.modal.close(),
+            
+            switchTab: (tabId) => {
+                state.dbTab = tabId;
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+                dbManager.renderGrid();
+            },
+
+            renderFilters: () => {
+                const container = document.getElementById('dbFilters');
+                container.innerHTML = state.tags.map(tag => `
+                    <div class="filter-chip ${tag === state.dbFilter ? 'active' : ''}" 
+                         onclick="dbManager.setFilter('${tag}')">${tag}</div>
+                `).join('');
+            },
+
+            setFilter: (tag) => {
+                state.dbFilter = tag;
+                dbManager.renderFilters();
+                dbManager.renderGrid();
+            },
+
+            renderGrid: () => {
+                const grid = document.getElementById('dbGrid');
+                let filtered = state.notes.filter(n => n.status === state.dbTab);
+                
+                if (state.dbFilter !== 'Tümü') {
+                    filtered = filtered.filter(n => n.tag === state.dbFilter);
+                }
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '<div style="color:var(--text-secondary); font-size:0.9rem; grid-column: 1/-1;">Bu kriterlerde veri bulunamadı.</div>';
+                    return;
+                }
+
+                grid.innerHTML = filtered.map(n => {
+                    const previewText = state.dbTab === 'archived' ? (n.synthesis || n.source) : n.source;
+                    return `
+                    <div class="card glass" onclick="appController.loadNote('${n.id}'); dbManager.close();">
+                        <span class="card-tag">${n.tag}</span>
+                        <div class="card-content">${uiHelpers.escapeHtml(previewText)}</div>
+                    </div>
+                `}).join('');
+            }
+        };
+
+        // Uygulamayı Başlat
+        window.onload = appController.init;
     </script>
 </body>
 </html>
