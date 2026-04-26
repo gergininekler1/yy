@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chimptopus | Sentez Merkezi</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700&family=Montserrat:wght@800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <style>
-        /* --- CSS DEĞİŞKENLERİ --- */
-        :root {
+        /* --- 1. MODERN LIGHT TEMA --- */
+        :root, [data-theme="light"] {
             --bg-base: #f5f5f7;
             --bg-gradient: linear-gradient(135deg, #eef0f5, #ffffff);
             --glass-bg: rgba(255, 255, 255, 0.7);
@@ -22,12 +22,13 @@
             --accent: #007AFF; 
             --danger: #FF3B30;
             --success: #34C759;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
+            --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px;
+            --font-main: 'Inter', sans-serif;
+            --font-title: 'Montserrat', sans-serif;
             --transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
+        /* --- 2. MODERN DARK TEMA --- */
         [data-theme="dark"] {
             --bg-base: #121212;
             --bg-gradient: linear-gradient(135deg, #1e1e1e, #121212);
@@ -36,37 +37,100 @@
             --glass-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.3);
             --text-primary: #f5f5f7;
             --text-secondary: #a1a1a6;
+            --font-main: 'Inter', sans-serif;
+            --font-title: 'Montserrat', sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        /* --- 3. APPLE TEMA --- */
+        [data-theme="apple"] {
+            --bg-base: #fbfbfd;
+            --bg-gradient: linear-gradient(180deg, #fbfbfd, #ffffff);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 1);
+            --glass-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --radius-lg: 24px; --radius-md: 18px; --radius-sm: 12px;
+            --font-main: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif;
+            --font-title: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif;
+        }
+
+        /* --- 4. EDEBİYAT TEMASI --- */
+        [data-theme="literature"] {
+            --bg-base: #f4ecd8;
+            --bg-gradient: #f4ecd8;
+            --glass-bg: #fdf6e3;
+            --glass-border: #d4c5b0;
+            --glass-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --text-primary: #2b2622;
+            --text-secondary: #5e554b;
+            --accent: #8b3a3a;
+            --radius-lg: 4px; --radius-md: 4px; --radius-sm: 2px;
+            --font-main: 'Crimson Text', serif;
+            --font-title: 'Playfair Display', serif;
+        }
+
+        /* --- 5. MATRIX TEMA --- */
+        [data-theme="matrix"] {
+            --bg-base: #060b06;
+            --bg-gradient: #060b06;
+            --glass-bg: rgba(10, 25, 10, 0.7);
+            --glass-border: #144414;
+            --glass-shadow: 0 0 15px rgba(0, 255, 0, 0.05);
+            --text-primary: #4af626; 
+            --text-secondary: #2a882a;
+            --accent: #66ff66;
+            --danger: #ff4444;
+            --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px;
+            --font-main: 'Courier New', Courier, monospace;
+            --font-title: 'Courier New', Courier, monospace;
+        }
+
+        /* --- 6. WINDOWS 95 TEMA --- */
+        [data-theme="win95"] {
+            --bg-base: #008080;
+            --bg-gradient: #008080;
+            --glass-bg: #c0c0c0;
+            --glass-border: #dfdfdf;
+            --text-primary: #000000;
+            --text-secondary: #222222;
+            --accent: #000080;
+            --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px;
+            --font-main: 'Tahoma', 'MS Sans Serif', sans-serif;
+            --font-title: 'Tahoma', 'MS Sans Serif', sans-serif;
+            --glass-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
         body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; font-size: 14px; }
 
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
 
-        .glass { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: var(--glass-shadow); }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: var(--glass-shadow); transition: background 0.3s, border 0.3s; }
+        [data-theme="win95"] .glass, [data-theme="matrix"] .glass, [data-theme="literature"] .glass { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
-        /* --- HEADER & İKONLAR --- */
         header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; position: sticky; top: 0; z-index: 100; border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg); border-top: none; }
-        .logo { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .logo { font-family: var(--font-title); font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
         .logo svg { stroke: var(--accent); width: 20px; height: 20px; }
+        
+        [data-theme="win95"] header { background: #000080; color: white; border-bottom: 2px solid #fff; box-shadow: none; }
+        [data-theme="win95"] header .logo, [data-theme="win95"] header .icon-btn { color: white; }
         
         .header-controls { display: flex; align-items: center; gap: 4px; }
         .icon-btn { background: transparent; border: none; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 50%; transition: 0.2s; }
         .icon-btn:hover { background: rgba(150,150,150,0.1); color: var(--accent); }
         
         .color-menu { position: relative; display: inline-block; }
-        .color-dropdown { position: absolute; top: 120%; right: 0; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); padding: 6px; border-radius: 12px; display: none; gap: 4px; flex-direction: row; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .color-dropdown { position: absolute; top: 120%; right: 0; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 6px; border-radius: 12px; display: none; gap: 4px; flex-direction: row; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 500;}
         .color-menu:hover .color-dropdown { display: flex; }
         .color-dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
         .color-dot:hover { transform: scale(1.3); }
         .color-dot.active { border-color: var(--text-primary); }
 
-        /* YENİ: ID Rozeti Logo Yanında */
-        .header-badge { font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700; color: var(--accent); background: rgba(150,150,150,0.1); padding: 3px 6px; border-radius: 8px; margin-left: 6px; letter-spacing: 0.5px; display: none;}
+        .header-badge { font-size: 0.65rem; font-weight: 700; color: var(--accent); background: rgba(150,150,150,0.1); padding: 3px 6px; border-radius: 8px; margin-left: 6px; letter-spacing: 0.5px; display: none;}
 
-        /* --- BUTONLAR --- */
         .btn { background: rgba(150,150,150,0.1); color: var(--text-primary); border: 1px solid rgba(150,150,150,0.1); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn:hover { background: rgba(150,150,150,0.2); transform: translateY(-1px); }
         .btn-sm { padding: 6px 10px; font-size: 0.75rem; }
@@ -77,16 +141,18 @@
         .btn-icon-only { padding: 4px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; transition: 0.2s; border-radius: 50%; }
         .btn-icon-only:hover { color: var(--accent); background: rgba(150,150,150,0.1); }
 
-        /* --- SAYFA YAPISI --- */
+        [data-theme="win95"] .btn { background: #c0c0c0; border: none; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; font-weight: normal; color: #000;}
+        [data-theme="win95"] .btn:active { box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf; transform: translateY(1px); }
+        [data-theme="win95"] .btn-primary, [data-theme="win95"] .btn-success, [data-theme="win95"] .btn-danger { color: #000; background: #c0c0c0; }
+
         main { padding: 16px; padding-bottom: 80px; max-width: 800px; margin: 0 auto; position: relative; }
         .page { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; }
         .page.active { display: block; opacity: 1; transform: translateY(0); animation: slideUp 0.3s forwards; }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* --- KARTLAR & CHIPS --- */
-        .section-title { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .section-title { font-family: var(--font-title); font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
         .horizontal-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; margin-left: -16px; padding-left: 16px; padding-right: 16px; }
-        .card { flex: 0 0 115px; height: 115px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; scroll-snap-align: start; cursor: pointer; overflow: hidden; transition: var(--transition); border: 1px solid rgba(150,150,150,0.1); }
+        .card { flex: 0 0 120px; height: 120px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; scroll-snap-align: start; cursor: pointer; overflow: hidden; transition: var(--transition); border: 1px solid rgba(150,150,150,0.1); }
         .card:hover { border-color: var(--accent); transform: scale(0.98); }
         .card-tag { font-size: 0.6rem; font-weight: 700; color: var(--accent); background: rgba(150,150,150,0.1); padding: 3px 6px; border-radius: 4px; display: inline-block; }
         .card-title { font-size: 0.8rem; font-weight: 600; margin-top: 6px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -100,30 +166,31 @@
         .chip { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; background: rgba(150,150,150,0.1); color: var(--text-secondary); cursor: pointer; transition: 0.2s; white-space: nowrap; border: 1px solid transparent; }
         .chip.active { background: var(--accent); color: #fff; }
 
-        /* --- FORM ELEMANLARI --- */
         .input-group { margin-bottom: 16px; }
         input[type="text"], textarea { width: 100%; background: var(--glass-bg); border: 1px solid rgba(150,150,150,0.2); color: var(--text-primary); padding: 12px; border-radius: var(--radius-md); font-size: 0.85rem; outline: none; resize: none; transition: 0.2s; line-height: 1.5; }
         input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1); }
         
+        [data-theme="win95"] input[type="text"], [data-theme="win95"] textarea { background: #ffffff; border: none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0;}
+        [data-theme="win95"] .chip { border-radius: 0; background: #dfdfdf; color: #000; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff; }
+        [data-theme="win95"] .chip.active { background: #000080; color: #fff; }
+
         #sourceText { height: 140px; overflow-y: auto; }
         #finalText { height: 180px; overflow-y: auto; }
         .core-item textarea { height: 60px; overflow-y: auto; padding: 10px; }
-        
         select.folder-select { padding: 4px 8px; border-radius: var(--radius-sm); border: 1px solid rgba(150,150,150,0.3); background: var(--glass-bg); color: var(--text-primary); font-size: 0.75rem; outline: none; cursor: pointer; margin-left: 6px; }
+        [data-theme="win95"] select.folder-select { border-radius: 0; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a; border: none;}
 
-        /* --- BAĞLANTILI BLOKLAR --- */
-        .link-preview-box { background: var(--glass-bg); padding: 10px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); margin-top: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; border: 1px solid rgba(150,150,150,0.1); display: flex; flex-direction: column; }
+        .link-preview-box { background: var(--glass-bg); padding: 10px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); margin-top: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; border-right: 1px solid rgba(150,150,150,0.1); border-top: 1px solid rgba(150,150,150,0.1); border-bottom: 1px solid rgba(150,150,150,0.1); display: flex; flex-direction: column; }
         .link-preview-box:hover { background: rgba(150,150,150,0.1); transform: translateX(3px); }
         .link-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 600; color: var(--text-primary); }
 
-        /* --- DİĞER --- */
         .preview-box { height: 140px; overflow-y: auto; padding: 14px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px; background: var(--glass-bg); border: 1px solid rgba(150,150,150,0.2); border-radius: var(--radius-md); }
+        [data-theme="win95"] .preview-box { background: #fff; border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0; }
+        
         .core-list { display: flex; flex-direction: column; gap: 8px; }
         .core-item { display: flex; gap: 6px; align-items: flex-start; }
-        
         .checklist { display: flex; flex-direction: column; gap: 6px; transition: max-height 0.3s ease, opacity 0.2s ease; overflow: hidden; }
         .checklist.hidden { max-height: 0; opacity: 0; margin-bottom: 0; }
-        
         .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; cursor: pointer; background: var(--glass-bg); border-radius: var(--radius-sm); border: 1px solid rgba(150,150,150,0.1); }
         .check-item input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid rgba(150,150,150,0.3); border-radius: 4px; outline: none; cursor: pointer; position: relative; margin-top: 2px; }
         .check-item input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
@@ -133,25 +200,28 @@
 
         .nav-footer { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 12px; }
 
-        /* --- MODALLAR --- */
         dialog { margin: auto; width: 100%; max-width: 600px; height: 100vh; max-height: 100vh; background: var(--bg-base); border: none; padding: 0; z-index: 200; display: none; flex-direction: column; color: var(--text-primary); }
         dialog[open] { display: flex; animation: slideUp 0.25s forwards; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(150,150,150,0.1); background: var(--glass-bg); }
+        [data-theme="win95"] .modal-header { background: #000080; color: white; border-bottom: none;}
+        [data-theme="win95"] .modal-header select, [data-theme="win95"] .modal-header span { color: #fff; }
+
         .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
 
-        /* ÖNİZLEME & FULLSCREEN (LIGHTBOX ETKİSİ) */
         .read-section { margin-bottom: 16px; }
         .read-section h3 { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-        .read-box { background: var(--glass-bg); padding: 14px; border-radius: var(--radius-md); font-size: 0.85rem; line-height: 1.6; border: 1px solid rgba(150,150,150,0.1); max-height: 160px; overflow-y: auto; cursor: text; transition: 0.3s; position: relative;}
         
-        /* Lightbox Fullscreen Efekti */
+        .read-box { background: var(--glass-bg); padding: 14px; border-radius: var(--radius-md); font-size: 0.85rem; line-height: 1.6; border: 1px solid rgba(150,150,150,0.1); max-height: 160px; overflow-y: auto; cursor: text; position: relative;}
+        [data-theme="win95"] .read-box { background: #fff; border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0; }
+
         .read-box.fullscreen-mode {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90vw; max-width: 600px; max-height: 80vh; z-index: 99999;
             background: var(--bg-base); padding: 24px; border-radius: var(--radius-lg);
-            font-size: 1rem; line-height: 1.7; cursor: pointer;
-            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.5); /* Arka planı karartır */
+            font-size: 1rem; line-height: 1.7; cursor: pointer; border: 1px solid var(--glass-border);
+            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.5); 
+            transition: none !important; animation: none !important;
         }
         .read-box.fullscreen-mode::after { content: 'Kapatmak için tıkla'; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--text-secondary); opacity: 0.6; }
         .fs-hint { position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); opacity: 0.7; pointer-events: none;}
@@ -160,18 +230,24 @@
         .read-cores li { position: relative; padding-left: 12px; margin-bottom: 6px; line-height: 1.4; font-size: 0.8rem;}
         .read-cores li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: bold; font-size: 1rem; top: -1px; }
 
-        .cloud-panel { background: rgba(0, 122, 255, 0.05); border: 1px dashed var(--accent); padding: 12px; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;}
+        .cloud-panel { background: rgba(150, 150, 150, 0.05); border: 1px dashed rgba(150,150,150,0.3); padding: 12px; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;}
+        [data-theme="win95"] .cloud-panel { border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0; background: #c0c0c0; }
 
-        /* --- TOAST BİLDİRİMLER (ALERTS YERİNE) --- */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: var(--text-primary); color: var(--bg-base); padding: 10px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; opacity: 0; transform: translateY(20px); transition: 0.3s; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast-danger { background: var(--danger); color: #fff; }
         .toast-success { background: var(--success); color: #fff; }
 
-        /* ONAY MODALI (CONFIRM YERİNE) */
         #confirmModal { max-width: 320px; border-radius: var(--radius-lg); text-align: center; }
+        [data-theme="win95"] #confirmModal { border-radius: 0; background: #c0c0c0; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
         #confirmModal .modal-body { padding: 24px; }
+        
+        /* YENİ: Akıllı Öneri Alanı Tasarımı */
+        .suggestion-panel { background: rgba(0, 122, 255, 0.05); border-left: 3px solid var(--accent); padding: 12px; border-radius: var(--radius-sm); margin-top: 24px;}
+        [data-theme="win95"] .suggestion-panel { border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a; border-radius: 0; background: #c0c0c0; }
+        .suggestion-item { margin-top: 8px; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; color: var(--text-primary); padding: 4px; border-radius: 4px; transition: 0.2s;}
+        .suggestion-item:hover { background: rgba(150,150,150,0.1); }
     </style>
 </head>
 <body>
@@ -187,7 +263,9 @@
                 <button class="icon-btn" title="Vurgu Rengi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0-10 10c0 5.5 4.5 10 10 10 1.7 0 3-1.3 3-3 0-.8-.3-1.6-.9-2.1-.6-.6-1-1.3-1-2.1 0-1.7 1.3-3 3-3h1.8A3.2 3.2 0 0 0 22 8.6C22 5 17.5 2 12 2z"></path></svg></button>
                 <div class="color-dropdown" id="colorPicker"></div>
             </div>
-            <button class="icon-btn" onclick="toggleTheme()" title="Mod Değiştir"><svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+            <button class="icon-btn" onclick="cycleTheme()" title="Temayı Değiştir">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            </button>
             <button class="icon-btn" onclick="dbManager.open()" title="Veritabanı"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg></button>
         </div>
     </header>
@@ -246,12 +324,12 @@
 
             <div class="input-group" style="margin-top: 16px;">
                 <label class="section-title">İstasyon Başlığı</label>
-                <input type="text" id="noteTitle" placeholder="Örn: Yapay Zeka Devrimi (Opsiyonel)" oninput="appController.autoSaveDraft()">
+                <input type="text" id="noteTitle" placeholder="Örn: Zettelkasten Metodu (Opsiyonel)" oninput="appController.autoSaveDraft()">
             </div>
 
             <div class="input-group">
                 <label class="section-title">Sentez & Yaratım Alanı</label>
-                <textarea id="finalText" placeholder="Kendi özgün metnini buraya inşa et..."></textarea>
+                <textarea id="finalText" placeholder="Kendi özgün metnini buraya inşa et..." oninput="appController.autoSaveDraft(); aiEngine.findSuggestions()"></textarea>
             </div>
             
             <div class="input-group">
@@ -266,6 +344,12 @@
                     <button class="btn btn-primary" onclick="appController.addLink()">Ekle</button>
                 </div>
                 <div id="linkedNotesContainer" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+            
+            <div class="suggestion-panel" id="smartSuggestionPanel" style="display: none;">
+                <div class="section-title" style="color: var(--accent); margin-bottom: 4px;">💡 İlham Radarı</div>
+                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px;">Yazdıklarına bakılırsa bu notlar işine yarayabilir:</div>
+                <div id="smartSuggestionsList"></div>
             </div>
 
             <div class="nav-footer" style="border-top: none; padding-top: 0;">
@@ -326,7 +410,7 @@
         <div class="modal-body">
             <div class="read-section" id="previewSynthesisBlock">
                 <h3>Sentez / Yaratım</h3>
-                <div class="read-box" id="previewSynthesis" style="border-left: 3px solid var(--accent); font-weight: 500; cursor: pointer;" onclick="this.classList.toggle('fullscreen-mode')">
+                <div class="read-box" id="previewSynthesis" style="font-weight: 500; cursor: pointer;" onclick="this.classList.toggle('fullscreen-mode')">
                     <div class="fs-hint">⛶ Büyüt</div>
                     <span id="previewSynthesisText"></span>
                 </div>
@@ -341,8 +425,13 @@
             </div>
             
             <div class="read-section" id="previewLinksBlock" style="border-top: 1px solid rgba(150,150,150,0.2); padding-top: 12px; margin-top: 16px;">
-                <h3>Bağlantılı İstasyonlar</h3>
+                <h3>Giden Bağlantılar</h3>
                 <div id="previewLinkedNodes" style="display:flex; flex-direction:column; gap:6px;"></div>
+            </div>
+
+            <div class="read-section" id="previewBacklinksBlock" style="border-top: 1px dashed rgba(150,150,150,0.2); padding-top: 12px; margin-top: 16px;">
+                <h3>Geri Bağlantılar (Referanslar)</h3>
+                <div id="previewBacklinkedNodes" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
         </div>
     </dialog>
@@ -361,7 +450,6 @@
     <div id="toast-container"></div>
 
     <script>
-        // --- FIREBASE KURULUMU ---
         const firebaseConfig = { apiKey: "AIzaSyDvkn0pkYJPMNcnUYEaFElyrFUOmEumD30", authDomain: "gergininekler11.firebaseapp.com", databaseURL: "https://gergininekler11-default-rtdb.firebaseio.com", projectId: "gergininekler11", storageBucket: "gergininekler11.firebasestorage.app", messagingSenderId: "75194866682", appId: "1:75194866682:web:d390dc7fea8bd47fbde243", measurementId: "G-1F3HZ9EPDJ" };
         firebase.initializeApp(firebaseConfig);
         const cloudDB = firebase.database();
@@ -371,7 +459,7 @@
                 try {
                     await cloudDB.ref('chimptopus_data/user_default').set({ notes: state.notes, folders: state.folders });
                     uiHelpers.showToast('Buluta yedeklendi! ☁️', 'success');
-                } catch (error) { uiHelpers.showToast('Hata: ' + error.message, 'danger'); }
+                } catch (error) { uiHelpers.showToast('Hata: Firebase Kurallarını Açın!', 'danger'); }
             },
             restore: () => {
                 uiHelpers.showConfirm("Geri Yükle", "Buluttaki veriler cihazındakilerin üzerine yazılacak. Emin misin?", async (res) => {
@@ -384,12 +472,15 @@
                             db.save(); uiHelpers.showToast('Veriler çekildi. Yenileniyor...', 'success');
                             setTimeout(() => location.reload(), 1000);
                         } else { uiHelpers.showToast('Yedek bulunamadı.', 'danger'); }
-                    } catch (error) { uiHelpers.showToast('Hata: ' + error.message, 'danger'); }
+                    } catch (error) { uiHelpers.showToast('Hata: Firebase Kurallarını Açın!', 'danger'); }
                 });
             }
         };
 
         const colors = ['#007AFF', '#FF3B30', '#34C759', '#AF52DE', '#FF9500'];
+        const themes = ['light', 'dark', 'apple', 'matrix', 'literature', 'win95'];
+        const themeNames = { 'light':'Modern Açık', 'dark':'Modern Koyu', 'apple':'Apple Minimal', 'matrix':'Matrix Hacker', 'literature':'Edebiyat', 'win95':'Windows 95' };
+        
         const state = { notes: JSON.parse(localStorage.getItem('ch_notes')) || [], folders: JSON.parse(localStorage.getItem('ch_folders')) || [{id: 'genel', name: 'Genel'}], currentId: null, currentDisplayId: null, currentTag: 'Makale', currentFolderId: 'genel', dbActiveFolder: 'genel', previewActiveNoteId: null };
 
         const uiHelpers = {
@@ -404,8 +495,6 @@
             },
             formatDate: (iso) => { const d = new Date(iso); return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }); },
             toggleCores: () => { document.getElementById('coreChecklist').classList.toggle('hidden'); },
-            
-            // TOAST & CONFIRM SİSTEMİ
             showToast: (msg, type = 'success') => {
                 const c = document.getElementById('toast-container'); const t = document.createElement('div');
                 t.className = `toast toast-${type}`; t.innerText = msg; c.appendChild(t);
@@ -419,8 +508,6 @@
                 uiHelpers.confirmCallback = callback; document.getElementById('confirmModal').showModal();
             },
             handleConfirm: (res) => { document.getElementById('confirmModal').close(); if(uiHelpers.confirmCallback) uiHelpers.confirmCallback(res); },
-            
-            // KOPYALAMA
             copyToClipboard: () => {
                 const note = db.getNote(state.previewActiveNoteId); if(!note) return;
                 const text = note.synthesis || note.source;
@@ -433,6 +520,7 @@
             save: () => { localStorage.setItem('ch_notes', JSON.stringify(state.notes)); localStorage.setItem('ch_folders', JSON.stringify(state.folders)); appController.renderActiveShelf(); },
             getNote: (id) => state.notes.find(n => n.id === id),
             getNoteByDisplayId: (did) => state.notes.find(n => n.displayId === did),
+            getBacklinks: (id) => state.notes.filter(n => n.links && n.links.includes(id)),
             generateDisplayId: () => {
                 const used = state.notes.map(n => parseInt(n.displayId.replace('#', ''))).filter(n => !isNaN(n)).sort((a,b)=>a-b);
                 let next = 1; for (let i = 0; i < used.length; i++) { if (used[i] === next) next++; else break; }
@@ -440,7 +528,7 @@
             },
             saveDraft: () => {
                 const source = document.getElementById('sourceText').value.trim(); const title = document.getElementById('noteTitle') ? document.getElementById('noteTitle').value.trim() : '';
-                if (!source) return;
+                if (!source && !title) return;
                 if (!state.currentId) {
                     state.currentId = Date.now().toString(); state.currentDisplayId = db.generateDisplayId();
                     state.notes.unshift({ id: state.currentId, displayId: state.currentDisplayId, title, source, tag: state.currentTag, cores: [], synthesis: '', status: 'active', folderId: state.currentFolderId, links: [], date: new Date().toISOString() });
@@ -452,6 +540,7 @@
                     if(res) {
                         state.notes = state.notes.filter(n => n.id !== id);
                         if(state.currentId === id) appController.startNewNote();
+                        state.notes.forEach(n => { if(n.links) n.links = n.links.filter(lid => lid !== id); });
                         db.save(); document.getElementById('previewModal').close(); dbManager.renderGrid();
                         appController.renderRecentActivities(); uiHelpers.showToast("İstasyon silindi.");
                     }
@@ -459,7 +548,51 @@
             }
         };
 
-        function initTheme() {
+        // YENİ: Akıllı Öneri Motoru (NLP Tabanlı Basit Öneri)
+        const aiEngine = {
+            stopWords: ['ve', 'veya', 'ile', 'ama', 'fakat', 'lakin', 'bir', 'bu', 'şu', 'o', 'için', 'gibi', 'kadar', 'da', 'de', 'mı', 'mi', 'çok', 'en', 'daha', 'ise', 'ki', 'göre', 'diye'],
+            getKeywords: (text) => {
+                if(!text) return [];
+                return text.toLowerCase()
+                    .replace(/[.,!?;:()]/g, '')
+                    .split(/\s+/)
+                    .filter(w => w.length > 2 && !aiEngine.stopWords.includes(w));
+            },
+            findSuggestions: () => {
+                // Her tuşa basışta yorulmamak için kelime sayısı azsa işlem yapma
+                const currentText = document.getElementById('finalText').value + " " + document.getElementById('noteTitle').value;
+                const keywords = aiEngine.getKeywords(currentText);
+                const panel = document.getElementById('smartSuggestionPanel');
+                const list = document.getElementById('smartSuggestionsList');
+
+                if(keywords.length < 3) {
+                    panel.style.display = 'none'; return;
+                }
+
+                let scoredNotes = state.notes.map(n => {
+                    if(n.id === state.currentId) return {note: n, score: 0};
+                    const nText = (n.synthesis + " " + n.source + " " + n.title).toLowerCase();
+                    let score = 0;
+                    keywords.forEach(kw => { if(nText.includes(kw)) score++; });
+                    return {note: n, score};
+                }).filter(item => item.score > 1).sort((a,b) => b.score - a.score).slice(0, 3); // En iyi 3 not
+
+                if(scoredNotes.length > 0) {
+                    panel.style.display = 'block';
+                    list.innerHTML = scoredNotes.map(sn => `
+                        <div class="suggestion-item" onclick="document.getElementById('linkInput').value = '${sn.note.displayId}'; appController.addLink(); uiHelpers.showToast('Öneri Eklendi!')">
+                            <span style="font-weight:600;">${sn.note.displayId}</span>
+                            <span style="flex-grow:1; margin-left:8px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${uiHelpers.escapeHtml(sn.note.title || sn.note.tag)}</span>
+                            <span style="color:var(--accent);">+ Ekle</span>
+                        </div>
+                    `).join('');
+                } else {
+                    panel.style.display = 'none';
+                }
+            }
+        };
+
+        function initSettings() {
             const savedColor = localStorage.getItem('ch_accent') || '#007AFF'; document.documentElement.style.setProperty('--accent', savedColor);
             const picker = document.getElementById('colorPicker');
             colors.forEach(c => {
@@ -467,21 +600,24 @@
                 dot.onclick = () => { document.documentElement.style.setProperty('--accent', c); localStorage.setItem('ch_accent', c); document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active')); dot.classList.add('active'); };
                 picker.appendChild(dot);
             });
-            const savedTheme = localStorage.getItem('ch_theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme); updateThemeIcon(savedTheme);
+            const savedTheme = localStorage.getItem('ch_theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme); 
         }
-        function toggleTheme() { const target = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', target); localStorage.setItem('ch_theme', target); updateThemeIcon(target); }
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('themeIcon');
-            if (theme === 'dark') icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
-            else icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+
+        function cycleTheme() {
+            let current = document.documentElement.getAttribute('data-theme');
+            let idx = themes.indexOf(current); if(idx === -1) idx = 0;
+            let next = themes[(idx + 1) % themes.length];
+            document.documentElement.setAttribute('data-theme', next); localStorage.setItem('ch_theme', next);
+            uiHelpers.showToast('Tema: ' + themeNames[next], 'success');
         }
 
         const appController = {
-            init: () => { initTheme(); appController.renderActiveShelf(); appController.renderFolderSelect(); uiHelpers.updateBadge(); },
-            autoSaveDraft: () => db.saveDraft(),
+            init: () => { initSettings(); appController.renderActiveShelf(); appController.renderFolderSelect(); uiHelpers.updateBadge(); },
+            autoSaveDraft: () => { db.saveDraft(); aiEngine.findSuggestions(); },
             startNewNote: () => {
                 state.currentId = null; state.currentDisplayId = null;
                 document.getElementById('sourceText').value = ''; document.getElementById('finalText').value = ''; document.getElementById('noteTitle').value = '';
+                document.getElementById('smartSuggestionPanel').style.display = 'none';
                 uiHelpers.updateBadge(); uiHelpers.switchPage(1);
             },
             nextToStage2: () => {
@@ -509,13 +645,15 @@
                     : cores.map(c => `<label class="check-item"><input type="checkbox"><span>${uiHelpers.escapeHtml(c)}</span></label>`).join('');
 
                 document.getElementById('finalText').value = note.synthesis || ''; document.getElementById('noteTitle').value = note.title || '';
-                appController.renderFolderSelect(); appController.renderLinks(); appController.renderRecentActivities(); uiHelpers.switchPage(3);
+                appController.renderFolderSelect(); appController.renderLinks(); appController.renderRecentActivities(); 
+                aiEngine.findSuggestions(); // Sayfa açılınca önerileri kontrol et
+                uiHelpers.switchPage(3);
             },
             archiveNote: () => {
                 const note = db.getNote(state.currentId);
                 note.title = document.getElementById('noteTitle').value.trim(); note.synthesis = document.getElementById('finalText').value.trim();
                 note.folderId = state.currentFolderId; note.status = 'archived'; db.save();
-                uiHelpers.showToast('Sentez başarıyla arşivlendi!'); appController.startNewNote();
+                uiHelpers.showToast('Sentez arşivlendi!'); appController.startNewNote();
             },
             loadNoteForEdit: (id) => {
                 const note = db.getNote(id); if (!note) return;
@@ -529,7 +667,11 @@
             renderActiveShelf: () => {
                 const shelf = document.getElementById('activeNotesShelf'); const actives = state.notes.filter(n => n.status === 'active');
                 let html = `<div class="card new-card glass" onclick="appController.startNewNote()"><div style="font-size: 1.5rem; margin-bottom: 2px;">+</div><div style="font-size: 0.7rem; font-weight: 600;">Yeni İstasyon</div></div>`;
-                html += actives.map(n => `<div class="card glass" onclick="dbManager.openPreview('${n.id}')"><div style="display:flex; justify-content:space-between;"><span class="card-tag">${n.tag}</span><span style="font-size:0.6rem; color:var(--text-secondary);">${n.displayId}</span></div><div class="card-title">${uiHelpers.escapeHtml(n.title || 'Başlıksız')}</div><div class="card-content">${uiHelpers.escapeHtml(n.source)}</div></div>`).join('');
+                html += actives.map(n => {
+                    const totalLinks = (n.links ? n.links.length : 0) + db.getBacklinks(n.id).length;
+                    const linkBadge = totalLinks > 0 ? `<span style="font-size:0.6rem; color:var(--accent); font-weight:600; margin-left:4px;">🔗 ${totalLinks}</span>` : '';
+                    return `<div class="card glass" onclick="dbManager.openPreview('${n.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span class="card-tag">${n.tag}</span><div><span style="font-size:0.6rem; color:var(--text-secondary);">${n.displayId}</span>${linkBadge}</div></div><div class="card-title">${uiHelpers.escapeHtml(n.title || 'Başlıksız')}</div><div class="card-content">${uiHelpers.escapeHtml(n.source)}</div></div>`;
+                }).join('');
                 shelf.innerHTML = html;
             },
             renderFolderSelect: () => { document.getElementById('folderSelectGroup').innerHTML = state.folders.map(f => `<div class="chip ${f.id === state.currentFolderId ? 'active' : ''}" onclick="uiHelpers.selectFolder('${f.id}')">${uiHelpers.escapeHtml(f.name)}</div>`).join(''); },
@@ -542,7 +684,7 @@
                 if(!targetNote) return uiHelpers.showToast('Not bulunamadı!', 'danger'); if(targetNote.id === state.currentId) return uiHelpers.showToast('Kendisine bağlayamazsın!', 'danger');
                 const currentNote = db.getNote(state.currentId); if(!currentNote.links) currentNote.links = [];
                 if(!currentNote.links.includes(targetNote.id)) { currentNote.links.push(targetNote.id); db.save(); }
-                input.value = ''; appController.renderLinks();
+                input.value = ''; appController.renderLinks(); document.getElementById('smartSuggestionPanel').style.display = 'none'; // Eklenince öneriyi gizle
             },
             renderLinks: () => {
                 const container = document.getElementById('linkedNotesContainer'); const note = db.getNote(state.currentId);
@@ -592,7 +734,11 @@
             renderGrid: () => {
                 const grid = document.getElementById('dbGrid'); const filtered = state.notes.filter(n => n.folderId === state.dbActiveFolder && n.status === 'archived');
                 if (filtered.length === 0) return grid.innerHTML = '<div style="color:var(--text-secondary); grid-column:1/-1;">Bu klasör boş.</div>';
-                grid.innerHTML = filtered.map(n => `<div class="card glass" onclick="dbManager.openPreview('${n.id}')"><div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span class="card-tag">${n.tag}</span><span style="font-size:0.6rem; font-weight:bold; color:var(--text-secondary);">${n.displayId}</span></div><div class="card-title">${uiHelpers.escapeHtml(n.title || 'Başlıksız')}</div><div class="card-content">${uiHelpers.escapeHtml(n.synthesis || n.source)}</div><div class="card-date">${n.date ? uiHelpers.formatDate(n.date) : ''}</div></div>`).join('');
+                grid.innerHTML = filtered.map(n => {
+                    const totalLinks = (n.links ? n.links.length : 0) + db.getBacklinks(n.id).length;
+                    const linkBadge = totalLinks > 0 ? `<span style="font-size:0.6rem; color:var(--accent); font-weight:600; margin-left:4px;">🔗 ${totalLinks}</span>` : '';
+                    return `<div class="card glass" onclick="dbManager.openPreview('${n.id}')"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;"><span class="card-tag">${n.tag}</span><div><span style="font-size:0.6rem; font-weight:bold; color:var(--text-secondary);">${n.displayId}</span>${linkBadge}</div></div><div class="card-title">${uiHelpers.escapeHtml(n.title || 'Başlıksız')}</div><div class="card-content">${uiHelpers.escapeHtml(n.synthesis || n.source)}</div><div class="card-date">${n.date ? uiHelpers.formatDate(n.date) : ''}</div></div>`;
+                }).join('');
             },
             moveCurrentPreviewNote: (newFolderId) => { const note = db.getNote(state.previewActiveNoteId); if(note && note.folderId !== newFolderId) { note.folderId = newFolderId; db.save(); dbManager.renderGrid(); uiHelpers.showToast('Taşındı.'); } },
             openPreview: (id) => {
@@ -600,18 +746,36 @@
                 document.getElementById('previewIdBadge').innerText = note.displayId;
                 const folderSelect = document.getElementById('previewFolderSelect');
                 folderSelect.innerHTML = state.folders.map(f => `<option value="${f.id}" ${f.id === note.folderId ? 'selected' : ''}>📁 ${uiHelpers.escapeHtml(f.name)}</option>`).join('');
+                
                 const synthBlock = document.getElementById('previewSynthesisBlock'); const synthText = document.getElementById('previewSynthesisText');
                 document.getElementById('previewSynthesis').classList.remove('fullscreen-mode');
                 if (note.synthesis) { synthBlock.style.display = 'block'; synthText.innerHTML = uiHelpers.escapeHtml(note.synthesis).replace(/\n/g, '<br>'); } else synthBlock.style.display = 'none';
+                
                 const coresUl = document.getElementById('previewCores');
                 if(note.cores && note.cores.length > 0) coresUl.innerHTML = note.cores.map(c => `<li>${uiHelpers.escapeHtml(c)}</li>`).join(''); else coresUl.innerHTML = '<li style="opacity:0.5;">Çekirdek eklenmemiş.</li>';
                 document.getElementById('previewSource').innerHTML = uiHelpers.escapeHtml(note.source).replace(/\n/g, '<br>');
+                
+                // Giden Bağlantılar
                 const linksContainer = document.getElementById('previewLinkedNodes');
-                if(!note.links || note.links.length === 0) linksContainer.innerHTML = '<div style="opacity:0.5; font-size:0.75rem;">Bu istasyona bağlı not yok.</div>';
+                if(!note.links || note.links.length === 0) linksContainer.innerHTML = '<div style="opacity:0.5; font-size:0.75rem;">Giden bağlantı yok.</div>';
                 else linksContainer.innerHTML = note.links.map(linkId => {
                     const linked = db.getNote(linkId); if(!linked) return '';
                     return `<div class="link-preview-box" onclick="dbManager.openPreview('${linked.id}')"><div class="link-header"><span>${linked.displayId} - ${uiHelpers.escapeHtml(linked.title || linked.tag)}</span></div><div style="color:var(--text-primary); opacity:0.9;">${uiHelpers.escapeHtml((linked.synthesis || linked.source).substring(0, 60))}...</div></div>`;
                 }).join('');
+
+                // Geri Bağlantılar (Backlinks)
+                const backlinksBlock = document.getElementById('previewBacklinksBlock');
+                const backlinksContainer = document.getElementById('previewBacklinkedNodes');
+                const backlinks = db.getBacklinks(id);
+                if(backlinks.length === 0) {
+                    backlinksBlock.style.display = 'none';
+                } else {
+                    backlinksBlock.style.display = 'block';
+                    backlinksContainer.innerHTML = backlinks.map(linked => {
+                        return `<div class="link-preview-box" onclick="dbManager.openPreview('${linked.id}')"><div class="link-header"><span>${linked.displayId} - ${uiHelpers.escapeHtml(linked.title || linked.tag)}</span></div><div style="color:var(--text-primary); opacity:0.9;">${uiHelpers.escapeHtml((linked.synthesis || linked.source).substring(0, 60))}...</div></div>`;
+                    }).join('');
+                }
+
                 document.getElementById('btnEditNote').onclick = () => appController.loadNoteForEdit(id);
                 document.getElementById('btnDeleteNote').onclick = () => db.deleteNote(id);
                 modal.showModal();
