@@ -3,205 +3,577 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ToDo</title>
-
+<title>FlashStudy — Sınav Hazırlık</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont;
-}
+  :root {
+    --bg: #0d0d0f;
+    --surface: #161618;
+    --surface2: #1e1e21;
+    --border: #2a2a2e;
+    --accent: #c8f04a;
+    --accent2: #4af0c8;
+    --text: #e8e8ec;
+    --muted: #666672;
+    --danger: #f04a6a;
+    --success: #4af0a0;
+    --warning: #f0c84a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Instrument Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0; opacity:0.5;
+  }
+  .app { position:relative; z-index:1; }
 
-body {
-    background: #f2f2f2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+  /* HEADER */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 32px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:100;
+    background:rgba(13,13,15,0.92); backdrop-filter:blur(12px); gap:12px;
+  }
+  .logo { font-family:'Fraunces',serif; font-size:20px; font-weight:900; color:var(--accent); letter-spacing:-0.5px; white-space:nowrap; }
+  .logo span { color:var(--text); }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 
-/* APP */
-.app {
-    width: 360px;
-    height: 720px;
-    background: #fff;
-    border-radius: 30px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-}
+  /* BUTTONS */
+  .btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:7px 16px; border-radius:6px;
+    font-family:'DM Mono',monospace; font-size:11px; font-weight:500;
+    cursor:pointer; border:1px solid var(--border);
+    background:var(--surface); color:var(--text);
+    transition:all 0.15s; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;
+  }
+  .btn:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-accent { background:var(--accent); color:#0d0d0f; border-color:var(--accent); }
+  .btn-accent:hover { background:#d4f55c; border-color:#d4f55c; color:#0d0d0f; }
+  .btn-danger { background:rgba(240,74,106,0.1); color:var(--danger); border-color:rgba(240,74,106,0.4); }
+  .btn-danger:hover { background:rgba(240,74,106,0.2); color:var(--danger); border-color:var(--danger); }
+  .btn-sm { padding:5px 11px; font-size:10px; }
 
-/* HEADER */
-.header {
-    padding: 25px;
-}
+  /* UPLOAD */
+  #upload-screen {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:calc(100vh - 57px); padding:40px; text-align:center;
+  }
+  .upload-hero { font-family:'Fraunces',serif; font-size:clamp(36px,6vw,78px); font-weight:900; line-height:0.95; margin-bottom:16px; letter-spacing:-2px; }
+  .upload-hero em { font-style:italic; font-weight:300; color:var(--accent); }
+  .upload-sub { color:var(--muted); font-size:15px; margin-bottom:44px; max-width:400px; line-height:1.6; }
+  .drop-zone {
+    width:100%; max-width:500px; border:1.5px dashed var(--border); border-radius:16px;
+    padding:52px 40px; background:var(--surface); cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden;
+  }
+  .drop-zone::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,rgba(200,240,74,0.04) 0%,transparent 70%); }
+  .drop-zone:hover,.drop-zone.drag-over { border-color:var(--accent); background:rgba(200,240,74,0.04); }
+  .drop-zone input { display:none; }
+  .drop-icon { font-size:34px; margin-bottom:12px; display:block; }
+  .drop-zone h3 { font-family:'Fraunces',serif; font-size:18px; font-weight:600; margin-bottom:6px; }
+  .drop-zone p { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; }
+  .or-divider { display:flex; align-items:center; gap:16px; width:100%; max-width:500px; margin:22px 0; color:var(--muted); font-size:12px; font-family:'DM Mono',monospace; }
+  .or-divider::before,.or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .paste-area { width:100%; max-width:500px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; resize:vertical; min-height:110px; outline:none; transition:border-color 0.15s; }
+  .paste-area:focus { border-color:var(--accent); }
 
-.title {
-    font-size: 32px;
-    font-weight: 800;
-}
+  /* STUDY */
+  #study-screen { display:none; }
+  .study-layout { display:grid; grid-template-columns:270px 1fr; min-height:calc(100vh - 57px); }
 
-.date {
-    color: gray;
-    margin-top: 5px;
-}
+  /* SIDEBAR */
+  .sidebar { border-right:1px solid var(--border); padding:20px 0; overflow-y:auto; position:sticky; top:57px; height:calc(100vh - 57px); background:var(--surface); }
+  .sidebar-section-title { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); padding:0 18px 14px; }
+  .sidebar-divider { height:1px; background:var(--border); margin:10px 0; }
+  .karma-item { padding:11px 18px; cursor:pointer; border-left:3px solid transparent; transition:all 0.15s; display:flex; align-items:center; gap:10px; }
+  .karma-item:hover { background:var(--surface2); }
+  .karma-item.active { border-left-color:var(--accent2); background:rgba(74,240,200,0.06); }
+  .karma-item-name { font-size:13px; font-weight:600; color:var(--accent2); }
+  .deck-item { padding:11px 18px; cursor:pointer; border-left:3px solid transparent; transition:all 0.15s; }
+  .deck-item:hover { background:var(--surface2); }
+  .deck-item.active { border-left-color:var(--accent); background:rgba(200,240,74,0.06); }
+  .deck-item-name { font-size:13px; font-weight:500; margin-bottom:5px; line-height:1.3; }
+  .deck-item-count { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+  .deck-progress-bar-bg { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:6px; }
+  .deck-progress-bar-fill { height:100%; border-radius:2px; background:var(--accent); transition:width 0.4s ease; }
+  .deck-progress-pct { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:3px; }
+  .sidebar-footer { padding:14px 18px 0; border-top:1px solid var(--border); margin-top:12px; }
 
-/* TASK */
-.task {
-    display: flex;
-    align-items: center;
-    margin-top: 12px;
-}
+  /* MAIN */
+  .main-content { padding:36px 40px; max-width:920px; }
+  .deck-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; gap:16px; flex-wrap:wrap; }
+  .deck-title { font-family:'Fraunces',serif; font-size:30px; font-weight:900; letter-spacing:-1px; line-height:1.1; display: flex; align-items: center; gap: 12px;}
+  .deck-subtitle { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; margin-top:5px; }
+  .deck-header-right { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .mode-tabs { display:flex; gap:3px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:3px; }
+  .mode-tab { padding:6px 14px; border-radius:5px; font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; border:none; background:none; color:var(--muted); transition:all 0.15s; }
+  .mode-tab.active { background:var(--accent); color:#0d0d0f; font-weight:500; }
 
-.task input {
-    margin-right: 10px;
-}
+  /* TOGGLE */
+  .toggle-wrap { display:flex; align-items:center; gap:7px; cursor:pointer; }
+  .toggle { width:34px; height:19px; border-radius:10px; background:var(--border); position:relative; transition:background 0.2s; flex-shrink:0; }
+  .toggle.on { background:var(--accent); }
+  .toggle::after { content:''; position:absolute; top:3px; left:3px; width:13px; height:13px; border-radius:50%; background:#fff; transition:transform 0.2s; }
+  .toggle.on::after { transform:translateX(15px); }
+  .toggle-label { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
 
-.task.done span {
-    text-decoration: line-through;
-    color: gray;
-}
+  /* PROGRESS */
+  .progress-wrap { margin-bottom:28px; }
+  .progress-info { display:flex; justify-content:space-between; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:8px; }
+  .progress-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width 0.3s ease; }
 
-/* INPUT */
-.input {
-    width: 100%;
-    margin-top: 15px;
-    padding: 10px 0;
-    border: none;
-    border-top: 1px solid #eee;
-    outline: none;
-}
+  /* STATS BAR */
+  .stats-bar { display:flex; gap:20px; flex-wrap:wrap; padding:12px 18px; background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:22px; }
+  .stat-item { display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:11px; }
+  .stat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .stat-dot.green { background:var(--success); }
+  .stat-dot.red { background:var(--danger); }
+  .stat-dot.yellow { background:var(--warning); }
+  .stat-val { font-weight:500; color:var(--text); }
+  .stat-lbl { color:var(--muted); }
 
-/* DAYS */
-.days {
-    margin-top: auto;
-}
+  /* FLASHCARD */
+  .card-stage { perspective:1200px; margin-bottom:24px; position: relative;}
+  .card { width:100%; min-height:270px; position:relative; transform-style:preserve-3d; transition:transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor:pointer; }
+  .card.flipped { transform:rotateY(180deg); }
+  .card-face { position:absolute; inset:0; border-radius:16px; padding:36px 44px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; backface-visibility:hidden; -webkit-backface-visibility:hidden; min-height:270px; }
+  .card-front { background:var(--surface); border:1px solid var(--border); }
+  .card-back { background:linear-gradient(135deg,rgba(200,240,74,0.08) 0%,rgba(74,240,200,0.06) 100%); border:1px solid rgba(200,240,74,0.2); transform:rotateY(180deg); }
+  .card-label { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:18px; align-self:flex-start; display:flex; justify-content:space-between; width:100%;}
+  .card-back .card-label { color:var(--accent); }
+  .card-content { font-size:20px; font-weight:500; line-height:1.5; }
+  .card-back .card-content { font-size:17px; line-height:1.65; color:#e0e0e8; }
+  .card-hint { margin-top:22px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
 
-.day {
-    padding: 20px;
-    font-size: 22px;
-    font-weight: bold;
-    background: #eee;
-    border-top: 1px solid #ddd;
-    cursor: pointer;
-}
+  /* CARD NAV & REACTION */
+  .card-nav { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:20px; }
+  .nav-btn { width:42px; height:42px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+  .nav-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .nav-btn:disabled { opacity:0.25; cursor:not-allowed; }
+  .card-counter { font-family:'Fraunces',serif; font-size:26px; font-weight:600; min-width:70px; text-align:center; letter-spacing:-1px; }
+  .card-counter span { color:var(--muted); font-size:15px; font-weight:300; }
 
-.day.active {
-    background: #ccc;
-}
+  .reaction-row { display:flex; gap:10px; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s; transform: translateY(-10px); }
+  .reaction-row.visible { opacity:1; pointer-events:auto; transform: translateY(0); }
+  .reaction-btn { flex:1; max-width:160px; padding:11px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-family:'DM Mono',monospace; font-size:12px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .reaction-btn.wrong:hover { background:rgba(240,74,106,0.1); border-color:var(--danger); color:var(--danger); }
+  .reaction-btn.hard:hover { background:rgba(240,200,74,0.1); border-color:var(--warning); color:var(--warning); }
+  .reaction-btn.correct:hover { background:rgba(74,240,160,0.1); border-color:var(--success); color:var(--success); }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(13,13,15,0.85); backdrop-filter:blur(5px); z-index:999; display:none; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.active { display:flex; animation:fadeIn 0.2s ease; }
+  .modal-content { background:var(--surface); border:1px solid var(--border); border-radius:16px; width:100%; max-width:500px; padding:32px; box-shadow:0 20px 40px rgba(0,0,0,0.4); animation:slideUp 0.3s ease; }
+  .modal-title { font-family:'Fraunces',serif; font-size:24px; font-weight:600; margin-bottom:20px; color:var(--accent); }
+  .form-group { margin-bottom:16px; }
+  .form-group label { display:block; font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; letter-spacing:0.5px; }
+  .form-control { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; color:var(--text); font-family:'Instrument Sans',sans-serif; font-size:14px; min-height:80px; resize:vertical; outline:none; transition:0.2s; }
+  .form-control:focus { border-color:var(--accent); }
+  .modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
+
+  /* DECK COMPLETE & OTHERS */
+  .deck-complete { text-align:center; padding:48px 0; animation:slideIn 0.4s ease; }
+  .deck-complete .big-num { font-family:'Fraunces',serif; font-size:72px; font-weight:900; color:var(--accent); letter-spacing:-3px; line-height:1; }
+  .deck-complete h3 { font-family:'Fraunces',serif; font-size:22px; font-weight:600; margin:12px 0 6px; }
+  .deck-complete p { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; margin-bottom:24px; }
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:380px; color:var(--muted); text-align:center; gap:12px; }
+  .empty-state .icon { font-size:38px; }
+
+  @keyframes slideIn { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
+  @keyframes fadeIn { from{opacity:0;}to{opacity:1;} }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+
+  @media (max-width:720px) {
+    .study-layout { grid-template-columns:1fr; }
+    .sidebar { display:none; }
+    .main-content { padding:20px; }
+  }
 </style>
-
 </head>
 <body>
-
 <div class="app">
 
-    <div class="header">
-        <div class="title" id="title">MONDAY</div>
-        <div class="date" id="date"></div>
+<header>
+  <div class="logo">Flash<span>Study</span></div>
+  <div class="header-actions" id="header-actions"></div>
+</header>
 
-        <div id="tasks"></div>
+<div id="upload-screen">
+  <div class="upload-hero">Sınava<br><em>hazır</em> mısın?</div>
+  <p class="upload-sub">PDF'inden oluşturulan flashcard JSON dosyasını yükle, hemen çalışmaya başla.</p>
+  <label class="drop-zone" id="drop-zone">
+    <input type="file" accept=".json" onchange="loadFromFile(event)">
+    <span class="drop-icon">📂</span>
+    <h3>JSON Dosyasını Bırak</h3>
+    <p>ya da tıkla ve seç</p>
+  </label>
+  <div class="or-divider">ya da</div>
+  <textarea class="paste-area" id="paste-area" placeholder='JSON içeriğini buraya yapıştır...'></textarea>
+  <div class="load-btn-wrap">
+    <button class="btn btn-accent" onclick="loadFromPaste()">Yükle →</button>
+  </div>
+</div>
 
-        <input class="input" id="input" placeholder="Add task...">
+<div id="study-screen">
+  <div class="study-layout">
+    <aside class="sidebar">
+      <div id="sidebar-content"></div>
+      <div class="sidebar-footer">
+        <label class="btn" style="width:100%;justify-content:center;cursor:pointer;">
+          ↑ JSON Yükle <input type="file" accept=".json" onchange="loadFromFile(event)" style="display:none">
+        </label>
+      </div>
+    </aside>
+    <main class="main-content" id="main-content">
+      <div class="empty-state"><span class="icon">👈</span><p>Sol menüden bir bölüm seç</p></div>
+    </main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-content">
+    <div class="modal-title" id="modal-title">Kart Düzenle</div>
+    <div class="form-group">
+      <label>Ön Yüz (Soru)</label>
+      <textarea class="form-control" id="modal-front"></textarea>
     </div>
-
-    <div class="days" id="days"></div>
-
+    <div class="form-group">
+      <label>Arka Yüz (Cevap)</label>
+      <textarea class="form-control" id="modal-back"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">İptal</button>
+      <button class="btn btn-accent" onclick="saveCard()">Kaydet</button>
+    </div>
+  </div>
 </div>
 
 <script>
+// ═══════════ STATE ═══════════
+let allDecks = [];
+let currentDeckIndex = null; 
+let currentDeck = null;
+let currentMode = 'flashcard';
 
-const days = ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];
-let currentDay = localStorage.getItem("day") || "MONDAY";
+let shuffleOn = false;
+let cardOrder = [];
+let cardPos = 0;
+let cardFlipped = false;
+let wrongQueue = [];
+let retryMode = false;
+let deckStats = {};
 
-const tasksEl = document.getElementById("tasks");
-const input = document.getElementById("input");
+// Modal States
+let editingCardIndex = -1; 
+let isCreatingNew = false;
 
-document.getElementById("date").innerText = new Date().toDateString();
-
-function getData(){
-    return JSON.parse(localStorage.getItem("todo") || "{}");
+// ═══════════ LOAD ═══════════
+function loadFromFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => parseAndLoad(ev.target.result);
+  r.readAsText(f);
 }
-
-function saveData(data){
-    localStorage.setItem("todo", JSON.stringify(data));
+function loadFromPaste() {
+  const t = document.getElementById('paste-area').value.trim();
+  if (!t) return alert('Lütfen JSON yapıştır.');
+  parseAndLoad(t);
 }
-
-function renderDays(){
-    const daysEl = document.getElementById("days");
-    daysEl.innerHTML = "";
-
-    days.forEach(d=>{
-        const el = document.createElement("div");
-        el.className = "day" + (d===currentDay ? " active":"");
-        el.innerText = d;
-
-        el.onclick = ()=>{
-            currentDay = d;
-            localStorage.setItem("day", d);
-            render();
-        };
-
-        daysEl.appendChild(el);
+function parseAndLoad(text) {
+  try {
+    const data = JSON.parse(text);
+    if (!data.decks || !Array.isArray(data.decks)) throw new Error('decks dizisi bulunamadı');
+    allDecks = data.decks;
+    allDecks.forEach(d => {
+      if (!deckStats[d.title]) deckStats[d.title] = { correct:0, wrong:0, hard:0, seen:new Set() };
     });
+    document.getElementById('upload-screen').style.display = 'none';
+    document.getElementById('study-screen').style.display = 'block';
+    document.getElementById('header-actions').innerHTML = `<button class="btn" onclick="showUpload()">↑ Yeni Yükle</button>`;
+    renderSidebar();
+    if (allDecks.length > 0) selectDeck(0);
+  } catch(e) { alert('JSON ayrıştırılamadı: ' + e.message); }
+}
+function showUpload() {
+  document.getElementById('upload-screen').style.display = 'flex';
+  document.getElementById('study-screen').style.display = 'none';
 }
 
-function renderTasks(){
-    const data = getData();
-    const list = data[currentDay] || [];
+// ═══════════ SIDEBAR ═══════════
+function renderSidebar() {
+  let html = `<div class="sidebar-section-title">Bölümler</div>`;
+  html += `
+    <div class="karma-item ${currentDeckIndex===-1?'active':''}" onclick="selectKarmaTest()">
+      <span style="font-size:15px">⚡</span>
+      <div class="karma-item-name">Karma Test</div>
+    </div>
+    <div class="sidebar-divider"></div>
+  `;
+  allDecks.forEach((deck, i) => {
+    const st = deckStats[deck.title] || {correct:0,wrong:0,hard:0,seen:new Set()};
+    const total = (deck.cards||[]).length;
+    const pct = total > 0 ? Math.round((st.seen.size / total) * 100) : 0;
+    html += `
+      <div class="deck-item ${currentDeckIndex===i?'active':''}" onclick="selectDeck(${i})">
+        <div class="deck-item-name">${deck.title}</div>
+        <div class="deck-item-count">${total} kart</div>
+        <div class="deck-progress-bar-bg"><div class="deck-progress-bar-fill" style="width:${pct}%"></div></div>
+        <div class="deck-progress-pct">${pct}% tamamlandı</div>
+      </div>
+    `;
+  });
+  document.getElementById('sidebar-content').innerHTML = html;
+}
 
-    tasksEl.innerHTML = "";
+// ═══════════ SELECT & ALGORITHM ═══════════
+function selectDeck(i) {
+  currentDeckIndex = i;
+  currentDeck = allDecks[i];
+  currentMode = 'flashcard';
+  resetCardState();
+  renderSidebar();
+  renderDeck();
+}
+function selectKarmaTest() {
+  alert("Karma test şu an inşaa aşamasında. Lütfen bölümlerden birini seç.");
+}
+function resetCardState() {
+  const cards = currentDeck ? (currentDeck.cards||[]) : [];
+  cardOrder = cards.map((_,i)=>i);
+  
+  if (shuffleOn && currentDeck) {
+    // Akıllı Sıralama (Spaced Repetition Mantığı)
+    // Yanlış bilinen kartlar öne gelsin
+    const st = deckStats[currentDeck.title];
+    cardOrder.sort((a, b) => {
+      let weightA = 0, weightB = 0;
+      if (st.seen.has(a)) weightA = -1; // Bilinenler sona gitsin
+      if (wrongQueue.includes(a)) weightA = 10; // Yanlışlar en öne
 
-    list.forEach((t,i)=>{
-        const div = document.createElement("div");
-        div.className = "task" + (t.done ? " done":"");
-
-        const check = document.createElement("input");
-        check.type = "checkbox";
-        check.checked = t.done;
-
-        check.onchange = ()=>{
-            t.done = !t.done;
-            saveData(data);
-            render();
-        };
-
-        const span = document.createElement("span");
-        span.innerText = t.text;
-
-        div.append(check, span);
-        tasksEl.appendChild(div);
+      if (st.seen.has(b)) weightB = -1;
+      if (wrongQueue.includes(b)) weightB = 10;
+      
+      // Aynı ağırlıktakileri kendi içinde karıştır
+      if(weightA === weightB) return Math.random() - 0.5;
+      return weightB - weightA;
     });
+  }
+  cardPos = 0; cardFlipped = false; wrongQueue = []; retryMode = false;
+}
+function toggleShuffle() { shuffleOn=!shuffleOn; resetCardState(); renderDeck(); }
+
+// ═══════════ RENDER DECK ═══════════
+function renderDeck() {
+  const main = document.getElementById('main-content');
+  const cards = currentDeck.cards||[];
+  const st = deckStats[currentDeck.title];
+  const seenCount = st.correct + st.wrong + st.hard;
+
+  main.innerHTML = `
+    <div class="deck-header">
+      <div>
+        <div class="deck-title">${currentDeck.title} <button class="btn btn-sm btn-accent" onclick="openModal(true)" style="margin-left:8px;">➕ Yeni Kart</button></div>
+        <div class="deck-subtitle">${cards.length} flashcard</div>
+      </div>
+      <div class="deck-header-right">
+        <div class="toggle-wrap" onclick="toggleShuffle()">
+          <div class="toggle ${shuffleOn?'on':''}" ></div>
+          <div class="toggle-label">🔀 Akıllı Karıştır</div>
+        </div>
+      </div>
+    </div>
+
+    ${seenCount > 0 ? `
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-dot green"></div><span class="stat-val">${st.correct}</span><span class="stat-lbl">&nbsp;Biliyor</span></div>
+      <div class="stat-item"><div class="stat-dot yellow"></div><span class="stat-val">${st.hard}</span><span class="stat-lbl">&nbsp;Zor</span></div>
+      <div class="stat-item"><div class="stat-dot red"></div><span class="stat-val">${st.wrong}</span><span class="stat-lbl">&nbsp;Bilmiyor</span></div>
+      <div class="stat-item" style="margin-left:auto"><span class="stat-lbl">Görülen:&nbsp;</span><span class="stat-val">${seenCount}/${cards.length}</span></div>
+    </div>` : ''}
+
+    <div id="flashcard-mode">
+      ${!cards.length ? '<div class="empty-state"><span class="icon">🃏</span><p>Bu bölümde henüz kart yok. Yukarıdan ekleyebilirsin.</p></div>' : buildFlashcardHTML(cards)}
+    </div>
+  `;
 }
 
-input.addEventListener("keypress", e=>{
-    if(e.key==="Enter" && input.value.trim()){
-        const data = getData();
+// ═══════════ FLASHCARD HTML ═══════════
+function buildFlashcardHTML(cards) {
+  const queue = retryMode ? wrongQueue : cardOrder;
+  if (!queue.length) return buildCompleteHTML();
+  const ci = queue[cardPos];
+  const card = cards[ci];
+  const pct = Math.round(((cardPos+1)/queue.length)*100);
+  
+  return `
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span>${retryMode?'🔁 Yanlışlar Tekrarı':'İlerleme'}</span>
+        <span>${cardPos+1} / ${queue.length}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    
+    <div class="card-stage">
+      <div class="card" id="fc" onclick="flipCard()">
+        <div class="card-face card-front">
+          <div class="card-label">Soru <button class="btn btn-sm" onclick="event.stopPropagation(); openModal(false)" style="padding:2px 6px;">✏️ Düzenle</button></div>
+          <div class="card-content">${card.front}</div>
+          <div class="card-hint">Tıkla veya Boşluk ile çevir</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-label">Cevap</div>
+          <div class="card-content">${card.back}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reaction-row" id="reaction-row">
+      <button class="reaction-btn wrong" onclick="markCard('wrong')">✗ Bilmedim</button>
+      <button class="reaction-btn hard" onclick="markCard('hard')">~ Zordu</button>
+      <button class="reaction-btn correct" onclick="markCard('correct')">✓ Bildim</button>
+    </div>
 
-        if(!data[currentDay]) data[currentDay]=[];
+    ${wrongQueue.length > 0 && !retryMode ? `
+    <div class="retry-banner" style="margin-top:30px;">
+      <p><strong>${wrongQueue.length}</strong> kart yanlış işaretlendi.</p>
+      <button class="btn btn-danger btn-sm" onclick="startRetry()">🔁 Yanlışları Tekrar Et</button>
+    </div>` : ''}
+  `;
+}
 
-        data[currentDay].push({
-            text: input.value,
-            done: false
-        });
+function buildCompleteHTML() {
+  const st = deckStats[currentDeck.title];
+  const total = st.correct + st.wrong + st.hard;
+  const pct = total > 0 ? Math.round((st.correct/total)*100) : 0;
+  return `
+    <div class="deck-complete">
+      <div class="big-num">${pct}%</div>
+      <h3>${pct>=80?'Harika iş! 🎉':pct>=50?'Fena değil! 👍':'Biraz daha çalış 💪'}</h3>
+      <p>${st.correct} doğru · ${st.wrong} yanlış · ${st.hard} zor</p>
+      <div class="deck-complete-btns">
+        <button class="btn btn-accent" onclick="restartDeck()">↺ Baştan Başla</button>
+        ${st.wrong>0?`<button class="btn btn-danger" onclick="startRetry()">🔁 Yanlışları Tekrar Et</button>`:''}
+      </div>
+    </div>
+  `;
+}
 
-        saveData(data);
-        input.value="";
-        render();
+// ─── CARD ACTIONS ───
+function flipCard() {
+  const el = document.getElementById('fc'); if(!el) return;
+  cardFlipped = !cardFlipped; 
+  el.classList.toggle('flipped', cardFlipped);
+  
+  // Kart çevrildiğinde aksiyon butonlarını göster
+  const reactionRow = document.getElementById('reaction-row');
+  if(reactionRow) {
+    if(cardFlipped) {
+      reactionRow.classList.add('visible');
+    } else {
+      reactionRow.classList.remove('visible');
     }
+  }
+}
+
+function markCard(type) {
+  if (!currentDeck || !cardFlipped) return; // Çevirmeden basılamaz
+  
+  const queue = retryMode ? wrongQueue : cardOrder;
+  const ci = queue[cardPos];
+  const st = deckStats[currentDeck.title];
+  
+  st[type]++; 
+  st.seen.add(ci);
+  
+  if (type==='wrong' && !retryMode && !wrongQueue.includes(ci)) {
+    wrongQueue.push(ci);
+  }
+  
+  renderSidebar();
+  
+  // Sıradaki karta pürüzsüz geç
+  const cardEl = document.getElementById('fc');
+  cardEl.style.transform = "rotateY(0deg) scale(0.95)";
+  cardEl.style.opacity = "0";
+  
+  setTimeout(() => {
+     cardFlipped = false;
+     if (cardPos < queue.length-1) { 
+        cardPos++; 
+        renderDeck(); 
+     } else { 
+        renderDeck(); // Complete screen
+     }
+  }, 250); // Kartın kaybolması için ufak bir gecikme
+}
+
+function startRetry() { retryMode=true; cardPos=0; cardFlipped=false; renderDeck(); }
+function restartDeck() {
+  deckStats[currentDeck.title]={correct:0,wrong:0,hard:0,seen:new Set()};
+  resetCardState(); renderSidebar(); renderDeck();
+}
+
+// ═══════════ CRUD (EKLEME & DÜZENLEME) ═══════════
+function openModal(isNew = false) {
+  const modal = document.getElementById('edit-modal');
+  isCreatingNew = isNew;
+  
+  if (isCreatingNew) {
+    document.getElementById('modal-title').innerText = "Yeni Kart Ekle";
+    document.getElementById('modal-front').value = "";
+    document.getElementById('modal-back').value = "";
+  } else {
+    document.getElementById('modal-title').innerText = "Kartı Düzenle";
+    const queue = retryMode ? wrongQueue : cardOrder;
+    editingCardIndex = queue[cardPos];
+    const card = currentDeck.cards[editingCardIndex];
+    document.getElementById('modal-front').value = card.front;
+    document.getElementById('modal-back').value = card.back;
+  }
+  
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('active');
+}
+
+function saveCard() {
+  const frontText = document.getElementById('modal-front').value.trim();
+  const backText = document.getElementById('modal-back').value.trim();
+  
+  if(!frontText || !backText) {
+    alert("Lütfen ön ve arka yüzü doldurun.");
+    return;
+  }
+  
+  if (isCreatingNew) {
+    if (!currentDeck.cards) currentDeck.cards = [];
+    currentDeck.cards.push({ front: frontText, back: backText });
+    resetCardState(); // Yeni kart eklendiği için sırayı güncelle
+  } else {
+    currentDeck.cards[editingCardIndex].front = frontText;
+    currentDeck.cards[editingCardIndex].back = backText;
+  }
+  
+  closeModal();
+  renderSidebar();
+  renderDeck();
+}
+
+// ═══════════ KEYBOARD ═══════════
+document.addEventListener('keydown', e => {
+  if (!currentDeck || document.getElementById('edit-modal').classList.contains('active')) return;
+  if (e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT') return;
+  if (e.key===' ') { e.preventDefault(); flipCard(); }
+  else if (e.key==='1' && cardFlipped) markCard('wrong');
+  else if (e.key==='2' && cardFlipped) markCard('hard');
+  else if (e.key==='3' && cardFlipped) markCard('correct');
 });
 
-function render(){
-    document.getElementById("title").innerText = currentDay;
-    renderDays();
-    renderTasks();
-}
-
-render();
-
 </script>
-
 </body>
 </html>
