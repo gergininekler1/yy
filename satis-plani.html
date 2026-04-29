@@ -1,552 +1,168 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yazarın Atölyesi - Minimalist Blog Notları</title>
-    <style>
-        /* Genel Stiller - Minimalist ve Temiz */
-        :root {
-            --bg-color: #f8f8f8;
-            --text-color: #333;
-            --card-bg: #fff;
-            --border-color: #e0e0e0;
-            --accent-color: #ef4444; /* image_1.png'deki kırmızı kontrol işareti */
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --modal-bg: rgba(0, 0, 0, 0.5);
-            --transition: all 0.2s ease;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To Do List</title>
 
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #e0e0e0;
-            --card-bg: #2a2a2a;
-            --border-color: #3a3a3a;
-            --accent-color: #f87171;
-            --modal-bg: rgba(255, 255, 255, 0.1);
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-color;
-            transition: var(--transition);
-        }
+body {
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
 
-        .app-container {
-            width: 100%;
-            max-width: 480px; /* iPhone genişliği gibi dikey tutmak için */
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+.container {
+    width: 350px;
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
 
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
+/* HEADER */
+.header {
+    padding: 20px;
+}
 
-        header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
+.header h1 {
+    font-size: 28px;
+    font-weight: bold;
+}
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
+.date {
+    color: gray;
+    font-size: 14px;
+    margin-top: 5px;
+}
 
-        button {
-            background: none;
-            border: 1px solid var(--border-color);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            color: var(--text-color);
-            transition: var(--transition);
-        }
+/* TASK LIST */
+.task-list {
+    margin-top: 15px;
+}
 
-        button:hover {
-            border-color: var(--text-color);
-        }
+.task {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
 
-        #theme-toggle {
-            font-size: 1.2rem;
-        }
+.task input {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
 
-        /* Not Listesi ve Kartları */
-        .note-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+.task span {
+    font-size: 15px;
+}
 
-        .note-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+.task.completed span {
+    text-decoration: line-through;
+    color: gray;
+}
 
-        .note-card:hover {
-            border-color: var(--text-color);
-        }
+/* INPUT */
+.add-task {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-top: 1px solid #eee;
+    outline: none;
+}
 
-        .note-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-        }
+/* DAYS */
+.days {
+    margin-top: 10px;
+}
 
-        .note-title {
-            width: 100%;
-            font-size: 1.25rem;
-            font-weight: 700;
-            border: none;
-            background: none;
-            color: var(--text-color);
-            padding: 0;
-            margin: 0;
-            outline: none;
-            letter-spacing: -0.2px;
-        }
+.day {
+    padding: 18px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #eee;
+    border-top: 1px solid #ddd;
+}
+</style>
 
-        .method-selector {
-            font-size: 0.75rem;
-            padding: 4px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-
-        .note-content-area {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* Not Metodları Alanları */
-        textarea {
-            width: 100%;
-            border: none;
-            background: none;
-            color: var(--text-color);
-            font-family: var(--font-family);
-            font-size: 0.9375rem;
-            line-height: 1.6;
-            resize: vertical;
-            min-height: 100px;
-            padding: 5px 0;
-            outline: none;
-        }
-
-        textarea::placeholder {
-            color: #aaa;
-        }
-
-        /* Cornell Metodu */
-        .cornell-notes {
-            display: grid;
-            grid-template-areas: "cues detailed" "summary summary";
-            grid-template-columns: 35% 65%;
-            grid-template-rows: auto auto;
-            gap: 15px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
-
-        .cornell-cues-area { grid-area: cues; }
-        .cornell-detailed-area { grid-area: detailed; border-left: 1px solid var(--border-color); padding-left: 15px; }
-        .cornell-summary-area { grid-area: summary; border-top: 1px solid var(--border-color); padding-top: 15px; }
-
-        .cornell-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #888;
-            margin-bottom: 5px;
-        }
-
-        /* Taslak Metodu */
-        .outline-list {
-            margin-top: 10px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-        }
-
-        .outline-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .outline-marker {
-            color: var(--accent-color);
-            font-size: 1.2rem;
-            margin-top: -3px;
-        }
-
-        .outline-text {
-            font-size: 0.9375rem;
-            line-height: 1.5;
-        }
-
-        /* Zettelkasten */
-        .zettel-connection {
-            border-top: 1px solid var(--border-color);
-            padding-top: 10px;
-            margin-top: 10px;
-        }
-
-        .zettel-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .zettel-link-field {
-            width: 100%;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 8px;
-            font-size: 0.8rem;
-            color: var(--text-color);
-            background: var(--bg-color);
-        }
-
-        /* Not Kartı Alt İşlemler */
-        .note-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .delete-note {
-            color: #ef4444;
-            border-color: #ef4444;
-            padding: 6px 10px;
-            font-size: 0.75rem;
-        }
-
-        .delete-note:hover {
-            background-color: rgba(239, 68, 68, 0.1);
-        }
-
-        /* Tıkanıklık Soruları Modali */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: var(--modal-bg);
-            transition: var(--transition);
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            margin: 10% auto;
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-        }
-
-        .close-btn {
-            color: #aaa;
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close-btn:hover {
-            color: var(--text-color);
-        }
-
-        .modal h2 {
-            margin-top: 0;
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: -0.4px;
-            margin-bottom: 20px;
-        }
-
-        .question-section {
-            margin-bottom: 20px;
-        }
-
-        .question-category {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-        }
-
-        .question-item {
-            font-size: 0.9375rem;
-            line-height: 1.6;
-            margin-bottom: 8px;
-            padding-left: 15px;
-            position: relative;
-        }
-
-        .question-item::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--accent-color);
-        }
-
-    </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <header>
-            <h1>Yazarın Atölyesi</h1>
-            <div class="header-actions">
-                <button id="theme-toggle">☀️</button>
-                <button id="questions-btn">Tıkanıklık Kılavuzu</button>
+<div class="container">
+
+    <div class="header">
+        <h1>MONDAY</h1>
+        <div class="date" id="date"></div>
+
+        <div class="task-list" id="taskList">
+            <div class="task">
+                <input type="checkbox">
+                <span>Read 10 pages</span>
             </div>
-        </header>
-
-        <div id="not-listesi" class="note-list">
+            <div class="task">
+                <input type="checkbox">
+                <span>Walk the dog</span>
             </div>
-
-        <button id="add-note-btn" style="width: 100%; font-size: 1rem; border-color: var(--text-color);">+</button>
-    </div>
-
-    <div id="questions-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>Fikir Kılavuzu (Tıkanınca Sorulacaklar)</h2>
-            <div id="questions-content">
-                </div>
         </div>
+
+        <input type="text" class="add-task" id="taskInput" placeholder="Add a new task...">
     </div>
 
-    <script>
-        // Tıkanıklık Giderme Soruları Verisi
-        const uniqueQuestionsList = [
-            {
-                category: "1. Kişisel Bağ ve Hikayeleştirme",
-                questions: [
-                    "Bu konuyu ilk ne zaman duydum veya hayatıma nasıl girdi?",
-                    "Bu konuda geçmişte yaptığım en büyük ve en utanç verici hata neydi?",
-                    "Bu konu hakkında 5 yıl önceki 'bana' bir tavsiye verecek olsam ne derdim?",
-                    "Bu konuyla ilgili başımdan geçen en komik veya en sinir bozucu olay neydi?"
-                ]
-            },
-            {
-                category: "2. Okuyucu (Çözüm) Odaklı",
-                questions: [
-                    "İnsanlar bu konu hakkında internette gizli gizli neyi aratıyor olabilir?",
-                    "Okuyucumun bu konudaki en büyük 'baş ağrısı' (problemi) ne ve ben ona nasıl bir ağrı kesici sunabilirim?",
-                    "Birisi bu yazıyı okuduktan hemen sonra kalkıp ne yapmalı? (Aksiyon adımı ne?)",
-                    "Bu konu, okuyucunun zaman, para veya enerji tasarrufu yapmasını nasıl sağlar?"
-                ]
-            },
-            {
-                category: "3. Zıt Köşe ve Eleştirel",
-                questions: [
-                    "Bu konu hakkında herkesin doğru bildiği ama aslında tamamen yanlış olan efsane ne?",
-                    "Sektördeki/alandaki 'uzmanların' bu konuda söylemeye çekindiği gerçek nedir?",
-                    "Eğer bu konuyu tamamen tersinden anlatsaydım (Örn: Nasıl başarılı olunur yerine, nasıl kesin başarısız olunur) ortaya ne çıkardı?",
-                    "Bu fikrin en zayıf noktası neresi ve bunu nasıl savunabilirim?"
-                ]
-            },
-            {
-                category: "4. Basitleştirme ve Alternatif Açılar",
-                questions: [
-                    "Eğer bu devasa konuyu sadece 3 maddeyle özetlemek zorunda kalsaydım, o maddeler ne olurdu?",
-                    "Bu konuyu, alanı hiç bilmeyen uzaylı bir turiste nasıl anlatırdım?",
-                    "Bu konu ile tamamen alakasız görünen başka bir hobim/ilgi alanım arasında nasıl bir metafor kurabilirim? (Örn: Yemek yapmak ile kod yazmak arasındaki benzerlikler)"
-                ]
-            }
-        ];
+    <div class="days">
+        <div class="day">TUESDAY</div>
+        <div class="day">WEDNESDAY</div>
+        <div class="day">THURSDAY</div>
+        <div class="day">FRIDAY</div>
+    </div>
 
-        // Temel Elementler
-        const noteListDiv = document.getElementById('not-listesi');
-        const questionsModal = document.getElementById('questions-modal');
-        const themeToggleButton = document.getElementById('theme-toggle');
+</div>
 
-        // Not Kartı Şablonu Oluşturma
-        function createNoteCard(title = "") {
-            const card = document.createElement('div');
-            card.className = 'note-card';
+<script>
 
-            card.innerHTML = `
-                <div class="note-header">
-                    <input type="text" class="note-title" placeholder="Yeni Yazı Fikri..." value="${title}">
-                    <select class="method-selector">
-                        <option value="none">Sade</option>
-                        <option value="cornell">Cornell</option>
-                        <option value="outline">Taslak</option>
-                    </select>
-                </div>
-                <div class="note-content-area">
-                    <textarea placeholder="Ana fikirler, taslaklar..."></textarea>
-                </div>
-                <div class="zettel-connection">
-                    <div class="zettel-label">İlgili Not ID (Zettelkasten Bağlantısı)</div>
-                    <input type="text" class="zettel-link-field" placeholder="#etiket veya not başlığı">
-                </div>
-                <div class="note-actions">
-                    <button class="delete-note">Sil</button>
-                </div>
-            `;
+// Tarih göster
+const dateEl = document.getElementById("date");
+const today = new Date();
+dateEl.innerText = today.toDateString();
 
-            // Metod Değiştirici Olay Dinleyicisi
-            const selector = card.querySelector('.method-selector');
-            selector.addEventListener('change', (e) => updateNoteContent(card, e.target.value));
+// Task ekleme
+const input = document.getElementById("taskInput");
+const taskList = document.getElementById("taskList");
 
-            // Silme Butonu Olay Dinleyicisi
-            card.querySelector('.delete-note').addEventListener('click', () => {
-                if (confirm("Bu notu silmek istediğine emin misin?")) card.remove();
-            });
+input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter" && input.value.trim() !== "") {
+        addTask(input.value);
+        input.value = "";
+    }
+});
 
-            return card;
-        }
+function addTask(text) {
+    const task = document.createElement("div");
+    task.className = "task";
 
-        // Metod Seçimine Göre İçerik Alanını Güncelleme
-        function updateNoteContent(card, method) {
-            const contentArea = card.querySelector('.note-content-area');
-            contentArea.innerHTML = ""; // Mevcut içeriği temizle
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
 
-            switch (method) {
-                case "none":
-                    contentArea.innerHTML = '<textarea placeholder="Ana fikirler, taslaklar..."></textarea>';
-                    break;
-                case "cornell":
-                    contentArea.innerHTML = `
-                        <div class="cornell-notes">
-                            <div class="cornell-cues-area">
-                                <div class="cornell-label">Cues (İpuçları)</div>
-                                <textarea placeholder="Anahtar sorular, kelimeler..."></textarea>
-                            </div>
-                            <div class="cornell-detailed-area">
-                                <div class="cornell-label">Detailed Notes</div>
-                                <textarea placeholder="Detaylı notlar, açıklamalar..."></textarea>
-                            </div>
-                            <div class="cornell-summary-area">
-                                <div class="cornell-label">Summary (Özet)</div>
-                                <textarea placeholder="Notun kısa özeti..."></textarea>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case "outline":
-                    contentArea.innerHTML = `
-                        <div class="outline-list">
-                            <div class="outline-item">
-                                <span class="outline-marker">▶</span>
-                                <div class="outline-text" contenteditable="true">Ana Başlık 1 (Yazmak için tıkla)</div>
-                            </div>
-                            <div class="outline-item" style="margin-left: 20px;">
-                                <span class="outline-marker">◦</span>
-                                <div class="outline-text" contenteditable="true">Alt başlık...</div>
-                            </div>
-                            <textarea placeholder="Diğer taslak maddeleri... (BuJo sembolleri kullanabilirsin • X >)"></textarea>
-                        </div>
-                    `;
-                    break;
-            }
-        }
+    const span = document.createElement("span");
+    span.innerText = text;
 
-        // Başlangıç Notlarını Yükle
-        function loadInitialNotes() {
-            // Örnek bir not ekleyelim
-            const initialNote = createNoteCard("Örnek Blog Yazısı Fikri");
-            noteListDiv.appendChild(initialNote);
-        }
+    checkbox.addEventListener("change", () => {
+        task.classList.toggle("completed");
+    });
 
-        // Not Ekleme Butonu Olay Dinleyicisi
-        document.getElementById('add-note-btn').addEventListener('click', () => {
-            const newNote = createNoteCard();
-            noteListDiv.appendChild(newNote);
-            newNote.querySelector('.note-title').focus();
-        });
+    task.appendChild(checkbox);
+    task.appendChild(span);
+    taskList.appendChild(task);
+}
 
-        // Tıkanıklık Soruları Modalini Yönetme
-        function populateQuestionsModal() {
-            const contentDiv = document.getElementById('questions-content');
-            uniqueQuestionsList.forEach(section => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'question-section';
-                sectionDiv.innerHTML = `<div class="question-category">${section.category}</div>`;
-                section.questions.forEach(question => {
-                    sectionDiv.innerHTML += `<div class="question-item">${question}</div>`;
-                });
-                contentDiv.appendChild(sectionDiv);
-            });
-        }
+</script>
 
-        document.getElementById('questions-btn').onclick = () => questionsModal.style.display = "block";
-        questionsModal.querySelector('.close-btn').onclick = () => questionsModal.style.display = "none";
-        window.onclick = (event) => {
-            if (event.target == questionsModal) questionsModal.style.display = "none";
-        };
-
-        // Tema Değiştirme
-        function toggleTheme() {
-            if (document.body.getAttribute('data-theme') === 'dark') {
-                document.body.removeAttribute('data-theme');
-                themeToggleButton.textContent = "☀️";
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.body.setAttribute('data-theme', 'dark');
-                themeToggleButton.textContent = "🌙";
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-        themeToggleButton.addEventListener('click', toggleTheme);
-
-        // Başlangıç İşlemleri
-        // Tercih edilen temayı geri yükle
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-            themeToggleButton.textContent = "🌙";
-        }
-        populateQuestionsModal();
-        loadInitialNotes();
-
-    </script>
 </body>
 </html>
