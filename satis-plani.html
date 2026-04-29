@@ -3,59 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro ToDo</title>
+<title>ToDo</title>
 
 <style>
-:root {
-    --bg: #f2f2f2;
-    --card: #fff;
-    --text: #111;
-}
-
-body.dark {
-    --bg: #1c1c1e;
-    --card: #2c2c2e;
-    --text: #fff;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont;
 }
 
 body {
-    margin: 0;
-    font-family: -apple-system;
-    background: var(--bg);
+    background: #f2f2f2;
     display: flex;
     justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
+/* APP */
 .app {
     width: 360px;
-    height: 100vh;
-    background: var(--card);
+    height: 720px;
+    background: #fff;
     border-radius: 30px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
 }
 
 /* HEADER */
 .header {
-    padding: 20px;
+    padding: 25px;
 }
 
-h1 {
-    margin: 0;
-    color: var(--text);
+.title {
+    font-size: 32px;
+    font-weight: 800;
 }
 
-.info {
-    font-size: 13px;
+.date {
     color: gray;
+    margin-top: 5px;
 }
 
 /* TASK */
 .task {
     display: flex;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 .task input {
@@ -68,15 +65,13 @@ h1 {
 }
 
 /* INPUT */
-input[type="text"] {
+.input {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-/* BUTTONS */
-button {
-    margin-left: 5px;
+    margin-top: 15px;
+    padding: 10px 0;
+    border: none;
+    border-top: 1px solid #eee;
+    outline: none;
 }
 
 /* DAYS */
@@ -85,24 +80,16 @@ button {
 }
 
 .day {
-    padding: 15px;
+    padding: 20px;
+    font-size: 22px;
     font-weight: bold;
-    background: #ddd;
+    background: #eee;
+    border-top: 1px solid #ddd;
     cursor: pointer;
 }
 
 .day.active {
-    background: #aaa;
-}
-
-/* TOP BAR */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-}
-
-.progress {
-    font-size: 13px;
+    background: #ccc;
 }
 </style>
 
@@ -111,67 +98,63 @@ button {
 
 <div class="app">
 
-<div class="header">
+    <div class="header">
+        <div class="title" id="title">MONDAY</div>
+        <div class="date" id="date"></div>
 
-<div class="topbar">
-<h1 id="dayTitle">MONDAY</h1>
-<button onclick="toggleDark()">🌙</button>
-</div>
+        <div id="tasks"></div>
 
-<div class="info" id="date"></div>
-<div class="progress" id="progress"></div>
-<div class="progress" id="streak"></div>
+        <input class="input" id="input" placeholder="Add task...">
+    </div>
 
-<div id="tasks"></div>
-
-<input id="input" placeholder="Add task...">
-
-</div>
-
-<div class="days" id="days"></div>
+    <div class="days" id="days"></div>
 
 </div>
 
 <script>
 
 const days = ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];
-let currentDay = localStorage.getItem("currentDay") || "MONDAY";
+let currentDay = localStorage.getItem("day") || "MONDAY";
 
 const tasksEl = document.getElementById("tasks");
 const input = document.getElementById("input");
 
 document.getElementById("date").innerText = new Date().toDateString();
 
-function getData() {
-    return JSON.parse(localStorage.getItem("tasks") || "{}");
+function getData(){
+    return JSON.parse(localStorage.getItem("todo") || "{}");
 }
 
-function saveData(data) {
-    localStorage.setItem("tasks", JSON.stringify(data));
+function saveData(data){
+    localStorage.setItem("todo", JSON.stringify(data));
 }
 
-function renderDays() {
+function renderDays(){
     const daysEl = document.getElementById("days");
     daysEl.innerHTML = "";
-    days.forEach(d => {
+
+    days.forEach(d=>{
         const el = document.createElement("div");
         el.className = "day" + (d===currentDay ? " active":"");
         el.innerText = d;
-        el.onclick = () => {
+
+        el.onclick = ()=>{
             currentDay = d;
-            localStorage.setItem("currentDay", d);
+            localStorage.setItem("day", d);
             render();
         };
+
         daysEl.appendChild(el);
     });
 }
 
-function renderTasks() {
+function renderTasks(){
     const data = getData();
     const list = data[currentDay] || [];
+
     tasksEl.innerHTML = "";
 
-    list.forEach((t, i) => {
+    list.forEach((t,i)=>{
         const div = document.createElement("div");
         div.className = "task" + (t.done ? " done":"");
 
@@ -179,7 +162,7 @@ function renderTasks() {
         check.type = "checkbox";
         check.checked = t.done;
 
-        check.onchange = () => {
+        check.onchange = ()=>{
             t.done = !t.done;
             saveData(data);
             render();
@@ -188,63 +171,30 @@ function renderTasks() {
         const span = document.createElement("span");
         span.innerText = t.text;
 
-        span.ondblclick = () => {
-            const newText = prompt("Edit task", t.text);
-            if(newText) {
-                t.text = newText;
-                saveData(data);
-                render();
-            }
-        };
-
-        const del = document.createElement("button");
-        del.innerText = "❌";
-        del.onclick = () => {
-            list.splice(i,1);
-            saveData(data);
-            render();
-        };
-
-        div.append(check, span, del);
+        div.append(check, span);
         tasksEl.appendChild(div);
     });
-
-    updateProgress(list);
-}
-
-function updateProgress(list) {
-    const done = list.filter(t=>t.done).length;
-    const total = list.length;
-    const percent = total ? Math.round(done/total*100) : 0;
-    document.getElementById("progress").innerText = "Progress: "+percent+"%";
-
-    if(percent === 100 && total>0) {
-        let streak = Number(localStorage.getItem("streak")||0);
-        streak++;
-        localStorage.setItem("streak", streak);
-    }
-
-    document.getElementById("streak").innerText = "🔥 Streak: "+(localStorage.getItem("streak")||0);
 }
 
 input.addEventListener("keypress", e=>{
-    if(e.key==="Enter" && input.value.trim()) {
+    if(e.key==="Enter" && input.value.trim()){
         const data = getData();
+
         if(!data[currentDay]) data[currentDay]=[];
 
-        data[currentDay].push({text: input.value, done:false});
+        data[currentDay].push({
+            text: input.value,
+            done: false
+        });
+
         saveData(data);
         input.value="";
         render();
     }
 });
 
-function toggleDark() {
-    document.body.classList.toggle("dark");
-}
-
-function render() {
-    document.getElementById("dayTitle").innerText = currentDay;
+function render(){
+    document.getElementById("title").innerText = currentDay;
     renderDays();
     renderTasks();
 }
