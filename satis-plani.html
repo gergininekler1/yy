@@ -5,19 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FlashStudy — Sınav Hazırlık</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <style>
   :root {
-    --bg: #0d0d0f;
-    --surface: #161618;
-    --surface2: #1e1e21;
-    --border: #2a2a2e;
-    --accent: #c8f04a;
-    --accent2: #4af0c8;
-    --text: #e8e8ec;
-    --muted: #666672;
-    --danger: #f04a6a;
-    --success: #4af0a0;
-    --warning: #f0c84a;
+    --bg: #0d0d0f; --surface: #161618; --surface2: #1e1e21; --border: #2a2a2e;
+    --accent: #c8f04a; --accent2: #4af0c8; --text: #e8e8ec; --muted: #666672;
+    --danger: #f04a6a; --success: #4af0a0; --warning: #f0c84a;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--text); font-family:'Instrument Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
@@ -41,11 +34,9 @@
 
   /* BUTTONS */
   .btn {
-    display:inline-flex; align-items:center; gap:6px;
-    padding:7px 16px; border-radius:6px;
-    font-family:'DM Mono',monospace; font-size:11px; font-weight:500;
-    cursor:pointer; border:1px solid var(--border);
-    background:var(--surface); color:var(--text);
+    display:inline-flex; align-items:center; gap:6px; padding:7px 16px; border-radius:6px;
+    font-family:'DM Mono',monospace; font-size:11px; font-weight:500; cursor:pointer;
+    border:1px solid var(--border); background:var(--surface); color:var(--text);
     transition:all 0.15s; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;
   }
   .btn:hover { border-color:var(--accent); color:var(--accent); }
@@ -55,41 +46,29 @@
   .btn-danger:hover { background:rgba(240,74,106,0.2); color:var(--danger); border-color:var(--danger); }
   .btn-sm { padding:5px 11px; font-size:10px; }
 
-  /* UPLOAD */
-  #upload-screen {
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    min-height:calc(100vh - 57px); padding:40px; text-align:center;
-  }
+  /* UPLOAD & PDF EXTRACT */
+  #upload-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 57px); padding:40px; text-align:center; }
   .upload-hero { font-family:'Fraunces',serif; font-size:clamp(36px,6vw,78px); font-weight:900; line-height:0.95; margin-bottom:16px; letter-spacing:-2px; }
   .upload-hero em { font-style:italic; font-weight:300; color:var(--accent); }
-  .upload-sub { color:var(--muted); font-size:15px; margin-bottom:44px; max-width:400px; line-height:1.6; }
-  .drop-zone {
-    width:100%; max-width:500px; border:1.5px dashed var(--border); border-radius:16px;
-    padding:52px 40px; background:var(--surface); cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden;
-  }
-  .drop-zone::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,rgba(200,240,74,0.04) 0%,transparent 70%); }
-  .drop-zone:hover,.drop-zone.drag-over { border-color:var(--accent); background:rgba(200,240,74,0.04); }
-  .drop-zone input { display:none; }
-  .drop-icon { font-size:34px; margin-bottom:12px; display:block; }
-  .drop-zone h3 { font-family:'Fraunces',serif; font-size:18px; font-weight:600; margin-bottom:6px; }
-  .drop-zone p { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; }
-  .or-divider { display:flex; align-items:center; gap:16px; width:100%; max-width:500px; margin:22px 0; color:var(--muted); font-size:12px; font-family:'DM Mono',monospace; }
-  .or-divider::before,.or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
-  .paste-area { width:100%; max-width:500px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; resize:vertical; min-height:110px; outline:none; transition:border-color 0.15s; }
-  .paste-area:focus { border-color:var(--accent); }
+  .upload-sub { color:var(--muted); font-size:15px; margin-bottom:24px; max-width:400px; line-height:1.6; }
+  
+  .action-cards { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; width:100%; max-width:800px; }
+  .action-card { flex:1; min-width:280px; border:1.5px dashed var(--border); border-radius:16px; padding:40px 20px; background:var(--surface); cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden; }
+  .action-card:hover { border-color:var(--accent); background:rgba(200,240,74,0.04); }
+  .action-card input { display:none; }
+  .action-icon { font-size:34px; margin-bottom:12px; display:block; }
+  .action-card h3 { font-family:'Fraunces',serif; font-size:18px; font-weight:600; margin-bottom:6px; }
+  .action-card p { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; }
 
   /* STUDY */
   #study-screen { display:none; }
   .study-layout { display:grid; grid-template-columns:270px 1fr; min-height:calc(100vh - 57px); }
 
-  /* SIDEBAR */
-  .sidebar { border-right:1px solid var(--border); padding:20px 0; overflow-y:auto; position:sticky; top:57px; height:calc(100vh - 57px); background:var(--surface); }
-  .sidebar-section-title { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); padding:0 18px 14px; }
+  /* SIDEBAR (BÖLÜMLER) */
+  .sidebar { border-right:1px solid var(--border); padding:20px 0; overflow-y:auto; position:sticky; top:57px; height:calc(100vh - 57px); background:var(--surface); transition: transform 0.3s ease;}
+  .sidebar-section-title { font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); padding:0 18px 14px; display:flex; justify-content:space-between; align-items:center;}
+  .close-sidebar { display:none; color:var(--text); background:none; border:none; font-size:18px; cursor:pointer; }
   .sidebar-divider { height:1px; background:var(--border); margin:10px 0; }
-  .karma-item { padding:11px 18px; cursor:pointer; border-left:3px solid transparent; transition:all 0.15s; display:flex; align-items:center; gap:10px; }
-  .karma-item:hover { background:var(--surface2); }
-  .karma-item.active { border-left-color:var(--accent2); background:rgba(74,240,200,0.06); }
-  .karma-item-name { font-size:13px; font-weight:600; color:var(--accent2); }
   .deck-item { padding:11px 18px; cursor:pointer; border-left:3px solid transparent; transition:all 0.15s; }
   .deck-item:hover { background:var(--surface2); }
   .deck-item.active { border-left-color:var(--accent); background:rgba(200,240,74,0.06); }
@@ -97,19 +76,14 @@
   .deck-item-count { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
   .deck-progress-bar-bg { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-top:6px; }
   .deck-progress-bar-fill { height:100%; border-radius:2px; background:var(--accent); transition:width 0.4s ease; }
-  .deck-progress-pct { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:3px; }
-  .sidebar-footer { padding:14px 18px 0; border-top:1px solid var(--border); margin-top:12px; }
+  .sidebar-footer { padding:14px 18px 0; border-top:1px solid var(--border); margin-top:12px; display:flex; flex-direction:column; gap:8px;}
 
   /* MAIN */
   .main-content { padding:36px 40px; max-width:920px; }
   .deck-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; gap:16px; flex-wrap:wrap; }
   .deck-title { font-family:'Fraunces',serif; font-size:30px; font-weight:900; letter-spacing:-1px; line-height:1.1; display: flex; align-items: center; gap: 12px;}
   .deck-subtitle { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; margin-top:5px; }
-  .deck-header-right { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
-  .mode-tabs { display:flex; gap:3px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:3px; }
-  .mode-tab { padding:6px 14px; border-radius:5px; font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; border:none; background:none; color:var(--muted); transition:all 0.15s; }
-  .mode-tab.active { background:var(--accent); color:#0d0d0f; font-weight:500; }
-
+  
   /* TOGGLE */
   .toggle-wrap { display:flex; align-items:center; gap:7px; cursor:pointer; }
   .toggle { width:34px; height:19px; border-radius:10px; background:var(--border); position:relative; transition:background 0.2s; flex-shrink:0; }
@@ -118,13 +92,11 @@
   .toggle.on::after { transform:translateX(15px); }
   .toggle-label { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
 
-  /* PROGRESS */
+  /* PROGRESS & STATS */
   .progress-wrap { margin-bottom:28px; }
   .progress-info { display:flex; justify-content:space-between; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:8px; }
   .progress-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
   .progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width 0.3s ease; }
-
-  /* STATS BAR */
   .stats-bar { display:flex; gap:20px; flex-wrap:wrap; padding:12px 18px; background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:22px; }
   .stat-item { display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:11px; }
   .stat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
@@ -147,14 +119,7 @@
   .card-back .card-content { font-size:17px; line-height:1.65; color:#e0e0e8; }
   .card-hint { margin-top:22px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
 
-  /* CARD NAV & REACTION */
-  .card-nav { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:20px; }
-  .nav-btn { width:42px; height:42px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
-  .nav-btn:hover { border-color:var(--accent); color:var(--accent); }
-  .nav-btn:disabled { opacity:0.25; cursor:not-allowed; }
-  .card-counter { font-family:'Fraunces',serif; font-size:26px; font-weight:600; min-width:70px; text-align:center; letter-spacing:-1px; }
-  .card-counter span { color:var(--muted); font-size:15px; font-weight:300; }
-
+  /* REACTION */
   .reaction-row { display:flex; gap:10px; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s; transform: translateY(-10px); }
   .reaction-row.visible { opacity:1; pointer-events:auto; transform: translateY(0); }
   .reaction-btn { flex:1; max-width:160px; padding:11px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-family:'DM Mono',monospace; font-size:12px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
@@ -162,33 +127,36 @@
   .reaction-btn.hard:hover { background:rgba(240,200,74,0.1); border-color:var(--warning); color:var(--warning); }
   .reaction-btn.correct:hover { background:rgba(74,240,160,0.1); border-color:var(--success); color:var(--success); }
 
-  /* MODAL */
+  /* MODALS & EMPTY STATE */
   .modal-overlay { position:fixed; inset:0; background:rgba(13,13,15,0.85); backdrop-filter:blur(5px); z-index:999; display:none; align-items:center; justify-content:center; padding:20px; }
   .modal-overlay.active { display:flex; animation:fadeIn 0.2s ease; }
-  .modal-content { background:var(--surface); border:1px solid var(--border); border-radius:16px; width:100%; max-width:500px; padding:32px; box-shadow:0 20px 40px rgba(0,0,0,0.4); animation:slideUp 0.3s ease; }
+  .modal-content { background:var(--surface); border:1px solid var(--border); border-radius:16px; width:100%; max-width:500px; padding:32px; box-shadow:0 20px 40px rgba(0,0,0,0.4); animation:slideUp 0.3s ease; max-height:90vh; overflow-y:auto;}
   .modal-title { font-family:'Fraunces',serif; font-size:24px; font-weight:600; margin-bottom:20px; color:var(--accent); }
   .form-group { margin-bottom:16px; }
   .form-group label { display:block; font-family:'DM Mono',monospace; font-size:11px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; letter-spacing:0.5px; }
   .form-control { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; color:var(--text); font-family:'Instrument Sans',sans-serif; font-size:14px; min-height:80px; resize:vertical; outline:none; transition:0.2s; }
   .form-control:focus { border-color:var(--accent); }
   .modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
-
-  /* DECK COMPLETE & OTHERS */
   .deck-complete { text-align:center; padding:48px 0; animation:slideIn 0.4s ease; }
   .deck-complete .big-num { font-family:'Fraunces',serif; font-size:72px; font-weight:900; color:var(--accent); letter-spacing:-3px; line-height:1; }
-  .deck-complete h3 { font-family:'Fraunces',serif; font-size:22px; font-weight:600; margin:12px 0 6px; }
-  .deck-complete p { color:var(--muted); font-size:13px; font-family:'DM Mono',monospace; margin-bottom:24px; }
   .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:380px; color:var(--muted); text-align:center; gap:12px; }
-  .empty-state .icon { font-size:38px; }
 
+  /* MOBİL DÜZENLEMELERİ */
+  #mobile-menu-btn { display:none; }
+  
   @keyframes slideIn { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
   @keyframes fadeIn { from{opacity:0;}to{opacity:1;} }
   @keyframes slideUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
 
   @media (max-width:720px) {
     .study-layout { grid-template-columns:1fr; }
-    .sidebar { display:none; }
+    /* Mobilde Sidebar'ı Gizle, Menü Olarak Açılacak */
+    .sidebar { position:fixed; left:-100%; top:0; bottom:0; width:80%; z-index:200; background:var(--surface); border-right:1px solid var(--border); padding-top:60px; box-shadow: 20px 0 40px rgba(0,0,0,0.5); }
+    .sidebar.open { left:0; }
+    .close-sidebar { display:block; }
     .main-content { padding:20px; }
+    header { padding:14px 18px; }
+    #mobile-menu-btn { display:inline-flex; }
   }
 </style>
 </head>
@@ -197,33 +165,47 @@
 
 <header>
   <div class="logo">Flash<span>Study</span></div>
-  <div class="header-actions" id="header-actions"></div>
+  <div class="header-actions" id="header-actions">
+    <button class="btn" id="mobile-menu-btn" onclick="toggleMobileMenu()">☰ Bölümler</button>
+  </div>
 </header>
 
 <div id="upload-screen">
   <div class="upload-hero">Sınava<br><em>hazır</em> mısın?</div>
-  <p class="upload-sub">PDF'inden oluşturulan flashcard JSON dosyasını yükle, hemen çalışmaya başla.</p>
-  <label class="drop-zone" id="drop-zone">
-    <input type="file" accept=".json" onchange="loadFromFile(event)">
-    <span class="drop-icon">📂</span>
-    <h3>JSON Dosyasını Bırak</h3>
-    <p>ya da tıkla ve seç</p>
-  </label>
-  <div class="or-divider">ya da</div>
-  <textarea class="paste-area" id="paste-area" placeholder='JSON içeriğini buraya yapıştır...'></textarea>
-  <div class="load-btn-wrap">
-    <button class="btn btn-accent" onclick="loadFromPaste()">Yükle →</button>
+  <p class="upload-sub">Çalışmaya başlamak için JSON yükle veya PDF'inden metin çıkar.</p>
+  
+  <div class="action-cards">
+    <label class="action-card">
+      <input type="file" accept=".json" onchange="loadFromFile(event)">
+      <span class="action-icon">📂</span>
+      <h3>JSON Dosyası Yükle</h3>
+      <p>Flashcard verilerini içeri aktar</p>
+    </label>
+
+    <label class="action-card" style="border-color: var(--accent2);">
+      <input type="file" accept=".pdf" onchange="extractPDFText(event)">
+      <span class="action-icon">📄</span>
+      <h3 style="color: var(--accent2);">PDF'ten Metin Çıkar</h3>
+      <p>Yapay zekaya göndermek için PDF'i oku</p>
+    </label>
+  </div>
+  
+  <div style="margin-top:20px;">
+      <button class="btn btn-sm" onclick="clearData()" style="color:var(--danger); border-color:var(--border);">🗑️ Tüm Kayıtlı Veriyi Sil</button>
   </div>
 </div>
 
 <div id="study-screen">
   <div class="study-layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section-title">
+        Bölümler 
+        <button class="close-sidebar" onclick="toggleMobileMenu()">×</button>
+      </div>
       <div id="sidebar-content"></div>
       <div class="sidebar-footer">
-        <label class="btn" style="width:100%;justify-content:center;cursor:pointer;">
-          ↑ JSON Yükle <input type="file" accept=".json" onchange="loadFromFile(event)" style="display:none">
-        </label>
+        <button class="btn" style="width:100%;justify-content:center" onclick="createNewDeck()">➕ Yeni Bölüm Oluştur</button>
+        <button class="btn btn-accent" style="width:100%;justify-content:center" onclick="exportData()">⬇️ İlerlemeyi İndir</button>
       </div>
     </aside>
     <main class="main-content" id="main-content">
@@ -244,18 +226,34 @@
       <textarea class="form-control" id="modal-back"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn" onclick="closeModal()">İptal</button>
+      <button class="btn" onclick="closeModal('edit-modal')">İptal</button>
       <button class="btn btn-accent" onclick="saveCard()">Kaydet</button>
     </div>
   </div>
 </div>
 
+<div class="modal-overlay" id="pdf-modal">
+  <div class="modal-content" style="max-width: 700px;">
+    <div class="modal-title" style="color: var(--accent2);">PDF Metni Çıkarıldı</div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Aşağıdaki metni kopyalayıp bana (yapay zekaya) gönderebilirsin.</p>
+    <div class="form-group">
+      <textarea class="form-control" id="pdf-output" style="min-height: 300px;" readonly></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('pdf-modal')">Kapat</button>
+      <button class="btn btn-accent" onclick="copyPDFText()">📋 Kopyala</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// PDF.js Worker Tanımlaması
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
 // ═══════════ STATE ═══════════
 let allDecks = [];
 let currentDeckIndex = null; 
 let currentDeck = null;
-let currentMode = 'flashcard';
 
 let shuffleOn = false;
 let cardOrder = [];
@@ -265,62 +263,191 @@ let wrongQueue = [];
 let retryMode = false;
 let deckStats = {};
 
-// Modal States
 let editingCardIndex = -1; 
 let isCreatingNew = false;
 
-// ═══════════ LOAD ═══════════
+// ═══════════ LOCAL STORAGE (KAYIT SİSTEMİ) ═══════════
+function saveData() {
+  const statsToSave = {};
+  for (let key in deckStats) {
+    statsToSave[key] = {
+      ...deckStats[key],
+      seen: Array.from(deckStats[key].seen) // Set objesini Array'e çeviriyoruz çünkü JSON desteklemiyor
+    };
+  }
+  localStorage.setItem('flashstudy_data', JSON.stringify({
+    allDecks: allDecks,
+    deckStats: statsToSave
+  }));
+}
+
+function loadSavedData() {
+  const saved = localStorage.getItem('flashstudy_data');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      allDecks = parsed.allDecks || [];
+      const loadedStats = parsed.deckStats || {};
+      
+      deckStats = {};
+      for (let key in loadedStats) {
+        deckStats[key] = {
+          ...loadedStats[key],
+          seen: new Set(loadedStats[key].seen || []) // Array'i tekrar Set yapıyoruz
+        };
+      }
+      
+      if (allDecks.length > 0) {
+        document.getElementById('upload-screen').style.display = 'none';
+        document.getElementById('study-screen').style.display = 'block';
+        
+        let headerHtml = `<button class="btn" id="mobile-menu-btn" onclick="toggleMobileMenu()">☰ Bölümler</button>`;
+        headerHtml += `<button class="btn btn-sm" onclick="showUpload()">↑ Veri Yükle</button>`;
+        document.getElementById('header-actions').innerHTML = headerHtml;
+        
+        renderSidebar();
+        selectDeck(0);
+        return true;
+      }
+    } catch(e) { console.error("Kayıtlı veri okunamadı", e); }
+  }
+  return false;
+}
+
+function clearData() {
+  if(confirm("Tüm kayıtlı bölümler ve ilerlemen silinecek. Emin misin?")) {
+    localStorage.removeItem('flashstudy_data');
+    location.reload();
+  }
+}
+
+// Uygulama açılışında kayıtlı veriyi kontrol et
+window.onload = () => {
+  loadSavedData();
+};
+
+// ═══════════ PDF İŞLEMLERİ ═══════════
+async function extractPDFText(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  
+  const btn = e.target.nextElementSibling;
+  const originalIcon = btn.innerHTML;
+  btn.innerHTML = "⏳"; // Yükleniyor efekti
+  
+  try {
+    const reader = new FileReader();
+    reader.onload = async function(ev) {
+      const typedarray = new Uint8Array(ev.target.result);
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      let fullText = "";
+      
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(" ");
+        fullText += `--- SAYFA ${i} ---\n${pageText}\n\n`;
+      }
+      
+      document.getElementById('pdf-output').value = fullText;
+      document.getElementById('pdf-modal').classList.add('active');
+      btn.innerHTML = originalIcon;
+      e.target.value = ''; // Input'u sıfırla
+    };
+    reader.readAsArrayBuffer(file);
+  } catch (err) {
+    alert("PDF okunurken bir hata oluştu: " + err.message);
+    btn.innerHTML = originalIcon;
+  }
+}
+
+function copyPDFText() {
+  const copyText = document.getElementById("pdf-output");
+  copyText.select();
+  document.execCommand("copy");
+  alert("Metin kopyalandı! Şimdi sohbet ekranına yapıştırabilirsin.");
+}
+
+// ═══════════ JSON YÜKLEME VE İNDİRME ═══════════
 function loadFromFile(e) {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = ev => parseAndLoad(ev.target.result);
   r.readAsText(f);
 }
-function loadFromPaste() {
-  const t = document.getElementById('paste-area').value.trim();
-  if (!t) return alert('Lütfen JSON yapıştır.');
-  parseAndLoad(t);
-}
+
 function parseAndLoad(text) {
   try {
     const data = JSON.parse(text);
     if (!data.decks || !Array.isArray(data.decks)) throw new Error('decks dizisi bulunamadı');
-    allDecks = data.decks;
-    allDecks.forEach(d => {
-      if (!deckStats[d.title]) deckStats[d.title] = { correct:0, wrong:0, hard:0, seen:new Set() };
+    
+    // Mevcut verilerin üzerine ekle
+    data.decks.forEach(newDeck => {
+      const existingDeckIndex = allDecks.findIndex(d => d.title === newDeck.title);
+      if(existingDeckIndex !== -1) {
+         // Bölüm varsa kartları birleştir
+         allDecks[existingDeckIndex].cards = [...allDecks[existingDeckIndex].cards, ...(newDeck.cards || [])];
+      } else {
+         allDecks.push(newDeck);
+         deckStats[newDeck.title] = { correct:0, wrong:0, hard:0, seen:new Set() };
+      }
     });
+
+    saveData(); // Veriyi kaydet
+    
     document.getElementById('upload-screen').style.display = 'none';
     document.getElementById('study-screen').style.display = 'block';
-    document.getElementById('header-actions').innerHTML = `<button class="btn" onclick="showUpload()">↑ Yeni Yükle</button>`;
+    
+    let headerHtml = `<button class="btn" id="mobile-menu-btn" onclick="toggleMobileMenu()">☰ Bölümler</button>`;
+    headerHtml += `<button class="btn btn-sm" onclick="showUpload()">↑ Veri Yükle</button>`;
+    document.getElementById('header-actions').innerHTML = headerHtml;
+    
     renderSidebar();
-    if (allDecks.length > 0) selectDeck(0);
+    selectDeck(allDecks.length - 1); // Son ekleneni seç
   } catch(e) { alert('JSON ayrıştırılamadı: ' + e.message); }
 }
+
 function showUpload() {
   document.getElementById('upload-screen').style.display = 'flex';
   document.getElementById('study-screen').style.display = 'none';
 }
 
-// ═══════════ SIDEBAR ═══════════
+function exportData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({decks: allDecks}, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "flashstudy_yedek.json");
+  dlAnchorElem.click();
+}
+
+function createNewDeck() {
+  const title = prompt("Yeni bölümün adı ne olsun?");
+  if (title && title.trim() !== "") {
+    allDecks.push({ title: title.trim(), cards: [] });
+    deckStats[title.trim()] = { correct:0, wrong:0, hard:0, seen:new Set() };
+    saveData();
+    renderSidebar();
+    selectDeck(allDecks.length - 1);
+  }
+}
+
+// ═══════════ SİDEBAR & MOBİL MENÜ ═══════════
+function toggleMobileMenu() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('open');
+}
+
 function renderSidebar() {
-  let html = `<div class="sidebar-section-title">Bölümler</div>`;
-  html += `
-    <div class="karma-item ${currentDeckIndex===-1?'active':''}" onclick="selectKarmaTest()">
-      <span style="font-size:15px">⚡</span>
-      <div class="karma-item-name">Karma Test</div>
-    </div>
-    <div class="sidebar-divider"></div>
-  `;
+  let html = ``;
   allDecks.forEach((deck, i) => {
     const st = deckStats[deck.title] || {correct:0,wrong:0,hard:0,seen:new Set()};
     const total = (deck.cards||[]).length;
     const pct = total > 0 ? Math.round((st.seen.size / total) * 100) : 0;
     html += `
-      <div class="deck-item ${currentDeckIndex===i?'active':''}" onclick="selectDeck(${i})">
+      <div class="deck-item ${currentDeckIndex===i?'active':''}" onclick="selectDeck(${i}); toggleMobileMenu();">
         <div class="deck-item-name">${deck.title}</div>
         <div class="deck-item-count">${total} kart</div>
         <div class="deck-progress-bar-bg"><div class="deck-progress-bar-fill" style="width:${pct}%"></div></div>
-        <div class="deck-progress-pct">${pct}% tamamlandı</div>
       </div>
     `;
   });
@@ -331,31 +458,23 @@ function renderSidebar() {
 function selectDeck(i) {
   currentDeckIndex = i;
   currentDeck = allDecks[i];
-  currentMode = 'flashcard';
   resetCardState();
   renderSidebar();
   renderDeck();
 }
-function selectKarmaTest() {
-  alert("Karma test şu an inşaa aşamasında. Lütfen bölümlerden birini seç.");
-}
+
 function resetCardState() {
   const cards = currentDeck ? (currentDeck.cards||[]) : [];
   cardOrder = cards.map((_,i)=>i);
   
   if (shuffleOn && currentDeck) {
-    // Akıllı Sıralama (Spaced Repetition Mantığı)
-    // Yanlış bilinen kartlar öne gelsin
     const st = deckStats[currentDeck.title];
     cardOrder.sort((a, b) => {
       let weightA = 0, weightB = 0;
-      if (st.seen.has(a)) weightA = -1; // Bilinenler sona gitsin
-      if (wrongQueue.includes(a)) weightA = 10; // Yanlışlar en öne
-
+      if (st.seen.has(a)) weightA = -1;
+      if (wrongQueue.includes(a)) weightA = 10;
       if (st.seen.has(b)) weightB = -1;
       if (wrongQueue.includes(b)) weightB = 10;
-      
-      // Aynı ağırlıktakileri kendi içinde karıştır
       if(weightA === weightB) return Math.random() - 0.5;
       return weightB - weightA;
     });
@@ -374,13 +493,13 @@ function renderDeck() {
   main.innerHTML = `
     <div class="deck-header">
       <div>
-        <div class="deck-title">${currentDeck.title} <button class="btn btn-sm btn-accent" onclick="openModal(true)" style="margin-left:8px;">➕ Yeni Kart</button></div>
+        <div class="deck-title">${currentDeck.title} <button class="btn btn-sm btn-accent" onclick="openModal(true)" style="margin-left:8px;">➕ Kart</button></div>
         <div class="deck-subtitle">${cards.length} flashcard</div>
       </div>
       <div class="deck-header-right">
         <div class="toggle-wrap" onclick="toggleShuffle()">
           <div class="toggle ${shuffleOn?'on':''}" ></div>
-          <div class="toggle-label">🔀 Akıllı Karıştır</div>
+          <div class="toggle-label">🔀 Karıştır</div>
         </div>
       </div>
     </div>
@@ -390,11 +509,10 @@ function renderDeck() {
       <div class="stat-item"><div class="stat-dot green"></div><span class="stat-val">${st.correct}</span><span class="stat-lbl">&nbsp;Biliyor</span></div>
       <div class="stat-item"><div class="stat-dot yellow"></div><span class="stat-val">${st.hard}</span><span class="stat-lbl">&nbsp;Zor</span></div>
       <div class="stat-item"><div class="stat-dot red"></div><span class="stat-val">${st.wrong}</span><span class="stat-lbl">&nbsp;Bilmiyor</span></div>
-      <div class="stat-item" style="margin-left:auto"><span class="stat-lbl">Görülen:&nbsp;</span><span class="stat-val">${seenCount}/${cards.length}</span></div>
     </div>` : ''}
 
     <div id="flashcard-mode">
-      ${!cards.length ? '<div class="empty-state"><span class="icon">🃏</span><p>Bu bölümde henüz kart yok. Yukarıdan ekleyebilirsin.</p></div>' : buildFlashcardHTML(cards)}
+      ${!cards.length ? '<div class="empty-state"><span class="icon">🃏</span><p>Bu bölümde henüz kart yok. Yukarıdaki ➕ Kart butonundan ekleyebilirsin.</p></div>' : buildFlashcardHTML(cards)}
     </div>
   `;
 }
@@ -421,7 +539,7 @@ function buildFlashcardHTML(cards) {
         <div class="card-face card-front">
           <div class="card-label">Soru <button class="btn btn-sm" onclick="event.stopPropagation(); openModal(false)" style="padding:2px 6px;">✏️ Düzenle</button></div>
           <div class="card-content">${card.front}</div>
-          <div class="card-hint">Tıkla veya Boşluk ile çevir</div>
+          <div class="card-hint">Çevirmek için dokun</div>
         </div>
         <div class="card-face card-back">
           <div class="card-label">Cevap</div>
@@ -437,9 +555,8 @@ function buildFlashcardHTML(cards) {
     </div>
 
     ${wrongQueue.length > 0 && !retryMode ? `
-    <div class="retry-banner" style="margin-top:30px;">
-      <p><strong>${wrongQueue.length}</strong> kart yanlış işaretlendi.</p>
-      <button class="btn btn-danger btn-sm" onclick="startRetry()">🔁 Yanlışları Tekrar Et</button>
+    <div class="retry-banner" style="margin-top:30px; text-align:center;">
+      <button class="btn btn-danger btn-sm" onclick="startRetry()">🔁 ${wrongQueue.length} Yanlışı Tekrar Et</button>
     </div>` : ''}
   `;
 }
@@ -452,8 +569,7 @@ function buildCompleteHTML() {
     <div class="deck-complete">
       <div class="big-num">${pct}%</div>
       <h3>${pct>=80?'Harika iş! 🎉':pct>=50?'Fena değil! 👍':'Biraz daha çalış 💪'}</h3>
-      <p>${st.correct} doğru · ${st.wrong} yanlış · ${st.hard} zor</p>
-      <div class="deck-complete-btns">
+      <div class="deck-complete-btns" style="margin-top:20px;">
         <button class="btn btn-accent" onclick="restartDeck()">↺ Baştan Başla</button>
         ${st.wrong>0?`<button class="btn btn-danger" onclick="startRetry()">🔁 Yanlışları Tekrar Et</button>`:''}
       </div>
@@ -467,19 +583,15 @@ function flipCard() {
   cardFlipped = !cardFlipped; 
   el.classList.toggle('flipped', cardFlipped);
   
-  // Kart çevrildiğinde aksiyon butonlarını göster
   const reactionRow = document.getElementById('reaction-row');
   if(reactionRow) {
-    if(cardFlipped) {
-      reactionRow.classList.add('visible');
-    } else {
-      reactionRow.classList.remove('visible');
-    }
+    if(cardFlipped) reactionRow.classList.add('visible');
+    else reactionRow.classList.remove('visible');
   }
 }
 
 function markCard(type) {
-  if (!currentDeck || !cardFlipped) return; // Çevirmeden basılamaz
+  if (!currentDeck || !cardFlipped) return; 
   
   const queue = retryMode ? wrongQueue : cardOrder;
   const ci = queue[cardPos];
@@ -492,9 +604,9 @@ function markCard(type) {
     wrongQueue.push(ci);
   }
   
+  saveData(); // İlerlemeyi kaydet
   renderSidebar();
   
-  // Sıradaki karta pürüzsüz geç
   const cardEl = document.getElementById('fc');
   cardEl.style.transform = "rotateY(0deg) scale(0.95)";
   cardEl.style.opacity = "0";
@@ -505,14 +617,15 @@ function markCard(type) {
         cardPos++; 
         renderDeck(); 
      } else { 
-        renderDeck(); // Complete screen
+        renderDeck(); 
      }
-  }, 250); // Kartın kaybolması için ufak bir gecikme
+  }, 250);
 }
 
 function startRetry() { retryMode=true; cardPos=0; cardFlipped=false; renderDeck(); }
 function restartDeck() {
   deckStats[currentDeck.title]={correct:0,wrong:0,hard:0,seen:new Set()};
+  saveData();
   resetCardState(); renderSidebar(); renderDeck();
 }
 
@@ -537,43 +650,30 @@ function openModal(isNew = false) {
   modal.classList.add('active');
 }
 
-function closeModal() {
-  document.getElementById('edit-modal').classList.remove('active');
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
 }
 
 function saveCard() {
   const frontText = document.getElementById('modal-front').value.trim();
   const backText = document.getElementById('modal-back').value.trim();
   
-  if(!frontText || !backText) {
-    alert("Lütfen ön ve arka yüzü doldurun.");
-    return;
-  }
+  if(!frontText || !backText) { alert("Lütfen ön ve arka yüzü doldurun."); return; }
   
   if (isCreatingNew) {
     if (!currentDeck.cards) currentDeck.cards = [];
     currentDeck.cards.push({ front: frontText, back: backText });
-    resetCardState(); // Yeni kart eklendiği için sırayı güncelle
+    resetCardState(); 
   } else {
     currentDeck.cards[editingCardIndex].front = frontText;
     currentDeck.cards[editingCardIndex].back = backText;
   }
   
-  closeModal();
+  saveData(); // Değişikliği kaydet
+  closeModal('edit-modal');
   renderSidebar();
   renderDeck();
 }
-
-// ═══════════ KEYBOARD ═══════════
-document.addEventListener('keydown', e => {
-  if (!currentDeck || document.getElementById('edit-modal').classList.contains('active')) return;
-  if (e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT') return;
-  if (e.key===' ') { e.preventDefault(); flipCard(); }
-  else if (e.key==='1' && cardFlipped) markCard('wrong');
-  else if (e.key==='2' && cardFlipped) markCard('hard');
-  else if (e.key==='3' && cardFlipped) markCard('correct');
-});
-
 </script>
 </body>
 </html>
