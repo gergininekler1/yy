@@ -12,9 +12,9 @@
       --black: #000000;
       --blue: #000080;
       --blue2: #0000a8;
-      --green: #003b00;
-      --terminal: #071707;
+      --terminal: #061606;
       --terminalText: #8cff8c;
+      --amber: #fff7cc;
     }* { box-sizing: border-box; }
 
 body {
@@ -33,7 +33,7 @@ button, input, textarea, select {
 }
 
 .window {
-  max-width: 1120px;
+  max-width: 1220px;
   min-height: calc(100vh - 36px);
   margin: 0 auto;
   background: var(--gray);
@@ -144,7 +144,7 @@ button, input, textarea, select {
 .main {
   flex: 1;
   display: grid;
-  grid-template-columns: 230px 1fr;
+  grid-template-columns: 245px 1fr 280px;
   gap: 8px;
   padding: 8px;
   min-height: 0;
@@ -234,39 +234,7 @@ button, input, textarea, select {
   margin-top: 10px;
 }
 
-.workspace {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 8px;
-  min-height: 0;
-}
-
-.terminal {
-  background: var(--terminal);
-  color: var(--terminalText);
-  padding: 10px;
-  line-height: 1.45;
-  min-height: 184px;
-  font-family: Consolas, "Courier New", monospace;
-  border-top: 2px solid var(--dark);
-  border-left: 2px solid var(--dark);
-  border-right: 2px solid var(--light);
-  border-bottom: 2px solid var(--light);
-  white-space: pre-wrap;
-}
-
-.terminal strong { color: white; }
-
-.task-grid {
-  display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.task-area {
-  padding: 8px;
-}
+.field { margin-bottom: 8px; }
 
 label {
   display: block;
@@ -287,13 +255,43 @@ label {
 }
 
 .textarea {
-  min-height: 104px;
+  min-height: 82px;
   resize: vertical;
   line-height: 1.45;
 }
 
-.prompt-answer { min-height: 128px; }
-.draft-text { min-height: 320px; font-size: 15px; }
+.workspace {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 8px;
+  min-height: 0;
+}
+
+.terminal {
+  background: var(--terminal);
+  color: var(--terminalText);
+  padding: 10px;
+  line-height: 1.45;
+  min-height: 172px;
+  font-family: Consolas, "Courier New", monospace;
+  border-top: 2px solid var(--dark);
+  border-left: 2px solid var(--dark);
+  border-right: 2px solid var(--light);
+  border-bottom: 2px solid var(--light);
+  white-space: pre-wrap;
+}
+
+.terminal strong { color: white; }
+
+.task-grid {
+  display: grid;
+  grid-template-columns: 1fr 270px;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.task-area { padding: 8px; }
+.prompt-answer { min-height: 118px; }
 
 .action-row {
   display: flex;
@@ -323,7 +321,10 @@ label {
   text-align: left;
 }
 
-.draft-panel { min-height: 0; }
+.draft-text {
+  min-height: 300px;
+  font-size: 15px;
+}
 
 .draft-tools {
   display: flex;
@@ -332,6 +333,65 @@ label {
   gap: 8px;
   margin-bottom: 6px;
   flex-wrap: wrap;
+}
+
+.coach-card {
+  padding: 8px;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 34px;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.bar {
+  height: 16px;
+  background: white;
+  padding: 2px;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--blue);
+  width: 0%;
+}
+
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.check {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 6px;
+  align-items: start;
+}
+
+.box {
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-top: 2px solid var(--dark);
+  border-left: 2px solid var(--dark);
+  border-right: 2px solid var(--light);
+  border-bottom: 2px solid var(--light);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.box.ok:after { content: "✓"; }
+
+.warning {
+  background: var(--amber);
 }
 
 .mini-log {
@@ -364,7 +424,7 @@ label {
 
 .hidden { display: none !important; }
 
-@media (max-width: 880px) {
+@media (max-width: 1040px) {
   body { padding: 8px; }
   .window { min-height: calc(100vh - 16px); }
   .main { grid-template-columns: 1fr; }
@@ -387,7 +447,7 @@ label {
   <span class="menuitem">Dosya</span>
   <span class="menuitem">Komutlar</span>
   <span class="menuitem">Taslak</span>
-  <span class="menuitem">Terminal</span>
+  <span class="menuitem">Koç</span>
   <span class="menuitem">Yardım</span>
 </nav>
 
@@ -395,7 +455,8 @@ label {
   <button class="btn primary" id="saveBtn">💾 Kaydet</button>
   <button class="btn" id="exportBtn">📤 Dışa Aktar</button>
   <button class="btn" id="newPromptBtn">▶ Yeni Komut</button>
-  <button class="btn" id="stuckTopBtn">⚠ Tıkandım</button>
+  <button class="btn" id="coachBtn">🩺 Koçu Çalıştır</button>
+  <button class="btn" id="weakBtn">🔧 Zayıf Noktayı Komut Yap</button>
   <button class="btn danger" id="newProjectBtn">📄 Temizle</button>
 </section>
 
@@ -405,19 +466,23 @@ label {
     <div class="panel-body">
       <div class="command-list inset" id="commandList">
         <div class="command active" data-mode="idea"><div class="command-key">1</div><div><strong>Fikir Başlat</strong><small>Kıvılcım üret</small></div></div>
-        <div class="command" data-mode="scene"><div class="command-key">2</div><div><strong>Sahne Yaz</strong><small>Tek sahne kur</small></div></div>
-        <div class="command" data-mode="stuck"><div class="command-key">3</div><div><strong>Tıkandım</strong><small>Sorunu teşhis et</small></div></div>
-        <div class="command" data-mode="revise"><div class="command-key">4</div><div><strong>Revize Et</strong><small>Metni sıkılaştır</small></div></div>
-        <div class="command" data-mode="final"><div class="command-key">5</div><div><strong>Final Bul</strong><small>Son etkiyi seç</small></div></div>
+        <div class="command" data-mode="dna"><div class="command-key">2</div><div><strong>Öykü DNA</strong><small>Kalbi netleştir</small></div></div>
+        <div class="command" data-mode="scene"><div class="command-key">3</div><div><strong>Sahne Yaz</strong><small>Tek sahne kur</small></div></div>
+        <div class="command" data-mode="stuck"><div class="command-key">4</div><div><strong>Tıkandım</strong><small>Sorunu teşhis et</small></div></div>
+        <div class="command" data-mode="revise"><div class="command-key">5</div><div><strong>Revize Et</strong><small>Metni sıkılaştır</small></div></div>
+        <div class="command" data-mode="final"><div class="command-key">6</div><div><strong>Final Bul</strong><small>Son etkiyi seç</small></div></div>
       </div>
 
       <div class="side-box inset">
-        <strong>Kural</strong><br>
-        Tek görev, tek cevap, taslağa ekle. Bu uygulama plan defteri değil; yazı motoru.
+        <strong>Profesyonel Döngü</strong><br>
+        1. DNA netleşir.<br>
+        2. Sahne yazılır.<br>
+        3. Koç zayıf noktayı bulur.<br>
+        4. Yeni komut o zayıflığa göre gelir.
       </div>
 
       <div class="side-box inset">
-        <strong>Aktif Ritüel</strong><br>
+        <strong>Ritüel</strong><br>
         <span id="ritualText">Beş dakika boyunca kötü yazmaya izin ver.</span>
         <div class="action-row"><button class="btn small" id="ritualBtn">Değiştir</button></div>
       </div>
@@ -435,12 +500,12 @@ label {
         <div class="task-grid">
           <div class="task-area inset">
             <label for="answerBox">Cevabın</label>
-            <textarea id="answerBox" class="textarea prompt-answer" placeholder="Buraya hızlıca cevap yaz. Güzel olmak zorunda değil."></textarea>
+            <textarea id="answerBox" class="textarea prompt-answer" placeholder="Buraya hızlıca cevap yaz. Güzel olmak zorunda değil; işe yarar olması yeterli."></textarea>
             <div class="action-row">
               <button class="btn primary" id="appendBtn">Taslağa Ekle</button>
-              <button class="btn" id="expandBtn">Cevabı Sahneye Çevir</button>
+              <button class="btn" id="expandBtn">Sahneye Çevir</button>
               <button class="btn" id="newQuestionBtn">Yeni Soru</button>
-              <button class="btn" id="clearAnswerBtn">Cevabı Temizle</button>
+              <button class="btn" id="clearAnswerBtn">Temizle</button>
             </div>
           </div>
 
@@ -456,13 +521,43 @@ label {
           <input id="storyTitle" class="input" placeholder="Öykü başlığı" style="max-width: 360px;">
           <div class="action-row" style="margin-top: 0;">
             <button class="btn small" id="insertDividerBtn">Sahne Ayracı</button>
-            <button class="btn small" id="copyPromptBtn">Komutu Taslağa Kopyala</button>
+            <button class="btn small" id="copyPromptBtn">Komutu Kopyala</button>
+            <button class="btn small" id="pasteCoachBtn">Koç Notunu Ekle</button>
           </div>
         </div>
-        <textarea id="draftBox" class="textarea draft-text" placeholder="Taslak burada büyür. Cevaplarını yukarıdan ekleyebilirsin ya da doğrudan yazabilirsin."></textarea>
+        <textarea id="draftBox" class="textarea draft-text" placeholder="Taslak burada büyür. Cevaplarını yukarıdan ekleyebilir ya da doğrudan yazabilirsin."></textarea>
       </div>
     </section>
   </section>
+
+  <aside class="panel">
+    <div class="panel-title">Öykü Koçu</div>
+    <div class="panel-body">
+      <div class="coach-card inset">
+        <strong>Öykü DNA</strong>
+        <div class="field"><label for="dnaPremise">Tek Cümlelik Fikir</label><textarea id="dnaPremise" class="textarea" placeholder="Bu öykü aslında ne hakkında?"></textarea></div>
+        <div class="field"><label for="dnaWant">Karakter Ne İstiyor?</label><input id="dnaWant" class="input" placeholder="Somut istek"></div>
+        <div class="field"><label for="dnaObstacle">Onu Ne Engelliyor?</label><input id="dnaObstacle" class="input" placeholder="Engel / karşı güç"></div>
+        <div class="field"><label for="dnaStakes">Kaybederse Ne Olur?</label><input id="dnaStakes" class="input" placeholder="Bedel"></div>
+        <div class="field"><label for="dnaChange">Nasıl Değişecek?</label><input id="dnaChange" class="input" placeholder="İç dönüşüm"></div>
+        <div class="field"><label for="dnaMotif">Nesne / Motif</label><input id="dnaMotif" class="input" placeholder="Anahtar, mektup, ses kaydı..."></div>
+      </div>
+
+      <div class="coach-card inset" id="coachScore">
+        Koçu çalıştırınca öykünün işlevsel raporu burada görünür.
+      </div>
+
+      <div class="coach-card inset warning" id="nextMoveBox">
+        <strong>Sonraki En İyi Hamle</strong><br>
+        Önce bir fikir yaz, sonra koçu çalıştır.
+      </div>
+
+      <div class="coach-card inset" id="repeatBox">
+        <strong>Tekrar Eden Kelimeler</strong><br>
+        Henüz analiz yok.
+      </div>
+    </div>
+  </aside>
 </section>
 
 <footer class="statusbar">
@@ -473,7 +568,7 @@ label {
 </footer>
 
   </main>  <script>
-    const STORAGE_KEY = "kurgu-terminali-95-command-v1";
+    const STORAGE_KEY = "kurgu-terminali-95-pro-coach-v1";
     const nl = String.fromCharCode(10);
 
     const dataDefault = {
@@ -485,7 +580,17 @@ label {
       lastSaved: null,
       log: ["Terminal hazır."],
       selectedStuck: "",
-      selectedFinal: ""
+      selectedFinal: "",
+      coachNote: "",
+      weakest: "idea",
+      dna: {
+        premise: "",
+        want: "",
+        obstacle: "",
+        stakes: "",
+        change: "",
+        motif: ""
+      }
     };
 
     let data = loadData();
@@ -496,6 +601,7 @@ label {
 
     const modeNames = {
       idea: "Fikir Başlat",
+      dna: "Öykü DNA",
       scene: "Sahne Yaz",
       stuck: "Tıkandım",
       revise: "Revize Et",
@@ -507,37 +613,40 @@ label {
         "Bir karakter bugün hangi küçük yalanı sürdürmek zorunda kalıyor?",
         "Gündelik bir mekana olmaması gereken hangi nesne giriyor?",
         "Bir insan yıllardır sakladığı şeyi bugün neden saklayamıyor?",
-        "Öykü şu cümleyle başlasın: Kapı açıldığında kimse şaşırmadı. Devamını düşün.",
-        "Bir karakter, yanlış kişiye gönderilmiş bir mesajı okuyunca ne yapar?",
-        "Bir evde yıllardır açılmayan çekmecede ne var?"
+        "Kapı açıldığında kimse şaşırmadı. Bu cümlenin devamında ne olur?",
+        "Bir karakter yanlış kişiye gönderilmiş bir mesajı okuyunca ne yapar?"
+      ],
+      dna: [
+        "Bu öykünün kalbini tek cümleyle yaz: Kim, ne istiyor, neden alamıyor?",
+        "Karakterin isteğini somutlaştır. Okur neyin peşinde olduğunu görebilmeli.",
+        "Bedeli büyüt: Karakter başaramazsa ne kaybedecek?",
+        "İç değişimi yaz: Karakter öykünün sonunda hangi yanılsamasını bırakacak?",
+        "Motifi seç: Hangi nesne öykünün duygusunu taşıyacak?"
       ],
       scene: [
         "Bu sahnede kim var, ne istiyor ve onu kim ya da ne engelliyor?",
-        "Karakterin söyleyemediği cümleyi yaz. Sonra karşısındaki kişinin bunu anlamış gibi davranmasını sağla.",
-        "Sahnenin sonunda hangi küçük görüntü kalsın? Bir nesne, bir ses, bir hareket seç.",
-        "Karakter bir yere girmek istiyor ama giremiyor. Nereye ve neden?",
-        "İki kişi konuşuyor ama asıl konuştukları şey başka. Görünen konu ne, gerçek konu ne?"
+        "Sahneye geç gir: olay zaten başlamış olsun. İlk görüntüyü yaz.",
+        "Karakterin söyleyemediği cümleyi yaz. Sonra bunu davranışla gizlet.",
+        "Sahnenin sonunda hangi küçük görüntü kalsın? Bir nesne, ses veya hareket seç.",
+        "İki kişi konuşuyor ama asıl konu başka. Görünen konu ne, gerçek konu ne?"
       ],
       stuck: [
-        "Tıkanıklığı seç: fikir yok, sahne ilerlemiyor, karakter cansız, final yok, cümleler kötü, metin dağıldı.",
         "Şu anda seni durduran şeyi tek cümleyle yaz. Sorunu küçültelim.",
         "Sahne ilerlemiyorsa: karakterin bilmediği ama karşısındakinin bildiği şeyi yaz.",
-        "Karakter cansızsa: onun utandığı ama komik görünen bir alışkanlığı yaz.",
+        "Karakter cansızsa: onun utandığı ama somut görünen bir alışkanlığı yaz.",
         "Metin dağıldıysa: bu öykünün asıl sorusunu tek cümleye indir."
       ],
       revise: [
-        "Taslağındaki en zayıf paragrafı buraya yapıştır ve neyin çalışmadığını yaz.",
-        "İlk paragrafı daha geç başlat. Ön açıklamayı silsen nereden başlardı?",
-        "Tekrar eden kelimeleri düşün. Hangi kelimeyi fazla kullandığını hissediyorsun?",
+        "İlk paragraftaki açıklamayı azalt. Öykü nereden daha geç başlayabilir?",
+        "Bir duyguyu doğrudan söylemeden nesneyle göster.",
         "Bir diyalog cümlesini daha kısa, daha yaralı ve daha dolaylı yaz.",
-        "Bu metinden bir cümle silmek zorunda olsan hangisini silerdin?"
+        "Taslağından bir cümle silmek zorunda olsan hangisini silerdin?"
       ],
       final: [
         "Okur son cümlede ne hissetsin: hüzün, rahatsızlık, merak, boşluk, şaşkınlık, kabullenme?",
         "Finalde büyük açıklama yapma. Karakter hangi küçük hareketi yapacak?",
         "İlk sahnedeki görüntüyü sona döndür. Bu kez anlamı nasıl değişmiş olacak?",
-        "Karakter istediğini elde ediyor ama ne kaybediyor?",
-        "Son cümle bir cevap mı olsun, yoksa yeni bir soru mu açsın?"
+        "Karakter istediğini elde ediyor ama ne kaybediyor?"
       ]
     };
 
@@ -557,6 +666,8 @@ label {
       "Bir sahneyi kısa tut. En fazla yedi cümle.",
       "Finali çözmeye çalışma; karakterin elindeki nesneyi takip et."
     ];
+
+    const stopWords = ["bir", "ve", "ile", "de", "da", "bu", "şu", "o", "için", "gibi", "ama", "fakat", "sonra", "daha", "çok", "az", "mi", "mı", "mu", "mü", "ne", "niye", "neden", "nasıl", "diye", "olan", "olarak", "kadar", "her", "hiç", "ben", "sen", "biz", "siz", "onun", "ona", "onu"];
 
     function loadData() {
       try {
@@ -582,6 +693,17 @@ label {
 
     function randomFrom(list) {
       return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function normalizeText(text) {
+      let value = String(text || "").toLowerCase();
+      const chars = [".", ",", ";", ":", "!", "?", "(", ")", "[", "]", "{", "}", "\"", "'", "“", "”", "‘", "’", "…", "-", "–", "—", nl];
+      chars.forEach(ch => value = value.split(ch).join(" "));
+      return value;
+    }
+
+    function getWords(text) {
+      return normalizeText(text).split(" ").map(w => w.trim()).filter(w => w.length > 2 && !stopWords.includes(w));
     }
 
     function wordCount(text) {
@@ -620,15 +742,30 @@ label {
     }
 
     function generatePrompt() {
-      if (data.mode === "idea") {
-        const combo = generateIdeaCombo();
-        data.currentPrompt = combo;
-      } else {
-        data.currentPrompt = randomFrom(prompts[data.mode]);
-      }
+      if (data.mode === "idea") data.currentPrompt = generateIdeaCombo();
+      else if (data.mode === "scene") data.currentPrompt = buildScenePrompt();
+      else if (data.mode === "dna") data.currentPrompt = buildDnaPrompt();
+      else data.currentPrompt = randomFrom(prompts[data.mode]);
       renderTerminal();
       addLog("Yeni komut: " + modeNames[data.mode]);
       scheduleSave();
+    }
+
+    function buildDnaPrompt() {
+      if (!data.dna.premise) return "Öykünün kalbini tek cümleyle yaz: Kim, ne istiyor, neden alamıyor?";
+      if (!data.dna.want) return "Karakterin somut isteğini yaz. Okur onun neyin peşinde olduğunu görebilmeli.";
+      if (!data.dna.obstacle) return "Karakterin isteğine karşı duran engeli yaz. Bu engel insan, sır, zaman veya korku olabilir.";
+      if (!data.dna.stakes) return "Bedeli büyüt: Karakter başaramazsa ne kaybedecek?";
+      if (!data.dna.change) return "İç değişimi yaz: Karakter öykünün sonunda hangi yanlış inancı bırakacak?";
+      if (!data.dna.motif) return "Öykünün duygusunu taşıyacak nesneyi seç. Bu nesne finalde geri dönecek.";
+      return randomFrom(prompts.dna);
+    }
+
+    function buildScenePrompt() {
+      const want = data.dna.want || "karakterin isteği";
+      const obstacle = data.dna.obstacle || "engel";
+      const motif = data.dna.motif || "bir nesne";
+      return "Sahne kur:" + nl + "1. Karakter sahneye " + want + " isteğiyle girsin." + nl + "2. " + obstacle + " onu zorlasın." + nl + "3. " + motif + " sahnede görünsün." + nl + "4. Sahne sonunda karakterin durumu küçük ama geri dönülmez biçimde değişsin.";
     }
 
     function generateIdeaCombo() {
@@ -648,53 +785,18 @@ label {
 
     function renderModePanel() {
       if (data.mode === "stuck") {
-        $("#modePanel").innerHTML = `
-          <h3>Tıkanıklık Teşhisi</h3>
-          <div class="choice-list">
-            <button class="btn choice" data-stuck="Fikir yok">Fikir yok</button>
-            <button class="btn choice" data-stuck="Sahne ilerlemiyor">Sahne ilerlemiyor</button>
-            <button class="btn choice" data-stuck="Karakter cansız">Karakter cansız</button>
-            <button class="btn choice" data-stuck="Final bulamıyorum">Final bulamıyorum</button>
-            <button class="btn choice" data-stuck="Cümleler kötü">Cümleler kötü</button>
-            <button class="btn choice" data-stuck="Metin dağıldı">Metin dağıldı</button>
-          </div>
-        `;
+        $("#modePanel").innerHTML = `<h3>Tıkanıklık Teşhisi</h3><div class="choice-list"><button class="btn choice" data-stuck="Fikir yok">Fikir yok</button><button class="btn choice" data-stuck="Sahne ilerlemiyor">Sahne ilerlemiyor</button><button class="btn choice" data-stuck="Karakter cansız">Karakter cansız</button><button class="btn choice" data-stuck="Final bulamıyorum">Final bulamıyorum</button><button class="btn choice" data-stuck="Cümleler kötü">Cümleler kötü</button><button class="btn choice" data-stuck="Metin dağıldı">Metin dağıldı</button></div>`;
         return;
       }
-
       if (data.mode === "final") {
-        $("#modePanel").innerHTML = `
-          <h3>Final Hissi</h3>
-          <div class="choice-list">
-            <button class="btn choice" data-final="Hüzün">Hüzün</button>
-            <button class="btn choice" data-final="Rahatsızlık">Rahatsızlık</button>
-            <button class="btn choice" data-final="Merak">Merak</button>
-            <button class="btn choice" data-final="Boşluk">Boşluk</button>
-            <button class="btn choice" data-final="Şaşkınlık">Şaşkınlık</button>
-            <button class="btn choice" data-final="Kabullenme">Kabullenme</button>
-          </div>
-        `;
+        $("#modePanel").innerHTML = `<h3>Final Hissi</h3><div class="choice-list"><button class="btn choice" data-final="Hüzün">Hüzün</button><button class="btn choice" data-final="Rahatsızlık">Rahatsızlık</button><button class="btn choice" data-final="Merak">Merak</button><button class="btn choice" data-final="Boşluk">Boşluk</button><button class="btn choice" data-final="Şaşkınlık">Şaşkınlık</button><button class="btn choice" data-final="Kabullenme">Kabullenme</button></div>`;
         return;
       }
-
       if (data.mode === "revise") {
-        $("#modePanel").innerHTML = `
-          <h3>Revizyon Araçları</h3>
-          <div class="choice-list">
-            <button class="btn choice" data-revise="long">Uzun paragrafları bul</button>
-            <button class="btn choice" data-revise="start">Açılışı sıkılaştır</button>
-            <button class="btn choice" data-revise="dialogue">Diyalog önerisi al</button>
-            <button class="btn choice" data-revise="repeat">Tekrar hissini kontrol et</button>
-          </div>
-        `;
+        $("#modePanel").innerHTML = `<h3>Revizyon Araçları</h3><div class="choice-list"><button class="btn choice" data-revise="long">Uzun paragrafları bul</button><button class="btn choice" data-revise="start">Açılışı sıkılaştır</button><button class="btn choice" data-revise="dialogue">Diyalog önerisi al</button><button class="btn choice" data-revise="repeat">Tekrar hissini kontrol et</button><button class="btn choice" data-revise="sceneTurn">Sahne dönüşü ekle</button></div>`;
         return;
       }
-
-      $("#modePanel").innerHTML = `
-        <h3>Hızlı Hamle</h3>
-        <p>Bu komutta tek cevap yeter. Cevabın iyiyse taslağa ekle, kötüyse yeni komut al.</p>
-        <div class="action-row"><button class="btn small" id="exampleBtn">Örnek İlk Cümle</button></div>
-      `;
+      $("#modePanel").innerHTML = `<h3>Hızlı Hamle</h3><p>Bu komutta tek cevap yeter. Cevabın iyiyse taslağa ekle, kötüyse yeni komut al.</p><div class="action-row"><button class="btn small" id="exampleBtn">Örnek İlk Cümle</button><button class="btn small" id="dnaSceneBtn">DNA'dan Sahne Sor</button></div>`;
     }
 
     function appendAnswer() {
@@ -708,13 +810,15 @@ label {
       $("#answerBox").value = "";
       addLog("Cevap taslağa eklendi.");
       updateDraftInfo();
+      runCoach(false);
       save(true);
     }
 
     function expandAnswer() {
       const answer = $("#answerBox").value.trim();
       if (!answer) return;
-      const scene = "Sahne tohumu:" + nl + answer + nl + nl + "Sahneye çevirme görevi:" + nl + "1. Görüntüyle başla." + nl + "2. Karakterin istediği şeyi göster." + nl + "3. Engeli sahneye sok." + nl + "4. Sonunda küçük ama geri dönülmez bir değişiklik bırak.";
+      const motif = data.dna.motif || "bir nesne";
+      const scene = "Sahne tohumu:" + nl + answer + nl + nl + "Profesyonel sahne iskeleti:" + nl + "1. Görüntüyle başla; açıklamayla değil." + nl + "2. Karakterin isteğini davranışta göster." + nl + "3. Engeli sahneye fiziksel ya da sözlü olarak sok." + nl + "4. " + motif + " nesnesini bir kez göster." + nl + "5. Sahneyi küçük bir dönüşle bitir: karakter ya bir şeyi öğrenir, ya bir şeyi kaybeder, ya da yalanı büyür.";
       $("#answerBox").value = scene;
       data.answer = scene;
       addLog("Cevap sahne iskeletine çevrildi.");
@@ -737,15 +841,23 @@ label {
       save(true);
     }
 
+    function pasteCoachNote() {
+      if (!data.coachNote) return;
+      data.draft = data.draft.trim() ? data.draft + nl + nl + "[Koç Notu]" + nl + data.coachNote : "[Koç Notu]" + nl + data.coachNote;
+      $("#draftBox").value = data.draft;
+      updateDraftInfo();
+      save(true);
+    }
+
     function chooseStuck(kind) {
       data.selectedStuck = kind;
       const map = {
-        "Fikir yok": "Görev: Birinin bugün saklayamayacağı küçük bir yalan yaz.",
+        "Fikir yok": "Görev: Birinin bugün saklayamayacağı küçük bir yalan yaz. Sonra bu yalanın bedelini ekle.",
         "Sahne ilerlemiyor": "Görev: Sahneye beklenmedik bir bilgi sok. Karakterin bilmediği ama karşısındakinin bildiği şeyi yaz.",
-        "Karakter cansız": "Görev: Karaktere utanacağı somut bir alışkanlık ver. Bunu sahnede görünür yap.",
-        "Final bulamıyorum": "Görev: Büyük açıklama yerine karakterin yapacağı küçük bir hareket seç.",
-        "Cümleler kötü": "Görev: En kötü cümleni bilerek yaz. Sonra sadece bir kelimesini değiştir.",
-        "Metin dağıldı": "Görev: Bu öykünün asıl sorusunu tek cümleye indir."
+        "Karakter cansız": "Görev: Karaktere utandığı somut bir alışkanlık ver. Bunu sahnede görünür yap.",
+        "Final bulamıyorum": "Görev: Büyük açıklama yerine karakterin yapacağı küçük bir hareket seç. Bu hareket öykünün duygusunu taşısın.",
+        "Cümleler kötü": "Görev: En kötü cümleni bilerek yaz. Sonra sadece fiilini güçlendir.",
+        "Metin dağıldı": "Görev: Bu öykünün asıl sorusunu tek cümleye indir. Geri kalan her şeyi bu soruya bağla."
       };
       data.currentPrompt = map[kind];
       renderTerminal();
@@ -775,14 +887,115 @@ label {
       if (type === "long") {
         const parts = draft.split(nl + nl).map(p => p.trim()).filter(Boolean);
         const longParts = parts.filter(p => wordCount(p) > 80);
-        output = longParts.length ? "Uzun paragraf sayısı: " + longParts.length + nl + "Görev: En uzun paragrafı ikiye böl ve bir hareket cümlesi ekle." : "Uzun paragraf görünmüyor. Görev: bir paragrafı daha sert bir cümleyle bitir.";
+        output = longParts.length ? "Uzun paragraf sayısı: " + longParts.length + nl + "Görev: En uzun paragrafı ikiye böl. Bölüm noktasına bir hareket cümlesi koy." : "Uzun paragraf görünmüyor. Görev: bir paragrafı daha sert bir cümleyle bitir.";
       }
       if (type === "start") output = "Açılış görevi: İlk üç cümleden açıklama olanı sil. Öyküyü hareket, nesne ya da diyalogla başlat.";
-      if (type === "dialogue") output = "Diyalog görevi: Karakter istediğini direkt söylemesin. Onun yerine konuyu değiştirsin, soru sorsun veya küçük bir yalan söylesin.";
-      if (type === "repeat") output = "Tekrar kontrolü: Metinde fazla dönen duygu kelimelerini ara. Hissi doğrudan söylemek yerine nesneyle göster.";
+      if (type === "dialogue") output = "Diyalog görevi: Karakter istediğini direkt söylemesin. Konuyu değiştirsin, soru sorsun veya küçük bir yalan söylesin.";
+      if (type === "repeat") output = buildRepeatAdvice();
+      if (type === "sceneTurn") output = "Sahne dönüşü görevi: Bu sahnenin sonunda karakterin bildiği, istediği ya da sakladığı şeylerden biri değişsin. Değişimi tek cümleyle yaz.";
       data.currentPrompt = output;
       renderTerminal();
       addLog("Revizyon aracı çalıştı.");
+      save(false);
+    }
+
+    function buildRepeatAdvice() {
+      const repeated = getRepeatedWords(data.draft).slice(0, 5);
+      if (!repeated.length) return "Tekrar kontrolü: Belirgin tekrar yok. Hissi doğrudan söylemek yerine nesne, hareket ve sesle göster.";
+      return "Tekrar eden kelimeler: " + repeated.map(item => item.word + "(" + item.count + ")").join(", ") + nl + "Görev: Bu kelimelerden birini sahnede doğrudan söyleme; onun yerine davranışla göster.";
+    }
+
+    function getRepeatedWords(text) {
+      const words = getWords(text);
+      const counts = {};
+      words.forEach(w => counts[w] = (counts[w] || 0) + 1);
+      return Object.keys(counts).map(word => ({ word, count: counts[word] })).filter(item => item.count > 2).sort((a, b) => b.count - a.count);
+    }
+
+    function runCoach(showLog) {
+      const analysis = analyzeDraft();
+      renderCoach(analysis);
+      if (showLog) addLog("Koç raporu yenilendi.");
+      return analysis;
+    }
+
+    function analyzeDraft() {
+      const draft = data.draft || "";
+      const words = wordCount(draft);
+      const paragraphs = draft.split(nl + nl).map(p => p.trim()).filter(Boolean);
+      const paragraphCount = paragraphs.length;
+      const longParagraphs = paragraphs.filter(p => wordCount(p) > 85).length;
+      const quoteCount = (draft.split('"').length - 1) + (draft.split("“").length - 1) + (draft.split("”").length - 1);
+      const hasDialogue = quoteCount >= 2 || draft.indexOf("- ") >= 0;
+      const repeated = getRepeatedWords(draft);
+
+      const checks = [
+        { key: "premise", label: "Tek cümlelik fikir net", ok: data.dna.premise.trim().length > 10 },
+        { key: "want", label: "Karakterin somut isteği var", ok: data.dna.want.trim().length > 3 },
+        { key: "obstacle", label: "Engel / karşı güç belli", ok: data.dna.obstacle.trim().length > 3 },
+        { key: "stakes", label: "Başaramazsa bedel var", ok: data.dna.stakes.trim().length > 3 },
+        { key: "change", label: "Karakter değişimi düşünülmüş", ok: data.dna.change.trim().length > 3 },
+        { key: "motif", label: "Nesne / motif seçilmiş", ok: data.dna.motif.trim().length > 2 },
+        { key: "draft", label: "Taslak 300+ kelime", ok: words >= 300 },
+        { key: "paragraph", label: "Metin paragraflara bölünmüş", ok: paragraphCount >= 3 },
+        { key: "dialogue", label: "Diyalog veya doğrudan konuşma izi var", ok: hasDialogue },
+        { key: "long", label: "Aşırı uzun paragraf az", ok: longParagraphs < 2 }
+      ];
+
+      const score = Math.round((checks.filter(c => c.ok).length / checks.length) * 100);
+      const craftScore = Math.min(100, Math.round((Math.min(words, 600) / 600) * 30 + checks.filter(c => c.ok).length * 7));
+      const clarityScore = Math.round((["premise", "want", "obstacle", "stakes"].filter(k => checks.find(c => c.key === k && c.ok)).length / 4) * 100);
+      const sceneScore = Math.round((["draft", "paragraph", "dialogue", "long"].filter(k => checks.find(c => c.key === k && c.ok)).length / 4) * 100);
+
+      const next = decideNextMove(checks, words, longParagraphs, hasDialogue);
+      data.weakest = next.mode;
+      data.coachNote = next.text;
+
+      return { words, paragraphCount, longParagraphs, hasDialogue, repeated, checks, score, craftScore, clarityScore, sceneScore, next };
+    }
+
+    function decideNextMove(checks, words, longParagraphs, hasDialogue) {
+      const isOk = key => checks.find(c => c.key === key && c.ok);
+      if (!isOk("premise")) return { mode: "dna", text: "Önce tek cümlelik fikri netleştir. Kim, ne istiyor, neden alamıyor?" };
+      if (!isOk("want")) return { mode: "dna", text: "Karakterin isteği soyut kalıyor. İsteği görülebilir bir eyleme çevir." };
+      if (!isOk("obstacle")) return { mode: "dna", text: "Engel zayıf. Karakterin isteğine aktif biçimde karşı duran bir güç ekle." };
+      if (!isOk("stakes")) return { mode: "dna", text: "Bedel yoksa gerilim düşer. Karakter başaramazsa ne kaybedecek?" };
+      if (words < 300) return { mode: "scene", text: "Taslak kısa. Bir sahne daha yaz: karakter isteğiyle girsin, engelle karşılaşsın, değişmiş çıksın." };
+      if (!hasDialogue) return { mode: "scene", text: "Metne en az bir dolaylı diyalog ekle. Karakter istediğini direkt söylemesin." };
+      if (longParagraphs > 1) return { mode: "revise", text: "Paragraflar ağırlaşıyor. En uzun paragrafı ikiye böl ve araya hareket cümlesi koy." };
+      if (!isOk("motif")) return { mode: "dna", text: "Motif eksik. Öykünün duygusunu taşıyacak bir nesne seç ve finalde geri döndür." };
+      if (!isOk("change")) return { mode: "final", text: "Karakterin iç değişimi netleşmeli. Finalde neyi kabullenecek veya neyi inkâr edecek?" };
+      return { mode: "final", text: "Temel yapı çalışıyor. Şimdi final etkisini güçlendir: büyük açıklama yerine küçük bir jest seç." };
+    }
+
+    function renderCoach(analysis) {
+      const bars = [
+        { name: "Genel", value: analysis.score },
+        { name: "Netlik", value: analysis.clarityScore },
+        { name: "Sahne", value: analysis.sceneScore },
+        { name: "Zanaat", value: analysis.craftScore }
+      ].map(item => `<div class="score-row"><span>${item.name}</span><div class="bar inset"><div class="bar-fill" style="width:${item.value}%"></div></div><span>${item.value}</span></div>`).join("");
+
+      const checks = `<div class="check-list">` + analysis.checks.map(c => `<div class="check"><span class="box ${c.ok ? "ok" : ""}"></span><span>${escapeHTML(c.label)}</span></div>`).join("") + `</div>`;
+
+      $("#coachScore").innerHTML = `<strong>Koç Raporu</strong><br>${bars}<div style="margin-top:8px">${checks}</div>`;
+      $("#nextMoveBox").innerHTML = `<strong>Sonraki En İyi Hamle</strong><br>${escapeHTML(analysis.next.text)}<div class="action-row"><button class="btn small" id="applyNextBtn">Bu Hamleyi Komut Yap</button></div>`;
+
+      if (analysis.repeated.length) {
+        $("#repeatBox").innerHTML = `<strong>Tekrar Eden Kelimeler</strong><br>` + analysis.repeated.slice(0, 7).map(item => `${escapeHTML(item.word)}: ${item.count}`).join("<br>");
+      } else {
+        $("#repeatBox").innerHTML = `<strong>Tekrar Eden Kelimeler</strong><br>Belirgin tekrar yok.`;
+      }
+    }
+
+    function applyWeakestPrompt() {
+      const analysis = runCoach(false);
+      data.mode = analysis.next.mode;
+      data.currentPrompt = analysis.next.text;
+      $$(".command").forEach(cmd => cmd.classList.toggle("active", cmd.dataset.mode === data.mode));
+      renderTerminal();
+      renderModePanel();
+      addLog("Koçun önerisi komuta çevrildi.");
       save(false);
     }
 
@@ -804,12 +1017,19 @@ label {
       $("#storyTitle").value = data.title || "";
       $("#draftBox").value = data.draft || "";
       $("#answerBox").value = data.answer || "";
+      $("#dnaPremise").value = data.dna.premise || "";
+      $("#dnaWant").value = data.dna.want || "";
+      $("#dnaObstacle").value = data.dna.obstacle || "";
+      $("#dnaStakes").value = data.dna.stakes || "";
+      $("#dnaChange").value = data.dna.change || "";
+      $("#dnaMotif").value = data.dna.motif || "";
       if (!data.currentPrompt) data.currentPrompt = generateIdeaCombo();
       $$(".command").forEach(cmd => cmd.classList.toggle("active", cmd.dataset.mode === data.mode));
       renderTerminal();
       renderModePanel();
       renderLog();
       updateDraftInfo();
+      runCoach(false);
       renderStatus("Hazır");
     }
 
@@ -817,11 +1037,16 @@ label {
       const lines = [];
       lines.push("# " + (data.title || "Adsız Öykü"));
       lines.push("");
-      lines.push("## Son Aktif Komut");
-      lines.push(modeNames[data.mode]);
+      lines.push("## Öykü DNA");
+      lines.push("Fikir: " + (data.dna.premise || "-"));
+      lines.push("İstek: " + (data.dna.want || "-"));
+      lines.push("Engel: " + (data.dna.obstacle || "-"));
+      lines.push("Bedel: " + (data.dna.stakes || "-"));
+      lines.push("Değişim: " + (data.dna.change || "-"));
+      lines.push("Motif: " + (data.dna.motif || "-"));
       lines.push("");
-      lines.push("## Aktif Görev");
-      lines.push(data.currentPrompt || "-");
+      lines.push("## Son Koç Notu");
+      lines.push(data.coachNote || "-");
       lines.push("");
       lines.push("## Taslak");
       lines.push(data.draft || "-");
@@ -851,18 +1076,32 @@ label {
       $("#exportBtn").addEventListener("click", exportMarkdown);
       $("#newPromptBtn").addEventListener("click", generatePrompt);
       $("#newQuestionBtn").addEventListener("click", generatePrompt);
-      $("#stuckTopBtn").addEventListener("click", () => setMode("stuck"));
+      $("#coachBtn").addEventListener("click", () => runCoach(true));
+      $("#weakBtn").addEventListener("click", applyWeakestPrompt);
       $("#newProjectBtn").addEventListener("click", newProject);
       $("#appendBtn").addEventListener("click", appendAnswer);
       $("#expandBtn").addEventListener("click", expandAnswer);
       $("#clearAnswerBtn").addEventListener("click", () => { data.answer = ""; $("#answerBox").value = ""; scheduleSave(); });
       $("#insertDividerBtn").addEventListener("click", insertDivider);
       $("#copyPromptBtn").addEventListener("click", copyPromptToDraft);
+      $("#pasteCoachBtn").addEventListener("click", pasteCoachNote);
       $("#ritualBtn").addEventListener("click", () => { $("#ritualText").textContent = randomFrom(rituals); });
 
       $("#storyTitle").addEventListener("input", event => { data.title = event.target.value; scheduleSave(); });
-      $("#draftBox").addEventListener("input", event => { data.draft = event.target.value; updateDraftInfo(); scheduleSave(); });
+      $("#draftBox").addEventListener("input", event => { data.draft = event.target.value; updateDraftInfo(); runCoach(false); scheduleSave(); });
       $("#answerBox").addEventListener("input", event => { data.answer = event.target.value; scheduleSave(); });
+
+      const dnaMap = [
+        ["#dnaPremise", "premise"],
+        ["#dnaWant", "want"],
+        ["#dnaObstacle", "obstacle"],
+        ["#dnaStakes", "stakes"],
+        ["#dnaChange", "change"],
+        ["#dnaMotif", "motif"]
+      ];
+      dnaMap.forEach(pair => {
+        $(pair[0]).addEventListener("input", event => { data.dna[pair[1]] = event.target.value; runCoach(false); scheduleSave(); });
+      });
 
       document.body.addEventListener("click", event => {
         const stuck = event.target.closest("button[data-stuck]");
@@ -878,6 +1117,17 @@ label {
           data.answer = sample;
           scheduleSave();
         }
+        const dnaScene = event.target.closest("#dnaSceneBtn");
+        if (dnaScene) {
+          data.mode = "scene";
+          data.currentPrompt = buildScenePrompt();
+          $$(".command").forEach(cmd => cmd.classList.toggle("active", cmd.dataset.mode === data.mode));
+          renderTerminal();
+          renderModePanel();
+          save(false);
+        }
+        const applyNext = event.target.closest("#applyNextBtn");
+        if (applyNext) applyWeakestPrompt();
       });
     }
 
