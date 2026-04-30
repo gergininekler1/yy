@@ -3,196 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusCards - Fütüristik Bohem</title>
+    <title>NexusCards - Final Sürüm</title>
     <style>
-        /* Fütüristik Bohem Renk Paleti */
         :root {
-            --bg-dark: #0d0b12; /* Derin uzay moru/siyahı */
+            --bg-dark: #0d0b12; 
             --glass-bg: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --accent-terracotta: #E27D60; /* Bohem kiremit neon */
-            --accent-gold: #E8A87C; /* Bohem kum/altın */
+            --accent-terracotta: #E27D60; 
+            --accent-gold: #E8A87C; 
             --text-main: #F4F0EB;
             --text-muted: #8F8C99;
+            --danger: #FF5E5E;
+            --warning: #F1C40F;
             --font-main: 'Segoe UI', -apple-system, sans-serif;
             --font-mono: 'Courier New', Courier, monospace;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-main);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; overflow-x: hidden; position: relative; display: flex; flex-direction: column; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
+        .ambient-orb-1 { position: fixed; top: -15%; left: -10%; width: 60vw; height: 60vw; border-radius: 50%; background: radial-gradient(circle, rgba(226,125,96,0.15) 0%, rgba(0,0,0,0) 70%); z-index: -1; filter: blur(50px); }
+        .ambient-orb-2 { position: fixed; bottom: -20%; right: -10%; width: 70vw; height: 70vw; border-radius: 50%; background: radial-gradient(circle, rgba(232,168,124,0.1) 0%, rgba(0,0,0,0) 70%); z-index: -1; filter: blur(60px); }
 
-        /* Arka Plan Ambient Parlamalar (Bohem + Fütüristik) */
-        .ambient-orb-1 {
-            position: fixed; top: -15%; left: -10%; width: 60vw; height: 60vw;
-            border-radius: 50%; background: radial-gradient(circle, rgba(226,125,96,0.15) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1; filter: blur(50px);
-        }
-        .ambient-orb-2 {
-            position: fixed; bottom: -20%; right: -10%; width: 70vw; height: 70vw;
-            border-radius: 50%; background: radial-gradient(circle, rgba(232,168,124,0.1) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1; filter: blur(60px);
-        }
-
-        /* Üst Menü & Kronometre */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 5%;
-            background: rgba(13, 11, 18, 0.6);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; background: rgba(13, 11, 18, 0.6); backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
         .logo { font-weight: 300; font-size: 1.5rem; letter-spacing: 2px; }
         .logo span { color: var(--accent-gold); font-weight: 700; }
-
-        /* Daha önceki isteğine uygun olarak sayaç ve menü sağa yaslı */
-        .header-right {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 20px;
-            text-align: right;
-        }
-
-        .timer-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
+        
+        .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 20px; text-align: right; }
+        .timer-container { display: flex; flex-direction: column; align-items: flex-end; }
         .timer-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .timer { font-family: var(--font-mono); font-size: 1.3rem; color: var(--accent-terracotta); text-shadow: 0 0 10px rgba(226,125,96,0.4); }
 
-        main {
-            flex: 1; padding: 30px 5%; max-width: 1000px; margin: 0 auto; width: 100%;
-        }
+        main { flex: 1; padding: 30px 5%; max-width: 1000px; margin: 0 auto; width: 100%; }
 
-        /* Panel Geçişleri */
         .panel { display: none; animation: floatIn 0.5s ease forwards; }
         .panel.active { display: block; }
         @keyframes floatIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Butonlar */
-        .btn {
-            padding: 12px 24px; border: none; border-radius: 8px;
-            background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-gold));
-            color: #120F14; font-weight: 600; letter-spacing: 0.5px;
-            cursor: pointer; transition: all 0.3s;
-        }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-gold)); color: #120F14; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         .btn:hover { box-shadow: 0 0 15px rgba(232,168,124,0.4); transform: scale(1.02); }
-        .btn-outline {
-            background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold);
-        }
+        .btn-outline { background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); }
         .btn-outline:hover { background: rgba(232,168,124,0.1); }
+        .btn-small { padding: 8px 16px; font-size: 0.9rem; }
 
-        /* NETFLIX TARZI KARTLAR */
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        .deck-slider {
-            display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px;
-            scroll-snap-type: x mandatory;
-        }
+        .deck-slider { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; }
         .deck-slider::-webkit-scrollbar { height: 4px; }
         .deck-slider::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 10px; }
 
-        .deck-card {
-            flex: 0 0 auto; width: 150px; height: 180px;
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 20px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            cursor: pointer; scroll-snap-align: start; backdrop-filter: blur(10px);
-            transition: 0.3s;
-        }
+        .deck-card { flex: 0 0 auto; width: 150px; height: 180px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; scroll-snap-align: start; backdrop-filter: blur(10px); transition: 0.3s; }
         .deck-card:hover { border-color: var(--accent-gold); transform: translateY(-8px); box-shadow: 0 10px 25px rgba(232,168,124,0.15); }
         .deck-card h3 { font-size: 1.1rem; font-weight: 500; }
         .deck-card .count { font-family: var(--font-mono); color: var(--accent-terracotta); font-size: 0.9rem; }
 
-        /* DÜZENLEME & TOPLU EKLEME ALANI */
-        .editor-container {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 25px; margin-top: 20px; backdrop-filter: blur(10px);
-        }
-
+        .editor-container { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 25px; margin-top: 20px; backdrop-filter: blur(10px); }
         .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        input, textarea {
-            width: 100%; padding: 14px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border); border-radius: 8px;
-            color: var(--text-main); outline: none; transition: 0.3s;
-        }
-        input:focus, textarea:focus { border-color: var(--accent-terracotta); }
-
+        textarea { width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-main); outline: none; transition: 0.3s; }
+        textarea:focus { border-color: var(--accent-terracotta); }
         .bulk-hint { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; }
 
         .question-list { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .question-list::-webkit-scrollbar { width: 4px; }
-        .question-list::-webkit-scrollbar-thumb { background: var(--glass-border); }
+        .q-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.2); border-left: 3px solid var(--accent-gold); border-radius: 6px; word-break: break-word; }
+        .q-item button { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 5px 10px; border-radius: 4px; cursor: pointer; flex-shrink: 0; margin-left: 10px; }
 
-        .q-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px; background: rgba(0,0,0,0.2); border-left: 3px solid var(--accent-gold);
-            border-radius: 6px; word-break: break-word;
-        }
-        .q-item button { background: transparent; border: 1px solid #FF5E5E; color: #FF5E5E; padding: 5px 10px; border-radius: 4px; cursor: pointer; flex-shrink: 0; margin-left: 10px; }
-
-        /* ÇALIŞMA EKRANI & İSTATİSTİK PANOSU */
         .study-area { max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
-
-        .stats-board {
-            display: flex; justify-content: space-between; width: 100%;
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 15px; margin-bottom: 25px;
-        }
+        .stats-board { display: flex; justify-content: space-between; width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-bottom: 25px; }
         .stat-box { text-align: center; flex: 1; }
         .stat-box span { display: block; font-family: var(--font-mono); font-size: 1.4rem; font-weight: bold; margin-top: 5px; }
-        .stat-hard span { color: #FF5E5E; }
-        .stat-normal span { color: #F1C40F; }
+        .stat-hard span { color: var(--danger); }
+        .stat-normal span { color: var(--warning); }
         .stat-easy span { color: #32E0C4; }
 
         .flashcard-wrapper { perspective: 1000px; width: 100%; height: 320px; margin-bottom: 30px; }
         .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
         .flashcard.flipped { transform: rotateY(180deg); }
 
-        .card-face {
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-            background: linear-gradient(145deg, rgba(30,27,38,0.9), rgba(20,18,25,0.9));
-            border: 1px solid var(--glass-border); border-radius: 20px;
-            display: flex; align-items: center; justify-content: center; padding: 30px;
-            font-size: 1.3rem; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(145deg, rgba(30,27,38,0.9), rgba(20,18,25,0.9)); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; align-items: center; justify-content: center; padding: 30px; font-size: 1.3rem; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
         .card-back { transform: rotateY(180deg); border-color: var(--accent-terracotta); color: var(--accent-gold); }
+
+        /* Yeni Eklenen: Sicil Noktası */
+        .status-dot { position: absolute; top: 20px; right: 20px; width: 14px; height: 14px; border-radius: 50%; display: none; box-shadow: 0 0 10px currentColor; }
+        .status-dot.zor { display: block; background: var(--danger); color: var(--danger); }
+        .status-dot.normal { display: block; background: var(--warning); color: var(--warning); }
 
         .action-buttons { display: flex; gap: 15px; width: 100%; opacity: 0; pointer-events: none; transition: 0.3s; }
         .action-buttons.visible { opacity: 1; pointer-events: auto; }
-        .action-buttons button { flex: 1; padding: 15px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; }
-        .btn-zor { background: rgba(255, 94, 94, 0.1); color: #FF5E5E; border: 1px solid #FF5E5E; }
-        .btn-normal { background: rgba(241, 196, 15, 0.1); color: #F1C40F; border: 1px solid #F1C40F; }
+        .action-buttons button { flex: 1; padding: 15px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s;}
+        .action-buttons button:hover { transform: translateY(-3px); }
+        .btn-zor { background: rgba(255, 94, 94, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-normal { background: rgba(241, 196, 15, 0.1); color: var(--warning); border: 1px solid var(--warning); }
         .btn-kolay { background: rgba(50, 224, 196, 0.1); color: #32E0C4; border: 1px solid #32E0C4; }
 
     </style>
 </head>
 <body>
-
-    <!-- Ambient Arka Plan -->
     <div class="ambient-orb-1"></div>
     <div class="ambient-orb-2"></div>
 
@@ -207,38 +111,35 @@
     </header>
 
     <main>
-        <!-- 1. ANA EKRAN (KLASÖRLER) -->
         <div id="panel-home" class="panel active">
             <div class="section-header">
                 <h2>Arşivim</h2>
-                <button class="btn btn-outline" onclick="promptNewDeck()">+ Yeni Klasör</button>
+                <div>
+                    <button class="btn btn-outline btn-small" style="margin-right: 10px; border-color: var(--text-muted); color: var(--text-muted);" onclick="exportData()">💾 Yedekle</button>
+                    <button class="btn btn-outline btn-small" onclick="promptNewDeck()">+ Yeni Klasör</button>
+                </div>
             </div>
             <div class="deck-slider" id="deck-list"></div>
         </div>
 
-        <!-- 2. DÜZENLEME VE KAYNAK EKLEME EKRANI -->
         <div id="panel-editor" class="panel">
             <div class="section-header">
                 <button class="btn btn-outline" onclick="showPanel('panel-home')">← Arşive Dön</button>
                 <button class="btn" onclick="startStudy()">Sistemi Başlat ▶</button>
             </div>
-            
             <h2 id="editor-title" style="color: var(--accent-gold); margin-bottom: 20px;"></h2>
-            
             <div class="editor-container">
-                <h3 style="margin-bottom: 15px;">Toplu Kaynak Ekle (Yapay Zeka İçin)</h3>
-                <div class="bulk-hint">Yapay zekadan aldığın listeyi "Soru | Cevap" formatında buraya yapıştır.</div>
+                <h3 style="margin-bottom: 15px;">Toplu Kaynak Ekle</h3>
+                <div class="bulk-hint">Yapay zekadan aldığın listeyi "Soru | Cevap" formatında yapıştır.</div>
                 <div class="input-group">
-                    <textarea id="bulk-input" rows="4" placeholder="Örnek:&#10;Kanuni Esasi kaç yılında ilan edildi? | 1876&#10;Kavimler Göçü tarihi nedir? | 375"></textarea>
+                    <textarea id="bulk-input" rows="4" placeholder="Örnek:&#10;İlk anayasa nedir? | Kanuni Esasi"></textarea>
                     <button class="btn" onclick="bulkImport()">Toplu Yükle</button>
                 </div>
-
                 <h3 style="margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--glass-border);">Mevcut Kartlar</h3>
                 <div class="question-list" id="question-list"></div>
             </div>
         </div>
 
-        <!-- 3. ÇALIŞMA SİSTEMİ EKRANI -->
         <div id="panel-study" class="panel">
             <div class="study-area">
                 <div class="section-header" style="width: 100%;">
@@ -246,7 +147,6 @@
                     <span id="card-counter" style="font-family: var(--font-mono); color: var(--text-muted);">0/0</span>
                 </div>
 
-                <!-- İşlevsel İstatistik Panosu -->
                 <div class="stats-board">
                     <div class="stat-box stat-hard">Zorlu <span id="stat-zor">0</span></div>
                     <div class="stat-box stat-normal">Döngüde <span id="stat-normal">0</span></div>
@@ -255,31 +155,33 @@
 
                 <div class="flashcard-wrapper" onclick="flipCard()">
                     <div class="flashcard" id="flashcard">
-                        <div class="card-face card-front" id="card-front"></div>
-                        <div class="card-face card-back" id="card-back"></div>
+                        <div class="card-face card-front">
+                            <div class="status-dot" id="dot-front"></div>
+                            <span id="card-front"></span>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="status-dot" id="dot-back"></div>
+                            <span id="card-back"></span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="action-buttons" id="action-buttons">
-                    <button class="btn-zor" onclick="answerCard('zor')">ZOR</button>
-                    <button class="btn-normal" onclick="answerCard('normal')">NORMAL</button>
-                    <button class="btn-kolay" onclick="answerCard('kolay')">KOLAY</button>
+                    <button class="btn-zor" onclick="answerCard('zor', event)">ZOR</button>
+                    <button class="btn-normal" onclick="answerCard('normal', event)">NORMAL</button>
+                    <button class="btn-kolay" onclick="answerCard('kolay', event)">KOLAY</button>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        // Veritabanı
-        let db = JSON.parse(localStorage.getItem('nexus_v2')) || {};
+        let db = JSON.parse(localStorage.getItem('nexus_v3')) || {};
         let currentDeck = null;
-        
-        // Çalışma Algoritması ve İstatistikler
         let studyQueue = [];
         let sessionStats = { zor: 0, normal: 0, kolay: 0, total: 0 };
         let currentCardObj = null;
 
-        // Kronometre (Sağa Yaslı, Daha Önce İstenen Düzeltme)
         let seconds = 0;
         setInterval(() => {
             seconds++;
@@ -288,142 +190,103 @@
             document.getElementById('timer').innerText = `${m}:${s}`;
         }, 1000);
 
-        function saveDB() {
-            localStorage.setItem('nexus_v2', JSON.stringify(db));
-            renderHome();
+        function saveDB() { localStorage.setItem('nexus_v3', JSON.stringify(db)); renderHome(); }
+        function showPanel(panelId) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(panelId).classList.add('active'); if(panelId === 'panel-home') renderHome(); }
+
+        // Yedekleme Özelliği
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "NexusCards_Yedek.json");
+            dlAnchorElem.click();
         }
 
-        function showPanel(panelId) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(panelId).classList.add('active');
-            if(panelId === 'panel-home') renderHome();
-        }
-
-        // --- ANA EKRAN ---
         function renderHome() {
             const list = document.getElementById('deck-list');
             list.innerHTML = '';
             for (let deckName in db) {
-                list.innerHTML += `
-                    <div class="deck-card" onclick="openEditor('${deckName}')">
-                        <h3>${deckName}</h3>
-                        <div class="count">${db[deckName].length} Kart</div>
-                    </div>
-                `;
+                list.innerHTML += `<div class="deck-card" onclick="openEditor('${deckName}')"><h3>${deckName}</h3><div class="count">${db[deckName].length} Kart</div></div>`;
             }
         }
 
-        function promptNewDeck() {
-            const name = prompt("Klasör (Ders/Kitap) Adı:");
-            if (name && !db[name]) { db[name] = []; saveDB(); }
-        }
+        function promptNewDeck() { const name = prompt("Klasör Adı:"); if (name && !db[name]) { db[name] = []; saveDB(); } }
 
-        // --- EDİTÖR & TOPLU EKLEME ---
-        function openEditor(deckName) {
-            currentDeck = deckName;
-            document.getElementById('editor-title').innerText = deckName;
-            renderQuestionList();
-            showPanel('panel-editor');
-        }
+        function openEditor(deckName) { currentDeck = deckName; document.getElementById('editor-title').innerText = deckName; renderQuestionList(); showPanel('panel-editor'); }
 
         function bulkImport() {
-            const text = document.getElementById('bulk-input').value;
-            const lines = text.split('\n');
+            const lines = document.getElementById('bulk-input').value.split('\n');
             let addedCount = 0;
-
             lines.forEach(line => {
                 if(line.includes('|')) {
                     const [q, a] = line.split('|');
-                    // Yeni eklenenler listenin en başına gelsin (Daha önce yaptığımız düzeltme)
-                    db[currentDeck].unshift({ q: q.trim(), a: a.trim(), id: Date.now() + Math.random() }); 
+                    db[currentDeck].unshift({ q: q.trim(), a: a.trim(), id: Date.now() + Math.random(), lastAnswer: null }); 
                     addedCount++;
                 }
             });
-
-            if(addedCount > 0) {
-                document.getElementById('bulk-input').value = '';
-                saveDB();
-                renderQuestionList();
-            }
+            if(addedCount > 0) { document.getElementById('bulk-input').value = ''; saveDB(); renderQuestionList(); }
         }
 
         function renderQuestionList() {
-            const list = document.getElementById('question-list');
-            list.innerHTML = '';
-            db[currentDeck].forEach((card, index) => {
-                list.innerHTML += `
-                    <div class="q-item">
-                        <div style="padding-right:10px;"><strong>S:</strong> ${card.q}</div>
-                        <button onclick="deleteCard(${index})">Sil</button>
-                    </div>
-                `;
-            });
+            const list = document.getElementById('question-list'); list.innerHTML = '';
+            db[currentDeck].forEach((card, index) => { list.innerHTML += `<div class="q-item"><div style="padding-right:10px;"><strong>S:</strong> ${card.q}</div><button onclick="deleteCard(${index})">Sil</button></div>`; });
         }
 
-        function deleteCard(index) {
-            db[currentDeck].splice(index, 1);
-            saveDB();
-            renderQuestionList();
-        }
+        function deleteCard(index) { db[currentDeck].splice(index, 1); saveDB(); renderQuestionList(); }
 
-        // --- ÇALIŞMA SİSTEMİ VE İSTATİSTİKLER ---
         function startStudy() {
             if (db[currentDeck].length === 0) return alert("Klasör boş!");
-            
-            // Kartları karıştır ve çalışma kuyruğuna al
             studyQueue = [...db[currentDeck]].sort(() => Math.random() - 0.5);
             sessionStats = { zor: 0, normal: studyQueue.length, kolay: 0, total: studyQueue.length };
-            
-            updateStatsUI();
-            showPanel('panel-study');
-            nextCard();
+            updateStatsUI(); showPanel('panel-study'); nextCard();
         }
 
         function updateStatsUI() {
-            document.getElementById('stat-zor').innerText = sessionStats.zor;
-            document.getElementById('stat-normal').innerText = sessionStats.normal;
-            document.getElementById('stat-kolay').innerText = sessionStats.kolay;
-            document.getElementById('card-counter').innerText = `${sessionStats.kolay}/${sessionStats.total}`;
+            document.getElementById('stat-zor').innerText = sessionStats.zor; document.getElementById('stat-normal').innerText = sessionStats.normal;
+            document.getElementById('stat-kolay').innerText = sessionStats.kolay; document.getElementById('card-counter').innerText = `${sessionStats.kolay}/${sessionStats.total}`;
         }
 
         function nextCard() {
-            if (studyQueue.length === 0) {
-                alert(`Tebrikler! ${sessionStats.total} kartlık bölümü tamamen bitirdin.`);
-                return showPanel('panel-home');
-            }
+            if (studyQueue.length === 0) { alert(`Tebrikler! Bölümü bitirdin.`); return showPanel('panel-home'); }
 
             currentCardObj = studyQueue[0];
             document.getElementById('card-front').innerText = currentCardObj.q;
             document.getElementById('card-back').innerText = currentCardObj.a;
             
+            // Sicil Noktasını Ayarla
+            const dotFront = document.getElementById('dot-front');
+            const dotBack = document.getElementById('dot-back');
+            dotFront.className = 'status-dot'; dotBack.className = 'status-dot';
+            
+            if (currentCardObj.lastAnswer === 'zor') { dotFront.classList.add('zor'); dotBack.classList.add('zor'); } 
+            else if (currentCardObj.lastAnswer === 'normal') { dotFront.classList.add('normal'); dotBack.classList.add('normal'); }
+            
             document.getElementById('flashcard').classList.remove('flipped');
             document.getElementById('action-buttons').classList.remove('visible');
         }
 
+        // Çift Yönlü Çevirme Düzeltmesi
         function flipCard() {
             const fc = document.getElementById('flashcard');
-            if (!fc.classList.contains('flipped')) {
-                fc.classList.add('flipped');
-                document.getElementById('action-buttons').classList.add('visible');
-            }
+            const btns = document.getElementById('action-buttons');
+            fc.classList.toggle('flipped');
+            
+            if(fc.classList.contains('flipped')) { btns.classList.add('visible'); } 
+            else { btns.classList.remove('visible'); }
         }
 
-        function answerCard(difficulty) {
-            const card = studyQueue.shift(); // Kartı sıradan çek
+        function answerCard(difficulty, event) {
+            event.stopPropagation(); // Butona basınca kartın tekrar çevrilmesini engeller
+            
+            const card = studyQueue.shift(); 
+            card.lastAnswer = difficulty; // Sicili kaydet
 
             if (difficulty === 'zor') {
-                // Zor kartı 2-3 adım sonraya tekrar sok
-                const insertIndex = Math.min(2, studyQueue.length);
-                studyQueue.splice(insertIndex, 0, card);
-                // İstatistik ayarı: Daha önce zor demediysek zoru artır
+                studyQueue.splice(Math.min(2, studyQueue.length), 0, card);
                 if(!card.isHard) { card.isHard = true; sessionStats.zor++; sessionStats.normal--; }
             } 
-            else if (difficulty === 'normal') {
-                // Normali destenin en sonuna at
-                studyQueue.push(card);
-            } 
+            else if (difficulty === 'normal') { studyQueue.push(card); } 
             else if (difficulty === 'kolay') {
-                // Kolay dendiyse tamamen çıkar ve istatistikleri güncelle
                 sessionStats.kolay++;
                 if(card.isHard) { sessionStats.zor--; } else { sessionStats.normal--; }
             }
@@ -431,7 +294,6 @@
             updateStatsUI();
             document.getElementById('flashcard').classList.remove('flipped');
             document.getElementById('action-buttons').classList.remove('visible');
-            
             setTimeout(nextCard, 300);
         }
 
