@@ -1,662 +1,1143 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Orbital Notes · Reference Layout</title>
+  <title>Orbital Notes</title>
+
   <style>
     :root {
-      --bg: #eeeeee;
-      --ink: #2a2a2a;
-      --fade: rgba(0,0,0,.105);
-      --line: rgba(0,0,0,.055);
-      --muted: #7f7f7f;
-      --panel: rgba(255,255,255,.58);
-      --ease: cubic-bezier(.16,1,.3,1);
-    }* { box-sizing: border-box; }
+      --bg: #eeeeed;
+      --bg-soft: #f7f7f5;
+      --text: #2c2c2c;
+      --muted: #8d8d8a;
+      --line: rgba(40, 40, 40, 0.08);
+      --line-strong: rgba(40, 40, 40, 0.16);
+      --white: rgba(255, 255, 255, 0.72);
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.08);
+      --radius: 34px;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
 
-html, body {
-  margin: 0;
-  width: 100%;
-  min-height: 100%;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  overflow: hidden;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-button, input, select, textarea { font: inherit; }
-button { border: 0; background: none; padding: 0; cursor: pointer; color: inherit; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255,255,255,.9), transparent 36%),
+        linear-gradient(135deg, #e8e8e6 0%, #f4f4f2 52%, #dededc 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
 
-.scene {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: #eeeeee;
-  isolation: isolate;
-}
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
 
-.scene::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 78% 16%, rgba(255,255,255,.35), transparent 24%),
-    radial-gradient(circle at 22% 84%, rgba(255,255,255,.26), transparent 28%);
-  pointer-events: none;
-  z-index: -2;
-}
+    button {
+      cursor: pointer;
+      border: 0;
+    }
 
-/* Hidden app controls: press N for new note, or use the tiny corner button. */
-.corner-controls {
-  position: fixed;
-  left: 18px;
-  top: 18px;
-  z-index: 50;
-  display: flex;
-  gap: 8px;
-  opacity: .08;
-  transition: opacity .18s ease;
-}
+    .app {
+      position: relative;
+      min-height: 100vh;
+      overflow: hidden;
+    }
 
-.corner-controls:hover,
-.corner-controls:focus-within { opacity: 1; }
+    .screen {
+      min-height: 100vh;
+      width: 100%;
+      transition: opacity .7s var(--ease), transform .9s var(--ease), filter .9s var(--ease);
+    }
 
-.corner-btn {
-  border-radius: 999px;
-  padding: 10px 13px;
-  background: rgba(255,255,255,.72);
-  border: 1px solid rgba(0,0,0,.08);
-  font-size: 12px;
-  font-weight: 900;
-  color: #555;
-  box-shadow: 0 10px 24px rgba(0,0,0,.055);
-}
+    .screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+    }
 
-.corner-btn:hover { background: #242424; color: #fff; }
+    .home {
+      padding: 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 42px;
+    }
 
-/* Exact reference composition */
-.orbit {
-  position: absolute;
-  width: 720px;
-  height: 720px;
-  left: -455px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 3px solid var(--line);
-  border-radius: 50%;
-  z-index: 1;
-}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      position: relative;
+      z-index: 3;
+    }
 
-.orbit-marker {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(0,0,0,.09);
-  transform: translate(-50%, -50%);
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-.orbit-marker.dark {
-  width: 10px;
-  height: 10px;
-  background: #2b2b2b;
-}
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--line-strong);
+      background:
+        radial-gradient(circle at 35% 30%, #fff, #d8d8d5 74%);
+      box-shadow: inset -8px -10px 22px rgba(0,0,0,.06), inset 8px 8px 18px rgba(255,255,255,.9);
+    }
 
-.m1 { left: 76.8%; top: 22.6%; }
-.m2 { left: 97.15%; top: 50%; }
-.m3 { left: 76.8%; top: 77.4%; }
-.m4 { left: 45%; top: 94.4%; }
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
 
-.ghost-step {
-  position: absolute;
-  z-index: 3;
-  color: var(--fade);
-  font-size: 76px;
-  line-height: .8;
-  font-weight: 950;
-  letter-spacing: -.14em;
-  transform: rotate(-27deg);
-  user-select: none;
-  transition: color .2s ease, transform .2s ease;
-}
+    .brand span {
+      display: block;
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
 
-.ghost-step:hover { color: rgba(0,0,0,.19); }
+    .btn {
+      min-height: 46px;
+      padding: 0 20px;
+      border-radius: 999px;
+      background: #2c2c2c;
+      color: #f7f7f5;
+      box-shadow: 0 16px 34px rgba(0,0,0,.16);
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+    }
 
-.g1 { left: 108px; top: 166px; }
-.g2 { left: 306px; top: 407px; }
-.g4 { left: 315px; top: 1018px; }
-.g5 { left: 108px; top: 1248px; }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 44px rgba(0,0,0,.18);
+      background: #151515;
+    }
 
-.focus {
-  position: absolute;
-  left: 373px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 56px;
-  transition: 460ms var(--ease);
-}
+    .btn.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line-strong);
+      box-shadow: none;
+    }
 
-.focus-no {
-  font-size: 140px;
-  line-height: .78;
-  font-weight: 950;
-  letter-spacing: -.14em;
-  color: #2b2b2b;
-  min-width: 198px;
-}
+    .hero {
+      position: relative;
+      flex: 1;
+      min-height: 640px;
+      display: grid;
+      grid-template-columns: minmax(260px, 460px) 1fr;
+      align-items: center;
+      gap: 70px;
+      z-index: 2;
+    }
 
-.focus-copy {
-  width: 330px;
-  transform: translateY(2px);
-}
+    .hero-copy {
+      max-width: 470px;
+    }
 
-.focus-title {
-  margin: 0 0 11px;
-  font-size: 32px;
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: -.055em;
-  color: #2b2b2b;
-}
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
 
-.focus-desc {
-  margin: 0;
-  font-size: 31px;
-  line-height: 1.22;
-  color: #7d7d7d;
-  font-weight: 400;
-  letter-spacing: -.035em;
-}
+    .hero h2 {
+      margin: 0;
+      font-size: clamp(54px, 8vw, 118px);
+      line-height: .86;
+      letter-spacing: -.08em;
+      font-weight: 900;
+    }
 
-/* Off-canvas editor, so the main view stays identical to the reference. */
-.editor-toggle {
-  position: fixed;
-  right: 22px;
-  bottom: 22px;
-  z-index: 45;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.68);
-  border: 1px solid rgba(0,0,0,.075);
-  color: #666;
-  display: grid;
-  place-items: center;
-  font-weight: 950;
-  opacity: .12;
-  transition: .18s ease;
-  box-shadow: 0 14px 35px rgba(0,0,0,.075);
-}
+    .hero p {
+      margin: 26px 0 0;
+      color: #747470;
+      font-size: 17px;
+      line-height: 1.7;
+      max-width: 390px;
+    }
 
-.editor-toggle:hover { opacity: 1; background: #242424; color: white; }
+    .space {
+      position: relative;
+      height: min(68vh, 680px);
+      min-height: 520px;
+      border-radius: 48px;
+      background: rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.48);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
 
-.sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  display: none;
-  background: rgba(0,0,0,.18);
-  backdrop-filter: blur(8px);
-}
+    .space::before {
+      content: "";
+      position: absolute;
+      width: 720px;
+      height: 720px;
+      border: 1px solid rgba(40,40,40,.08);
+      border-radius: 50%;
+      left: -340px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
-.sheet-backdrop.show { display: block; }
+    .space::after {
+      content: "";
+      position: absolute;
+      width: 1010px;
+      height: 1010px;
+      border: 1px solid rgba(40,40,40,.045);
+      border-radius: 50%;
+      left: -485px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
-.sheet {
-  position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: min(430px, 92vw);
-  z-index: 100;
-  padding: 22px;
-  background: rgba(245,245,245,.86);
-  backdrop-filter: blur(18px);
-  border-left: 1px solid rgba(0,0,0,.075);
-  box-shadow: -30px 0 80px rgba(0,0,0,.16);
-  transform: translateX(105%);
-  transition: 430ms var(--ease);
-  overflow: auto;
-}
+    .empty-state {
+      position: absolute;
+      right: 50px;
+      bottom: 46px;
+      max-width: 290px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
 
-.sheet.show { transform: translateX(0); }
+    .planet {
+      position: absolute;
+      width: 136px;
+      height: 136px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 32% 26%, rgba(255,255,255,.98), rgba(230,230,227,.85) 36%, rgba(177,177,173,.74) 100%);
+      border: 1px solid rgba(255,255,255,.7);
+      box-shadow:
+        inset -24px -28px 46px rgba(0,0,0,.12),
+        inset 18px 18px 38px rgba(255,255,255,.9),
+        0 28px 70px rgba(0,0,0,.1);
+      transition: transform .45s var(--ease), box-shadow .45s var(--ease), filter .45s var(--ease);
+      z-index: 2;
+      animation: float 6s ease-in-out infinite;
+    }
 
-.sheet-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 16px;
-  margin-bottom: 20px;
-}
+    .planet::before {
+      content: "";
+      position: absolute;
+      width: 158%;
+      height: 42%;
+      border: 1px solid rgba(45,45,45,.12);
+      border-radius: 50%;
+      transform: rotate(-18deg);
+    }
 
-.sheet-kicker {
-  margin: 0 0 7px;
-  color: #797979;
-  font-size: 12px;
-  font-weight: 950;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
+    .planet:hover {
+      transform: scale(1.08) translateY(-6px);
+      filter: contrast(1.05);
+      box-shadow:
+        inset -24px -28px 46px rgba(0,0,0,.12),
+        inset 18px 18px 38px rgba(255,255,255,.9),
+        0 38px 90px rgba(0,0,0,.14);
+    }
 
-.sheet-title {
-  margin: 0;
-  font-size: 34px;
-  line-height: .9;
-  letter-spacing: -.085em;
-  font-weight: 950;
-}
+    .planet-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 18px;
+    }
 
-.close-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.6);
-  border: 1px solid rgba(0,0,0,.08);
-  color: #666;
-  font-size: 20px;
-  font-weight: 950;
-}
+    .planet-title {
+      display: block;
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: -.03em;
+      color: #303030;
+    }
 
-.close-btn:hover { background: #242424; color: white; }
+    .planet-category {
+      display: block;
+      margin-top: 5px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #72726e;
+    }
 
-.form {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 22px;
-}
+    .zooming .home {
+      transform: scale(1.22);
+      filter: blur(8px);
+      opacity: 0;
+    }
 
-label {
-  display: grid;
-  gap: 7px;
-  color: #686868;
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
+    @keyframes float {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -12px; }
+    }
 
-input, select, textarea {
-  width: 100%;
-  border: 1px solid rgba(0,0,0,.075);
-  background: rgba(255,255,255,.6);
-  border-radius: 20px;
-  color: #242424;
-  outline: none;
-}
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(238,238,237,.64);
+      backdrop-filter: blur(18px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 10;
+    }
 
-input, select { padding: 14px 15px; }
+    .modal-backdrop.active {
+      display: flex;
+    }
 
-textarea {
-  min-height: 230px;
-  padding: 16px 17px;
-  resize: vertical;
-  line-height: 1.55;
-}
+    .modal {
+      width: min(520px, 100%);
+      background: rgba(250,250,248,.78);
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: var(--radius);
+      box-shadow: 0 40px 120px rgba(0,0,0,.14);
+      padding: 30px;
+      transform: translateY(20px) scale(.98);
+      opacity: 0;
+      animation: modalIn .45s var(--ease) forwards;
+    }
 
-input:focus, select:focus, textarea:focus {
-  border-color: rgba(0,0,0,.28);
-  background: rgba(255,255,255,.88);
-  box-shadow: 0 12px 32px rgba(0,0,0,.065);
-}
+    @keyframes modalIn {
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
 
-.primary-btn {
-  border-radius: 999px;
-  padding: 15px 18px;
-  background: #242424;
-  color: #fff;
-  font-weight: 950;
-  letter-spacing: -.025em;
-}
+    .modal h3 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -.06em;
+    }
 
-.planet-list { display: grid; gap: 10px; margin-top: 18px; }
+    .modal p {
+      margin: 10px 0 26px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
 
-.planet-chip {
-  display: grid;
-  grid-template-columns: 32px 1fr;
-  gap: 11px;
-  align-items: center;
-  width: 100%;
-  padding: 12px;
-  border-radius: 20px;
-  background: rgba(255,255,255,.48);
-  border: 1px solid rgba(0,0,0,.055);
-  text-align: left;
-}
+    .field {
+      display: grid;
+      gap: 9px;
+      margin-bottom: 16px;
+    }
 
-.planet-chip.active, .planet-chip:hover { background: rgba(255,255,255,.78); }
+    .field label {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #666662;
+    }
 
-.mini-planet {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 28%, rgba(255,255,255,.28), transparent 22%),
-    linear-gradient(145deg,#c6c6c6,#9e9e9e);
-}
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      outline: none;
+      background: rgba(255,255,255,.62);
+      border-radius: 20px;
+      padding: 16px 18px;
+      color: var(--text);
+      resize: vertical;
+      transition: border .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+    }
 
-.planet-chip strong {
-  display: block;
-  font-size: 14px;
-  letter-spacing: -.035em;
-}
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(40,40,40,.24);
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 0 0 5px rgba(0,0,0,.035);
+    }
 
-.planet-chip span {
-  display: block;
-  margin-top: 2px;
-  color: #858585;
-  font-size: 12px;
-}
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
 
-.step-row {
-  display: flex;
-  gap: 8px;
-  margin: 12px 0 16px;
-}
+    .detail {
+      padding: 42px;
+      display: grid;
+      grid-template-columns: minmax(360px, 46vw) 1fr;
+      align-items: center;
+      gap: 42px;
+      background:
+        radial-gradient(circle at 0% 50%, rgba(255,255,255,.86), transparent 34%),
+        linear-gradient(135deg, #efefed, #e4e4e2);
+    }
 
-.step-pill {
-  flex: 1;
-  border-radius: 999px;
-  padding: 10px 0;
-  background: rgba(255,255,255,.55);
-  border: 1px solid rgba(0,0,0,.07);
-  color: #777;
-  font-size: 13px;
-  font-weight: 950;
-}
+    .orbit-panel {
+      position: relative;
+      min-height: calc(100vh - 84px);
+      border-radius: 48px;
+      overflow: hidden;
+    }
 
-.step-pill.active { background: #242424; color: #fff; }
+    .orbit {
+      position: absolute;
+      width: min(78vw, 920px);
+      height: min(78vw, 920px);
+      min-width: 660px;
+      min-height: 660px;
+      border: 2px solid rgba(44,44,44,.07);
+      border-radius: 50%;
+      left: -56%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
-.status {
-  margin-top: 10px;
-  color: #818181;
-  font-size: 12px;
-  font-weight: 850;
-  text-align: right;
-}
+    .orbit::before,
+    .orbit::after {
+      content: "";
+      position: absolute;
+      inset: 13%;
+      border-radius: 50%;
+      border: 1px solid rgba(44,44,44,.045);
+    }
 
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 22px;
-  z-index: 150;
-  transform: translateX(-50%) translateY(24px);
-  opacity: 0;
-  pointer-events: none;
-  border-radius: 999px;
-  padding: 12px 16px;
-  background: rgba(24,24,24,.94);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 900;
-  transition: .24s ease;
-}
+    .orbit::after {
+      inset: 28%;
+    }
 
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .step-node {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 260px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-radius: 24px;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      transform:
+        rotate(var(--angle))
+        translateX(calc(var(--radius) * 1px))
+        rotate(calc(var(--angle) * -1));
+      transition: opacity .45s var(--ease), transform .45s var(--ease);
+    }
 
-@media (max-width: 900px) {
-  html, body { overflow: auto; }
-  .scene { width: 900px; height: 1450px; transform-origin: top left; }
-}
+    .step-node::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #d4d4d1;
+      box-shadow: 0 0 0 8px rgba(255,255,255,.32);
+      flex: 0 0 auto;
+    }
 
+    .step-num {
+      font-size: clamp(54px, 7vw, 98px);
+      line-height: .8;
+      font-weight: 950;
+      letter-spacing: -.1em;
+      color: rgba(40,40,40,.13);
+      transition: color .45s var(--ease), transform .45s var(--ease);
+    }
+
+    .step-label {
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: opacity .45s var(--ease), transform .45s var(--ease);
+    }
+
+    .step-label strong {
+      display: block;
+      font-size: 20px;
+      letter-spacing: -.04em;
+    }
+
+    .step-label span {
+      display: block;
+      margin-top: 6px;
+      max-width: 230px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .step-node.active .step-num {
+      color: #303030;
+      transform: scale(1.08);
+    }
+
+    .step-node.active::before {
+      background: #303030;
+      box-shadow: 0 0 0 10px rgba(48,48,48,.06);
+    }
+
+    .step-node.active .step-label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .detail-card {
+      position: relative;
+      z-index: 3;
+      width: min(620px, 100%);
+      justify-self: end;
+      background: rgba(250,250,248,.72);
+      border: 1px solid rgba(255,255,255,.86);
+      border-radius: 46px;
+      padding: clamp(28px, 5vw, 56px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      overflow: hidden;
+    }
+
+    .detail-card::before {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      right: -160px;
+      top: -180px;
+      background: radial-gradient(circle, rgba(255,255,255,.8), transparent 68%);
+      pointer-events: none;
+    }
+
+    .detail-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 34px;
+    }
+
+    .detail-title small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .detail-title h2 {
+      margin: 0;
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: .9;
+      letter-spacing: -.08em;
+    }
+
+    .category-pill {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #696965;
+      background: rgba(255,255,255,.46);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .step-content {
+      transition: opacity .32s var(--ease), transform .32s var(--ease);
+    }
+
+    .step-content.switching {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .step-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .step-content h3 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: -.055em;
+    }
+
+    .step-content p {
+      margin: 0 0 22px;
+      color: #797975;
+      line-height: 1.65;
+    }
+
+    textarea.note-area {
+      width: 100%;
+      min-height: 230px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      outline: none;
+      background: rgba(255,255,255,.56);
+      border-radius: 28px;
+      padding: 20px;
+      line-height: 1.65;
+      color: var(--text);
+      transition: border .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+    }
+
+    textarea.note-area:focus {
+      border-color: rgba(40,40,40,.23);
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 0 0 6px rgba(0,0,0,.035);
+    }
+
+    .step-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .mini-btn {
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.58);
+      border: 1px solid var(--line);
+      color: var(--text);
+      transition: transform .22s var(--ease), background .22s var(--ease);
+    }
+
+    .mini-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.9);
+    }
+
+    .back-link {
+      position: fixed;
+      left: 42px;
+      top: 42px;
+      z-index: 6;
+    }
+
+    @media (max-width: 980px) {
+      .home {
+        padding: 24px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .space {
+        min-height: 520px;
+      }
+
+      .detail {
+        grid-template-columns: 1fr;
+        padding: 24px;
+        align-items: start;
+      }
+
+      .orbit-panel {
+        min-height: 420px;
+      }
+
+      .orbit {
+        left: 50%;
+        top: 60%;
+        transform: translate(-50%, -50%);
+        min-width: 560px;
+        min-height: 560px;
+      }
+
+      .detail-card {
+        justify-self: center;
+      }
+
+      .step-node {
+        width: 210px;
+      }
+
+      .step-label span {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .brand h1 {
+        font-size: 14px;
+      }
+
+      .hero h2 {
+        font-size: 60px;
+      }
+
+      .space {
+        border-radius: 34px;
+      }
+
+      .planet {
+        width: 112px;
+        height: 112px;
+      }
+
+      .modal {
+        padding: 22px;
+        border-radius: 28px;
+      }
+
+      .modal-actions,
+      .step-actions {
+        flex-direction: column;
+      }
+
+      .btn,
+      .mini-btn {
+        width: 100%;
+      }
+
+      .detail-top {
+        flex-direction: column;
+      }
+
+      .back-link {
+        position: static;
+        margin-bottom: 16px;
+      }
+
+      .orbit-panel {
+        min-height: 360px;
+      }
+
+      .orbit {
+        min-width: 480px;
+        min-height: 480px;
+      }
+
+      .step-node {
+        width: 160px;
+      }
+
+      .step-num {
+        font-size: 48px;
+      }
+
+      .step-label strong {
+        font-size: 14px;
+      }
+
+      .detail-card {
+        border-radius: 34px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <main class="scene" id="scene">
-    <div class="corner-controls">
-      <button class="corner-btn" id="newBtn" type="button">Yeni</button>
-      <button class="corner-btn" id="listBtn" type="button">Notlar</button>
-    </div><section class="orbit" aria-label="Adım yörüngesi">
-  <span class="orbit-marker m1"></span>
-  <span class="orbit-marker m2 dark"></span>
-  <span class="orbit-marker m3"></span>
-  <span class="orbit-marker m4"></span>
-</section>
+  <main class="app" id="app">
+    <section class="screen home" id="homeScreen">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div>
+            <h1>Orbital Notes</h1>
+            <span>planet based thinking</span>
+          </div>
+        </div>
 
-<button class="ghost-step g1" data-step="0" type="button">01</button>
-<button class="ghost-step g2" data-step="1" type="button">02</button>
-<button class="ghost-step g4" data-step="3" type="button">04</button>
-<button class="ghost-step g5" data-step="4" type="button">05</button>
+        <button class="btn" id="openModalBtn">Yeni Not</button>
+      </header>
 
-<section class="focus" id="focusBlock">
-  <div class="focus-no" id="focusNo">03</div>
-  <div class="focus-copy">
-    <h1 class="focus-title" id="focusTitle">Ambient</h1>
-    <p class="focus-desc" id="focusDesc">already on and never<br>turns off.</p>
-  </div>
-</section>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Minimal bilgi sistemi</div>
+          <h2>Notlarını<br />yörüngeye<br />taşı.</h2>
+          <p>
+            Her not bir gezegen olarak doğar. Gezegenini seç, içine yaklaş ve
+            düşüncelerini beş aşamalı sakin bir akışta geliştir.
+          </p>
+        </div>
 
-<button class="editor-toggle" id="editorBtn" type="button">✎</button>
+        <div class="space" id="space">
+          <p class="empty-state" id="emptyState">
+            Henüz gezegen yok. İlk notunu oluşturduğunda burada yumuşak bir
+            orbital sistem belirecek.
+          </p>
+        </div>
+      </section>
+    </section>
 
-  </main>  <div class="sheet-backdrop" id="backdrop"></div>
-  <aside class="sheet" id="sheet">
-    <div class="sheet-head">
-      <div>
-        <p class="sheet-kicker" id="sheetKicker">Orbital note</p>
-        <h2 class="sheet-title" id="sheetTitle">Notlar</h2>
+    <section class="screen detail hidden" id="detailScreen">
+      <button class="mini-btn back-link" id="backBtn">← Galaksiye dön</button>
+
+      <div class="orbit-panel">
+        <div class="orbit" id="orbit">
+          <button class="step-node active" style="--angle:-46deg; --radius:390;" data-step="0">
+            <span class="step-num">01</span>
+            <span class="step-label">
+              <strong>Başlık</strong>
+              <span>Genel bakış ve niyet.</span>
+            </span>
+          </button>
+
+          <button class="step-node" style="--angle:-23deg; --radius:390;" data-step="1">
+            <span class="step-num">02</span>
+            <span class="step-label">
+              <strong>Ana Fikir</strong>
+              <span>Merkez düşünceyi tanımla.</span>
+            </span>
+          </button>
+
+          <button class="step-node" style="--angle:0deg; --radius:390;" data-step="2">
+            <span class="step-num">03</span>
+            <span class="step-label">
+              <strong>Detaylar</strong>
+              <span>Katmanları genişlet.</span>
+            </span>
+          </button>
+
+          <button class="step-node" style="--angle:23deg; --radius:390;" data-step="3">
+            <span class="step-num">04</span>
+            <span class="step-label">
+              <strong>Örnekler</strong>
+              <span>Ek notlar ve çağrışımlar.</span>
+            </span>
+          </button>
+
+          <button class="step-node" style="--angle:46deg; --radius:390;" data-step="4">
+            <span class="step-num">05</span>
+            <span class="step-label">
+              <strong>Sonuç</strong>
+              <span>Özet ve kapanış.</span>
+            </span>
+          </button>
+        </div>
       </div>
-      <button class="close-btn" id="closeSheet" type="button">×</button>
-    </div><form class="form" id="planetForm">
-  <label>
-    Gezegen adı
-    <input id="planetName" type="text" placeholder="Örn. Ambient" required />
-  </label>
-  <label>
-    Kategori
-    <select id="planetCategory" required>
-      <option value="">Seç</option>
-      <option>Ambient</option>
-      <option>Araştırma</option>
-      <option>Kişisel</option>
-      <option>Fikir</option>
-      <option>Proje</option>
-    </select>
-  </label>
-  <button class="primary-btn" type="submit">Oluştur</button>
-</form>
 
-<div class="step-row" id="stepRow"></div>
+      <article class="detail-card">
+        <div class="detail-top">
+          <div class="detail-title">
+            <small id="detailMeta">Seçili gezegen</small>
+            <h2 id="detailNoteTitle">Not</h2>
+          </div>
+          <div class="category-pill" id="detailCategory">Kategori</div>
+        </div>
 
-<label>
-  Aktif not
-  <textarea id="noteArea" placeholder="Bu adıma ait notunu yaz..."></textarea>
-</label>
-<div class="status" id="saveStatus">Kaydedildi</div>
+        <div class="step-content" id="stepContent">
+          <div class="step-kicker" id="stepKicker">01 / 05</div>
+          <h3 id="stepTitle">Başlık / Genel Bakış</h3>
+          <p id="stepDescription">
+            Bu bölümde notun genel yönünü, amacını ve zihinsel bağlamını tanımla.
+          </p>
+          <textarea class="note-area" id="noteTextarea" placeholder="Bu adım için notlarını yaz..."></textarea>
+        </div>
 
-<section class="planet-list" id="planetList"></section>
+        <div class="step-actions">
+          <button class="mini-btn" id="prevStepBtn">← Önceki Adım</button>
+          <button class="mini-btn" id="nextStepBtn">Sonraki Adım →</button>
+        </div>
+      </article>
+    </section>
+  </main>
 
-  </aside>  <div class="toast" id="toast">Kaydedildi</div>  <script>
-    const STEPS = [
-      { no: '01', title: 'Çekirdek fikir', desc: 'Notun merkezindeki fikri\nkısa ve net biçimde\nyakala.' },
-      { no: '02', title: 'Bağlam', desc: 'Neden önemli olduğunu\nve arka planını\ntanımla.' },
-      { no: '03', title: 'Ambient', desc: 'already on and never\nturns off.' },
-      { no: '04', title: 'Bağlantılar', desc: 'İlgili kişiler ve\nnot ilişkilerini\neşleştir.' },
-      { no: '05', title: 'Sonraki adım', desc: 'Devam etmek için\nen net hareketi\nyaz.' }
+  <div class="modal-backdrop" id="modalBackdrop">
+    <form class="modal" id="noteForm">
+      <h3>Yeni gezegen</h3>
+      <p>Notunu oluştur. Kaydettiğinde ana sahnede yeni bir gezegen olarak belirecek.</p>
+
+      <div class="field">
+        <label for="noteName">Not adı</label>
+        <input id="noteName" type="text" placeholder="Örn. Ürün stratejisi" required />
+      </div>
+
+      <div class="field">
+        <label for="noteCategory">Kategori</label>
+        <input id="noteCategory" type="text" placeholder="Örn. İş, Fikir, Araştırma" required />
+      </div>
+
+      <div class="field">
+        <label for="noteDescription">Kısa açıklama</label>
+        <textarea id="noteDescription" rows="3" placeholder="İsteğe bağlı kısa bağlam..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="closeModalBtn">Vazgeç</button>
+        <button type="submit" class="btn">Kaydet</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const app = document.getElementById("app");
+    const homeScreen = document.getElementById("homeScreen");
+    const detailScreen = document.getElementById("detailScreen");
+    const space = document.getElementById("space");
+    const emptyState = document.getElementById("emptyState");
+
+    const openModalBtn = document.getElementById("openModalBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const noteForm = document.getElementById("noteForm");
+
+    const detailNoteTitle = document.getElementById("detailNoteTitle");
+    const detailCategory = document.getElementById("detailCategory");
+    const detailMeta = document.getElementById("detailMeta");
+
+    const stepNodes = [...document.querySelectorAll(".step-node")];
+    const stepContent = document.getElementById("stepContent");
+    const stepKicker = document.getElementById("stepKicker");
+    const stepTitle = document.getElementById("stepTitle");
+    const stepDescription = document.getElementById("stepDescription");
+    const noteTextarea = document.getElementById("noteTextarea");
+    const prevStepBtn = document.getElementById("prevStepBtn");
+    const nextStepBtn = document.getElementById("nextStepBtn");
+    const backBtn = document.getElementById("backBtn");
+
+    const steps = [
+      {
+        title: "Başlık / Genel Bakış",
+        description: "Bu bölümde notun genel yönünü, amacını ve zihinsel bağlamını tanımla."
+      },
+      {
+        title: "Ana Fikir",
+        description: "Notun merkezindeki en güçlü fikri sade ve net şekilde yaz."
+      },
+      {
+        title: "Detaylar",
+        description: "Kavramları, bağlantıları, açıklamaları ve önemli ayrıntıları burada genişlet."
+      },
+      {
+        title: "Örnekler / Ek Notlar",
+        description: "Örnekler, referanslar, çağrışımlar veya ek fikirleri bu alana ekle."
+      },
+      {
+        title: "Sonuç / Özet",
+        description: "Notun final çıkarımını, özetini veya sonraki aksiyonunu netleştir."
+      }
     ];
 
-    const STORAGE = 'orbital_reference_exact_v1';
-    const scene = document.getElementById('scene');
-    const focusNo = document.getElementById('focusNo');
-    const focusTitle = document.getElementById('focusTitle');
-    const focusDesc = document.getElementById('focusDesc');
-    const ghostButtons = [...document.querySelectorAll('.ghost-step')];
-    const editorBtn = document.getElementById('editorBtn');
-    const newBtn = document.getElementById('newBtn');
-    const listBtn = document.getElementById('listBtn');
-    const sheet = document.getElementById('sheet');
-    const backdrop = document.getElementById('backdrop');
-    const closeSheet = document.getElementById('closeSheet');
-    const form = document.getElementById('planetForm');
-    const planetName = document.getElementById('planetName');
-    const planetCategory = document.getElementById('planetCategory');
-    const stepRow = document.getElementById('stepRow');
-    const noteArea = document.getElementById('noteArea');
-    const saveStatus = document.getElementById('saveStatus');
-    const planetList = document.getElementById('planetList');
-    const toast = document.getElementById('toast');
+    let notes = [];
+    let activeNoteId = null;
+    let activeStep = 0;
 
-    let planets = JSON.parse(localStorage.getItem(STORAGE) || '[]');
-    let activePlanetId = planets[0]?.id || null;
-    let activeStep = 2;
-    let saveTimer = null;
+    function openModal() {
+      modalBackdrop.classList.add("active");
+      document.getElementById("noteName").focus();
+    }
 
-    if (!planets.length) {
-      const demo = {
-        id: 'demo',
-        name: 'Ambient',
-        category: 'Ambient',
-        notes: ['', '', '', '', ''],
-        createdAt: new Date().toISOString()
+    function closeModal() {
+      modalBackdrop.classList.remove("active");
+      noteForm.reset();
+    }
+
+    function createNote({ name, category, description }) {
+      const note = {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        name,
+        category,
+        description,
+        contents: ["", "", "", "", ""]
       };
-      planets.push(demo);
-      activePlanetId = demo.id;
-      save();
+
+      notes.push(note);
+      renderPlanet(note, notes.length - 1);
+      emptyState.style.display = "none";
     }
 
-    function uid() {
-      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+    function renderPlanet(note, index) {
+      const planet = document.createElement("button");
+      planet.className = "planet";
+      planet.dataset.id = note.id;
+
+      const positions = [
+        { left: 18, top: 18 },
+        { left: 52, top: 24 },
+        { left: 30, top: 55 },
+        { left: 68, top: 58 },
+        { left: 12, top: 70 },
+        { left: 45, top: 72 }
+      ];
+
+      const pos = positions[index % positions.length];
+      planet.style.left = pos.left + "%";
+      planet.style.top = pos.top + "%";
+      planet.style.animationDelay = `${index * -0.7}s`;
+
+      planet.innerHTML = `
+        <span class="planet-content">
+          <span class="planet-title">${escapeHtml(note.name)}</span>
+          <span class="planet-category">${escapeHtml(note.category)}</span>
+        </span>
+      `;
+
+      planet.addEventListener("click", () => openDetail(note.id, planet));
+      space.appendChild(planet);
     }
 
-    function save() {
-      localStorage.setItem(STORAGE, JSON.stringify(planets));
+    function openDetail(noteId, planetEl) {
+      activeNoteId = noteId;
+      activeStep = 0;
+
+      app.classList.add("zooming");
+      planetEl.style.transform = "scale(8)";
+      planetEl.style.opacity = "0";
+
+      setTimeout(() => {
+        homeScreen.classList.add("hidden");
+        detailScreen.classList.remove("hidden");
+        app.classList.remove("zooming");
+        planetEl.style.transform = "";
+        planetEl.style.opacity = "";
+        loadActiveNote();
+        setStep(0, false);
+      }, 720);
     }
 
-    function activePlanet() {
-      return planets.find(p => p.id === activePlanetId);
+    function loadActiveNote() {
+      const note = getActiveNote();
+      if (!note) return;
+
+      detailNoteTitle.textContent = note.name;
+      detailCategory.textContent = note.category;
+      detailMeta.textContent = note.description ? note.description : "Seçili gezegen";
     }
 
-    function toastMsg(message) {
-      toast.textContent = message;
-      toast.classList.add('show');
-      clearTimeout(toast.timer);
-      toast.timer = setTimeout(() => toast.classList.remove('show'), 1300);
+    function getActiveNote() {
+      return notes.find(note => note.id === activeNoteId);
     }
 
-    function openSheet() {
-      backdrop.classList.add('show');
-      sheet.classList.add('show');
-      renderSheet();
-    }
+    function setStep(index, animated = true) {
+      const note = getActiveNote();
+      if (!note) return;
 
-    function hideSheet() {
-      backdrop.classList.remove('show');
-      sheet.classList.remove('show');
-    }
+      saveCurrentTextarea();
 
-    function renderMain() {
-      const step = STEPS[activeStep];
-      focusNo.textContent = step.no;
-      focusTitle.textContent = step.title;
-      focusDesc.innerHTML = step.desc.replaceAll('\n', '<br>');
+      activeStep = Math.max(0, Math.min(index, steps.length - 1));
 
-      ghostButtons.forEach(btn => {
-        const stepIndex = Number(btn.dataset.step);
-        btn.style.display = stepIndex === activeStep ? 'none' : 'block';
+      stepNodes.forEach(node => {
+        node.classList.toggle("active", Number(node.dataset.step) === activeStep);
       });
 
-      if (noteArea) {
-        const planet = activePlanet();
-        noteArea.value = planet?.notes?.[activeStep] || '';
-        noteArea.placeholder = `${step.no} · ${step.title} için notunu yaz...`;
+      const updateContent = () => {
+        stepKicker.textContent = `${String(activeStep + 1).padStart(2, "0")} / 05`;
+        stepTitle.textContent = steps[activeStep].title;
+        stepDescription.textContent = steps[activeStep].description;
+        noteTextarea.value = note.contents[activeStep] || "";
+
+        prevStepBtn.disabled = activeStep === 0;
+        nextStepBtn.disabled = activeStep === steps.length - 1;
+
+        if (animated) {
+          stepContent.classList.remove("switching");
+        }
+      };
+
+      if (animated) {
+        stepContent.classList.add("switching");
+        setTimeout(updateContent, 220);
+      } else {
+        updateContent();
       }
-      renderSheet();
     }
 
-    function renderStepButtons() {
-      stepRow.innerHTML = '';
-      STEPS.forEach((step, index) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'step-pill' + (index === activeStep ? ' active' : '');
-        btn.textContent = step.no;
-        btn.addEventListener('click', () => goToStep(index));
-        stepRow.appendChild(btn);
-      });
+    function saveCurrentTextarea() {
+      const note = getActiveNote();
+      if (!note) return;
+      note.contents[activeStep] = noteTextarea.value;
     }
 
-    function renderPlanets() {
-      planetList.innerHTML = '';
-      planets.forEach((planet, index) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'planet-chip' + (planet.id === activePlanetId ? ' active' : '');
-        btn.innerHTML = `
-          <span class="mini-planet"></span>
-          <span><strong>${String(index + 1).padStart(2,'0')} · ${planet.name}</strong><span>${planet.category}</span></span>
-        `;
-        btn.addEventListener('click', () => {
-          activePlanetId = planet.id;
-          save();
-          renderMain();
-        });
-        planetList.appendChild(btn);
-      });
+    function goBackHome() {
+      saveCurrentTextarea();
+
+      detailScreen.classList.add("hidden");
+      homeScreen.classList.remove("hidden");
+      activeNoteId = null;
+      activeStep = 0;
     }
 
-    function renderSheet() {
-      renderStepButtons();
-      renderPlanets();
-      const planet = activePlanet();
-      const step = STEPS[activeStep];
-      if (planet) noteArea.value = planet.notes[activeStep] || '';
-      noteArea.placeholder = `${step.no} · ${step.title} için notunu yaz...`;
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function goToStep(index) {
-      activeStep = Math.max(0, Math.min(4, index));
-      renderMain();
-    }
+    openModalBtn.addEventListener("click", openModal);
+    closeModalBtn.addEventListener("click", closeModal);
 
-    ghostButtons.forEach(btn => {
-      btn.addEventListener('click', () => goToStep(Number(btn.dataset.step)));
+    modalBackdrop.addEventListener("click", event => {
+      if (event.target === modalBackdrop) closeModal();
     });
 
-    editorBtn.addEventListener('click', openSheet);
-    newBtn.addEventListener('click', openSheet);
-    listBtn.addEventListener('click', openSheet);
-    closeSheet.addEventListener('click', hideSheet);
-    backdrop.addEventListener('click', hideSheet);
-
-    form.addEventListener('submit', event => {
+    noteForm.addEventListener("submit", event => {
       event.preventDefault();
-      const planet = {
-        id: uid(),
-        name: planetName.value.trim(),
-        category: planetCategory.value,
-        notes: ['', '', '', '', ''],
-        createdAt: new Date().toISOString()
-      };
-      if (!planet.name || !planet.category) return;
-      planets.unshift(planet);
-      activePlanetId = planet.id;
-      activeStep = 2;
-      save();
-      form.reset();
-      renderMain();
-      toastMsg('Gezegen oluşturuldu');
+
+      const name = document.getElementById("noteName").value.trim();
+      const category = document.getElementById("noteCategory").value.trim();
+      const description = document.getElementById("noteDescription").value.trim();
+
+      if (!name || !category) return;
+
+      createNote({ name, category, description });
+      closeModal();
     });
 
-    noteArea.addEventListener('input', () => {
-      const planet = activePlanet();
-      if (!planet) return;
-      planet.notes[activeStep] = noteArea.value;
-      planet.updatedAt = new Date().toISOString();
-      save();
-      saveStatus.textContent = 'Kaydediliyor...';
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => saveStatus.textContent = 'Kaydedildi', 420);
+    stepNodes.forEach(node => {
+      node.addEventListener("click", () => {
+        setStep(Number(node.dataset.step));
+      });
     });
 
-    window.addEventListener('keydown', event => {
-      if (document.activeElement === noteArea || document.activeElement === planetName) return;
-      if (event.key.toLowerCase() === 'n') openSheet();
-      if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') goToStep(activeStep - 1);
-      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') goToStep(activeStep + 1);
-      if (event.key === 'Escape') hideSheet();
+    noteTextarea.addEventListener("input", saveCurrentTextarea);
+
+    prevStepBtn.addEventListener("click", () => setStep(activeStep - 1));
+    nextStepBtn.addEventListener("click", () => setStep(activeStep + 1));
+    backBtn.addEventListener("click", goBackHome);
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && modalBackdrop.classList.contains("active")) {
+        closeModal();
+      }
+
+      if (!detailScreen.classList.contains("hidden")) {
+        if (event.key === "ArrowRight") setStep(activeStep + 1);
+        if (event.key === "ArrowLeft") setStep(activeStep - 1);
+      }
     });
 
-    renderMain();
-  </script></body>
+    createNote({
+      name: "Ambient",
+      category: "Fikir",
+      description: "already on and never turns off."
+    });
+  </script>
+</body>
 </html>
