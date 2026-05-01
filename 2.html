@@ -1,748 +1,949 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Orbital Notes</title>
+  <title>Orbital Notes · V2</title>
   <style>
-    :root{
-      --bg:#ececec;
-      --ink:#222;
-      --muted:#8f8f8f;
-      --soft:#cfcfcf;
-      --line:rgba(0,0,0,.08);
-      --glass:rgba(255,255,255,.34);
-      --glass-strong:rgba(255,255,255,.6);
-      --shadow:0 20px 50px rgba(0,0,0,.09);
-      --ease:cubic-bezier(.16,1,.3,1);
-    }
-
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    body{overflow-x:hidden}
-
-    button,input,select,textarea{font:inherit}
-
-    .app{
-      min-height:100svh;
-      display:grid;
-      grid-template-columns:360px 1fr;
-      background:
-        radial-gradient(circle at 80% 15%, rgba(255,255,255,.55), transparent 22%),
-        radial-gradient(circle at 20% 80%, rgba(255,255,255,.4), transparent 24%),
-        var(--bg);
-    }
-
-    /* SIDEBAR */
-    .sidebar{
-      padding:28px 22px;
-      border-right:1px solid rgba(0,0,0,.05);
-      background:rgba(255,255,255,.18);
-      backdrop-filter:blur(12px);
-      position:relative;
-      z-index:20;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size:24px;
-      font-weight:900;
-      letter-spacing:-.06em;
-      margin-bottom:26px;
-    }
-
-    .brand-dot{
-      width:34px;
-      height:34px;
-      border-radius:50%;
-      background:linear-gradient(145deg,#3f3f3f,#1f1f1f);
-      position:relative;
-      box-shadow:inset -10px -10px 0 rgba(255,255,255,.08);
-    }
-
-    .brand-dot::after{
-      content:"";
-      position:absolute;
-      left:-6px;
-      top:12px;
-      width:46px;
-      height:9px;
-      border:2px solid rgba(255,255,255,.65);
-      border-left-color:transparent;
-      border-right-color:transparent;
-      border-radius:999px;
-      transform:rotate(-18deg);
-    }
-
-    .subhead{
-      margin:0 0 8px;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      font-size:12px;
-      font-weight:800;
-      color:#777;
-    }
-
-    .intro{
-      margin:0 0 18px;
-      color:#6f6f6f;
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    .form{
-      display:grid;
-      gap:12px;
-    }
-
-    label{
-      display:grid;
-      gap:6px;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color:#686868;
-      font-weight:800;
-    }
-
-    input,select{
-      width:100%;
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:18px;
-      padding:14px 15px;
-      background:rgba(255,255,255,.5);
-      outline:none;
-      transition:.2s ease;
-      color:var(--ink);
-    }
-
-    input:focus,select:focus,textarea:focus{
-      background:rgba(255,255,255,.78);
-      border-color:rgba(0,0,0,.25);
-      box-shadow:0 10px 26px rgba(0,0,0,.06);
-    }
-
-    .create-btn{
-      border:none;
-      border-radius:999px;
-      padding:16px 18px;
-      background:#222;
-      color:#fff;
-      font-weight:900;
-      letter-spacing:-.03em;
-      cursor:pointer;
-      box-shadow:0 16px 35px rgba(0,0,0,.17);
-      transition:.2s ease;
-    }
-
-    .create-btn:hover{
-      transform:translateY(-2px);
-      background:#111;
-    }
-
-    .planet-list{
-      margin-top:22px;
-      display:grid;
-      gap:10px;
-      max-height:44vh;
-      overflow:auto;
-      padding-right:4px;
-    }
-
-    .planet-chip{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      width:100%;
-      border:1px solid rgba(0,0,0,.05);
-      border-radius:22px;
-      padding:12px 13px;
-      background:rgba(255,255,255,.36);
-      cursor:pointer;
-      transition:.2s ease;
-      text-align:left;
-    }
-
-    .planet-chip:hover,.planet-chip.active{
-      background:rgba(255,255,255,.68);
-      transform:translateX(2px);
-    }
-
-    .mini-planet{
-      width:32px;
-      height:32px;
-      border-radius:50%;
-      flex:0 0 auto;
-      background:
-        radial-gradient(circle at 35% 28%, rgba(255,255,255,.22), transparent 20%),
-        linear-gradient(145deg,#444,#1f1f1f);
-      box-shadow:inset -10px -10px 0 rgba(255,255,255,.06);
-    }
-
-    .planet-chip strong{
-      display:block;
-      font-size:14px;
-      letter-spacing:-.03em;
-    }
-
-    .planet-chip span{
-      display:block;
-      color:#888;
-      margin-top:2px;
-      font-size:12px;
-    }
-
-    /* WORKSPACE */
-    .workspace{
-      position:relative;
-      min-height:100svh;
-      overflow:hidden;
-    }
-
-    .scene{
-      position:relative;
-      min-height:100svh;
-      overflow:hidden;
-      touch-action:pan-y;
-    }
-
-    .orbit{
-      position:absolute;
-      left:-290px;
-      top:50%;
-      width:720px;
-      height:720px;
-      transform:translateY(-50%);
-      border:3px solid rgba(0,0,0,.045);
-      border-radius:50%;
-      transition:transform 800ms var(--ease), opacity 500ms ease;
-      opacity:.95;
-    }
-
-    .scene.zoomed .orbit{
-      transform:translateY(-50%) scale(1.18);
-      opacity:.82;
-    }
-
-    .step-node{
-      position:absolute;
-      transform:translate(-50%,-50%);
-      border:none;
-      background:transparent;
-      cursor:pointer;
-      padding:0;
-      color:rgba(0,0,0,.10);
-      transition:.25s ease;
-    }
-
-    .step-node .dot{
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:rgba(0,0,0,.12);
-      position:absolute;
-      left:0;
-      top:0;
-      transform:translate(-50%,-50%);
-      transition:.25s ease;
-    }
-
-    .step-node .num{
-      font-size:78px;
-      font-weight:950;
-      line-height:.8;
-      letter-spacing:-.14em;
-      user-select:none;
-      display:block;
-    }
-
-    .step-node:hover{color:rgba(0,0,0,.22)}
-    .step-node.active{color:#2b2b2b}
-    .step-node.active .num{font-size:118px}
-    .step-node.active .dot{
-      width:16px;
-      height:16px;
-      background:#2a2a2a;
-      box-shadow:0 0 0 8px rgba(0,0,0,.04);
-    }
-
-    .step-node.s1{left:13%;top:18%;transform:translate(-50%,-50%) rotate(-26deg)}
-    .step-node.s2{left:48%;top:33%;transform:translate(-50%,-50%) rotate(-24deg)}
-    .step-node.s3{left:82%;top:50%;transform:translate(-50%,-50%)}
-    .step-node.s4{left:48%;top:68%;transform:translate(-50%,-50%) rotate(-24deg)}
-    .step-node.s5{left:13%;top:84%;transform:translate(-50%,-50%) rotate(-26deg)}
-
-    .step-node.active.s1,
-    .step-node.active.s2,
-    .step-node.active.s4,
-    .step-node.active.s5{
-      transform:translate(-50%,-50%) rotate(0deg);
-    }
-
-    .planet-stage{
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      transition:800ms var(--ease);
-      pointer-events:none;
-    }
-
-    .scene.zoomed .planet-stage{
-      transform:translateX(-18vw) scale(1.28);
-      opacity:.38;
-    }
-
-    .planet-core{
-      width:min(31vw,320px);
-      height:min(31vw,320px);
-      min-width:190px;
-      min-height:190px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 35% 26%, rgba(255,255,255,.25), transparent 22%),
-        linear-gradient(145deg,#c5c5c5,#b8b8b8);
-      box-shadow:inset -30px -30px 60px rgba(0,0,0,.08);
-      position:relative;
-    }
-
-    .planet-core::before,
-    .planet-core::after{
-      content:"";
-      position:absolute;
-      left:-10%;
-      width:120%;
-      height:26%;
-      border:3px solid rgba(255,255,255,.28);
-      border-left-color:transparent;
-      border-right-color:transparent;
-      border-radius:50%;
-      transform:rotate(-10deg);
-    }
-
-    .planet-core::before{top:34%}
-    .planet-core::after{top:46%}
-
-    .planet-label{
-      position:absolute;
-      left:50%;
-      top:calc(50% + min(18vw,180px));
-      transform:translateX(-50%);
-      text-align:center;
-      transition:.3s ease;
-    }
-
-    .planet-label h1{
-      margin:0;
-      font-size:clamp(30px,5vw,68px);
-      line-height:.9;
-      letter-spacing:-.1em;
-    }
-
-    .planet-label p{
-      margin:8px 0 0;
-      font-size:clamp(16px,1.8vw,24px);
-      color:#999;
-      font-weight:700;
-    }
-
-    .active-caption{
-      position:absolute;
-      left:58%;
-      top:50%;
-      transform:translateY(-50%) translateX(40px);
-      opacity:0;
-      transition:700ms var(--ease);
-      z-index:5;
-      max-width:360px;
-    }
-
-    .scene.zoomed .active-caption{
-      opacity:1;
-      transform:translateY(-50%) translateX(0);
-    }
-
-    .active-caption h3{
-      margin:0 0 6px;
-      font-size:17px;
-      font-weight:800;
-      color:#2b2b2b;
-    }
-
-    .active-caption p{
-      margin:0;
-      color:#7d7d7d;
-      font-size:16px;
-      line-height:1.45;
-    }
-
-    .info-block{
-      position:absolute;
-      left:50%;
-      bottom:180px;
-      transform:translateX(-50%);
-      text-align:center;
-      transition:700ms var(--ease);
-      z-index:5;
-    }
-
-    .scene.zoomed .info-block{
-      bottom:150px;
-    }
-
-    .info-block .cat{
-      margin:0 0 10px;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      color:#7c7c7c;
-      font-size:14px;
-      font-weight:900;
-    }
-
-    .info-block .name{
-      margin:0;
-      font-size:clamp(52px,6vw,90px);
-      line-height:.88;
-      letter-spacing:-.11em;
-      font-weight:950;
-    }
-
-    .editor{
-      position:absolute;
-      left:50%;
-      bottom:36px;
-      transform:translateX(-50%);
-      width:min(760px,72vw);
-      background:rgba(255,255,255,.34);
-      border:1px solid rgba(255,255,255,.42);
-      backdrop-filter:blur(15px);
-      border-radius:34px;
-      box-shadow:var(--shadow);
-      padding:26px;
-      opacity:0;
-      pointer-events:none;
-      transition:700ms var(--ease);
-      z-index:10;
-    }
-
-    .scene.zoomed .editor{
-      opacity:1;
-      pointer-events:auto;
-    }
-
-    .editor-head{
-      display:flex;
-      align-items:flex-start;
-      gap:18px;
-      margin-bottom:14px;
-    }
-
-    .editor-num{
-      font-size:110px;
-      line-height:.78;
-      font-weight:950;
-      letter-spacing:-.14em;
-      flex:0 0 auto;
-    }
-
-    .editor-copy h2{
-      margin:10px 0 8px;
-      font-size:clamp(28px,3vw,44px);
-      line-height:.92;
-      letter-spacing:-.08em;
-    }
-
-    .editor-copy p{
-      margin:0;
-      color:#7b7b7b;
-      font-size:15px;
-      line-height:1.45;
-    }
-
-    textarea{
-      width:100%;
-      min-height:150px;
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:22px;
-      padding:16px 18px;
-      background:rgba(255,255,255,.56);
-      color:var(--ink);
-      outline:none;
-      resize:vertical;
-      line-height:1.55;
-      font-size:15px;
-    }
-
-    .swipe-hint{
-      margin-top:12px;
-      text-align:center;
-      color:#8a8a8a;
-      font-size:13px;
-      font-weight:700;
-    }
-
-    .empty{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      text-align:center;
-      color:#7b7b7b;
-      z-index:4;
-      width:min(480px,90%);
-      transition:.3s ease;
-    }
-
-    .empty strong{
-      display:block;
-      font-size:110px;
-      line-height:.8;
-      letter-spacing:-.14em;
-      color:#2b2b2b;
-      margin-bottom:10px;
-    }
-
-    .scene.zoomed .empty{
-      opacity:0;
-      pointer-events:none;
-    }
-
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:20px;
-      transform:translateX(-50%) translateY(24px);
-      opacity:0;
-      pointer-events:none;
-      padding:12px 16px;
-      border-radius:999px;
-      background:rgba(24,24,24,.92);
-      color:#fff;
-      font-size:14px;
-      font-weight:800;
-      z-index:50;
-      transition:.25s ease;
-    }
-
-    .toast.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(0);
-    }
-
-    /* MOBILE */
-    @media (max-width: 920px){
-      .app{
-        grid-template-columns:1fr;
-      }
-
-      .sidebar{
-        border-right:none;
-        border-bottom:1px solid rgba(0,0,0,.05);
-        padding:18px 14px 16px;
-      }
-
-      .brand{margin-bottom:16px;font-size:22px}
-
-      .form{
-        grid-template-columns:1fr 1fr auto;
-        align-items:end;
-      }
-
-      .form label:first-child{grid-column:1 / span 3}
-      .create-btn{padding:14px 16px;min-width:120px}
-
-      .planet-list{
-        margin-top:16px;
-        display:grid;
-        grid-auto-flow:column;
-        grid-auto-columns:minmax(220px,1fr);
-        overflow-x:auto;
-        overflow-y:hidden;
-        max-height:none;
-      }
-
-      .workspace,
-      .scene{
-        min-height:calc(100svh - 220px);
-      }
-
-      .orbit{
-        width:560px;
-        height:560px;
-        left:-240px;
-      }
-
-      .scene.zoomed .planet-stage{
-        transform:translateY(-28px) scale(.88);
-        opacity:.36;
-      }
-
-      .planet-core{
-        width:230px;
-        height:230px;
-        min-width:0;
-        min-height:0;
-      }
-
-      .planet-label{
-        top:calc(50% + 130px);
-      }
-
-      .active-caption{
-        left:auto;
-        right:22px;
-        top:46%;
-        max-width:220px;
-      }
-
-      .active-caption h3{font-size:15px}
-      .active-caption p{font-size:14px}
-
-      .info-block{
-        bottom:230px;
-      }
-
-      .info-block .name{
-        font-size:66px;
-      }
-
-      .editor{
-        left:16px;
-        right:16px;
-        bottom:14px;
-        transform:none;
-        width:auto;
-        padding:18px;
-        border-radius:28px;
-      }
-
-      .editor-head{
-        gap:12px;
-      }
-
-      .editor-num{
-        font-size:92px;
-      }
-
-      .editor-copy h2{
-        margin-top:8px;
-        font-size:32px;
-      }
-
-      .empty strong{font-size:86px}
-    }
-
-    @media (max-width: 560px){
-      .form{
-        grid-template-columns:1fr;
-      }
-
-      .form label:first-child{grid-column:auto}
-      .create-btn{width:100%}
-
-      .workspace,
-      .scene{
-        min-height:calc(100svh - 310px);
-      }
-
-      .orbit{
-        width:500px;
-        height:500px;
-        left:-250px;
-      }
-
-      .step-node .num{font-size:64px}
-      .step-node.active .num{font-size:86px}
-
-      .scene.zoomed .planet-stage{
-        transform:translateY(-34px) scale(.78);
-      }
-
-      .planet-core{
-        width:180px;
-        height:180px;
-      }
-
-      .planet-label{
-        top:calc(50% + 100px);
-      }
-
-      .planet-label h1{font-size:40px}
-      .planet-label p{font-size:16px}
-
-      .active-caption{
-        right:16px;
-        top:44%;
-        max-width:160px;
-      }
-
-      .info-block{
-        bottom:240px;
-      }
-
-      .info-block .cat{
-        font-size:12px;
-        margin-bottom:8px;
-      }
-
-      .info-block .name{
-        font-size:44px;
-      }
-
-      .editor{
-        padding:16px;
-      }
-
-      .editor-head{
-        display:block;
-      }
-
-      .editor-num{
-        font-size:80px;
-      }
-
-      .editor-copy h2{
-        font-size:26px;
-        margin:6px 0 8px;
-      }
-
-      textarea{
-        min-height:130px;
-        font-size:14px;
-      }
-
-      .swipe-hint{
-        font-size:12px;
-      }
-    }
+    :root {
+      --bg: #eeeeee;
+      --ink: #222222;
+      --muted: #8d8d8d;
+      --soft: rgba(0, 0, 0, .08);
+      --card: rgba(255, 255, 255, .46);
+      --card-strong: rgba(255, 255, 255, .72);
+      --dark: #242424;
+      --radius-xl: 34px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .11);
+      --ease: cubic-bezier(.16, 1, .3, 1);
+      --planet-a: #bdbdbd;
+      --planet-b: #9d9d9d;
+      --accent: #242424;
+    }* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, .62), transparent 24%),
+    radial-gradient(circle at 18% 78%, rgba(255, 255, 255, .42), transparent 28%),
+    var(--bg);
+}
+
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.app {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 372px minmax(0, 1fr);
+}
+
+.sidebar {
+  position: relative;
+  z-index: 50;
+  padding: 28px 22px;
+  border-right: 1px solid rgba(0, 0, 0, .055);
+  background: rgba(255, 255, 255, .2);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: -.065em;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 25%, rgba(255,255,255,.28), transparent 22%),
+    linear-gradient(145deg, #454545, #1f1f1f);
+  box-shadow: inset -11px -10px 0 rgba(255,255,255,.08);
+  position: relative;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 12px;
+  width: 50px;
+  height: 10px;
+  border: 2px solid rgba(255,255,255,.68);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-radius: 999px;
+  transform: rotate(-18deg);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #777;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+}
+
+.intro {
+  margin: 0 0 18px;
+  color: #6f6f6f;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.composer {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: #676767;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+
+input, select, textarea {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, .075);
+  border-radius: 19px;
+  outline: none;
+  color: var(--ink);
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+input, select {
+  padding: 14px 15px;
+  background: rgba(255, 255, 255, .5);
+}
+
+textarea {
+  min-height: 158px;
+  padding: 16px 17px;
+  resize: vertical;
+  line-height: 1.55;
+  background: rgba(255,255,255,.58);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(0,0,0,.28);
+  background: rgba(255,255,255,.8);
+  box-shadow: 0 12px 30px rgba(0,0,0,.065);
+}
+
+.create-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 18px;
+  color: white;
+  background: var(--dark);
+  font-weight: 950;
+  letter-spacing: -.03em;
+  cursor: pointer;
+  box-shadow: 0 18px 42px rgba(0,0,0,.18);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  background: #111;
+  box-shadow: 0 22px 52px rgba(0,0,0,.22);
+}
+
+.planet-list {
+  margin-top: 23px;
+  display: grid;
+  gap: 10px;
+  max-height: 43vh;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.planet-chip {
+  width: 100%;
+  border: 1px solid rgba(0,0,0,.052);
+  border-radius: 23px;
+  padding: 12px;
+  background: rgba(255,255,255,.38);
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: .2s ease;
+}
+
+.planet-chip:hover, .planet-chip.active {
+  background: rgba(255,255,255,.72);
+  transform: translateX(2px);
+}
+
+.mini-planet {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 25%, rgba(255,255,255,.25), transparent 22%),
+    linear-gradient(145deg, var(--p1), var(--p2));
+  box-shadow: inset -10px -9px 0 rgba(0,0,0,.09);
+}
+
+.chip-copy strong {
+  display: block;
+  font-size: 14px;
+  letter-spacing: -.035em;
+  white-space: nowrap;
+  max-width: 185px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip-copy span {
+  display: block;
+  margin-top: 2px;
+  color: #878787;
+  font-size: 12px;
+}
+
+.chip-actions {
+  display: flex;
+  gap: 5px;
+  opacity: .45;
+  transition: opacity .2s ease;
+}
+
+.planet-chip:hover .chip-actions { opacity: 1; }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(0,0,0,.07);
+  border-radius: 999px;
+  background: rgba(255,255,255,.52);
+  color: #595959;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.icon-btn:hover { background: #242424; color: #fff; }
+
+.utility-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.utility-btn {
+  border: 1px solid rgba(0,0,0,.07);
+  border-radius: 999px;
+  padding: 11px 12px;
+  background: rgba(255,255,255,.4);
+  color: #606060;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  transition: .2s ease;
+}
+
+.utility-btn:hover { background: rgba(255,255,255,.78); color: #222; }
+
+.workspace {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.scene {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.orbit {
+  position: absolute;
+  left: -298px;
+  top: 50%;
+  width: 735px;
+  height: 735px;
+  transform: translateY(-50%);
+  border: 3px solid rgba(0,0,0,.045);
+  border-radius: 50%;
+  opacity: .96;
+  transition: transform 820ms var(--ease), opacity 520ms ease;
+}
+
+.scene.zoomed .orbit {
+  transform: translateY(-50%) scale(1.14);
+  opacity: .82;
+}
+
+.step-node {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(0,0,0,.105);
+  transform: translate(-50%, -50%);
+  transition: color .26s ease, transform .26s ease;
+}
+
+.step-node .dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.13);
+  transform: translate(-50%, -50%);
+  transition: .25s ease;
+}
+
+.step-node .num {
+  display: block;
+  font-size: 78px;
+  font-weight: 950;
+  line-height: .8;
+  letter-spacing: -.145em;
+  user-select: none;
+}
+
+.step-node:hover { color: rgba(0,0,0,.25); }
+.step-node.active { color: var(--accent); }
+.step-node.active .num { font-size: 122px; }
+.step-node.active .dot {
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  box-shadow: 0 0 0 9px rgba(0,0,0,.04);
+}
+
+.s1 { left: 14%; top: 18%; transform: translate(-50%, -50%) rotate(-25deg); }
+.s2 { left: 50%; top: 32%; transform: translate(-50%, -50%) rotate(-23deg); }
+.s3 { left: 83%; top: 50%; transform: translate(-50%, -50%); }
+.s4 { left: 50%; top: 69%; transform: translate(-50%, -50%) rotate(-23deg); }
+.s5 { left: 14%; top: 84%; transform: translate(-50%, -50%) rotate(-25deg); }
+.step-node.active { transform: translate(-50%, -50%) rotate(0deg); }
+
+.planet-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: 820ms var(--ease);
+}
+
+.scene.zoomed .planet-stage {
+  transform: translateX(-18vw) scale(1.26);
+  opacity: .36;
+}
+
+.planet-core {
+  width: min(31vw, 330px);
+  height: min(31vw, 330px);
+  min-width: 200px;
+  min-height: 200px;
+  border-radius: 999px;
+  position: relative;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255,255,255,.32), transparent 23%),
+    radial-gradient(circle at 75% 76%, rgba(0,0,0,.12), transparent 34%),
+    linear-gradient(145deg, var(--planet-a), var(--planet-b));
+  box-shadow: inset -34px -32px 70px rgba(0,0,0,.11), 0 34px 90px rgba(0,0,0,.1);
+  transition: background .3s ease;
+}
+
+.planet-core::before, .planet-core::after {
+  content: "";
+  position: absolute;
+  left: -11%;
+  width: 122%;
+  height: 27%;
+  border: 3px solid rgba(255,255,255,.28);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-radius: 50%;
+  transform: rotate(-10deg);
+}
+
+.planet-core::before { top: 34%; }
+.planet-core::after { top: 46%; opacity: .58; }
+
+.planet-label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + min(18vw, 188px));
+  width: min(520px, 80vw);
+  text-align: center;
+  transform: translateX(-50%);
+  transition: opacity .3s ease;
+}
+
+.planet-label h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 72px);
+  line-height: .88;
+  letter-spacing: -.105em;
+  font-weight: 950;
+}
+
+.planet-label p {
+  margin: 9px 0 0;
+  color: #8b8b8b;
+  font-weight: 800;
+  font-size: clamp(16px, 1.7vw, 22px);
+}
+
+.caption {
+  position: absolute;
+  left: 58%;
+  top: 50%;
+  z-index: 8;
+  max-width: 365px;
+  transform: translateY(-50%) translateX(46px);
+  opacity: 0;
+  transition: 720ms var(--ease);
+  pointer-events: none;
+}
+
+.scene.zoomed .caption {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.caption h3 {
+  margin: 0 0 7px;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+
+.caption p {
+  margin: 0;
+  color: #777;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.planet-info {
+  position: absolute;
+  left: 50%;
+  bottom: 182px;
+  z-index: 7;
+  text-align: center;
+  transform: translateX(-50%);
+  transition: 720ms var(--ease);
+  pointer-events: none;
+}
+
+.scene.zoomed .planet-info { bottom: 152px; }
+
+.planet-info .category {
+  margin: 0 0 10px;
+  color: #777;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.planet-info .title {
+  margin: 0;
+  font-size: clamp(52px, 6.5vw, 92px);
+  line-height: .86;
+  letter-spacing: -.112em;
+  font-weight: 950;
+}
+
+.step-progress {
+  position: absolute;
+  left: 50%;
+  bottom: 126px;
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  gap: 10px;
+  opacity: 0;
+  transition: 600ms var(--ease);
+}
+
+.scene.zoomed .step-progress { opacity: 1; }
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.14);
+  transition: .22s ease;
+}
+
+.progress-dot.active {
+  width: 32px;
+  background: var(--accent);
+}
+
+.editor {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  z-index: 12;
+  width: min(770px, 72vw);
+  transform: translateX(-50%) translateY(34px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255,255,255,.48);
+  background: var(--card);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  transition: 720ms var(--ease);
+}
+
+.scene.zoomed .editor {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.editor.switching {
+  animation: cardSwitch .38s var(--ease);
+}
+
+.editor-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.editor-no {
+  font-size: 112px;
+  line-height: .76;
+  font-weight: 950;
+  letter-spacing: -.145em;
+  color: var(--accent);
+}
+
+.editor-copy h2 {
+  margin: 10px 0 8px;
+  font-size: clamp(30px, 3.1vw, 46px);
+  line-height: .9;
+  letter-spacing: -.085em;
+  font-weight: 950;
+}
+
+.editor-copy p {
+  margin: 0;
+  color: #767676;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.save-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 11px;
+  color: #858585;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.swipe-hint { opacity: .9; }
+
+.empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 6;
+  width: min(510px, 86vw);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #777;
+  line-height: 1.5;
+  transition: .35s ease;
+}
+
+.scene.zoomed .empty { opacity: 0; pointer-events: none; }
+
+.empty strong {
+  display: block;
+  margin-bottom: 12px;
+  color: #2a2a2a;
+  font-size: 112px;
+  line-height: .78;
+  letter-spacing: -.145em;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0,0,0,.22);
+  backdrop-filter: blur(10px);
+}
+
+.modal-backdrop.show { display: grid; }
+
+.modal {
+  width: min(460px, 100%);
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,.5);
+  background: rgba(245,245,245,.86);
+  box-shadow: 0 30px 90px rgba(0,0,0,.2);
+  padding: 22px;
+}
+
+.modal h2 {
+  margin: 0 0 14px;
+  font-size: 34px;
+  line-height: .9;
+  letter-spacing: -.08em;
+}
+
+.modal-form { display: grid; gap: 12px; }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 4px;
+}
+
+.secondary-btn, .danger-btn {
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 999px;
+  padding: 12px 15px;
+  cursor: pointer;
+  font-weight: 900;
+  background: rgba(255,255,255,.55);
+  color: #555;
+}
+
+.secondary-btn:hover { background: white; color: #222; }
+.danger-btn:hover { background: #242424; color: white; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  z-index: 150;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(24,24,24,.93);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 18px 45px rgba(0,0,0,.2);
+  transform: translateX(-50%) translateY(25px);
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@keyframes cardSwitch {
+  from { opacity: .25; transform: translateX(-50%) translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@media (max-width: 960px) {
+  .app { display: block; }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(0,0,0,.055);
+    padding: 18px 14px 16px;
+  }
+
+  .brand { margin-bottom: 16px; font-size: 22px; }
+  .intro { margin-bottom: 15px; }
+
+  .composer {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+  }
+
+  .composer label:first-child { grid-column: 1 / span 3; }
+  .create-btn { min-width: 120px; padding: 14px 16px; }
+
+  .planet-list {
+    margin-top: 16px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(225px, 1fr);
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+    padding-bottom: 5px;
+  }
+
+  .utility-row { grid-template-columns: 1fr 1fr; }
+
+  .workspace, .scene { min-height: calc(100svh - 235px); }
+
+  .orbit {
+    width: 570px;
+    height: 570px;
+    left: -250px;
+  }
+
+  .scene.zoomed .planet-stage {
+    transform: translateY(-30px) scale(.87);
+    opacity: .34;
+  }
+
+  .planet-core {
+    width: 230px;
+    height: 230px;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .planet-label { top: calc(50% + 130px); }
+
+  .step-node .num { font-size: 62px; }
+  .step-node.active .num { font-size: 92px; }
+
+  .caption {
+    left: auto;
+    right: 20px;
+    top: 43%;
+    max-width: 220px;
+  }
+
+  .caption h3 { font-size: 15px; }
+  .caption p { font-size: 14px; }
+
+  .planet-info { bottom: 240px; }
+  .scene.zoomed .planet-info { bottom: 228px; }
+  .planet-info .title { font-size: 62px; }
+
+  .step-progress { bottom: 206px; }
+
+  .editor {
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    width: auto;
+    transform: translateY(34px);
+    padding: 18px;
+    border-radius: 29px;
+  }
+
+  .scene.zoomed .editor { transform: translateY(0); }
+  .editor.switching { animation: mobileCardSwitch .38s var(--ease); }
+  .editor-no { font-size: 88px; }
+  .editor-copy h2 { font-size: 32px; }
+}
+
+@media (max-width: 560px) {
+  .sidebar { padding: 16px 13px 14px; }
+  .brand { font-size: 21px; }
+
+  .composer { grid-template-columns: 1fr; }
+  .composer label:first-child { grid-column: auto; }
+  .create-btn { width: 100%; }
+
+  .chip-copy strong { max-width: 132px; }
+  .workspace, .scene { min-height: calc(100svh - 322px); }
+
+  .orbit {
+    width: 510px;
+    height: 510px;
+    left: -260px;
+  }
+
+  .planet-core { width: 184px; height: 184px; }
+  .planet-label { top: calc(50% + 102px); }
+  .planet-label h1 { font-size: 38px; }
+  .planet-label p { font-size: 15px; }
+
+  .scene.zoomed .planet-stage {
+    transform: translateY(-36px) scale(.77);
+  }
+
+  .step-node .num { font-size: 55px; }
+  .step-node.active .num { font-size: 78px; }
+
+  .caption {
+    right: 14px;
+    top: 42%;
+    max-width: 158px;
+  }
+
+  .caption p { display: none; }
+
+  .planet-info { bottom: 228px; }
+  .scene.zoomed .planet-info { bottom: 218px; }
+  .planet-info .category { font-size: 12px; margin-bottom: 8px; }
+  .planet-info .title { font-size: 43px; }
+
+  .step-progress { bottom: 194px; }
+
+  .editor {
+    padding: 16px;
+    border-radius: 27px;
+  }
+
+  .editor-head {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .editor-no { font-size: 78px; }
+  .editor-copy h2 { margin: 6px 0 8px; font-size: 26px; }
+  .editor-copy p { font-size: 13px; }
+  textarea { min-height: 125px; font-size: 14px; }
+  .save-line { font-size: 11px; }
+  .empty strong { font-size: 82px; }
+}
+
+@keyframes mobileCardSwitch {
+  from { opacity: .25; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
   </style>
 </head>
 <body>
   <main class="app">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-dot"></span>
+        <span class="brand-mark"></span>
         Orbital Notes
+      </div><p class="eyebrow">Yeni gezegen</p>
+  <p class="intro">Gezegen oluşturunca yakınlaşır. 01–05 arasında yukarı/aşağı kaydırarak, mouse wheel ile veya numaralara dokunarak geç.</p>
+
+  <form class="composer" id="planetForm">
+    <label>
+      Gezegen adı
+      <input id="planetName" type="text" placeholder="Örn. Gergedan" required />
+    </label>
+
+    <label>
+      Kategori
+      <select id="planetCategory" required>
+        <option value="">Seç</option>
+        <option>Kişisel</option>
+        <option>Araştırma</option>
+        <option>Fikir</option>
+        <option>Proje</option>
+        <option>Toplantı</option>
+      </select>
+    </label>
+
+    <button class="create-btn" type="submit">Oluştur</button>
+  </form>
+
+  <section class="planet-list" id="planetList" aria-label="Gezegen listesi"></section>
+
+  <div class="utility-row">
+    <button class="utility-btn" id="exportBtn" type="button">JSON export</button>
+    <button class="utility-btn" id="clearBtn" type="button">Hepsini sil</button>
+  </div>
+</aside>
+
+<section class="workspace">
+  <div class="scene" id="scene">
+    <div class="orbit" id="orbit">
+      <button class="step-node s1" data-step="0" aria-label="01 Çekirdek fikir"><span class="dot"></span><span class="num">01</span></button>
+      <button class="step-node s2" data-step="1" aria-label="02 Bağlam"><span class="dot"></span><span class="num">02</span></button>
+      <button class="step-node s3 active" data-step="2" aria-label="03 Detaylar"><span class="dot"></span><span class="num">03</span></button>
+      <button class="step-node s4" data-step="3" aria-label="04 Bağlantılar"><span class="dot"></span><span class="num">04</span></button>
+      <button class="step-node s5" data-step="4" aria-label="05 Sonraki adım"><span class="dot"></span><span class="num">05</span></button>
+    </div>
+
+    <div class="planet-stage">
+      <div class="planet-core" id="planetCore"></div>
+      <div class="planet-label" id="planetLabel">
+        <h1>Yeni Not</h1>
+        <p>Gezegenini oluştur</p>
+      </div>
+    </div>
+
+    <div class="caption" id="caption">
+      <h3 id="captionTitle">Detaylar</h3>
+      <p id="captionDesc">Maddeler, gözlemler ve kaynakları topla.</p>
+    </div>
+
+    <div class="planet-info" id="planetInfo">
+      <p class="category" id="planetCategoryView">Kategori</p>
+      <h2 class="title" id="planetNameView">Gezegen</h2>
+    </div>
+
+    <div class="step-progress" id="stepProgress" aria-label="Adım ilerleme"></div>
+
+    <article class="editor" id="editor">
+      <div class="editor-head">
+        <div class="editor-no" id="editorNo">03</div>
+        <div class="editor-copy">
+          <h2 id="editorTitle">Detaylar</h2>
+          <p id="editorDesc">Maddeler, gözlemler ve kaynakları topla.</p>
+        </div>
       </div>
 
-      <p class="subhead">Yeni gezegen</p>
-      <p class="intro">
-        Gezegen oluşturunca otomatik yakınlaşır. Sonra 01–05 arasında
-        <strong>yukarı / aşağı kaydırarak</strong> geçebilirsin.
-      </p>
+      <textarea id="noteArea" placeholder="Bu adıma ait notunu yaz..."></textarea>
 
-      <form class="form" id="planetForm">
+      <div class="save-line">
+        <span class="swipe-hint">Swipe ↑ / ↓ ile adım değiştir</span>
+        <span id="saveStatus">Kaydedildi</span>
+      </div>
+    </article>
+
+    <div class="empty" id="emptyState">
+      <strong>03</strong>
+      Bir gezegen oluştur. Sonra ekran yakınlaşır ve 01–05 adımları arasında dikey kaydırmayla geçersin.
+    </div>
+  </div>
+</section>
+
+  </main>  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <h2>Gezegeni düzenle</h2>
+      <form class="modal-form" id="editForm">
         <label>
           Gezegen adı
-          <input id="planetName" type="text" placeholder="Örn. Gergedan" required />
+          <input id="editName" type="text" required />
         </label>
-
         <label>
           Kategori
-          <select id="planetCategory" required>
-            <option value="">Seç</option>
+          <select id="editCategory" required>
             <option>Kişisel</option>
             <option>Araştırma</option>
             <option>Fikir</option>
@@ -750,349 +951,381 @@
             <option>Toplantı</option>
           </select>
         </label>
-
-        <button class="create-btn" type="submit">Oluştur</button>
+        <div class="modal-actions">
+          <button class="secondary-btn" id="cancelEdit" type="button">Vazgeç</button>
+          <button class="danger-btn" type="submit">Kaydet</button>
+        </div>
       </form>
-
-      <section class="planet-list" id="planetList"></section>
-    </aside>
-
-    <section class="workspace">
-      <div class="scene" id="scene">
-        <div class="orbit" id="orbit">
-          <button class="step-node s1" data-step="0">
-            <span class="dot"></span>
-            <span class="num">01</span>
-          </button>
-
-          <button class="step-node s2" data-step="1">
-            <span class="dot"></span>
-            <span class="num">02</span>
-          </button>
-
-          <button class="step-node s3 active" data-step="2">
-            <span class="dot"></span>
-            <span class="num">03</span>
-          </button>
-
-          <button class="step-node s4" data-step="3">
-            <span class="dot"></span>
-            <span class="num">04</span>
-          </button>
-
-          <button class="step-node s5" data-step="4">
-            <span class="dot"></span>
-            <span class="num">05</span>
-          </button>
-        </div>
-
-        <div class="planet-stage">
-          <div class="planet-core"></div>
-          <div class="planet-label" id="planetLabel">
-            <h1>Yeni Not</h1>
-            <p>Gezegenini oluştur</p>
-          </div>
-        </div>
-
-        <div class="active-caption" id="activeCaption">
-          <h3 id="captionTitle">Detaylar</h3>
-          <p id="captionDesc">Notun ana maddelerini burada topla.</p>
-        </div>
-
-        <div class="info-block" id="infoBlock">
-          <p class="cat" id="planetCategoryView">Kategori</p>
-          <h2 class="name" id="planetNameView">Gezegen</h2>
-        </div>
-
-        <div class="editor" id="editor">
-          <div class="editor-head">
-            <div class="editor-num" id="editorNum">03</div>
-            <div class="editor-copy">
-              <h2 id="editorTitle">Detaylar</h2>
-              <p id="editorDesc">Notun ana maddelerini burada topla.</p>
-            </div>
-          </div>
-
-          <textarea id="noteArea" placeholder="Bu adıma ait notunu yaz..."></textarea>
-          <div class="swipe-hint">Yukarı / aşağı kaydırarak adımlar arasında geç</div>
-        </div>
-
-        <div class="empty" id="emptyState">
-          <strong>03</strong>
-          Bir gezegen oluştur. Sonra ekran o gezegene yaklaşır ve 01–05 adımları arasında swipe ile gezebilirsin.
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div class="toast" id="toast">Kaydedildi</div>
-
-  <script>
+    </div>
+  </div>  <div class="toast" id="toast">Kaydedildi</div>  <script>
     const steps = [
-      {
-        no: "01",
-        title: "Çekirdek fikir",
-        desc: "Bu notun merkezindeki fikri net şekilde yaz."
-      },
-      {
-        no: "02",
-        title: "Bağlam",
-        desc: "Neden önemli, hangi probleme dokunuyor, arka planı nedir?"
-      },
-      {
-        no: "03",
-        title: "Detaylar",
-        desc: "Maddeler, gözlemler, örnekler ve kaynakları topla."
-      },
-      {
-        no: "04",
-        title: "Bağlantılar",
-        desc: "İlgili kişiler, dosyalar, linkler ve diğer notlarla ilişkileri ekle."
-      },
-      {
-        no: "05",
-        title: "Sonraki adım",
-        desc: "Buradan sonra yapılacak en net aksiyonu yaz."
-      }
+      { no: '01', title: 'Çekirdek fikir', desc: 'Bu notun merkezindeki fikri net şekilde yaz.' },
+      { no: '02', title: 'Bağlam', desc: 'Neden önemli, hangi probleme dokunuyor, arka planı nedir?' },
+      { no: '03', title: 'Detaylar', desc: 'Maddeler, gözlemler, örnekler ve kaynakları topla.' },
+      { no: '04', title: 'Bağlantılar', desc: 'İlgili kişiler, dosyalar, linkler ve diğer notlarla ilişkileri ekle.' },
+      { no: '05', title: 'Sonraki adım', desc: 'Buradan sonra yapılacak en net aksiyonu yaz.' }
     ];
 
-    const form = document.getElementById("planetForm");
-    const planetNameInput = document.getElementById("planetName");
-    const planetCategoryInput = document.getElementById("planetCategory");
-    const planetList = document.getElementById("planetList");
-    const scene = document.getElementById("scene");
-    const planetLabel = document.getElementById("planetLabel");
-    const planetNameView = document.getElementById("planetNameView");
-    const planetCategoryView = document.getElementById("planetCategoryView");
-    const captionTitle = document.getElementById("captionTitle");
-    const captionDesc = document.getElementById("captionDesc");
-    const editor = document.getElementById("editor");
-    const editorNum = document.getElementById("editorNum");
-    const editorTitle = document.getElementById("editorTitle");
-    const editorDesc = document.getElementById("editorDesc");
-    const noteArea = document.getElementById("noteArea");
-    const emptyState = document.getElementById("emptyState");
-    const toast = document.getElementById("toast");
-    const stepNodes = [...document.querySelectorAll(".step-node")];
+    const palettes = [
+      ['#c6c6c6', '#9d9d9d', '#242424'],
+      ['#d0ccc4', '#a9a195', '#2c2924'],
+      ['#c3cbd0', '#93a2aa', '#263139'],
+      ['#c9c3d2', '#9d93aa', '#2d2836'],
+      ['#c4d0c7', '#94aa99', '#243027'],
+      ['#d1c2c2', '#aa9090', '#332525']
+    ];
 
-    let planets = JSON.parse(localStorage.getItem("orbital-planets-v2") || "[]");
+    const form = document.getElementById('planetForm');
+    const planetName = document.getElementById('planetName');
+    const planetCategory = document.getElementById('planetCategory');
+    const planetList = document.getElementById('planetList');
+    const scene = document.getElementById('scene');
+    const planetLabel = document.getElementById('planetLabel');
+    const planetCore = document.getElementById('planetCore');
+    const planetNameView = document.getElementById('planetNameView');
+    const planetCategoryView = document.getElementById('planetCategoryView');
+    const captionTitle = document.getElementById('captionTitle');
+    const captionDesc = document.getElementById('captionDesc');
+    const editor = document.getElementById('editor');
+    const editorNo = document.getElementById('editorNo');
+    const editorTitle = document.getElementById('editorTitle');
+    const editorDesc = document.getElementById('editorDesc');
+    const noteArea = document.getElementById('noteArea');
+    const saveStatus = document.getElementById('saveStatus');
+    const stepProgress = document.getElementById('stepProgress');
+    const emptyState = document.getElementById('emptyState');
+    const toast = document.getElementById('toast');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const editName = document.getElementById('editName');
+    const editCategory = document.getElementById('editCategory');
+    const cancelEdit = document.getElementById('cancelEdit');
+    const stepNodes = [...document.querySelectorAll('.step-node')];
+
+    let planets = JSON.parse(localStorage.getItem('orbital-notes-v3') || '[]');
     let activePlanetId = planets[0]?.id || null;
+    let editingPlanetId = null;
     let activeStep = 2;
-    let wheelLock = false;
     let touchStartY = 0;
-    let touchEndY = 0;
+    let wheelLock = false;
+    let saveTimer = null;
 
-    function savePlanets() {
-      localStorage.setItem("orbital-planets-v2", JSON.stringify(planets));
+    function uid() {
+      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+    }
+
+    function save() {
+      localStorage.setItem('orbital-notes-v3', JSON.stringify(planets));
     }
 
     function showToast(message) {
       toast.textContent = message;
-      toast.classList.add("show");
+      toast.classList.add('show');
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 1400);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1450);
     }
 
     function getActivePlanet() {
       return planets.find(p => p.id === activePlanetId);
     }
 
-    function clampStep(step) {
-      if (step < 0) return 0;
-      if (step > 4) return 4;
-      return step;
+    function clampStep(index) {
+      return Math.max(0, Math.min(4, index));
     }
 
-    function renderPlanetList() {
-      planetList.innerHTML = "";
+    function paletteFor(planet) {
+      return palettes[planet.palette || 0] || palettes[0];
+    }
 
-      planets.forEach((planet, index) => {
-        const btn = document.createElement("button");
-        btn.className = "planet-chip" + (planet.id === activePlanetId ? " active" : "");
-        btn.type = "button";
-        btn.innerHTML = `
-          <span class="mini-planet"></span>
-          <div>
-            <strong>${String(index + 1).padStart(2, "0")} · ${planet.name}</strong>
-            <span>${planet.category}</span>
-          </div>
-        `;
-        btn.addEventListener("click", () => {
-          activatePlanet(planet.id, 2);
-        });
-        planetList.appendChild(btn);
+    function applyPalette(planet) {
+      const [a, b, accent] = paletteFor(planet);
+      document.documentElement.style.setProperty('--planet-a', a);
+      document.documentElement.style.setProperty('--planet-b', b);
+      document.documentElement.style.setProperty('--accent', accent);
+    }
+
+    function markSaving() {
+      saveStatus.textContent = 'Kaydediliyor...';
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        saveStatus.textContent = 'Kaydedildi';
+      }, 450);
+    }
+
+    function renderProgress() {
+      stepProgress.innerHTML = '';
+      steps.forEach((_, index) => {
+        const dot = document.createElement('button');
+        dot.className = 'progress-dot' + (index === activeStep ? ' active' : '');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `${steps[index].no} ${steps[index].title}`);
+        dot.addEventListener('click', () => goToStep(index));
+        stepProgress.appendChild(dot);
       });
     }
 
-    function renderStep() {
+    function renderPlanetList() {
+      planetList.innerHTML = '';
+
+      planets.forEach((planet, index) => {
+        const [p1, p2] = paletteFor(planet);
+        const chip = document.createElement('button');
+        chip.className = 'planet-chip' + (planet.id === activePlanetId ? ' active' : '');
+        chip.type = 'button';
+        chip.style.setProperty('--p1', p1);
+        chip.style.setProperty('--p2', p2);
+        chip.innerHTML = `
+          <span class="mini-planet"></span>
+          <span class="chip-copy">
+            <strong>${String(index + 1).padStart(2, '0')} · ${planet.name}</strong>
+            <span>${planet.category}</span>
+          </span>
+          <span class="chip-actions">
+            <span class="icon-btn edit" title="Düzenle">✎</span>
+            <span class="icon-btn delete" title="Sil">×</span>
+          </span>
+        `;
+
+        chip.addEventListener('click', event => {
+          if (event.target.closest('.edit')) {
+            event.stopPropagation();
+            openEditModal(planet.id);
+            return;
+          }
+
+          if (event.target.closest('.delete')) {
+            event.stopPropagation();
+            deletePlanet(planet.id);
+            return;
+          }
+
+          activatePlanet(planet.id, activeStep);
+        });
+
+        planetList.appendChild(chip);
+      });
+    }
+
+    function renderStep(animate = true) {
       const planet = getActivePlanet();
       if (!planet) return;
 
       const step = steps[activeStep];
 
       stepNodes.forEach(node => {
-        node.classList.toggle("active", Number(node.dataset.step) === activeStep);
+        node.classList.toggle('active', Number(node.dataset.step) === activeStep);
       });
 
       captionTitle.textContent = step.title;
       captionDesc.textContent = step.desc;
-
-      editorNum.textContent = step.no;
+      editorNo.textContent = step.no;
       editorTitle.textContent = step.title;
       editorDesc.textContent = step.desc;
-
+      noteArea.value = planet.notes[activeStep] || '';
       noteArea.placeholder = `${step.no} · ${step.title} için notunu yaz...`;
-      noteArea.value = planet.notes[activeStep] || "";
-    }
 
-    function activatePlanet(id, stepIndex = 2) {
-      activePlanetId = id;
-      activeStep = clampStep(stepIndex);
+      renderProgress();
 
-      const planet = getActivePlanet();
-      if (!planet) return;
-
-      planetLabel.innerHTML = `
-        <h1>${planet.name}</h1>
-        <p>${planet.category}</p>
-      `;
-
-      planetNameView.textContent = planet.name;
-      planetCategoryView.textContent = planet.category;
-
-      scene.classList.add("zoomed");
-      emptyState.style.display = "none";
-
-      renderPlanetList();
-      renderStep();
-    }
-
-    function changeStep(direction) {
-      const next = clampStep(activeStep + direction);
-      if (next === activeStep) return;
-      activeStep = next;
-      renderStep();
-      showToast(`${steps[activeStep].no} · ${steps[activeStep].title}`);
-    }
-
-    function goToStep(stepIndex) {
-      const next = clampStep(stepIndex);
-      if (next === activeStep) return;
-      activeStep = next;
-      renderStep();
-      showToast(`${steps[activeStep].no} · ${steps[activeStep].title}`);
-    }
-
-    function ensureActivePlanet() {
-      if (!getActivePlanet() && planets.length) {
-        activePlanetId = planets[0].id;
+      if (animate) {
+        editor.classList.remove('switching');
+        void editor.offsetWidth;
+        editor.classList.add('switching');
       }
     }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+    function activatePlanet(id, preferredStep = 2) {
+      activePlanetId = id;
+      activeStep = clampStep(preferredStep);
+      const planet = getActivePlanet();
+      if (!planet) return;
 
-      const name = planetNameInput.value.trim();
-      const category = planetCategoryInput.value;
+      applyPalette(planet);
+      planetLabel.innerHTML = `<h1>${planet.name}</h1><p>${planet.category}</p>`;
+      planetNameView.textContent = planet.name;
+      planetCategoryView.textContent = planet.category;
 
+      scene.classList.add('zoomed');
+      emptyState.style.display = 'none';
+      renderPlanetList();
+      renderStep(false);
+    }
+
+    function goToStep(index) {
+      const next = clampStep(index);
+      if (!getActivePlanet() || next === activeStep) return;
+      activeStep = next;
+      renderStep(true);
+      showToast(`${steps[activeStep].no} · ${steps[activeStep].title}`);
+    }
+
+    function changeStep(direction) {
+      goToStep(activeStep + direction);
+    }
+
+    function openEditModal(id) {
+      const planet = planets.find(p => p.id === id);
+      if (!planet) return;
+      editingPlanetId = id;
+      editName.value = planet.name;
+      editCategory.value = planet.category;
+      editModal.classList.add('show');
+      editName.focus();
+    }
+
+    function closeEditModal() {
+      editModal.classList.remove('show');
+      editingPlanetId = null;
+    }
+
+    function deletePlanet(id) {
+      const planet = planets.find(p => p.id === id);
+      if (!planet) return;
+      const ok = confirm(`“${planet.name}” gezegeni silinsin mi?`);
+      if (!ok) return;
+
+      planets = planets.filter(p => p.id !== id);
+      if (activePlanetId === id) activePlanetId = planets[0]?.id || null;
+      save();
+      renderPlanetList();
+
+      if (activePlanetId) {
+        activatePlanet(activePlanetId, 2);
+      } else {
+        scene.classList.remove('zoomed');
+        emptyState.style.display = 'block';
+        planetLabel.innerHTML = '<h1>Yeni Not</h1><p>Gezegenini oluştur</p>';
+        planetNameView.textContent = 'Gezegen';
+        planetCategoryView.textContent = 'Kategori';
+      }
+
+      showToast('Gezegen silindi');
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const name = planetName.value.trim();
+      const category = planetCategory.value;
       if (!name || !category) return;
 
       const planet = {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        id: uid(),
         name,
         category,
-        notes: ["", "", "", "", ""]
+        palette: planets.length % palettes.length,
+        notes: ['', '', '', '', ''],
+        createdAt: new Date().toISOString()
       };
 
       planets.unshift(planet);
-      savePlanets();
-      renderPlanetList();
-
+      save();
       form.reset();
       activatePlanet(planet.id, 2);
-      showToast("Gezegen oluşturuldu");
+      showToast('Gezegen oluşturuldu');
     });
 
-    noteArea.addEventListener("input", () => {
+    noteArea.addEventListener('input', () => {
       const planet = getActivePlanet();
       if (!planet) return;
       planet.notes[activeStep] = noteArea.value;
-      savePlanets();
+      planet.updatedAt = new Date().toISOString();
+      save();
+      markSaving();
     });
 
     stepNodes.forEach(node => {
-      node.addEventListener("click", () => {
+      node.addEventListener('click', () => {
         if (!getActivePlanet()) return;
         goToStep(Number(node.dataset.step));
       });
     });
 
-    // Desktop wheel navigation
-    scene.addEventListener("wheel", (e) => {
+    scene.addEventListener('wheel', event => {
       if (!getActivePlanet()) return;
-
-      // textarea içindeyken wheel textarea'da çalışsın
       if (document.activeElement === noteArea) return;
-
       if (wheelLock) return;
-
-      const threshold = 18;
-      if (Math.abs(e.deltaY) < threshold) return;
+      if (Math.abs(event.deltaY) < 18) return;
 
       wheelLock = true;
-      if (e.deltaY > 0) changeStep(1);
-      else changeStep(-1);
-
+      changeStep(event.deltaY > 0 ? 1 : -1);
       setTimeout(() => wheelLock = false, 420);
     }, { passive: true });
 
-    // Mobile swipe navigation
-    scene.addEventListener("touchstart", (e) => {
+    scene.addEventListener('touchstart', event => {
       if (!getActivePlanet()) return;
-      touchStartY = e.changedTouches[0].clientY;
+      touchStartY = event.changedTouches[0].clientY;
     }, { passive: true });
 
-    scene.addEventListener("touchend", (e) => {
+    scene.addEventListener('touchend', event => {
       if (!getActivePlanet()) return;
-
-      // textarea üzerinde swipe varsa geçiş yapma
-      const target = e.target;
-      if (target === noteArea) return;
-
-      touchEndY = e.changedTouches[0].clientY;
+      if (event.target === noteArea) return;
+      const touchEndY = event.changedTouches[0].clientY;
       const delta = touchStartY - touchEndY;
-
-      if (Math.abs(delta) < 40) return;
-
-      if (delta > 0) changeStep(1);   // swipe up
-      else changeStep(-1);            // swipe down
+      if (Math.abs(delta) < 42) return;
+      changeStep(delta > 0 ? 1 : -1);
     }, { passive: true });
 
-    // Keyboard navigation
-    window.addEventListener("keydown", (e) => {
+    window.addEventListener('keydown', event => {
       if (!getActivePlanet()) return;
-      if (document.activeElement === noteArea) return;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
+      if (document.activeElement === noteArea || document.activeElement === editName) return;
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
         changeStep(1);
       }
-
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
         changeStep(-1);
       }
     });
 
-    // init
-    ensureActivePlanet();
-    renderPlanetList();
+    editForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const planet = planets.find(p => p.id === editingPlanetId);
+      if (!planet) return;
+      planet.name = editName.value.trim();
+      planet.category = editCategory.value;
+      planet.updatedAt = new Date().toISOString();
+      save();
+      closeEditModal();
+      activatePlanet(planet.id, activeStep);
+      showToast('Gezegen güncellendi');
+    });
 
-    if (activePlanetId) {
-      activatePlanet(activePlanetId, 2);
-    }
-  </script>
-</body>
+    cancelEdit.addEventListener('click', closeEditModal);
+    editModal.addEventListener('click', event => {
+      if (event.target === editModal) closeEditModal();
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const payload = JSON.stringify(planets, null, 2);
+      const blob = new Blob([payload], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'orbital-notes.json';
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('JSON indirildi');
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (!planets.length) return;
+      const ok = confirm('Tüm gezegenler ve notlar silinsin mi?');
+      if (!ok) return;
+      planets = [];
+      activePlanetId = null;
+      save();
+      renderPlanetList();
+      scene.classList.remove('zoomed');
+      emptyState.style.display = 'block';
+      planetLabel.innerHTML = '<h1>Yeni Not</h1><p>Gezegenini oluştur</p>';
+      planetNameView.textContent = 'Gezegen';
+      planetCategoryView.textContent = 'Kategori';
+      showToast('Tüm notlar silindi');
+    });
+
+    renderPlanetList();
+    if (activePlanetId) activatePlanet(activePlanetId, 2);
+  </script></body>
 </html>
