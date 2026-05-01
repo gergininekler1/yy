@@ -16,12 +16,15 @@
       --terminalText: #8cff8c;
       --paper: #fffef2;
       --yellow: #ffffcc;
+      --kasa: #dfdfdf;
+      --baslik: #c0c0c0;
+      --not: #f4f4f4;
     }* { box-sizing: border-box; }
 
 body {
   margin: 0;
   min-height: 100vh;
-  padding: 18px;
+  padding: 14px;
   background: var(--teal);
   font-family: Tahoma, Arial, sans-serif;
   font-size: 13px;
@@ -35,8 +38,8 @@ button, input, textarea, select {
 }
 
 .window {
-  height: calc(100vh - 36px);
-  max-width: 1280px;
+  height: calc(100vh - 28px);
+  max-width: 1360px;
   margin: 0 auto;
   background: var(--gray);
   border-top: 2px solid var(--light);
@@ -46,6 +49,7 @@ button, input, textarea, select {
   box-shadow: 4px 4px 0 rgba(0, 0, 0, .45);
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .titlebar {
@@ -58,6 +62,7 @@ button, input, textarea, select {
   padding: 3px 4px 3px 8px;
   font-weight: bold;
   user-select: none;
+  flex: 0 0 auto;
 }
 
 .title-left { display: flex; align-items: center; gap: 8px; }
@@ -136,11 +141,12 @@ button, input, textarea, select {
   white-space: nowrap;
 }
 
-.btn:active {
+.btn:active, .btn.active {
   border-top: 2px solid var(--black);
   border-left: 2px solid var(--black);
   border-right: 2px solid var(--light);
   border-bottom: 2px solid var(--light);
+  background: #b0b0b0;
 }
 
 .btn.primary { font-weight: bold; }
@@ -150,7 +156,7 @@ button, input, textarea, select {
 .main {
   flex: 1;
   display: grid;
-  grid-template-columns: 245px 1fr 315px;
+  grid-template-columns: 250px minmax(0, 1fr) 330px;
   gap: 8px;
   padding: 8px;
   min-height: 0;
@@ -202,7 +208,7 @@ button, input, textarea, select {
   padding: 10px;
   line-height: 1.45;
   font-family: Consolas, "Courier New", monospace;
-  min-height: 108px;
+  min-height: 110px;
   white-space: pre-wrap;
   margin-bottom: 8px;
 }
@@ -228,7 +234,7 @@ label {
 }
 
 .textarea {
-  min-height: 82px;
+  min-height: 74px;
   resize: vertical;
   line-height: 1.45;
 }
@@ -240,14 +246,20 @@ label {
   margin-top: 8px;
 }
 
-.topic-list {
+.tool-box {
+  padding: 8px;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.node-list {
   display: flex;
   flex-direction: column;
   gap: 5px;
   margin-top: 8px;
 }
 
-.topic-item {
+.node-list-item {
   display: grid;
   grid-template-columns: 24px 1fr;
   gap: 7px;
@@ -258,12 +270,12 @@ label {
   line-height: 1.25;
 }
 
-.topic-item:hover, .topic-item.active {
+.node-list-item:hover, .node-list-item.active {
   background: var(--blue2);
   color: white;
 }
 
-.topic-icon {
+.node-list-icon {
   width: 22px;
   height: 22px;
   display: grid;
@@ -277,32 +289,41 @@ label {
   font-size: 14px;
 }
 
-.topic-title { font-weight: bold; }
-.topic-count { font-size: 11px; opacity: .9; }
+.node-list-title { font-weight: bold; }
+.node-list-meta { font-size: 11px; opacity: .9; }
 
-.map-wrap {
+.map-shell {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 500px;
+  min-height: 520px;
   background: var(--paper);
   overflow: hidden;
+  touch-action: none;
+  cursor: grab;
 }
 
-.map-canvas {
+.map-shell.dragging { cursor: grabbing; }
+
+.map-viewport {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
+  width: 2200px;
+  height: 1600px;
+  transform-origin: 0 0;
 }
 
 .line-layer {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: 0;
+  top: 0;
+  width: 2200px;
+  height: 1600px;
   pointer-events: none;
 }
 
-.node {
+.map-node {
   position: absolute;
   transform: translate(-50%, -50%);
   background: var(--gray);
@@ -310,21 +331,45 @@ label {
   border-left: 2px solid var(--light);
   border-right: 2px solid var(--black);
   border-bottom: 2px solid var(--black);
-  min-width: 140px;
-  max-width: 190px;
+  min-width: 130px;
+  max-width: 210px;
   padding: 7px;
   cursor: pointer;
   box-shadow: 2px 2px 0 rgba(0,0,0,.25);
+  user-select: none;
+  z-index: 2;
 }
 
-.node:hover, .node.active {
+.map-node:hover, .map-node.active {
   outline: 2px dotted black;
   outline-offset: -5px;
 }
 
-.node.main-node {
+.map-node.kasa {
   min-width: 190px;
-  background: #dfdfdf;
+  background: var(--kasa);
+  font-size: 15px;
+}
+
+.map-node.baslik {
+  background: var(--baslik);
+}
+
+.map-node.not {
+  min-width: 120px;
+  max-width: 170px;
+  background: var(--not);
+  font-size: 12px;
+}
+
+.rank-label {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 4px;
+  background: var(--blue);
+  color: white;
+  margin-bottom: 4px;
+  font-weight: bold;
 }
 
 .node-title {
@@ -340,11 +385,32 @@ label {
   line-height: 1.35;
   max-height: 48px;
   overflow: hidden;
+  white-space: pre-wrap;
 }
 
 .node-count {
   margin-top: 5px;
   font-size: 11px;
+}
+
+.map-controls {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  max-width: 260px;
+}
+
+.zoom-indicator {
+  background: white;
+  padding: 5px 7px;
+  border-top: 2px solid var(--dark);
+  border-left: 2px solid var(--dark);
+  border-right: 2px solid var(--light);
+  border-bottom: 2px solid var(--light);
 }
 
 .editor-section {
@@ -353,42 +419,28 @@ label {
   margin-bottom: 8px;
 }
 
-.note-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.note-card {
-  background: var(--gray);
-  border-top: 2px solid var(--light);
-  border-left: 2px solid var(--light);
-  border-right: 2px solid var(--black);
-  border-bottom: 2px solid var(--black);
-  padding: 7px;
-  line-height: 1.4;
-}
-
-.note-card strong { display: block; margin-bottom: 4px; }
-
-.note-text {
-  white-space: pre-wrap;
-  font-size: 12px;
-}
-
-.note-actions {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-}
-
 .hint-box {
   padding: 8px;
   line-height: 1.45;
   background: var(--yellow);
   margin-bottom: 8px;
+}
+
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.link-pill {
+  padding: 5px;
+  background: var(--gray);
+  border-top: 2px solid var(--light);
+  border-left: 2px solid var(--light);
+  border-right: 2px solid var(--black);
+  border-bottom: 2px solid var(--black);
+  line-height: 1.35;
 }
 
 .statusbar {
@@ -417,7 +469,7 @@ label {
   body { overflow: auto; padding: 8px; }
   .window { height: auto; min-height: calc(100vh - 16px); }
   .main { grid-template-columns: 1fr; }
-  .map-wrap { min-height: 520px; }
+  .map-shell { min-height: 540px; }
   .statusbar { grid-template-columns: 1fr 1fr; }
 }
 
@@ -434,178 +486,183 @@ label {
       </div>
     </header><nav class="menubar">
   <span class="menuitem">Dosya</span>
-  <span class="menuitem">Kasa</span>
-  <span class="menuitem">Başlıklar</span>
-  <span class="menuitem">Notlar</span>
+  <span class="menuitem">Kasalar</span>
+  <span class="menuitem">Düğümler</span>
+  <span class="menuitem">Bağlantılar</span>
+  <span class="menuitem">Görünüm</span>
   <span class="menuitem">Terminal</span>
-  <span class="menuitem">Yardım</span>
 </nav>
 
 <section class="toolbar">
   <button class="btn primary" id="saveBtn">💾 Kaydet</button>
-  <button class="btn" id="addTopicBtn">➕ Başlık Ekle</button>
-  <button class="btn" id="addNoteTopBtn">📝 Not Ekle</button>
-  <button class="btn" id="layoutBtn">🧭 Haritayı Düzenle</button>
+  <button class="btn" id="addKasaBtn">📦 Kasa Ekle</button>
+  <button class="btn" id="addBaslikBtn">🗂️ Başlık Ekle</button>
+  <button class="btn" id="addNoteBtn">📝 Not Ekle</button>
+  <button class="btn" id="linkModeBtn">🔗 Bağlantı Modu</button>
+  <button class="btn" id="toggleNotesBtn">👁️ Notları Gizle</button>
+  <button class="btn" id="autoLayoutBtn">🧭 Otomatik Diz</button>
   <button class="btn" id="exportBtn">📤 Dışa Aktar</button>
   <button class="btn danger" id="resetBtn">📄 Temizle</button>
 </section>
 
 <section class="main">
   <aside class="panel">
-    <div class="panel-title">Ana Kasa</div>
+    <div class="panel-title">Terminal & Liste</div>
     <div class="panel-body">
       <div class="terminal-screen inset" id="terminalScreen">KURGU TERMİNALİ 95
 
 Mind Map Not Kasası
 
-Ana kasayı belirle. Başlıklar kasaya bağlanır. Her başlık kendi notlarını taşır.</div>
+Zoom, pan, sürükle-bırak ve bağlantı sistemi aktif.</div>
 
-<div class="editor-section inset">
+<div class="tool-box inset">
         <div class="field">
-          <label for="vaultTitle">Kasa Başlığı</label>
-          <input id="vaultTitle" class="input" placeholder="Örn: Kısa Öykü Fikirleri">
+          <label for="filterInput">Ara / Filtrele</label>
+          <input id="filterInput" class="input" placeholder="Başlık veya not ara...">
         </div>
-        <div class="field">
-          <label for="vaultIcon">Kasa İkonu</label>
-          <select id="vaultIcon" class="select"></select>
-        </div>
-        <div class="field">
-          <label for="vaultNote">Kasa Notu</label>
-          <textarea id="vaultNote" class="textarea" placeholder="Bu haritanın ana fikri..."></textarea>
+        <div class="action-row">
+          <button class="btn small" id="fitBtnLeft">Ekrana Sığdır</button>
+          <button class="btn small" id="showAllBtn">Hepsini Göster</button>
         </div>
       </div>
 
-      <div class="hint-box inset">
-        <strong>Kullanım</strong><br>
-        Sol tarafta kasa, ortada harita, sağda seçili başlık ve notlar var. Başlığa tıklayınca sağdaki editör açılır.
-      </div>
-
-      <div class="editor-section inset">
-        <strong>Başlıklar</strong>
-        <div class="topic-list" id="topicList"></div>
+      <div class="tool-box inset">
+        <strong>Düğüm Listesi</strong>
+        <div class="node-list" id="nodeList"></div>
       </div>
     </div>
   </aside>
 
   <section class="panel">
-    <div class="panel-title"><span>Mind Map Alanı</span><span id="mapInfo">0 başlık</span></div>
+    <div class="panel-title"><span>Mind Map Alanı</span><span id="mapInfo">0 düğüm</span></div>
     <div class="panel-body">
-      <div class="map-wrap inset" id="mapWrap">
-        <svg class="line-layer" id="lineLayer"></svg>
-        <div class="map-canvas" id="mapCanvas"></div>
+      <div class="map-shell inset" id="mapShell">
+        <div class="map-controls">
+          <button class="btn small" id="zoomOutBtn">-</button>
+          <button class="btn small" id="zoomInBtn">+</button>
+          <button class="btn small" id="resetViewBtn">Reset</button>
+          <button class="btn small" id="fitBtn">Sığdır</button>
+          <span class="zoom-indicator" id="zoomIndicator">100%</span>
+        </div>
+        <div class="map-viewport" id="mapViewport">
+          <svg class="line-layer" id="lineLayer"></svg>
+          <div id="nodeLayer"></div>
+        </div>
       </div>
     </div>
   </section>
 
   <aside class="panel">
-    <div class="panel-title">Başlık & Not Editörü</div>
+    <div class="panel-title">Düğüm Editörü</div>
     <div class="panel-body">
-      <div id="emptyEditor" class="hint-box inset">Bir başlık seç ya da yeni başlık ekle.</div>
+      <div id="emptyEditor" class="hint-box inset">Bir düğüm seç ya da yeni kasa/başlık/not ekle.</div>
 
-      <div id="topicEditor" class="hidden">
+      <div id="nodeEditor" class="hidden">
         <div class="editor-section inset">
           <div class="field">
-            <label for="topicIcon">Başlık İkonu</label>
-            <select id="topicIcon" class="select"></select>
+            <label for="nodeType">Rütbe</label>
+            <select id="nodeType" class="select">
+              <option value="kasa">Kasa</option>
+              <option value="baslik">Başlık</option>
+              <option value="not">Not</option>
+            </select>
           </div>
           <div class="field">
-            <label for="topicTitle">Başlık</label>
-            <input id="topicTitle" class="input" placeholder="Örn: Karakterler">
+            <label for="nodeIcon">İkon</label>
+            <select id="nodeIcon" class="select"></select>
           </div>
           <div class="field">
-            <label for="topicSummary">Kısa Not</label>
-            <textarea id="topicSummary" class="textarea" placeholder="Bu başlığın ana notu..."></textarea>
+            <label for="nodeTitle">Başlık</label>
+            <input id="nodeTitle" class="input" placeholder="Düğüm başlığı">
+          </div>
+          <div class="field">
+            <label for="nodeBody">Not</label>
+            <textarea id="nodeBody" class="textarea" placeholder="Bu düğümün içeriği..."></textarea>
           </div>
           <div class="action-row">
-            <button class="btn primary" id="updateTopicBtn">Güncelle</button>
-            <button class="btn danger" id="deleteTopicBtn">Başlığı Sil</button>
+            <button class="btn primary" id="updateNodeBtn">Güncelle</button>
+            <button class="btn danger" id="deleteNodeBtn">Sil</button>
           </div>
         </div>
 
         <div class="editor-section inset">
-          <strong>Yeni Not</strong>
+          <strong>Bağlantı Ekle</strong>
           <div class="field" style="margin-top:8px">
-            <label for="noteTitle">Not Başlığı</label>
-            <input id="noteTitle" class="input" placeholder="Örn: Ana karakterin sırrı">
-          </div>
-          <div class="field">
-            <label for="noteBody">Not İçeriği</label>
-            <textarea id="noteBody" class="textarea" placeholder="Notu yaz..."></textarea>
+            <label for="targetNodeSelect">Seçili düğümü şuna bağla</label>
+            <select id="targetNodeSelect" class="select"></select>
           </div>
           <div class="action-row">
-            <button class="btn primary" id="addNoteBtn">Notu Ekle</button>
-            <button class="btn" id="clearNoteBtn">Temizle</button>
+            <button class="btn primary" id="connectBtn">Bağla</button>
+            <button class="btn" id="unlinkAllBtn">Bağları Temizle</button>
           </div>
         </div>
 
         <div class="editor-section inset">
-          <strong>Bağlı Notlar</strong>
-          <div class="note-list" id="noteList"></div>
+          <strong>Bağlantılar</strong>
+          <div class="link-list" id="linkList"></div>
         </div>
+      </div>
+
+      <div class="hint-box inset">
+        <strong>Mobil kullanım</strong><br>
+        Haritada boş alanda sürükleyerek gez, + / - ile zoom yap, düğümleri tutup taşı. Notlar kalabalıklaşınca üstten gizleyebilirsin.
       </div>
     </div>
   </aside>
 </section>
 
 <footer class="statusbar">
-  <div class="status-cell" id="statusVault">Kasa: -</div>
-  <div class="status-cell" id="statusTopics">Başlık: 0</div>
-  <div class="status-cell" id="statusNotes">Not: 0</div>
+  <div class="status-cell" id="statusNodes">Düğüm: 0</div>
+  <div class="status-cell" id="statusLinks">Bağlantı: 0</div>
+  <div class="status-cell" id="statusMode">Mod: Seçim</div>
   <div class="status-cell" id="statusSaved">Son kayıt: -</div>
 </footer>
 
   </main>  <script>
-    const STORAGE_KEY = "kurgu-terminali-95-mindmap-v1";
+    const STORAGE_KEY = "kurgu-terminali-95-mindmap-v2";
     const nl = String.fromCharCode(10);
+    const WORLD_W = 2200;
+    const WORLD_H = 1600;
 
-    const iconOptions = [
-      "📦", "📝", "💡", "🎭", "🏠", "🔑", "📞", "✉️", "🕯️", "🧩", "🧠", "🗂️", "📚", "🎬", "🌙", "⚠️", "❤️", "👤", "📍", "🕰️", "🔍", "🏁"
-    ];
+    const icons = ["📦", "🧠", "💡", "🗂️", "📝", "🎭", "🏠", "🔑", "📞", "✉️", "🕯️", "🧩", "📚", "🎬", "🌙", "⚠️", "❤️", "👤", "📍", "🕰️", "🔍", "🏁", "🧷", "🪟", "📌"];
+
+    function makeId() {
+      return "id_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+    }
+
+    const k1 = makeId();
+    const b1 = makeId();
+    const b2 = makeId();
+    const n1 = makeId();
 
     const defaults = {
-      vault: {
-        title: "Ana Kasa",
-        icon: "📦",
-        note: "Bu kasaya bağlı başlıklar ve notlar mind map olarak görünür."
-      },
-      selectedTopicId: null,
-      topics: [
-        {
-          id: makeId(),
-          title: "Karakterler",
-          icon: "🎭",
-          summary: "Ana karakterler, arzular, sırlar ve ilişkiler.",
-          notes: [
-            { id: makeId(), title: "Ana karakter", body: "Kim, ne istiyor, neden alamıyor?" }
-          ]
-        },
-        {
-          id: makeId(),
-          title: "Mekanlar",
-          icon: "🏠",
-          summary: "Öykünün geçtiği yerler ve atmosfer notları.",
-          notes: []
-        },
-        {
-          id: makeId(),
-          title: "Semboller",
-          icon: "🔑",
-          summary: "Nesneler, tekrar eden motifler ve gizli anlamlar.",
-          notes: []
-        }
+      nodes: [
+        { id: k1, type: "kasa", icon: "📦", title: "Ana Kasa", body: "Merkez fikir veya ana proje.", x: 1100, y: 800 },
+        { id: b1, type: "baslik", icon: "🎭", title: "Karakterler", body: "Karakterler, arzular, sırlar ve ilişkiler.", x: 1100, y: 520 },
+        { id: b2, type: "baslik", icon: "🔑", title: "Semboller", body: "Motifler, nesneler ve tekrar eden imgeler.", x: 820, y: 900 },
+        { id: n1, type: "not", icon: "📝", title: "Ana karakter", body: "Kim, ne istiyor, neden alamıyor?", x: 1340, y: 920 }
       ],
+      links: [
+        { id: makeId(), from: k1, to: b1 },
+        { id: makeId(), from: k1, to: b2 },
+        { id: makeId(), from: b1, to: n1 }
+      ],
+      selectedNodeId: k1,
+      viewport: { scale: 0.72, x: -420, y: -320 },
+      showNotes: true,
+      filter: "",
+      linkMode: false,
+      linkSourceId: null,
       lastSaved: null
     };
 
     let data = loadData();
     let saveTimer = null;
+    let dragState = null;
+    let panState = null;
 
     const $ = selector => document.querySelector(selector);
     const $$ = selector => Array.from(document.querySelectorAll(selector));
-
-    function makeId() {
-      return "id_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
-    }
 
     function loadData() {
       try {
@@ -625,6 +682,10 @@ Ana kasayı belirle. Başlıklar kasaya bağlanır. Her başlık kendi notların
       return String(value || "").trim();
     }
 
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
     function formatTime(iso) {
       if (!iso) return "-";
       return new Date(iso).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
@@ -634,276 +695,476 @@ Ana kasayı belirle. Başlıklar kasaya bağlanır. Her başlık kendi notların
       data.lastSaved = new Date().toISOString();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       renderStatus();
-      setTerminal(manual ? "Kaydedildi." : "Otomatik kayıt tamamlandı.");
+      terminal(manual ? "Kaydedildi." : "Otomatik kayıt tamamlandı.");
     }
 
     function scheduleSave() {
-      setTerminal("Yazılıyor...");
+      terminal("Yazılıyor...");
       clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => save(false), 450);
+      saveTimer = setTimeout(() => save(false), 500);
     }
 
-    function setTerminal(message) {
-      const text = "KURGU TERMİNALİ 95" + nl + "Mind Map Not Kasası" + nl + nl + message;
-      $("#terminalScreen").textContent = text;
+    function terminal(message) {
+      $("#terminalScreen").textContent = "KURGU TERMİNALİ 95" + nl + "Mind Map Not Kasası" + nl + nl + message;
+    }
+
+    function nodeById(id) {
+      return data.nodes.find(node => node.id === id) || null;
+    }
+
+    function selectedNode() {
+      return nodeById(data.selectedNodeId);
+    }
+
+    function visibleNodes() {
+      const q = clean(data.filter).toLowerCase();
+      return data.nodes.filter(node => {
+        if (!data.showNotes && node.type === "not") return false;
+        if (!q) return true;
+        return (node.title + " " + node.body + " " + node.type).toLowerCase().includes(q);
+      });
+    }
+
+    function visibleNodeIds() {
+      return new Set(visibleNodes().map(node => node.id));
+    }
+
+    function nodeRank(type) {
+      if (type === "kasa") return "KASA";
+      if (type === "baslik") return "BAŞLIK";
+      return "NOT";
     }
 
     function fillIconSelect(select, selected) {
-      select.innerHTML = iconOptions.map(icon => `<option value="${icon}" ${icon === selected ? "selected" : ""}>${icon}</option>`).join("");
+      select.innerHTML = icons.map(icon => `<option value="${icon}" ${icon === selected ? "selected" : ""}>${icon}</option>`).join("");
     }
 
-    function selectedTopic() {
-      return data.topics.find(topic => topic.id === data.selectedTopicId) || null;
-    }
-
-    function renderVaultFields() {
-      $("#vaultTitle").value = data.vault.title || "";
-      $("#vaultNote").value = data.vault.note || "";
-      fillIconSelect($("#vaultIcon"), data.vault.icon || "📦");
-    }
-
-    function renderTopicList() {
-      if (!data.topics.length) {
-        $("#topicList").innerHTML = `<div class="hint-box inset">Henüz başlık yok.</div>`;
-        return;
-      }
-      $("#topicList").innerHTML = data.topics.map(topic => {
-        const active = topic.id === data.selectedTopicId ? "active" : "";
-        return `<div class="topic-item ${active}" data-topic-id="${topic.id}"><div class="topic-icon">${escapeHTML(topic.icon)}</div><div><div class="topic-title">${escapeHTML(topic.title)}</div><div class="topic-count">${topic.notes.length} not</div></div></div>`;
-      }).join("");
+    function renderViewport() {
+      const vp = $("#mapViewport");
+      vp.style.transform = `translate(${data.viewport.x}px, ${data.viewport.y}px) scale(${data.viewport.scale})`;
+      $("#zoomIndicator").textContent = Math.round(data.viewport.scale * 100) + "%";
     }
 
     function renderMap() {
-      const wrap = $("#mapWrap");
-      const width = wrap.clientWidth || 700;
-      const height = wrap.clientHeight || 500;
-      const cx = width / 2;
-      const cy = height / 2;
-      const radiusX = Math.max(210, Math.min(width * 0.34, 330));
-      const radiusY = Math.max(145, Math.min(height * 0.30, 230));
+      const ids = visibleNodeIds();
+      const nodes = visibleNodes();
+      const links = data.links.filter(link => ids.has(link.from) && ids.has(link.to));
 
-      const lineParts = [];
-      const nodeParts = [];
+      $("#lineLayer").innerHTML = links.map(link => {
+        const a = nodeById(link.from);
+        const b = nodeById(link.to);
+        if (!a || !b) return "";
+        const isSelected = a.id === data.selectedNodeId || b.id === data.selectedNodeId;
+        return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${isSelected ? "#0000a8" : "#000080"}" stroke-width="${isSelected ? 4 : 2}"></line>`;
+      }).join("");
 
-      nodeParts.push(`<div class="node main-node" style="left:${cx}px;top:${cy}px" data-main-node="yes"><div class="node-title"><span>${escapeHTML(data.vault.icon)}</span><span>${escapeHTML(data.vault.title || "Ana Kasa")}</span></div><div class="node-note">${escapeHTML(data.vault.note || "")}</div><div class="node-count">${data.topics.length} başlık</div></div>`);
+      $("#nodeLayer").innerHTML = nodes.map(node => {
+        const active = node.id === data.selectedNodeId ? "active" : "";
+        const connectedCount = data.links.filter(l => l.from === node.id || l.to === node.id).length;
+        return `<div class="map-node ${node.type} ${active}" data-node-id="${node.id}" style="left:${node.x}px;top:${node.y}px"><div class="rank-label">${nodeRank(node.type)}</div><div class="node-title"><span>${escapeHTML(node.icon)}</span><span>${escapeHTML(node.title || "Adsız")}</span></div><div class="node-note">${escapeHTML(node.body || "")}</div><div class="node-count">${connectedCount} bağlantı</div></div>`;
+      }).join("");
 
-      data.topics.forEach((topic, index) => {
-        const angle = data.topics.length === 1 ? 0 : (Math.PI * 2 * index) / data.topics.length - Math.PI / 2;
-        const x = cx + Math.cos(angle) * radiusX;
-        const y = cy + Math.sin(angle) * radiusY;
-        const active = topic.id === data.selectedTopicId ? "active" : "";
-        lineParts.push(`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#000080" stroke-width="2"></line>`);
-        nodeParts.push(`<div class="node ${active}" style="left:${x}px;top:${y}px" data-topic-id="${topic.id}"><div class="node-title"><span>${escapeHTML(topic.icon)}</span><span>${escapeHTML(topic.title)}</span></div><div class="node-note">${escapeHTML(topic.summary || "")}</div><div class="node-count">${topic.notes.length} not</div></div>`);
-      });
+      $("#mapInfo").textContent = nodes.length + " düğüm";
+      renderViewport();
+    }
 
-      $("#lineLayer").innerHTML = lineParts.join("");
-      $("#mapCanvas").innerHTML = nodeParts.join("");
-      $("#mapInfo").textContent = data.topics.length + " başlık";
+    function renderNodeList() {
+      const nodes = visibleNodes();
+      if (!nodes.length) {
+        $("#nodeList").innerHTML = `<div class="hint-box inset">Sonuç yok.</div>`;
+        return;
+      }
+      $("#nodeList").innerHTML = nodes.map(node => {
+        const active = node.id === data.selectedNodeId ? "active" : "";
+        return `<div class="node-list-item ${active}" data-node-id="${node.id}"><div class="node-list-icon">${escapeHTML(node.icon)}</div><div><div class="node-list-title">${escapeHTML(node.title || "Adsız")}</div><div class="node-list-meta">${nodeRank(node.type)}</div></div></div>`;
+      }).join("");
     }
 
     function renderEditor() {
-      const topic = selectedTopic();
-      if (!topic) {
+      const node = selectedNode();
+      if (!node) {
         $("#emptyEditor").classList.remove("hidden");
-        $("#topicEditor").classList.add("hidden");
+        $("#nodeEditor").classList.add("hidden");
         return;
       }
-
       $("#emptyEditor").classList.add("hidden");
-      $("#topicEditor").classList.remove("hidden");
-      fillIconSelect($("#topicIcon"), topic.icon || "📝");
-      $("#topicTitle").value = topic.title || "";
-      $("#topicSummary").value = topic.summary || "";
-      renderNotes(topic);
+      $("#nodeEditor").classList.remove("hidden");
+      $("#nodeType").value = node.type;
+      fillIconSelect($("#nodeIcon"), node.icon || "📝");
+      $("#nodeTitle").value = node.title || "";
+      $("#nodeBody").value = node.body || "";
+      renderTargetSelect();
+      renderLinkList();
     }
 
-    function renderNotes(topic) {
-      if (!topic.notes.length) {
-        $("#noteList").innerHTML = `<div class="hint-box inset">Bu başlığa bağlı not yok.</div>`;
+    function renderTargetSelect() {
+      const current = selectedNode();
+      const options = data.nodes.filter(node => !current || node.id !== current.id).map(node => `<option value="${node.id}">${node.icon} ${escapeHTML(node.title)} [${nodeRank(node.type)}]</option>`).join("");
+      $("#targetNodeSelect").innerHTML = options || `<option value="">Bağlanacak düğüm yok</option>`;
+    }
+
+    function renderLinkList() {
+      const node = selectedNode();
+      if (!node) return;
+      const links = data.links.filter(link => link.from === node.id || link.to === node.id);
+      if (!links.length) {
+        $("#linkList").innerHTML = `<div class="hint-box inset">Bağlantı yok.</div>`;
         return;
       }
-      $("#noteList").innerHTML = topic.notes.map(note => {
-        return `<div class="note-card"><strong>${escapeHTML(note.title || "Adsız Not")}</strong><div class="note-text">${escapeHTML(note.body || "")}</div><div class="note-actions"><button class="btn small" data-note-edit="${note.id}">Düzenle</button><button class="btn small danger" data-note-delete="${note.id}">Sil</button></div></div>`;
+      $("#linkList").innerHTML = links.map(link => {
+        const otherId = link.from === node.id ? link.to : link.from;
+        const other = nodeById(otherId);
+        if (!other) return "";
+        return `<div class="link-pill"><strong>${escapeHTML(other.icon)} ${escapeHTML(other.title)}</strong><br>${nodeRank(other.type)}<div class="action-row"><button class="btn small danger" data-unlink="${link.id}">Bağı Sil</button></div></div>`;
       }).join("");
     }
 
     function renderStatus() {
-      const noteCount = data.topics.reduce((total, topic) => total + topic.notes.length, 0);
-      $("#statusVault").textContent = "Kasa: " + (data.vault.title || "-");
-      $("#statusTopics").textContent = "Başlık: " + data.topics.length;
-      $("#statusNotes").textContent = "Not: " + noteCount;
+      $("#statusNodes").textContent = "Düğüm: " + data.nodes.length;
+      $("#statusLinks").textContent = "Bağlantı: " + data.links.length;
+      $("#statusMode").textContent = data.linkMode ? "Mod: Bağlantı" : "Mod: Seçim";
       $("#statusSaved").textContent = "Son kayıt: " + formatTime(data.lastSaved);
+      $("#linkModeBtn").classList.toggle("active", data.linkMode);
+      $("#toggleNotesBtn").textContent = data.showNotes ? "👁️ Notları Gizle" : "👁️ Notları Göster";
     }
 
     function renderAll() {
-      renderVaultFields();
-      renderTopicList();
+      renderNodeList();
       renderMap();
       renderEditor();
       renderStatus();
     }
 
-    function addTopic() {
-      const topic = {
-        id: makeId(),
-        title: "Yeni Başlık",
-        icon: "📝",
-        summary: "Kısa not yaz...",
-        notes: []
-      };
-      data.topics.push(topic);
-      data.selectedTopicId = topic.id;
-      renderAll();
-      save(true);
-      setTerminal("Yeni başlık eklendi. Sağ panelden ikon, başlık ve notu düzenleyebilirsin.");
-    }
-
-    function updateTopic() {
-      const topic = selectedTopic();
-      if (!topic) return;
-      topic.icon = $("#topicIcon").value;
-      topic.title = clean($("#topicTitle").value) || "Adsız Başlık";
-      topic.summary = $("#topicSummary").value;
-      renderAll();
-      save(true);
-      setTerminal("Başlık güncellendi.");
-    }
-
-    function deleteTopic() {
-      const topic = selectedTopic();
-      if (!topic) return;
-      if (!confirm("Bu başlık ve bağlı notları silinsin mi?")) return;
-      data.topics = data.topics.filter(item => item.id !== topic.id);
-      data.selectedTopicId = data.topics[0] ? data.topics[0].id : null;
-      renderAll();
-      save(true);
-      setTerminal("Başlık silindi.");
-    }
-
-    function addNote() {
-      const topic = selectedTopic();
-      if (!topic) {
-        setTerminal("Önce bir başlık seç.");
+    function selectNode(id) {
+      if (data.linkMode) {
+        handleLinkModeClick(id);
         return;
       }
-      const title = clean($("#noteTitle").value) || "Adsız Not";
-      const body = clean($("#noteBody").value);
-      if (!body && title === "Adsız Not") return;
-      topic.notes.push({ id: makeId(), title, body });
-      $("#noteTitle").value = "";
-      $("#noteBody").value = "";
+      data.selectedNodeId = id;
       renderAll();
-      save(true);
-      setTerminal("Not eklendi.");
-    }
-
-    function editNote(noteId) {
-      const topic = selectedTopic();
-      if (!topic) return;
-      const note = topic.notes.find(item => item.id === noteId);
-      if (!note) return;
-      $("#noteTitle").value = note.title || "";
-      $("#noteBody").value = note.body || "";
-      topic.notes = topic.notes.filter(item => item.id !== noteId);
-      renderAll();
-      setTerminal("Not düzenleme alanına alındı. Değiştirip tekrar Notu Ekle diyebilirsin.");
+      terminal("Düğüm seçildi: " + (selectedNode() ? selectedNode().title : "-"));
       scheduleSave();
     }
 
-    function deleteNote(noteId) {
-      const topic = selectedTopic();
-      if (!topic) return;
-      topic.notes = topic.notes.filter(item => item.id !== noteId);
+    function handleLinkModeClick(id) {
+      if (!data.linkSourceId) {
+        data.linkSourceId = id;
+        data.selectedNodeId = id;
+        renderAll();
+        terminal("Bağlantı kaynağı seçildi. Şimdi bağlanacak ikinci düğümü seç.");
+        return;
+      }
+      if (data.linkSourceId === id) {
+        terminal("Aynı düğüm kendisine bağlanamaz.");
+        return;
+      }
+      createLink(data.linkSourceId, id);
+      data.linkSourceId = null;
+      data.linkMode = false;
+      data.selectedNodeId = id;
       renderAll();
       save(true);
-      setTerminal("Not silindi.");
     }
 
-    function addNoteFromToolbar() {
-      if (!selectedTopic()) {
-        if (data.topics[0]) data.selectedTopicId = data.topics[0].id;
-        else addTopic();
-      }
+    function createNode(type) {
+      const base = selectedNode() || data.nodes[0];
+      const offset = type === "kasa" ? 320 : type === "baslik" ? 240 : 170;
+      const node = {
+        id: makeId(),
+        type,
+        icon: type === "kasa" ? "📦" : type === "baslik" ? "🗂️" : "📝",
+        title: type === "kasa" ? "Yeni Kasa" : type === "baslik" ? "Yeni Başlık" : "Yeni Not",
+        body: "",
+        x: clamp((base ? base.x : 1100) + offset, 120, WORLD_W - 120),
+        y: clamp((base ? base.y : 800) + offset / 2, 90, WORLD_H - 90)
+      };
+      data.nodes.push(node);
+      data.selectedNodeId = node.id;
+      if (base && type !== "kasa") createLink(base.id, node.id, false);
       renderAll();
-      $("#noteTitle").focus();
-      setTerminal("Not eklemek için sağ paneldeki alanı kullan.");
+      save(true);
+      terminal(nodeRank(type) + " eklendi. Sürükleyerek yerleştirebilirsin.");
+    }
+
+    function createLink(from, to, announce = true) {
+      if (!from || !to || from === to) return;
+      const exists = data.links.some(link => (link.from === from && link.to === to) || (link.from === to && link.to === from));
+      if (exists) {
+        if (announce) terminal("Bu bağlantı zaten var.");
+        return;
+      }
+      data.links.push({ id: makeId(), from, to });
+      if (announce) terminal("Bağlantı eklendi.");
+    }
+
+    function updateNode() {
+      const node = selectedNode();
+      if (!node) return;
+      node.type = $("#nodeType").value;
+      node.icon = $("#nodeIcon").value;
+      node.title = clean($("#nodeTitle").value) || "Adsız";
+      node.body = $("#nodeBody").value;
+      renderAll();
+      save(true);
+      terminal("Düğüm güncellendi.");
+    }
+
+    function deleteNode() {
+      const node = selectedNode();
+      if (!node) return;
+      if (!confirm("Bu düğüm silinsin mi? Bağlantıları da kaldırılacak.")) return;
+      data.nodes = data.nodes.filter(item => item.id !== node.id);
+      data.links = data.links.filter(link => link.from !== node.id && link.to !== node.id);
+      data.selectedNodeId = data.nodes[0] ? data.nodes[0].id : null;
+      renderAll();
+      save(true);
+      terminal("Düğüm silindi.");
+    }
+
+    function connectSelectedToTarget() {
+      const node = selectedNode();
+      const target = $("#targetNodeSelect").value;
+      if (!node || !target) return;
+      createLink(node.id, target);
+      renderAll();
+      save(true);
+    }
+
+    function unlinkAllSelected() {
+      const node = selectedNode();
+      if (!node) return;
+      data.links = data.links.filter(link => link.from !== node.id && link.to !== node.id);
+      renderAll();
+      save(true);
+      terminal("Seçili düğümün bağlantıları temizlendi.");
+    }
+
+    function unlinkById(id) {
+      data.links = data.links.filter(link => link.id !== id);
+      renderAll();
+      save(true);
+      terminal("Bağlantı silindi.");
+    }
+
+    function setZoom(scale, centerX, centerY) {
+      const shell = $("#mapShell");
+      const rect = shell.getBoundingClientRect();
+      const cx = centerX == null ? rect.width / 2 : centerX;
+      const cy = centerY == null ? rect.height / 2 : centerY;
+      const oldScale = data.viewport.scale;
+      const newScale = clamp(scale, 0.22, 2.2);
+      const worldX = (cx - data.viewport.x) / oldScale;
+      const worldY = (cy - data.viewport.y) / oldScale;
+      data.viewport.scale = newScale;
+      data.viewport.x = cx - worldX * newScale;
+      data.viewport.y = cy - worldY * newScale;
+      renderViewport();
+      scheduleSave();
+    }
+
+    function resetView() {
+      data.viewport = { scale: 0.72, x: -420, y: -320 };
+      renderViewport();
+      scheduleSave();
+    }
+
+    function fitView() {
+      const nodes = visibleNodes();
+      if (!nodes.length) return;
+      const shell = $("#mapShell");
+      const rect = shell.getBoundingClientRect();
+      const minX = Math.min(...nodes.map(n => n.x)) - 180;
+      const maxX = Math.max(...nodes.map(n => n.x)) + 180;
+      const minY = Math.min(...nodes.map(n => n.y)) - 120;
+      const maxY = Math.max(...nodes.map(n => n.y)) + 120;
+      const scaleX = rect.width / (maxX - minX);
+      const scaleY = rect.height / (maxY - minY);
+      const scale = clamp(Math.min(scaleX, scaleY), 0.22, 1.35);
+      data.viewport.scale = scale;
+      data.viewport.x = (rect.width - (minX + maxX) * scale) / 2;
+      data.viewport.y = (rect.height - (minY + maxY) * scale) / 2;
+      renderViewport();
+      scheduleSave();
+      terminal("Harita ekrana sığdırıldı.");
+    }
+
+    function autoLayout() {
+      const kasalar = data.nodes.filter(n => n.type === "kasa");
+      if (!kasalar.length) createNode("kasa");
+      const centers = data.nodes.filter(n => n.type === "kasa");
+      const centerStartX = 650;
+      const gap = 650;
+      centers.forEach((kasa, i) => {
+        kasa.x = centerStartX + i * gap;
+        kasa.y = 760;
+        const linked = data.links.filter(l => l.from === kasa.id || l.to === kasa.id).map(l => l.from === kasa.id ? l.to : l.from).map(nodeById).filter(Boolean).filter(n => n.type !== "kasa");
+        linked.forEach((node, index) => {
+          const angle = linked.length === 1 ? -Math.PI / 2 : (Math.PI * 2 * index) / linked.length;
+          const r = node.type === "not" ? 230 : 300;
+          node.x = clamp(kasa.x + Math.cos(angle) * r, 100, WORLD_W - 100);
+          node.y = clamp(kasa.y + Math.sin(angle) * r, 80, WORLD_H - 80);
+        });
+      });
+      renderAll();
+      save(true);
+      fitView();
+      terminal("Harita otomatik dizildi.");
     }
 
     function exportMarkdown() {
       const lines = [];
-      lines.push("# " + (data.vault.icon || "") + " " + (data.vault.title || "Ana Kasa"));
+      lines.push("# Kurgu Terminali 95 Mind Map");
       lines.push("");
-      lines.push(data.vault.note || "");
-      data.topics.forEach(topic => {
+      lines.push("## Düğümler");
+      data.nodes.forEach(node => {
         lines.push("");
-        lines.push("## " + (topic.icon || "") + " " + topic.title);
-        lines.push(topic.summary || "");
-        topic.notes.forEach(note => {
-          lines.push("");
-          lines.push("### " + note.title);
-          lines.push(note.body || "");
-        });
+        lines.push("### " + node.icon + " " + node.title + " [" + nodeRank(node.type) + "]");
+        lines.push(node.body || "");
+      });
+      lines.push("");
+      lines.push("## Bağlantılar");
+      data.links.forEach(link => {
+        const a = nodeById(link.from);
+        const b = nodeById(link.to);
+        if (a && b) lines.push("- " + a.title + " <-> " + b.title);
       });
       const blob = new Blob([lines.join(nl)], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = (data.vault.title || "kurgu-terminali-95-mindmap") + ".md";
+      a.download = "kurgu-terminali-95-mindmap.md";
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      setTerminal("Markdown dışa aktarıldı.");
+      terminal("Markdown dışa aktarıldı.");
     }
 
     function resetAll() {
-      if (!confirm("Tüm kasa, başlıklar ve notlar temizlensin mi?")) return;
+      if (!confirm("Tüm harita temizlensin mi?")) return;
       data = structuredClone(defaults);
       renderAll();
       save(true);
-      setTerminal("Yeni temiz kasa açıldı.");
+      terminal("Yeni temiz harita açıldı.");
+    }
+
+    function bindMapInteractions() {
+      const shell = $("#mapShell");
+      shell.addEventListener("wheel", event => {
+        event.preventDefault();
+        const rect = shell.getBoundingClientRect();
+        const delta = event.deltaY > 0 ? -0.08 : 0.08;
+        setZoom(data.viewport.scale + delta, event.clientX - rect.left, event.clientY - rect.top);
+      }, { passive: false });
+
+      shell.addEventListener("pointerdown", event => {
+        const nodeEl = event.target.closest(".map-node");
+        if (nodeEl) {
+          const id = nodeEl.dataset.nodeId;
+          const node = nodeById(id);
+          if (!node) return;
+          if (data.linkMode) {
+            selectNode(id);
+            return;
+          }
+          data.selectedNodeId = id;
+          const rect = shell.getBoundingClientRect();
+          const startWorldX = (event.clientX - rect.left - data.viewport.x) / data.viewport.scale;
+          const startWorldY = (event.clientY - rect.top - data.viewport.y) / data.viewport.scale;
+          dragState = { id, startWorldX, startWorldY, nodeX: node.x, nodeY: node.y, moved: false };
+          nodeEl.setPointerCapture(event.pointerId);
+          renderAll();
+          return;
+        }
+        panState = { startX: event.clientX, startY: event.clientY, viewX: data.viewport.x, viewY: data.viewport.y };
+        shell.classList.add("dragging");
+        shell.setPointerCapture(event.pointerId);
+      });
+
+      shell.addEventListener("pointermove", event => {
+        if (dragState) {
+          const rect = shell.getBoundingClientRect();
+          const worldX = (event.clientX - rect.left - data.viewport.x) / data.viewport.scale;
+          const worldY = (event.clientY - rect.top - data.viewport.y) / data.viewport.scale;
+          const node = nodeById(dragState.id);
+          if (!node) return;
+          const dx = worldX - dragState.startWorldX;
+          const dy = worldY - dragState.startWorldY;
+          if (Math.abs(dx) + Math.abs(dy) > 2) dragState.moved = true;
+          node.x = clamp(dragState.nodeX + dx, 60, WORLD_W - 60);
+          node.y = clamp(dragState.nodeY + dy, 50, WORLD_H - 50);
+          renderMap();
+          return;
+        }
+        if (panState) {
+          data.viewport.x = panState.viewX + (event.clientX - panState.startX);
+          data.viewport.y = panState.viewY + (event.clientY - panState.startY);
+          renderViewport();
+        }
+      });
+
+      shell.addEventListener("pointerup", event => {
+        if (dragState) {
+          const id = dragState.id;
+          const moved = dragState.moved;
+          dragState = null;
+          if (!moved) selectNode(id);
+          else { renderAll(); scheduleSave(); terminal("Düğüm taşındı."); }
+        }
+        if (panState) {
+          panState = null;
+          shell.classList.remove("dragging");
+          scheduleSave();
+        }
+      });
+
+      shell.addEventListener("pointercancel", () => {
+        dragState = null;
+        panState = null;
+        shell.classList.remove("dragging");
+      });
     }
 
     function bind() {
       $("#saveBtn").addEventListener("click", () => save(true));
-      $("#addTopicBtn").addEventListener("click", addTopic);
-      $("#addNoteTopBtn").addEventListener("click", addNoteFromToolbar);
-      $("#layoutBtn").addEventListener("click", () => { renderMap(); setTerminal("Harita yeniden düzenlendi."); });
+      $("#addKasaBtn").addEventListener("click", () => createNode("kasa"));
+      $("#addBaslikBtn").addEventListener("click", () => createNode("baslik"));
+      $("#addNoteBtn").addEventListener("click", () => createNode("not"));
+      $("#linkModeBtn").addEventListener("click", () => { data.linkMode = !data.linkMode; data.linkSourceId = null; renderStatus(); terminal(data.linkMode ? "Bağlantı modu açık. Önce kaynak, sonra hedef düğümü seç." : "Bağlantı modu kapalı."); });
+      $("#toggleNotesBtn").addEventListener("click", () => { data.showNotes = !data.showNotes; renderAll(); scheduleSave(); });
+      $("#autoLayoutBtn").addEventListener("click", autoLayout);
       $("#exportBtn").addEventListener("click", exportMarkdown);
       $("#resetBtn").addEventListener("click", resetAll);
-      $("#updateTopicBtn").addEventListener("click", updateTopic);
-      $("#deleteTopicBtn").addEventListener("click", deleteTopic);
-      $("#addNoteBtn").addEventListener("click", addNote);
-      $("#clearNoteBtn").addEventListener("click", () => { $("#noteTitle").value = ""; $("#noteBody").value = ""; });
-
-      $("#vaultTitle").addEventListener("input", event => { data.vault.title = event.target.value; renderMap(); renderStatus(); scheduleSave(); });
-      $("#vaultIcon").addEventListener("change", event => { data.vault.icon = event.target.value; renderMap(); scheduleSave(); });
-      $("#vaultNote").addEventListener("input", event => { data.vault.note = event.target.value; renderMap(); scheduleSave(); });
+      $("#zoomInBtn").addEventListener("click", () => setZoom(data.viewport.scale + 0.12));
+      $("#zoomOutBtn").addEventListener("click", () => setZoom(data.viewport.scale - 0.12));
+      $("#resetViewBtn").addEventListener("click", resetView);
+      $("#fitBtn").addEventListener("click", fitView);
+      $("#fitBtnLeft").addEventListener("click", fitView);
+      $("#showAllBtn").addEventListener("click", () => { data.filter = ""; $("#filterInput").value = ""; data.showNotes = true; renderAll(); fitView(); });
+      $("#updateNodeBtn").addEventListener("click", updateNode);
+      $("#deleteNodeBtn").addEventListener("click", deleteNode);
+      $("#connectBtn").addEventListener("click", connectSelectedToTarget);
+      $("#unlinkAllBtn").addEventListener("click", unlinkAllSelected);
+      $("#filterInput").addEventListener("input", event => { data.filter = event.target.value; renderAll(); scheduleSave(); });
 
       document.body.addEventListener("click", event => {
-        const topicItem = event.target.closest("[data-topic-id]");
-        if (topicItem) {
-          data.selectedTopicId = topicItem.dataset.topicId;
-          renderAll();
-          setTerminal("Başlık seçildi: " + (selectedTopic() ? selectedTopic().title : "-"));
-          scheduleSave();
-        }
-        const editBtn = event.target.closest("button[data-note-edit]");
-        if (editBtn) editNote(editBtn.dataset.noteEdit);
-        const deleteBtn = event.target.closest("button[data-note-delete]");
-        if (deleteBtn) deleteNote(deleteBtn.dataset.noteDelete);
+        const listItem = event.target.closest(".node-list-item");
+        if (listItem) selectNode(listItem.dataset.nodeId);
+        const unlink = event.target.closest("button[data-unlink]");
+        if (unlink) unlinkById(unlink.dataset.unlink);
       });
 
-      window.addEventListener("resize", renderMap);
+      window.addEventListener("resize", () => { renderMap(); });
+      bindMapInteractions();
     }
 
     function boot() {
-      fillIconSelect($("#vaultIcon"), data.vault.icon || "📦");
-      fillIconSelect($("#topicIcon"), "📝");
-      if (!data.selectedTopicId && data.topics[0]) data.selectedTopicId = data.topics[0].id;
+      fillIconSelect($("#nodeIcon"), "📝");
+      $("#filterInput").value = data.filter || "";
       bind();
       renderAll();
-      setTerminal("Kasa hazır. Başlık ekle veya mevcut başlıklardan birini seç.");
+      fitView();
+      terminal("Harita hazır. Mobilde + / - ile zoom yap, boş alanda sürükleyerek gez, düğümleri tutup taşı.");
     }
 
     boot();
