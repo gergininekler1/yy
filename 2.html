@@ -1,886 +1,683 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Silkroad Temalı Not Defteri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gezegen Not Aracı</title>
   <style>
-    :root{
-      --bg:#3a2a1a;
-      --panel:#1c1c1d;
-      --panel-2:#262626;
-      --panel-3:#111;
-      --gold:#9f8a57;
-      --gold-2:#cbb476;
-      --gold-3:#6f603b;
-      --blue:#4f5f8d;
-      --blue-2:#6678a9;
-      --line:#5d5d5d;
-      --text:#e7d9b8;
-      --muted:#b7aa86;
-      --danger:#8d3a32;
-      --success:#5f7b44;
-      --shadow: rgba(0,0,0,.45);
-    }
+    :root {
+      --bg: #ececec;
+      --text: #242424;
+      --muted: #9a9a9a;
+      --soft: #d5d5d5;
+      --planet: #2f2f2f;
+      --card: rgba(255, 255, 255, 0.42);
+      --line: rgba(0, 0, 0, 0.12);
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.12);
+    }* {
+  box-sizing: border-box;
+}
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
 
-    html, body{
-      margin:0;
-      padding:0;
-      width:100%;
-      min-height:100%;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.06), transparent 25%),
-        linear-gradient(180deg, #7d5f34 0%, #4e3b21 16%, #2a2117 100%);
-      color:var(--text);
-      font-family: Tahoma, Verdana, Arial, sans-serif;
-      overflow-x:hidden;
-    }
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 410px 1fr;
+  isolation: isolate;
+}
 
-    body{
-      min-height:100dvh;
-    }
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.5), transparent 24%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,.35), transparent 20%),
+    radial-gradient(circle at 40% 80%, rgba(0,0,0,.05), transparent 26%);
+  z-index: -2;
+}
 
-    .app{
-      width:100%;
-      min-height:100dvh;
-      padding:10px;
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-    }
+.sidebar {
+  padding: 42px 32px;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  z-index: 5;
+}
 
-    .window{
-      width:100%;
-      max-width:460px;
-      background:linear-gradient(180deg, #2d2d2d 0%, #181818 100%);
-      border:2px solid var(--gold-3);
-      box-shadow:
-        0 0 0 1px #000 inset,
-        0 0 0 2px #4b4b4b inset,
-        0 10px 30px var(--shadow);
-      border-radius:8px;
-      overflow:hidden;
-    }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 42px;
+  letter-spacing: -0.04em;
+  font-size: 22px;
+  font-weight: 800;
+}
 
-    /* ÜST BAŞLIK */
-    .titlebar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 12px;
-      background:
-        linear-gradient(180deg, #0b0b0b 0%, #171717 100%);
-      border-bottom:1px solid #444;
-      box-shadow: inset 0 -1px 0 #000;
-    }
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--text);
+  position: relative;
+  box-shadow: inset -9px -8px 0 rgba(255,255,255,.12);
+}
 
-    .titlebar h1{
-      margin:0;
-      font-size:15px;
-      font-weight:700;
-      color:#f3f0e3;
-      letter-spacing:.3px;
-      text-align:center;
-      flex:1;
-    }
+.logo-mark::after {
+  content: "";
+  position: absolute;
+  width: 48px;
+  height: 10px;
+  border: 2px solid rgba(255,255,255,.7);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-radius: 50%;
+  left: -7px;
+  top: 11px;
+  transform: rotate(-18deg);
+}
 
-    .title-deco{
-      width:24px;
-      height:24px;
-      border:1px solid var(--gold-3);
-      background:linear-gradient(180deg, #7b6a3d, #534525);
-      border-radius:3px;
-      display:grid;
-      place-items:center;
-      color:#efe2b8;
-      font-size:13px;
-      font-weight:bold;
-      flex:0 0 24px;
-    }
+.panel-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: #777;
+  font-weight: 700;
+}
 
-    /* MAVI BAR */
-    .namebar{
-      margin:8px;
-      background:linear-gradient(180deg, var(--blue-2) 0%, var(--blue) 100%);
-      border:1px solid #7e8ebc;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
-      border-radius:4px;
-      padding:6px 10px;
-      text-align:center;
-      color:#f1f4ff;
-      font-weight:700;
-      font-size:16px;
-    }
+.intro {
+  margin: 0 0 26px;
+  color: #6f6f6f;
+  line-height: 1.55;
+  font-size: 14px;
+}
 
-    /* İÇ PANEL */
-    .content{
-      padding:8px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), transparent 10%),
-        linear-gradient(180deg, #1c1c1c, #151515);
-      border-top:1px solid #2d2d2d;
-    }
+form {
+  display: grid;
+  gap: 14px;
+}
 
-    .section{
-      background:linear-gradient(180deg, #252525 0%, #1a1a1a 100%);
-      border:1px solid #474747;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-      padding:10px;
-      margin-bottom:8px;
-      border-radius:4px;
-    }
+label {
+  display: grid;
+  gap: 7px;
+  color: #6d6d6d;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
 
-    .row{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
+input, select, textarea {
+  width: 100%;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.46);
+  border-radius: 18px;
+  padding: 15px 16px;
+  outline: none;
+  color: var(--text);
+  font: inherit;
+  transition: .25s ease;
+}
 
-    .row + .row{
-      margin-top:8px;
-    }
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(0,0,0,.32);
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
+}
 
-    .label{
-      color:var(--gold-2);
-      font-size:13px;
-      min-width:88px;
-      flex:0 0 auto;
-    }
+button {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 20px;
+  background: #262626;
+  color: white;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  box-shadow: 0 20px 40px rgba(0,0,0,.16);
+}
 
-    .value{
-      color:#fff;
-      font-size:13px;
-      flex:1 1 auto;
-      min-width:0;
-    }
+button:hover {
+  transform: translateY(-2px);
+  background: #111;
+  box-shadow: 0 24px 48px rgba(0,0,0,.2);
+}
 
-    .field{
-      width:100%;
-      border:1px solid #4e4e4e;
-      background:linear-gradient(180deg, #0a0a0a, #151515);
-      color:#fff;
-      border-radius:4px;
-      padding:10px 12px;
-      outline:none;
-      font-size:14px;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,.7);
-    }
+.planet-list {
+  margin-top: 30px;
+  display: grid;
+  gap: 10px;
+  max-height: 28vh;
+  overflow: auto;
+  padding-right: 4px;
+}
 
-    .field::placeholder,
-    textarea::placeholder{
-      color:#8e8e8e;
-    }
+.planet-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.34);
+  border: 1px solid rgba(0,0,0,.05);
+  cursor: pointer;
+  transition: .2s ease;
+}
 
-    .field:focus,
-    textarea:focus{
-      border-color:#8d9fd3;
-      box-shadow:
-        inset 0 1px 2px rgba(0,0,0,.7),
-        0 0 0 1px rgba(141,159,211,.25);
-    }
+.planet-chip:hover {
+  background: rgba(255,255,255,.58);
+  transform: translateX(3px);
+}
 
-    .editor-title{
-      font-size:13px;
-      color:var(--gold-2);
-      margin-bottom:6px;
-    }
+.mini-planet {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--planet);
+  box-shadow: inset -8px -7px 0 rgba(255,255,255,.13);
+}
 
-    textarea{
-      width:100%;
-      min-height:280px;
-      resize:vertical;
-      border:1px solid #4e4e4e;
-      background:
-        linear-gradient(180deg, #171717 0%, #0f0f0f 100%);
-      color:#ececec;
-      border-radius:4px;
-      padding:12px;
-      outline:none;
-      font-size:14px;
-      line-height:1.55;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,.7);
-    }
+.chip-text strong {
+  display: block;
+  font-size: 13px;
+}
 
-    .stats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-    }
+.chip-text span {
+  color: #8a8a8a;
+  font-size: 12px;
+}
 
-    .statbox{
-      background:linear-gradient(180deg, #2e2e2e, #222);
-      border:1px solid #4d4d4d;
-      border-radius:4px;
-      padding:8px;
-    }
+.space {
+  position: relative;
+  overflow: hidden;
+}
 
-    .statbox .small{
-      color:var(--gold-2);
-      font-size:12px;
-      margin-bottom:4px;
-    }
+.orbit {
+  position: absolute;
+  left: -255px;
+  top: 50%;
+  width: 680px;
+  height: 680px;
+  border: 3px solid rgba(0,0,0,.06);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 600ms ease;
+  opacity: .95;
+}
 
-    .statbox .big{
-      color:#fff;
-      font-size:13px;
-      font-weight:700;
-    }
+.orbit.zoomed {
+  transform: translateY(-50%) scale(1.38) translateX(-40px);
+  opacity: .55;
+}
 
-    .bar-group{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
+.orbit-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.18);
+  transform: translate(-50%, -50%);
+}
 
-    .barline{
-      display:grid;
-      grid-template-columns:42px 1fr;
-      gap:8px;
-      align-items:center;
-    }
+.orbit-dot.active {
+  width: 16px;
+  height: 16px;
+  background: #262626;
+  box-shadow: 0 0 0 8px rgba(0,0,0,.04);
+}
 
-    .barline span{
-      color:#ddd;
-      font-size:12px;
-      font-weight:700;
-    }
+.orbit-num {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-size: clamp(46px, 6vw, 90px);
+  line-height: 1;
+  font-weight: 900;
+  color: rgba(0,0,0,.11);
+  letter-spacing: -0.12em;
+  user-select: none;
+}
 
-    .bar{
-      height:18px;
-      background:#060606;
-      border:1px solid #444;
-      border-radius:3px;
-      overflow:hidden;
-      position:relative;
-    }
+.orbit-num.active {
+  color: #282828;
+  font-size: clamp(76px, 10vw, 142px);
+  transform: translate(-50%, -50%) rotate(0deg);
+  letter-spacing: -0.13em;
+  text-shadow: 0 24px 40px rgba(0,0,0,.08);
+}
 
-    .fill{
-      position:absolute;
-      left:0;
-      top:0;
-      bottom:0;
-    }
+.planet-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: 900ms cubic-bezier(.16,1,.3,1);
+}
 
-    .fill.red{
-      width:100%;
-      background:linear-gradient(180deg, #ff4157, #be0b1f);
-    }
+.planet-stage.has-note {
+  transform: translateX(-23vw) scale(1.35);
+  opacity: .45;
+  filter: blur(.2px);
+}
 
-    .fill.blue{
-      width:72%;
-      background:linear-gradient(180deg, #4a70ff, #1430a9);
-    }
+.planet {
+  width: min(35vw, 360px);
+  height: min(35vw, 360px);
+  min-width: 210px;
+  min-height: 210px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,.25), transparent 22%),
+    radial-gradient(circle at 72% 78%, rgba(0,0,0,.28), transparent 34%),
+    linear-gradient(135deg, #3f3f3f, #1f1f1f);
+  box-shadow: inset -50px -40px 90px rgba(0,0,0,.32), 0 45px 110px rgba(0,0,0,.2);
+  position: relative;
+  animation: breathe 5s ease-in-out infinite;
+}
 
-    .bartext{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:11px;
-      color:#fff;
-      text-shadow:0 1px 1px #000;
-      padding:0 6px;
-    }
+.planet::before {
+  content: "";
+  position: absolute;
+  width: 125%;
+  height: 34%;
+  left: -12%;
+  top: 34%;
+  border: 3px solid rgba(255,255,255,.33);
+  border-left-color: rgba(255,255,255,.07);
+  border-right-color: rgba(255,255,255,.07);
+  border-radius: 50%;
+  transform: rotate(-15deg);
+}
 
-    /* BUTONLAR */
-    .actions{
-      display:grid;
-      grid-template-columns:repeat(2, 1fr);
-      gap:8px;
-    }
+.planet-label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + min(20vw, 210px));
+  transform: translateX(-50%);
+  text-align: center;
+  transition: .4s ease;
+}
 
-    .btn{
-      appearance:none;
-      border:1px solid var(--gold-3);
-      background:
-        linear-gradient(180deg, #6d603d 0%, #4d432b 48%, #3b321f 49%, #2a2418 100%);
-      color:#f1e7c8;
-      border-radius:4px;
-      padding:10px 8px;
-      font-size:13px;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.08),
-        0 1px 0 rgba(0,0,0,.45);
-      min-height:42px;
-    }
+.planet-label h1 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 72px);
+  letter-spacing: -0.08em;
+}
 
-    .btn:active{
-      transform:translateY(1px);
-      filter:brightness(.96);
-    }
+.planet-label p {
+  margin: 8px 0 0;
+  color: #818181;
+  font-weight: 650;
+}
 
-    .btn.blue{
-      border-color:#5a6b9f;
-      background:linear-gradient(180deg, #7085bf, #4d608e 52%, #3a4a72 53%, #2c3857);
-    }
+.notes {
+  position: absolute;
+  right: 7vw;
+  top: 50%;
+  width: min(560px, 45vw);
+  transform: translateY(-50%) translateX(80px);
+  opacity: 0;
+  pointer-events: none;
+  transition: 800ms cubic-bezier(.16,1,.3,1);
+  z-index: 4;
+}
 
-    .btn.red{
-      border-color:#77413c;
-      background:linear-gradient(180deg, #94514a, #713a35 52%, #5a2e2a 53%, #42211e);
-    }
+.notes.visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+}
 
-    .btn.green{
-      border-color:#576c40;
-      background:linear-gradient(180deg, #7b9860, #5d7645 52%, #496036 53%, #354629);
-    }
+.note-head {
+  margin-bottom: 22px;
+}
 
-    .btn.full{
-      grid-column:1 / -1;
-    }
+.note-head .eyebrow {
+  margin: 0 0 7px;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #8a8a8a;
+  font-size: 12px;
+  font-weight: 800;
+}
 
-    .footer{
-      padding:10px;
-      border-top:1px solid #454545;
-      background:linear-gradient(180deg, #161616, #0d0d0d);
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      flex-wrap:wrap;
-      font-size:12px;
-      color:var(--muted);
-    }
+.note-head h2 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 76px);
+  line-height: .9;
+  letter-spacing: -0.1em;
+}
 
-    .chip{
-      background:#0a0a0a;
-      border:1px solid #3b3b3b;
-      border-radius:4px;
-      padding:5px 8px;
-      white-space:nowrap;
-    }
+.note-head p {
+  margin: 13px 0 0;
+  color: #747474;
+  font-size: 17px;
+}
 
-    /* NOTLAR PANELİ */
-    .drawer{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.55);
-      display:none;
-      align-items:flex-end;
-      z-index:100;
-    }
+.steps {
+  display: grid;
+  gap: 12px;
+}
 
-    .drawer.open{
-      display:flex;
-    }
+.step {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 18px;
+  align-items: start;
+  padding: 18px;
+  border-radius: 28px;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,.4);
+  box-shadow: 0 16px 34px rgba(0,0,0,.06);
+  backdrop-filter: blur(14px);
+  transform: translateY(16px);
+  opacity: 0;
+  animation: rise .55s ease forwards;
+}
 
-    .drawer-panel{
-      width:100%;
-      max-width:460px;
-      margin:0 auto;
-      background:linear-gradient(180deg, #262626, #171717);
-      border:2px solid var(--gold-3);
-      border-bottom:none;
-      border-radius:10px 10px 0 0;
-      max-height:78dvh;
-      overflow:hidden;
-      box-shadow:0 -10px 30px rgba(0,0,0,.45);
-    }
+.step:nth-child(2) { animation-delay: .08s; }
+.step:nth-child(3) { animation-delay: .16s; }
+.step:nth-child(4) { animation-delay: .24s; }
+.step:nth-child(5) { animation-delay: .32s; }
 
-    .drawer-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:10px;
-      border-bottom:1px solid #444;
-      background:linear-gradient(180deg, #0f0f0f, #1a1a1a);
-    }
+.step-no {
+  font-size: 44px;
+  line-height: .9;
+  font-weight: 950;
+  letter-spacing: -0.12em;
+  color: #292929;
+}
 
-    .drawer-head h2{
-      margin:0;
-      font-size:14px;
-      color:#f0e6c7;
-    }
+.step strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+  letter-spacing: -0.03em;
+}
 
-    .drawer-body{
-      padding:10px;
-    }
+.step textarea {
+  min-height: 72px;
+  resize: vertical;
+  border-radius: 18px;
+  background: rgba(255,255,255,.52);
+}
 
-    .search{
-      width:100%;
-      margin-bottom:10px;
-    }
+.empty-hint {
+  position: absolute;
+  right: 9vw;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(420px, 42vw);
+  color: #777;
+  font-size: 18px;
+  line-height: 1.5;
+}
 
-    .notes{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      max-height:56dvh;
-      overflow:auto;
-    }
+.empty-hint strong {
+  display: block;
+  margin-bottom: 12px;
+  color: #2c2c2c;
+  font-size: clamp(42px, 6vw, 82px);
+  line-height: .88;
+  letter-spacing: -0.11em;
+}
 
-    .note-item{
-      width:100%;
-      text-align:left;
-      border:1px solid #4d4d4d;
-      background:linear-gradient(180deg, #2b2b2b, #1e1e1e);
-      border-radius:4px;
-      padding:10px;
-      color:#ececec;
-      cursor:pointer;
-    }
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%) translateY(30px);
+  background: rgba(24,24,24,.92);
+  color: white;
+  padding: 13px 18px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: .28s ease;
+  z-index: 10;
+  box-shadow: 0 20px 50px rgba(0,0,0,.22);
+  font-size: 14px;
+  font-weight: 700;
+}
 
-    .note-item.active{
-      border-color:#92a3d6;
-      background:linear-gradient(180deg, #41527d, #2a3450);
-    }
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
-    .note-title{
-      display:block;
-      font-size:13px;
-      font-weight:700;
-      color:#fff;
-      margin-bottom:4px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
 
-    .note-preview{
-      display:block;
-      font-size:12px;
-      color:#bdbdbd;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
+@keyframes rise {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
-    .empty{
-      text-align:center;
-      color:#a9a9a9;
-      font-size:13px;
-      padding:16px;
-      border:1px dashed #575757;
-      border-radius:4px;
-      background:#121212;
-    }
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .app {
+    min-height: 100vh;
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: relative;
+    padding: 28px 20px;
+  }
+  .space {
+    min-height: 950px;
+  }
+  .planet-stage.has-note {
+    transform: translateY(-235px) scale(.85);
+    opacity: .32;
+  }
+  .empty-hint, .notes {
+    right: 20px;
+    left: 20px;
+    top: 470px;
+    width: auto;
+  }
+  .orbit {
+    left: -330px;
+  }
+}
 
-    @media (min-width: 700px){
-      .window{
-        max-width:560px;
-      }
-
-      .actions{
-        grid-template-columns:repeat(3, 1fr);
-      }
-
-      .drawer-panel{
-        max-width:560px;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="window">
-      <div class="titlebar">
-        <div class="title-deco">◄</div>
-        <h1>Character</h1>
-        <div class="title-deco">×</div>
-      </div>
+  <div class="grain"></div>
+  <main class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <span class="logo-mark"></span>
+        Orbital Notes
+      </div><p class="panel-title">Yeni gezegen notu</p>
+  <p class="intro">Bir not yarattığında notun bir gezegene dönüşür. İsim ve kategori ver; ardından gezegen yakınlaşıp 5 aşamalı not alanını açar.</p>
 
-      <div class="namebar">Not Defteri</div>
+  <form id="planetForm">
+    <label>
+      Gezegen adı
+      <input id="planetName" type="text" placeholder="Örn. Ürün Fikri" required />
+    </label>
 
-      <div class="content">
-        <div class="section">
-          <div class="bar-group">
-            <div class="barline">
-              <span>HP</span>
-              <div class="bar">
-                <div class="fill red"></div>
-                <div class="bartext">Hazır</div>
-              </div>
-            </div>
-            <div class="barline">
-              <span>MP</span>
-              <div class="bar">
-                <div class="fill blue"></div>
-                <div class="bartext" id="autosaveText">Otomatik kayıt açık</div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <label>
+      Kategori
+      <select id="planetCategory" required>
+        <option value="">Kategori seç</option>
+        <option>Fikir</option>
+        <option>Araştırma</option>
+        <option>Proje</option>
+        <option>Kişisel</option>
+        <option>Toplantı</option>
+      </select>
+    </label>
 
-        <div class="section">
-          <div class="editor-title">Not Başlığı</div>
-          <input id="titleInput" class="field" type="text" placeholder="Başlık gir..." />
-        </div>
+    <button type="submit">Gezegen oluştur</button>
+  </form>
 
-        <div class="section">
-          <div class="editor-title">Not İçeriği</div>
-          <textarea id="contentInput" placeholder="Buraya notunu yaz..."></textarea>
-        </div>
+  <section class="planet-list" id="planetList" aria-label="Gezegen notları"></section>
+</aside>
 
-        <div class="section">
-          <div class="stats">
-            <div class="statbox">
-              <div class="small">Not Sayısı</div>
-              <div class="big" id="noteCount">0</div>
-            </div>
-            <div class="statbox">
-              <div class="small">Aktif Not</div>
-              <div class="big" id="activeInfo">Yok</div>
-            </div>
-            <div class="statbox">
-              <div class="small">Kelime</div>
-              <div class="big" id="wordCount">0</div>
-            </div>
-            <div class="statbox">
-              <div class="small">Karakter</div>
-              <div class="big" id="charCount">0</div>
-            </div>
-          </div>
-        </div>
+<section class="space">
+  <div class="orbit" id="orbit">
+    <span class="orbit-dot" style="left: 14%; top: 19%"></span>
+    <span class="orbit-dot" style="left: 74%; top: 30%"></span>
+    <span class="orbit-dot active" style="left: 82%; top: 50%"></span>
+    <span class="orbit-dot" style="left: 74%; top: 70%"></span>
+    <span class="orbit-dot" style="left: 14%; top: 81%"></span>
 
-        <div class="section">
-          <div class="actions">
-            <button class="btn blue" id="openNotesBtn">Notlar</button>
-            <button class="btn green" id="newBtn">Yeni</button>
-            <button class="btn" id="saveBtn">Kaydet</button>
-            <button class="btn" id="duplicateBtn">Kopyala</button>
-            <button class="btn red" id="clearBtn">Temizle</button>
-            <button class="btn red" id="deleteBtn">Sil</button>
-            <button class="btn full" id="exportBtn">TXT Dışa Aktar</button>
-          </div>
-        </div>
-      </div>
+    <span class="orbit-num" style="left: 26%; top: 15%">01</span>
+    <span class="orbit-num" style="left: 82%; top: 32%">02</span>
+    <span class="orbit-num active" style="left: 98%; top: 50%">03</span>
+    <span class="orbit-num" style="left: 82%; top: 70%">04</span>
+    <span class="orbit-num" style="left: 26%; top: 88%">05</span>
+  </div>
 
-      <div class="footer">
-        <div class="chip" id="statusText">Durum: Hazır</div>
-        <div class="chip" id="updatedText">Son kayıt: -</div>
-      </div>
+  <div class="planet-stage" id="planetStage">
+    <div class="planet"></div>
+    <div class="planet-label" id="planetLabel">
+      <h1>Yeni Not</h1>
+      <p>Gezegenini oluştur</p>
     </div>
   </div>
 
-  <!-- Notlar Paneli -->
-  <div class="drawer" id="drawer">
-    <div class="drawer-panel">
-      <div class="drawer-head">
-        <h2>Not Listesi</h2>
-        <button class="btn" id="closeDrawerBtn" style="padding:8px 12px; min-height:auto;">Kapat</button>
-      </div>
-      <div class="drawer-body">
-        <input id="searchInput" class="field search" type="search" placeholder="Not ara..." />
-        <div class="notes" id="notesList"></div>
-      </div>
-    </div>
+  <div class="empty-hint" id="emptyHint">
+    <strong>03</strong>
+    Görseldeki orbital akıştan ilham alan bir not sistemi. Başlamak için soldan bir gezegen oluştur.
   </div>
 
-  <script>
-    const STORAGE_KEY = "sro_mobile_notes_v2";
+  <article class="notes" id="notesPanel">
+    <header class="note-head">
+      <p class="eyebrow" id="noteCategory">Kategori</p>
+      <h2 id="noteTitle">Gezegen adı</h2>
+      <p>Notunu beş odak adımında geliştir.</p>
+    </header>
 
-    const el = {
-      titleInput: document.getElementById("titleInput"),
-      contentInput: document.getElementById("contentInput"),
-      noteCount: document.getElementById("noteCount"),
-      activeInfo: document.getElementById("activeInfo"),
-      wordCount: document.getElementById("wordCount"),
-      charCount: document.getElementById("charCount"),
-      statusText: document.getElementById("statusText"),
-      updatedText: document.getElementById("updatedText"),
-      autosaveText: document.getElementById("autosaveText"),
+    <div class="steps">
+      <section class="step">
+        <span class="step-no">01</span>
+        <div>
+          <strong>Çekirdek fikir</strong>
+          <textarea placeholder="Bu notun ana fikri nedir?"></textarea>
+        </div>
+      </section>
+      <section class="step">
+        <span class="step-no">02</span>
+        <div>
+          <strong>Bağlam</strong>
+          <textarea placeholder="Neden önemli, hangi problemle ilgili?"></textarea>
+        </div>
+      </section>
+      <section class="step">
+        <span class="step-no">03</span>
+        <div>
+          <strong>Detaylar</strong>
+          <textarea placeholder="Maddeler, gözlemler, kaynaklar..."></textarea>
+        </div>
+      </section>
+      <section class="step">
+        <span class="step-no">04</span>
+        <div>
+          <strong>Bağlantılar</strong>
+          <textarea placeholder="İlgili kişiler, dosyalar, fikirler..."></textarea>
+        </div>
+      </section>
+      <section class="step">
+        <span class="step-no">05</span>
+        <div>
+          <strong>Sonraki hareket</strong>
+          <textarea placeholder="Bundan sonra ne yapılacak?"></textarea>
+        </div>
+      </section>
+    </div>
+  </article>
+</section>
 
-      openNotesBtn: document.getElementById("openNotesBtn"),
-      closeDrawerBtn: document.getElementById("closeDrawerBtn"),
-      drawer: document.getElementById("drawer"),
-      searchInput: document.getElementById("searchInput"),
-      notesList: document.getElementById("notesList"),
+  </main>  <div class="toast" id="toast">Gezegen oluşturuldu</div>  <script>
+    const form = document.getElementById('planetForm');
+    const list = document.getElementById('planetList');
+    const planetName = document.getElementById('planetName');
+    const planetCategory = document.getElementById('planetCategory');
+    const planetLabel = document.getElementById('planetLabel');
+    const planetStage = document.getElementById('planetStage');
+    const notesPanel = document.getElementById('notesPanel');
+    const noteTitle = document.getElementById('noteTitle');
+    const noteCategory = document.getElementById('noteCategory');
+    const emptyHint = document.getElementById('emptyHint');
+    const orbit = document.getElementById('orbit');
+    const toast = document.getElementById('toast');
 
-      newBtn: document.getElementById("newBtn"),
-      saveBtn: document.getElementById("saveBtn"),
-      duplicateBtn: document.getElementById("duplicateBtn"),
-      clearBtn: document.getElementById("clearBtn"),
-      deleteBtn: document.getElementById("deleteBtn"),
-      exportBtn: document.getElementById("exportBtn"),
-    };
+    const planets = [];
 
-    let notes = loadNotes();
-    let activeId = notes[0]?.id ?? null;
-    let saveTimer = null;
-
-    function uid(){
-      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
     }
 
-    function nowISO(){
-      return new Date().toISOString();
-    }
+    function activatePlanet(planet) {
+      planetLabel.innerHTML = `<h1>${planet.name}</h1><p>${planet.category}</p>`;
+      noteTitle.textContent = planet.name;
+      noteCategory.textContent = planet.category;
 
-    function formatDate(iso){
-      if(!iso) return "-";
-      return new Intl.DateTimeFormat("tr-TR", {
-        dateStyle:"short",
-        timeStyle:"short"
-      }).format(new Date(iso));
-    }
+      emptyHint.style.display = 'none';
+      notesPanel.classList.remove('visible');
 
-    function loadNotes(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw){
-          const parsed = JSON.parse(raw);
-          if(Array.isArray(parsed) && parsed.length) return parsed;
-        }
-      }catch(e){}
-
-      const t = nowISO();
-      return [{
-        id: uid(),
-        title: "Yeni Not",
-        content: "",
-        createdAt: t,
-        updatedAt: t
-      }];
-    }
-
-    function persist(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    }
-
-    function getActiveNote(){
-      return notes.find(n => n.id === activeId) || null;
-    }
-
-    function setStatus(text){
-      el.statusText.textContent = "Durum: " + text;
-    }
-
-    function updateStats(){
-      const content = el.contentInput.value || "";
-      const trimmed = content.trim();
-      const words = trimmed ? trimmed.split(/\s+/).length : 0;
-      const chars = content.length;
-
-      el.wordCount.textContent = words;
-      el.charCount.textContent = chars;
-      el.noteCount.textContent = notes.length;
-
-      const active = getActiveNote();
-      el.activeInfo.textContent = active ? "Seçili" : "Yok";
-      el.updatedText.textContent = "Son kayıt: " + (active ? formatDate(active.updatedAt) : "-");
-    }
-
-    function renderEditor(){
-      const note = getActiveNote();
-      if(!note) return;
-
-      el.titleInput.value = note.title || "";
-      el.contentInput.value = note.content || "";
-      updateStats();
-    }
-
-    function renderNotes(){
-      const q = el.searchInput.value.trim().toLowerCase();
-      const filtered = [...notes]
-        .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-        .filter(n => {
-          return (n.title || "").toLowerCase().includes(q) ||
-                 (n.content || "").toLowerCase().includes(q);
-        });
-
-      el.notesList.innerHTML = "";
-
-      if(!filtered.length){
-        el.notesList.innerHTML = '<div class="empty">Aramaya uygun not bulunamadı.</div>';
-        return;
-      }
-
-      filtered.forEach(note => {
-        const btn = document.createElement("button");
-        btn.className = "note-item" + (note.id === activeId ? " active" : "");
-        btn.innerHTML = `
-          <span class="note-title">${escapeHtml(note.title || "Başlıksız Not")}</span>
-          <span class="note-preview">${escapeHtml((note.content || "Boş not").replace(/\s+/g," ").slice(0, 60))}</span>
-        `;
-        btn.addEventListener("click", () => {
-          activeId = note.id;
-          renderEditor();
-          renderNotes();
-          closeDrawer();
-          setStatus("Not açıldı");
-        });
-        el.notesList.appendChild(btn);
+      requestAnimationFrame(() => {
+        planetStage.classList.add('has-note');
+        orbit.classList.add('zoomed');
+        notesPanel.classList.add('visible');
       });
-
-      updateStats();
     }
 
-    function saveActiveNote(){
-      const note = getActiveNote();
-      if(!note) return;
-
-      note.title = (el.titleInput.value || "").trim() || "Başlıksız Not";
-      note.content = el.contentInput.value || "";
-      note.updatedAt = nowISO();
-
-      persist();
-      renderNotes();
-      updateStats();
-      setStatus("Kaydedildi");
-      el.autosaveText.textContent = "Kaydedildi";
+    function renderPlanetList() {
+      list.innerHTML = '';
+      planets.forEach((planet, index) => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'planet-chip';
+        item.innerHTML = `
+          <span class="mini-planet"></span>
+          <span class="chip-text">
+            <strong>${String(index + 1).padStart(2, '0')} · ${planet.name}</strong>
+            <span>${planet.category}</span>
+          </span>
+        `;
+        item.addEventListener('click', () => activatePlanet(planet));
+        list.appendChild(item);
+      });
     }
 
-    function scheduleSave(){
-      updateStats();
-      setStatus("Yazılıyor...");
-      el.autosaveText.textContent = "Yazılıyor...";
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(saveActiveNote, 350);
-    }
-
-    function createNote(){
-      const t = nowISO();
-      const newNote = {
-        id: uid(),
-        title: "Yeni Not",
-        content: "",
-        createdAt: t,
-        updatedAt: t
-      };
-      notes.unshift(newNote);
-      activeId = newNote.id;
-      persist();
-      renderEditor();
-      renderNotes();
-      setStatus("Yeni not oluşturuldu");
-      el.autosaveText.textContent = "Hazır";
-      el.titleInput.focus();
-      el.titleInput.select();
-    }
-
-    function duplicateNote(){
-      const current = getActiveNote();
-      if(!current) return;
-
-      const t = nowISO();
-      const copy = {
-        id: uid(),
-        title: (current.title || "Not") + " - Kopya",
-        content: current.content || "",
-        createdAt: t,
-        updatedAt: t
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const newPlanet = {
+        name: planetName.value.trim(),
+        category: planetCategory.value
       };
 
-      notes.unshift(copy);
-      activeId = copy.id;
-      persist();
-      renderEditor();
-      renderNotes();
-      setStatus("Not kopyalandı");
-    }
-
-    function clearCurrent(){
-      const current = getActiveNote();
-      if(!current) return;
-
-      if(!confirm("Bu notun içeriği temizlensin mi?")) return;
-      el.contentInput.value = "";
-      saveActiveNote();
-      setStatus("İçerik temizlendi");
-    }
-
-    function deleteCurrent(){
-      const current = getActiveNote();
-      if(!current) return;
-
-      if(!confirm("Bu not silinsin mi?")) return;
-
-      notes = notes.filter(n => n.id !== current.id);
-
-      if(!notes.length){
-        const t = nowISO();
-        notes = [{
-          id: uid(),
-          title: "Yeni Not",
-          content: "",
-          createdAt: t,
-          updatedAt: t
-        }];
-      }
-
-      activeId = notes[0].id;
-      persist();
-      renderEditor();
-      renderNotes();
-      setStatus("Not silindi");
-    }
-
-    function exportCurrent(){
-      const current = getActiveNote();
-      if(!current) return;
-
-      const text = (current.title || "Not") + "\\n\\n" + (current.content || "");
-      const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = slugify(current.title || "not") + ".txt";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-
-      setStatus("Dışa aktarıldı");
-    }
-
-    function slugify(str){
-      return String(str || "not")
-        .toLowerCase()
-        .replace(/ğ/g, "g")
-        .replace(/ü/g, "u")
-        .replace(/ş/g, "s")
-        .replace(/ı/g, "i")
-        .replace(/ö/g, "o")
-        .replace(/ç/g, "c")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "") || "not";
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function openDrawer(){
-      el.drawer.classList.add("open");
-    }
-
-    function closeDrawer(){
-      el.drawer.classList.remove("open");
-    }
-
-    el.openNotesBtn.addEventListener("click", openDrawer);
-    el.closeDrawerBtn.addEventListener("click", closeDrawer);
-    el.drawer.addEventListener("click", (e) => {
-      if(e.target === el.drawer) closeDrawer();
+      planets.unshift(newPlanet);
+      renderPlanetList();
+      activatePlanet(newPlanet);
+      showToast('Gezegen yakınlaştırıldı ve 5 adımlı not alanı açıldı');
+      form.reset();
     });
-
-    el.newBtn.addEventListener("click", createNote);
-    el.saveBtn.addEventListener("click", saveActiveNote);
-    el.duplicateBtn.addEventListener("click", duplicateNote);
-    el.clearBtn.addEventListener("click", clearCurrent);
-    el.deleteBtn.addEventListener("click", deleteCurrent);
-    el.exportBtn.addEventListener("click", exportCurrent);
-
-    el.titleInput.addEventListener("input", scheduleSave);
-    el.contentInput.addEventListener("input", scheduleSave);
-    el.searchInput.addEventListener("input", renderNotes);
-
-    renderEditor();
-    renderNotes();
-    setStatus("Hazır");
-  </script>
-</body>
+  </script></body>
 </html>
