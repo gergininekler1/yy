@@ -2,262 +2,291 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gezegen Not Aracı</title>
+  <title>Orbital Notes</title>
   <style>
     :root {
-      --bg: #ececec;
-      --text: #242424;
-      --muted: #9a9a9a;
-      --soft: #d5d5d5;
-      --planet: #2f2f2f;
-      --card: rgba(255, 255, 255, 0.42);
-      --line: rgba(0, 0, 0, 0.12);
-      --shadow: 0 30px 90px rgba(0, 0, 0, 0.12);
-    }* {
-  box-sizing: border-box;
-}
+      --bg: #ededed;
+      --ink: #242424;
+      --muted: #8a8a8a;
+      --soft: rgba(0,0,0,.1);
+      --panel: rgba(255,255,255,.42);
+      --panel-strong: rgba(255,255,255,.68);
+      --shadow: 0 28px 90px rgba(0,0,0,.13);
+      --ease: cubic-bezier(.16, 1, .3, 1);
+    }* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
 
 body {
   margin: 0;
-  min-height: 100vh;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(255,255,255,.62), transparent 24%),
+    radial-gradient(circle at 22% 84%, rgba(255,255,255,.48), transparent 28%),
+    var(--bg);
+  color: var(--ink);
+  overflow-x: hidden;
 }
+
+button, input, select, textarea { font: inherit; }
 
 .app {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+  min-height: 100svh;
   display: grid;
-  grid-template-columns: 410px 1fr;
-  isolation: isolate;
-}
-
-.grain {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.28;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,.5), transparent 24%),
-    radial-gradient(circle at 80% 20%, rgba(255,255,255,.35), transparent 20%),
-    radial-gradient(circle at 40% 80%, rgba(0,0,0,.05), transparent 26%);
-  z-index: -2;
+  grid-template-columns: minmax(310px, 390px) 1fr;
 }
 
 .sidebar {
-  padding: 42px 32px;
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(16px);
-  z-index: 5;
+  position: relative;
+  z-index: 8;
+  padding: 34px 28px;
+  background: rgba(255,255,255,.22);
+  border-right: 1px solid rgba(0,0,0,.06);
+  backdrop-filter: blur(18px);
 }
 
-.logo {
+.brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 42px;
-  letter-spacing: -0.04em;
+  margin-bottom: 34px;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 900;
+  letter-spacing: -.055em;
 }
 
-.logo-mark {
-  width: 34px;
-  height: 34px;
+.brand-planet {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--text);
+  background: #262626;
   position: relative;
-  box-shadow: inset -9px -8px 0 rgba(255,255,255,.12);
+  box-shadow: inset -10px -9px 0 rgba(255,255,255,.12);
 }
 
-.logo-mark::after {
+.brand-planet::after {
   content: "";
   position: absolute;
-  width: 48px;
+  left: -7px;
+  top: 12px;
+  width: 50px;
   height: 10px;
-  border: 2px solid rgba(255,255,255,.7);
+  border: 2px solid rgba(255,255,255,.72);
   border-left-color: transparent;
   border-right-color: transparent;
   border-radius: 50%;
-  left: -7px;
-  top: 11px;
   transform: rotate(-18deg);
 }
 
-.panel-title {
+.kicker {
   margin: 0 0 10px;
-  font-size: 14px;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 850;
   letter-spacing: .18em;
+  text-transform: uppercase;
   color: #777;
-  font-weight: 700;
 }
 
 .intro {
-  margin: 0 0 26px;
+  margin: 0 0 22px;
   color: #6f6f6f;
   line-height: 1.55;
   font-size: 14px;
 }
 
-form {
-  display: grid;
-  gap: 14px;
-}
+form { display: grid; gap: 13px; }
 
 label {
   display: grid;
   gap: 7px;
-  color: #6d6d6d;
-  font-size: 12px;
-  font-weight: 700;
+  color: #6c6c6c;
+  font-size: 11px;
+  font-weight: 850;
   text-transform: uppercase;
-  letter-spacing: .12em;
+  letter-spacing: .14em;
 }
 
 input, select, textarea {
   width: 100%;
   border: 1px solid rgba(0,0,0,.08);
-  background: rgba(255,255,255,.46);
-  border-radius: 18px;
-  padding: 15px 16px;
+  background: rgba(255,255,255,.48);
+  border-radius: 20px;
+  color: var(--ink);
   outline: none;
-  color: var(--text);
-  font: inherit;
-  transition: .25s ease;
+  transition: border .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+input, select { padding: 15px 16px; }
+
+textarea {
+  min-height: 210px;
+  padding: 18px;
+  line-height: 1.55;
+  resize: vertical;
 }
 
 input:focus, select:focus, textarea:focus {
   border-color: rgba(0,0,0,.32);
-  background: rgba(255,255,255,.72);
-  box-shadow: 0 10px 30px rgba(0,0,0,.06);
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 12px 36px rgba(0,0,0,.07);
 }
 
-button {
-  margin-top: 8px;
+.primary-btn {
+  margin-top: 6px;
   border: 0;
   border-radius: 999px;
-  padding: 16px 20px;
-  background: #262626;
+  padding: 15px 18px;
   color: white;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  background: #252525;
+  font-weight: 900;
+  letter-spacing: -.02em;
   cursor: pointer;
+  box-shadow: 0 20px 42px rgba(0,0,0,.17);
   transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-  box-shadow: 0 20px 40px rgba(0,0,0,.16);
 }
 
-button:hover {
+.primary-btn:hover {
   transform: translateY(-2px);
   background: #111;
-  box-shadow: 0 24px 48px rgba(0,0,0,.2);
+  box-shadow: 0 24px 52px rgba(0,0,0,.22);
 }
 
 .planet-list {
-  margin-top: 30px;
+  margin-top: 28px;
   display: grid;
   gap: 10px;
-  max-height: 28vh;
+  max-height: 34vh;
   overflow: auto;
   padding-right: 4px;
 }
 
 .planet-chip {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 20px;
   background: rgba(255,255,255,.34);
-  border: 1px solid rgba(0,0,0,.05);
+  text-align: left;
   cursor: pointer;
-  transition: .2s ease;
+  transition: transform .2s ease, background .2s ease;
 }
 
-.planet-chip:hover {
-  background: rgba(255,255,255,.58);
+.planet-chip:hover, .planet-chip.active {
+  background: rgba(255,255,255,.66);
   transform: translateX(3px);
 }
 
 .mini-planet {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 30px;
+  height: 30px;
   flex: 0 0 auto;
-  background: var(--planet);
-  box-shadow: inset -8px -7px 0 rgba(255,255,255,.13);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.25), transparent 24%),
+    linear-gradient(135deg, #444, #1f1f1f);
+  box-shadow: inset -8px -7px 0 rgba(0,0,0,.16);
 }
 
-.chip-text strong {
+.chip-copy strong {
   display: block;
   font-size: 13px;
+  letter-spacing: -.02em;
 }
 
-.chip-text span {
-  color: #8a8a8a;
+.chip-copy span {
+  display: block;
+  margin-top: 2px;
+  color: #858585;
   font-size: 12px;
 }
 
-.space {
+.workspace {
   position: relative;
+  min-height: 100svh;
   overflow: hidden;
 }
 
-.orbit {
+.orbit-wrap {
   position: absolute;
-  left: -255px;
+  left: -250px;
   top: 50%;
   width: 680px;
   height: 680px;
-  border: 3px solid rgba(0,0,0,.06);
-  border-radius: 50%;
   transform: translateY(-50%);
-  transition: transform 900ms cubic-bezier(.16,1,.3,1), opacity 600ms ease;
+  transition: transform 850ms var(--ease), opacity 600ms ease;
   opacity: .95;
 }
 
-.orbit.zoomed {
-  transform: translateY(-50%) scale(1.38) translateX(-40px);
-  opacity: .55;
+.orbit-wrap.zoomed {
+  transform: translateY(-50%) scale(1.18) translateX(-26px);
+  opacity: .78;
 }
 
-.orbit-dot {
+.orbit-ring {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  inset: 0;
+  border: 3px solid rgba(0,0,0,.055);
   border-radius: 50%;
-  background: rgba(0,0,0,.18);
-  transform: translate(-50%, -50%);
 }
 
-.orbit-dot.active {
-  width: 16px;
-  height: 16px;
-  background: #262626;
-  box-shadow: 0 0 0 8px rgba(0,0,0,.04);
-}
-
-.orbit-num {
+.step-node {
+  --x: 50%;
+  --y: 50%;
   position: absolute;
-  transform: translate(-50%, -50%) rotate(-18deg);
-  font-size: clamp(46px, 6vw, 90px);
-  line-height: 1;
-  font-weight: 900;
-  color: rgba(0,0,0,.11);
-  letter-spacing: -0.12em;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: rgba(0,0,0,.12);
+  transition: color .25s ease, transform .25s ease, opacity .25s ease;
+  padding: 0;
+}
+
+.step-node:hover {
+  color: rgba(0,0,0,.34);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.step-node .dot {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.17);
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  transition: .25s ease;
+}
+
+.step-node .num {
+  position: absolute;
+  font-size: clamp(46px, 6vw, 88px);
+  font-weight: 950;
+  letter-spacing: -.13em;
+  line-height: .8;
+  transform: translate(64px, -48px) rotate(-18deg);
   user-select: none;
 }
 
-.orbit-num.active {
-  color: #282828;
-  font-size: clamp(76px, 10vw, 142px);
-  transform: translate(-50%, -50%) rotate(0deg);
-  letter-spacing: -0.13em;
-  text-shadow: 0 24px 40px rgba(0,0,0,.08);
+.step-node.active { color: #262626; }
+
+.step-node.active .dot {
+  width: 15px;
+  height: 15px;
+  background: #262626;
+  box-shadow: 0 0 0 9px rgba(0,0,0,.045);
+}
+
+.step-node.active .num {
+  font-size: clamp(80px, 10vw, 145px);
+  transform: translate(76px, -66px) rotate(0deg);
+  text-shadow: 0 22px 42px rgba(0,0,0,.08);
 }
 
 .planet-stage {
@@ -265,193 +294,227 @@ button:hover {
   inset: 0;
   display: grid;
   place-items: center;
-  transition: 900ms cubic-bezier(.16,1,.3,1);
+  transition: 850ms var(--ease);
+  pointer-events: none;
 }
 
 .planet-stage.has-note {
-  transform: translateX(-23vw) scale(1.35);
-  opacity: .45;
+  transform: translateX(-24vw) scale(1.22);
+  opacity: .36;
   filter: blur(.2px);
 }
 
 .planet {
-  width: min(35vw, 360px);
-  height: min(35vw, 360px);
+  width: min(34vw, 360px);
+  height: min(34vw, 360px);
   min-width: 210px;
   min-height: 210px;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 26%, rgba(255,255,255,.25), transparent 22%),
-    radial-gradient(circle at 72% 78%, rgba(0,0,0,.28), transparent 34%),
-    linear-gradient(135deg, #3f3f3f, #1f1f1f);
-  box-shadow: inset -50px -40px 90px rgba(0,0,0,.32), 0 45px 110px rgba(0,0,0,.2);
   position: relative;
-  animation: breathe 5s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 31% 24%, rgba(255,255,255,.28), transparent 23%),
+    radial-gradient(circle at 76% 80%, rgba(0,0,0,.28), transparent 35%),
+    linear-gradient(135deg, #4a4a4a, #202020);
+  box-shadow: inset -52px -45px 90px rgba(0,0,0,.35), 0 44px 115px rgba(0,0,0,.22);
+  animation: breathe 5.2s ease-in-out infinite;
 }
 
 .planet::before {
   content: "";
   position: absolute;
-  width: 125%;
-  height: 34%;
   left: -12%;
   top: 34%;
-  border: 3px solid rgba(255,255,255,.33);
+  width: 124%;
+  height: 34%;
+  border: 3px solid rgba(255,255,255,.32);
   border-left-color: rgba(255,255,255,.07);
   border-right-color: rgba(255,255,255,.07);
   border-radius: 50%;
   transform: rotate(-15deg);
 }
 
-.planet-label {
+.planet-title {
   position: absolute;
   left: 50%;
-  top: calc(50% + min(20vw, 210px));
+  top: calc(50% + min(20vw, 212px));
   transform: translateX(-50%);
   text-align: center;
-  transition: .4s ease;
+  width: min(520px, 80vw);
 }
 
-.planet-label h1 {
+.planet-title h1 {
   margin: 0;
-  font-size: clamp(32px, 5vw, 72px);
-  letter-spacing: -0.08em;
+  font-size: clamp(34px, 5vw, 74px);
+  line-height: .86;
+  letter-spacing: -.1em;
 }
 
-.planet-label p {
-  margin: 8px 0 0;
-  color: #818181;
-  font-weight: 650;
+.planet-title p {
+  margin: 11px 0 0;
+  color: #7a7a7a;
+  font-weight: 750;
 }
 
-.notes {
+.empty {
+  position: absolute;
+  right: 8vw;
+  top: 50%;
+  width: min(430px, 42vw);
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 18px;
+  line-height: 1.5;
+  transition: opacity .25s ease;
+}
+
+.empty strong {
+  display: block;
+  margin-bottom: 12px;
+  color: #292929;
+  font-size: clamp(56px, 9vw, 132px);
+  line-height: .8;
+  letter-spacing: -.13em;
+}
+
+.note-panel {
   position: absolute;
   right: 7vw;
   top: 50%;
   width: min(560px, 45vw);
-  transform: translateY(-50%) translateX(80px);
+  transform: translateY(-50%) translateX(70px);
   opacity: 0;
   pointer-events: none;
-  transition: 800ms cubic-bezier(.16,1,.3,1);
+  transition: 760ms var(--ease);
   z-index: 4;
 }
 
-.notes.visible {
+.note-panel.visible {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
   pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
 }
 
-.note-head {
-  margin-bottom: 22px;
+.note-top {
+  margin-bottom: 18px;
 }
 
-.note-head .eyebrow {
-  margin: 0 0 7px;
+.note-top .category {
+  margin: 0 0 8px;
+  color: #838383;
   text-transform: uppercase;
-  letter-spacing: .16em;
-  color: #8a8a8a;
+  letter-spacing: .17em;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-.note-head h2 {
+.note-top h2 {
   margin: 0;
-  font-size: clamp(34px, 5vw, 76px);
-  line-height: .9;
-  letter-spacing: -0.1em;
-}
-
-.note-head p {
-  margin: 13px 0 0;
-  color: #747474;
-  font-size: 17px;
-}
-
-.steps {
-  display: grid;
-  gap: 12px;
-}
-
-.step {
-  display: grid;
-  grid-template-columns: 72px 1fr;
-  gap: 18px;
-  align-items: start;
-  padding: 18px;
-  border-radius: 28px;
-  background: var(--card);
-  border: 1px solid rgba(255,255,255,.4);
-  box-shadow: 0 16px 34px rgba(0,0,0,.06);
-  backdrop-filter: blur(14px);
-  transform: translateY(16px);
-  opacity: 0;
-  animation: rise .55s ease forwards;
-}
-
-.step:nth-child(2) { animation-delay: .08s; }
-.step:nth-child(3) { animation-delay: .16s; }
-.step:nth-child(4) { animation-delay: .24s; }
-.step:nth-child(5) { animation-delay: .32s; }
-
-.step-no {
-  font-size: 44px;
-  line-height: .9;
-  font-weight: 950;
-  letter-spacing: -0.12em;
-  color: #292929;
-}
-
-.step strong {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 17px;
-  letter-spacing: -0.03em;
-}
-
-.step textarea {
-  min-height: 72px;
-  resize: vertical;
-  border-radius: 18px;
-  background: rgba(255,255,255,.52);
-}
-
-.empty-hint {
-  position: absolute;
-  right: 9vw;
-  top: 50%;
-  transform: translateY(-50%);
-  width: min(420px, 42vw);
-  color: #777;
-  font-size: 18px;
-  line-height: 1.5;
-}
-
-.empty-hint strong {
-  display: block;
-  margin-bottom: 12px;
-  color: #2c2c2c;
-  font-size: clamp(42px, 6vw, 82px);
+  font-size: clamp(36px, 5.6vw, 78px);
   line-height: .88;
-  letter-spacing: -0.11em;
+  letter-spacing: -.11em;
 }
+
+.step-switcher {
+  display: flex;
+  gap: 9px;
+  margin: 18px 0;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.pill {
+  flex: 0 0 auto;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.44);
+  color: rgba(0,0,0,.42);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.pill:hover, .pill.active {
+  background: #252525;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0,0,0,.14);
+}
+
+.note-card {
+  min-height: 390px;
+  padding: 24px;
+  border-radius: 34px;
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.48);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  animation: cardIn .42s var(--ease);
+}
+
+.note-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.big-num {
+  font-size: clamp(72px, 8vw, 122px);
+  line-height: .76;
+  font-weight: 950;
+  letter-spacing: -.13em;
+}
+
+.note-meta h3 {
+  margin: 4px 0 8px;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -.065em;
+}
+
+.note-meta p {
+  margin: 0;
+  color: #747474;
+  line-height: 1.45;
+}
+
+.note-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ghost-btn {
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.42);
+  border-radius: 999px;
+  padding: 11px 14px;
+  color: #5e5e5e;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.ghost-btn:hover { background: rgba(255,255,255,.8); color: #222; }
 
 .toast {
   position: fixed;
   left: 50%;
-  bottom: 26px;
-  transform: translateX(-50%) translateY(30px);
-  background: rgba(24,24,24,.92);
-  color: white;
-  padding: 13px 18px;
-  border-radius: 999px;
+  bottom: 22px;
+  z-index: 20;
+  transform: translateX(-50%) translateY(26px);
   opacity: 0;
   pointer-events: none;
-  transition: .28s ease;
-  z-index: 10;
-  box-shadow: 0 20px 50px rgba(0,0,0,.22);
+  border-radius: 999px;
+  padding: 13px 18px;
+  background: rgba(27,27,27,.92);
+  color: white;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 850;
+  box-shadow: 0 18px 48px rgba(0,0,0,.22);
+  transition: .25s ease;
 }
 
 .toast.show {
@@ -464,64 +527,200 @@ button:hover {
   50% { transform: scale(1.035); }
 }
 
-@keyframes rise {
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@media (max-width: 900px) {
-  body { overflow: auto; }
+@media (max-width: 980px) {
+  body { overflow-y: auto; }
+
   .app {
-    min-height: 100vh;
-    height: auto;
-    grid-template-columns: 1fr;
+    display: block;
+    min-height: 100svh;
   }
+
   .sidebar {
     position: relative;
-    padding: 28px 20px;
+    padding: 24px 18px 18px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(0,0,0,.06);
   }
-  .space {
-    min-height: 950px;
+
+  .brand { margin-bottom: 20px; }
+  .intro { margin-bottom: 16px; }
+
+  form {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
   }
+
+  form label:first-child { grid-column: span 2; }
+  .primary-btn { margin-top: 0; min-height: 52px; }
+
+  .planet-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(210px, 1fr);
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+    margin-top: 18px;
+    padding-bottom: 4px;
+  }
+
+  .workspace {
+    min-height: 880px;
+    overflow: hidden;
+  }
+
+  .orbit-wrap {
+    left: 50%;
+    top: 12px;
+    width: 520px;
+    height: 520px;
+    transform: translateX(-50%);
+    opacity: .85;
+  }
+
+  .orbit-wrap.zoomed {
+    transform: translateX(-50%) translateY(-40px) scale(.9);
+    opacity: .55;
+  }
+
+  .step-node .num {
+    font-size: 46px;
+    transform: translate(42px, -34px) rotate(-18deg);
+  }
+
+  .step-node.active .num {
+    font-size: 76px;
+    transform: translate(52px, -48px) rotate(0deg);
+  }
+
+  .planet-stage {
+    height: 360px;
+    inset: 40px 0 auto;
+  }
+
   .planet-stage.has-note {
-    transform: translateY(-235px) scale(.85);
-    opacity: .32;
+    transform: translateY(-44px) scale(.74);
+    opacity: .28;
   }
-  .empty-hint, .notes {
-    right: 20px;
-    left: 20px;
-    top: 470px;
+
+  .planet {
+    width: 230px;
+    height: 230px;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .planet-title {
+    top: 286px;
+  }
+
+  .empty {
+    left: 22px;
+    right: 22px;
+    top: 430px;
     width: auto;
+    transform: none;
+    text-align: center;
   }
-  .orbit {
-    left: -330px;
+
+  .empty strong { font-size: 86px; }
+
+  .note-panel {
+    left: 16px;
+    right: 16px;
+    top: 380px;
+    width: auto;
+    transform: translateY(40px);
   }
+
+  .note-panel.visible {
+    transform: translateY(0);
+  }
+
+  .note-top { text-align: center; }
+  .note-top h2 { font-size: 42px; }
+  .note-card { min-height: 430px; padding: 18px; border-radius: 28px; }
+  .note-meta { gap: 14px; }
+  .note-meta h3 { font-size: 23px; }
+  textarea { min-height: 230px; }
+}
+
+@media (max-width: 560px) {
+  .sidebar { padding: 20px 14px 16px; }
+  .brand { font-size: 20px; }
+  form { grid-template-columns: 1fr; }
+  form label:first-child { grid-column: auto; }
+
+  .workspace { min-height: 900px; }
+  .orbit-wrap {
+    top: 10px;
+    width: 430px;
+    height: 430px;
+    left: 38%;
+  }
+
+  .orbit-wrap.zoomed {
+    transform: translateX(-50%) translateY(-18px) scale(.88);
+  }
+
+  .step-node .num {
+    font-size: 38px;
+    transform: translate(33px, -28px) rotate(-18deg);
+  }
+
+  .step-node.active .num {
+    font-size: 62px;
+    transform: translate(42px, -38px) rotate(0deg);
+  }
+
+  .planet-stage { inset: 35px 0 auto; height: 310px; }
+  .planet-stage.has-note { transform: translateY(-26px) scale(.66); }
+  .planet { width: 190px; height: 190px; }
+  .planet-title { top: 246px; }
+  .planet-title h1 { font-size: 34px; }
+
+  .empty { top: 350px; font-size: 15px; }
+  .empty strong { font-size: 72px; }
+
+  .note-panel { top: 330px; left: 12px; right: 12px; }
+  .note-top h2 { font-size: 36px; }
+  .step-switcher { margin: 14px 0; }
+  .pill { padding: 9px 12px; }
+
+  .note-card { min-height: 430px; }
+  .note-meta {
+    display: block;
+  }
+  .big-num { font-size: 82px; }
+  .note-meta h3 { margin-top: 12px; }
+  textarea { min-height: 240px; }
 }
 
   </style>
 </head>
 <body>
-  <div class="grain"></div>
   <main class="app">
     <aside class="sidebar">
-      <div class="logo">
-        <span class="logo-mark"></span>
+      <div class="brand">
+        <span class="brand-planet"></span>
         Orbital Notes
-      </div><p class="panel-title">Yeni gezegen notu</p>
-  <p class="intro">Bir not yarattığında notun bir gezegene dönüşür. İsim ve kategori ver; ardından gezegen yakınlaşıp 5 aşamalı not alanını açar.</p>
+      </div><p class="kicker">Yeni gezegen</p>
+  <p class="intro">Her not bir gezegen. Gezegenini oluştur, sonra orbital çekirdekte 01–05 numaralarına tıklayarak sadece o adıma ait not kutusunu aç.</p>
 
   <form id="planetForm">
     <label>
       Gezegen adı
-      <input id="planetName" type="text" placeholder="Örn. Ürün Fikri" required />
+      <input id="planetName" type="text" placeholder="Örn. Lansman Fikri" required />
     </label>
 
     <label>
       Kategori
       <select id="planetCategory" required>
-        <option value="">Kategori seç</option>
+        <option value="">Seç</option>
         <option>Fikir</option>
         <option>Araştırma</option>
         <option>Proje</option>
@@ -530,154 +729,248 @@ button:hover {
       </select>
     </label>
 
-    <button type="submit">Gezegen oluştur</button>
+    <button class="primary-btn" type="submit">Oluştur</button>
   </form>
 
   <section class="planet-list" id="planetList" aria-label="Gezegen notları"></section>
 </aside>
 
-<section class="space">
-  <div class="orbit" id="orbit">
-    <span class="orbit-dot" style="left: 14%; top: 19%"></span>
-    <span class="orbit-dot" style="left: 74%; top: 30%"></span>
-    <span class="orbit-dot active" style="left: 82%; top: 50%"></span>
-    <span class="orbit-dot" style="left: 74%; top: 70%"></span>
-    <span class="orbit-dot" style="left: 14%; top: 81%"></span>
+<section class="workspace">
+  <div class="orbit-wrap" id="orbitWrap" aria-label="Not çekirdekleri">
+    <div class="orbit-ring"></div>
 
-    <span class="orbit-num" style="left: 26%; top: 15%">01</span>
-    <span class="orbit-num" style="left: 82%; top: 32%">02</span>
-    <span class="orbit-num active" style="left: 98%; top: 50%">03</span>
-    <span class="orbit-num" style="left: 82%; top: 70%">04</span>
-    <span class="orbit-num" style="left: 26%; top: 88%">05</span>
+    <button class="step-node" style="--x: 16%; --y: 20%" data-step="0" aria-label="01 Çekirdek fikir">
+      <span class="dot"></span><span class="num">01</span>
+    </button>
+    <button class="step-node" style="--x: 73%; --y: 31%" data-step="1" aria-label="02 Bağlam">
+      <span class="dot"></span><span class="num">02</span>
+    </button>
+    <button class="step-node active" style="--x: 82%; --y: 50%" data-step="2" aria-label="03 Detaylar">
+      <span class="dot"></span><span class="num">03</span>
+    </button>
+    <button class="step-node" style="--x: 73%; --y: 70%" data-step="3" aria-label="04 Bağlantılar">
+      <span class="dot"></span><span class="num">04</span>
+    </button>
+    <button class="step-node" style="--x: 16%; --y: 80%" data-step="4" aria-label="05 Sonraki hareket">
+      <span class="dot"></span><span class="num">05</span>
+    </button>
   </div>
 
   <div class="planet-stage" id="planetStage">
     <div class="planet"></div>
-    <div class="planet-label" id="planetLabel">
+    <div class="planet-title" id="planetTitle">
       <h1>Yeni Not</h1>
       <p>Gezegenini oluştur</p>
     </div>
   </div>
 
-  <div class="empty-hint" id="emptyHint">
+  <div class="empty" id="emptyState">
     <strong>03</strong>
-    Görseldeki orbital akıştan ilham alan bir not sistemi. Başlamak için soldan bir gezegen oluştur.
+    Soldan bir gezegen oluştur. Sonra 01–05 çekirdeklerine tıklayınca yalnızca seçilen not alanı açılacak.
   </div>
 
-  <article class="notes" id="notesPanel">
-    <header class="note-head">
-      <p class="eyebrow" id="noteCategory">Kategori</p>
-      <h2 id="noteTitle">Gezegen adı</h2>
-      <p>Notunu beş odak adımında geliştir.</p>
+  <article class="note-panel" id="notePanel">
+    <header class="note-top">
+      <p class="category" id="activeCategory">Kategori</p>
+      <h2 id="activePlanetName">Gezegen</h2>
     </header>
 
-    <div class="steps">
-      <section class="step">
-        <span class="step-no">01</span>
+    <nav class="step-switcher" id="stepSwitcher" aria-label="Adım seçici">
+      <button class="pill" data-step="0">01</button>
+      <button class="pill" data-step="1">02</button>
+      <button class="pill active" data-step="2">03</button>
+      <button class="pill" data-step="3">04</button>
+      <button class="pill" data-step="4">05</button>
+    </nav>
+
+    <section class="note-card" id="noteCard">
+      <div class="note-meta">
+        <span class="big-num" id="cardNumber">03</span>
         <div>
-          <strong>Çekirdek fikir</strong>
-          <textarea placeholder="Bu notun ana fikri nedir?"></textarea>
+          <h3 id="cardTitle">Detaylar</h3>
+          <p id="cardDescription">Notun ana maddelerini, gözlemlerini ve kaynaklarını burada topla.</p>
         </div>
-      </section>
-      <section class="step">
-        <span class="step-no">02</span>
-        <div>
-          <strong>Bağlam</strong>
-          <textarea placeholder="Neden önemli, hangi problemle ilgili?"></textarea>
-        </div>
-      </section>
-      <section class="step">
-        <span class="step-no">03</span>
-        <div>
-          <strong>Detaylar</strong>
-          <textarea placeholder="Maddeler, gözlemler, kaynaklar..."></textarea>
-        </div>
-      </section>
-      <section class="step">
-        <span class="step-no">04</span>
-        <div>
-          <strong>Bağlantılar</strong>
-          <textarea placeholder="İlgili kişiler, dosyalar, fikirler..."></textarea>
-        </div>
-      </section>
-      <section class="step">
-        <span class="step-no">05</span>
-        <div>
-          <strong>Sonraki hareket</strong>
-          <textarea placeholder="Bundan sonra ne yapılacak?"></textarea>
-        </div>
-      </section>
-    </div>
+      </div>
+      <textarea id="noteTextarea" placeholder="Bu adıma ait notunu yaz..."></textarea>
+      <div class="note-actions">
+        <button class="ghost-btn" id="prevStep" type="button">Önceki</button>
+        <button class="ghost-btn" id="nextStep" type="button">Sonraki</button>
+      </div>
+    </section>
   </article>
 </section>
 
-  </main>  <div class="toast" id="toast">Gezegen oluşturuldu</div>  <script>
+  </main>  <div class="toast" id="toast">Kaydedildi</div>  <script>
+    const steps = [
+      {
+        number: '01',
+        title: 'Çekirdek fikir',
+        description: 'Bu notun ana fikrini tek ve net bir cümleyle yakala.'
+      },
+      {
+        number: '02',
+        title: 'Bağlam',
+        description: 'Bu fikrin neden önemli olduğunu, hangi problemle ilişkili olduğunu yaz.'
+      },
+      {
+        number: '03',
+        title: 'Detaylar',
+        description: 'Notun ana maddelerini, gözlemlerini ve kaynaklarını burada topla.'
+      },
+      {
+        number: '04',
+        title: 'Bağlantılar',
+        description: 'İlgili kişiler, dosyalar, fikirler veya başka gezegenlerle ilişkileri ekle.'
+      },
+      {
+        number: '05',
+        title: 'Sonraki hareket',
+        description: 'Bu nottan sonra atılacak en küçük ve net aksiyonu belirle.'
+      }
+    ];
+
     const form = document.getElementById('planetForm');
-    const list = document.getElementById('planetList');
     const planetName = document.getElementById('planetName');
     const planetCategory = document.getElementById('planetCategory');
-    const planetLabel = document.getElementById('planetLabel');
+    const planetList = document.getElementById('planetList');
     const planetStage = document.getElementById('planetStage');
-    const notesPanel = document.getElementById('notesPanel');
-    const noteTitle = document.getElementById('noteTitle');
-    const noteCategory = document.getElementById('noteCategory');
-    const emptyHint = document.getElementById('emptyHint');
-    const orbit = document.getElementById('orbit');
+    const planetTitle = document.getElementById('planetTitle');
+    const orbitWrap = document.getElementById('orbitWrap');
+    const emptyState = document.getElementById('emptyState');
+    const notePanel = document.getElementById('notePanel');
+    const activeCategory = document.getElementById('activeCategory');
+    const activePlanetName = document.getElementById('activePlanetName');
+    const cardNumber = document.getElementById('cardNumber');
+    const cardTitle = document.getElementById('cardTitle');
+    const cardDescription = document.getElementById('cardDescription');
+    const noteTextarea = document.getElementById('noteTextarea');
     const toast = document.getElementById('toast');
+    const prevStep = document.getElementById('prevStep');
+    const nextStep = document.getElementById('nextStep');
 
-    const planets = [];
+    let planets = JSON.parse(localStorage.getItem('orbital-planets') || '[]');
+    let activePlanetId = planets[0]?.id || null;
+    let activeStep = 2;
 
-    function showToast(text) {
-      toast.textContent = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1800);
+    function save() {
+      localStorage.setItem('orbital-planets', JSON.stringify(planets));
     }
 
-    function activatePlanet(planet) {
-      planetLabel.innerHTML = `<h1>${planet.name}</h1><p>${planet.category}</p>`;
-      noteTitle.textContent = planet.name;
-      noteCategory.textContent = planet.category;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1500);
+    }
 
-      emptyHint.style.display = 'none';
-      notesPanel.classList.remove('visible');
+    function getActivePlanet() {
+      return planets.find(planet => planet.id === activePlanetId);
+    }
 
-      requestAnimationFrame(() => {
-        planetStage.classList.add('has-note');
-        orbit.classList.add('zoomed');
-        notesPanel.classList.add('visible');
+    function setActiveStep(index) {
+      const planet = getActivePlanet();
+      if (!planet) return;
+
+      planet.notes[activeStep] = noteTextarea.value;
+      activeStep = Math.max(0, Math.min(4, index));
+
+      document.querySelectorAll('.step-node').forEach(node => {
+        node.classList.toggle('active', Number(node.dataset.step) === activeStep);
       });
+
+      document.querySelectorAll('.pill').forEach(pill => {
+        pill.classList.toggle('active', Number(pill.dataset.step) === activeStep);
+      });
+
+      const step = steps[activeStep];
+      cardNumber.textContent = step.number;
+      cardTitle.textContent = step.title;
+      cardDescription.textContent = step.description;
+      noteTextarea.value = planet.notes[activeStep] || '';
+      noteTextarea.placeholder = `${step.number} · ${step.title} için notunu yaz...`;
+
+      const noteCard = document.getElementById('noteCard');
+      noteCard.style.animation = 'none';
+      noteCard.offsetHeight;
+      noteCard.style.animation = '';
+
+      prevStep.disabled = activeStep === 0;
+      nextStep.disabled = activeStep === 4;
+      save();
+    }
+
+    function activatePlanet(id, preferredStep = activeStep) {
+      activePlanetId = id;
+      const planet = getActivePlanet();
+      if (!planet) return;
+
+      planetTitle.innerHTML = `<h1>${planet.name}</h1><p>${planet.category}</p>`;
+      activeCategory.textContent = planet.category;
+      activePlanetName.textContent = planet.name;
+
+      emptyState.style.opacity = '0';
+      setTimeout(() => { emptyState.style.display = 'none'; }, 220);
+      planetStage.classList.add('has-note');
+      orbitWrap.classList.add('zoomed');
+      notePanel.classList.add('visible');
+
+      renderPlanetList();
+      setActiveStep(preferredStep);
     }
 
     function renderPlanetList() {
-      list.innerHTML = '';
+      planetList.innerHTML = '';
+
       planets.forEach((planet, index) => {
         const item = document.createElement('button');
         item.type = 'button';
         item.className = 'planet-chip';
+        item.classList.toggle('active', planet.id === activePlanetId);
         item.innerHTML = `
           <span class="mini-planet"></span>
-          <span class="chip-text">
+          <span class="chip-copy">
             <strong>${String(index + 1).padStart(2, '0')} · ${planet.name}</strong>
             <span>${planet.category}</span>
           </span>
         `;
-        item.addEventListener('click', () => activatePlanet(planet));
-        list.appendChild(item);
+        item.addEventListener('click', () => activatePlanet(planet.id, activeStep));
+        planetList.appendChild(item);
       });
     }
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', event => {
       event.preventDefault();
-      const newPlanet = {
+
+      const planet = {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
         name: planetName.value.trim(),
-        category: planetCategory.value
+        category: planetCategory.value,
+        notes: ['', '', '', '', '']
       };
 
-      planets.unshift(newPlanet);
-      renderPlanetList();
-      activatePlanet(newPlanet);
-      showToast('Gezegen yakınlaştırıldı ve 5 adımlı not alanı açıldı');
+      planets.unshift(planet);
+      save();
       form.reset();
+      activeStep = 2;
+      activatePlanet(planet.id, 2);
+      showToast('Gezegen oluşturuldu. 01–05 çekirdeklerine tıkla.');
     });
+
+    noteTextarea.addEventListener('input', () => {
+      const planet = getActivePlanet();
+      if (!planet) return;
+      planet.notes[activeStep] = noteTextarea.value;
+      save();
+    });
+
+    document.querySelectorAll('.step-node, .pill').forEach(button => {
+      button.addEventListener('click', () => setActiveStep(Number(button.dataset.step)));
+    });
+
+    prevStep.addEventListener('click', () => setActiveStep(activeStep - 1));
+    nextStep.addEventListener('click', () => setActiveStep(activeStep + 1));
+
+    renderPlanetList();
+    if (activePlanetId) activatePlanet(activePlanetId, activeStep);
   </script></body>
 </html>
