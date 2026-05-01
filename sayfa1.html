@@ -2,19 +2,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chimptopus Galaxy Notes</title>
+  <title>Chimptopus Notes</title>
   <style>
     :root {
       --bg: #f4f1ec;
       --ink: #141414;
-      --muted: #76716a;
+      --muted: #77716a;
       --line: #171717;
       --soft: rgba(20, 20, 20, 0.08);
-      --panel: rgba(255, 255, 255, 0.64);
+      --panel: rgba(255, 255, 255, 0.66);
       --white: #fffdf8;
       --chip: #ebe6dd;
       --danger: #8d2f2f;
-      --radius: 26px;
+      --radius: 28px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }* { box-sizing: border-box; }
@@ -25,17 +25,14 @@ body {
   background:
     linear-gradient(var(--soft) 1px, transparent 1px),
     linear-gradient(90deg, var(--soft) 1px, transparent 1px),
-    radial-gradient(circle at 20% 10%, rgba(255,255,255,.95), transparent 28%),
+    radial-gradient(circle at 12% 8%, rgba(255,255,255,.95), transparent 28%),
     var(--bg);
   background-size: 12px 12px, 12px 12px, 100% 100%, 100% 100%;
   color: var(--ink);
   font-family: var(--sans);
 }
 
-button, input, textarea, select {
-  font: inherit;
-  color: inherit;
-}
+button, input, textarea, select { font: inherit; color: inherit; }
 
 button {
   border: 2px solid var(--line);
@@ -48,11 +45,25 @@ button {
 
 button:hover { transform: translateY(-1px); box-shadow: 0 7px 0 rgba(20,20,20,.09); }
 button:active { transform: translateY(0); box-shadow: none; }
+button:disabled { opacity: .35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+input, textarea, select {
+  width: 100%;
+  border: 2px solid var(--line);
+  background: var(--white);
+  border-radius: 20px;
+  padding: 13px 16px;
+  outline: none;
+}
+
+textarea { resize: vertical; min-height: 110px; }
+
+h1, h2, h3, p { margin: 0; }
 
 .app {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1080px, calc(100% - 30px));
   margin: 0 auto;
-  padding: 28px 0 42px;
+  padding: 26px 0 42px;
 }
 
 .topbar {
@@ -60,14 +71,10 @@ button:active { transform: translateY(0); box-shadow: none; }
   justify-content: space-between;
   align-items: center;
   gap: 18px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+.brand { display: flex; align-items: center; gap: 14px; }
 
 .logo {
   width: 48px;
@@ -85,12 +92,10 @@ button:active { transform: translateY(0); box-shadow: none; }
 .logo span { background: var(--ink); border-radius: 2px; }
 .logo span:nth-child(2), .logo span:nth-child(6) { opacity: .35; }
 
-h1, h2, h3, p { margin: 0; }
-
 h1 {
   font-family: var(--mono);
-  font-size: clamp(24px, 4vw, 46px);
-  letter-spacing: -2px;
+  font-size: clamp(27px, 5vw, 50px);
+  letter-spacing: -2.5px;
   line-height: .95;
 }
 
@@ -103,185 +108,90 @@ h1 {
   text-transform: uppercase;
 }
 
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
+.actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 .ghost { background: transparent; }
 .danger { color: var(--danger); border-color: var(--danger); }
-
-.layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 22px;
-  align-items: start;
-}
+.mini-btn { padding: 7px 11px; font-size: 12px; border-width: 2px; }
 
 .panel {
   background: var(--panel);
-  border: 2px solid var(--line);
+  border: 3px solid var(--line);
   border-radius: var(--radius);
   box-shadow: 12px 12px 0 rgba(20,20,20,.08);
   backdrop-filter: blur(8px);
 }
 
-.galaxy {
-  padding: 22px;
-  position: sticky;
-  top: 20px;
-  min-height: 620px;
-  overflow: hidden;
+.view { display: none; }
+.view.active { display: block; }
+
+.hero {
+  padding: 26px;
+  min-height: 640px;
 }
 
-.galaxy-head {
+.section-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 22px;
 }
 
-.galaxy-title {
+.title {
   font-family: var(--mono);
-  font-size: 20px;
-  letter-spacing: -1px;
+  font-size: clamp(26px, 4vw, 42px);
+  letter-spacing: -2px;
+  line-height: 1.02;
 }
-
-.orbit-wrap {
-  height: 410px;
-  border: 2px dashed rgba(20,20,20,.22);
-  border-radius: 50%;
-  position: relative;
-  margin: 18px auto;
-  width: min(100%, 265px);
-}
-
-.core {
-  width: 96px;
-  height: 96px;
-  border: 3px solid var(--line);
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--white);
-  box-shadow: 0 0 0 12px rgba(20,20,20,.04);
-  font-family: var(--mono);
-  font-size: 12px;
-  text-align: center;
-  padding: 12px;
-}
-
-.planet {
-  --x: 50%;
-  --y: 50%;
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  transform: translate(-50%, -50%);
-  width: 58px;
-  height: 58px;
-  border: 3px solid var(--line);
-  border-radius: 50%;
-  background: var(--white);
-  display: grid;
-  place-items: center;
-  font-family: var(--mono);
-  font-weight: 800;
-  box-shadow: 6px 6px 0 rgba(20,20,20,.10);
-  cursor: pointer;
-  z-index: 2;
-}
-
-.planet.active { background: var(--ink); color: var(--white); }
-
-.planet::after {
-  content: attr(data-name);
-  position: absolute;
-  top: 64px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--ink);
-  background: var(--bg);
-  border: 1px solid rgba(20,20,20,.18);
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 10px;
-  white-space: nowrap;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.planet.active::after { color: var(--ink); }
-
-.empty-galaxy {
-  text-align: center;
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 13px;
-  margin-top: 36px;
-  line-height: 1.6;
-}
-
-.planet-form, .note-form {
-  display: grid;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-input, textarea, select {
-  width: 100%;
-  border: 2px solid var(--line);
-  background: var(--white);
-  border-radius: 18px;
-  padding: 12px 14px;
-  outline: none;
-}
-
-textarea { resize: vertical; min-height: 95px; }
 
 .hint {
   font-family: var(--mono);
   color: var(--muted);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.55;
+  margin-top: 8px;
 }
 
-.workspace {
-  min-height: 620px;
-  padding: 24px;
-}
-
-.planet-detail {
-  display: none;
-}
-
-.planet-detail.active {
-  display: block;
-}
-
-.detail-head {
+.grid {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
-  align-items: start;
-  padding-bottom: 18px;
-  border-bottom: 2px solid rgba(20,20,20,.12);
+  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+  gap: 18px;
 }
 
-.meta-row {
+.vault-card, .planet-card {
+  border: 3px solid var(--line);
+  border-radius: 25px;
+  background: var(--white);
+  padding: 20px;
+  min-height: 190px;
+  box-shadow: 8px 8px 0 rgba(20,20,20,.08);
+  cursor: pointer;
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 14px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
 }
+
+.vault-card:hover, .planet-card:hover { transform: translateY(-1px); }
+
+.card-kicker {
+  font-family: var(--mono);
+  color: var(--muted);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-title {
+  font-family: var(--mono);
+  font-size: 27px;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  word-break: break-word;
+}
+
+.meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
 .chip {
   display: inline-flex;
@@ -295,6 +205,233 @@ textarea { resize: vertical; min-height: 95px; }
   font-size: 12px;
 }
 
+.form-box {
+  margin-top: 22px;
+  padding: 18px;
+  border: 2px dashed rgba(20,20,20,.35);
+  border-radius: 24px;
+  background: rgba(255,255,255,.42);
+}
+
+.form-box h3 {
+  font-family: var(--mono);
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+
+.stack-form { display: grid; gap: 10px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.empty-state {
+  min-height: 250px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  line-height: 1.7;
+  border: 2px dashed rgba(20,20,20,.25);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.backline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.breadcrumb {
+  font-family: var(--mono);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.galaxy-stage {
+  width: min(100%, 620px);
+  height: 465px;
+  margin: 6px auto 24px;
+  position: relative;
+  border: 2px dashed rgba(20,20,20,.24);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.58), transparent 62%);
+}
+
+.vault-core {
+  width: 148px;
+  height: 148px;
+  border: 4px solid var(--line);
+  border-radius: 50%;
+  background: var(--white);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 16px;
+  letter-spacing: 1px;
+  box-shadow: 0 0 0 18px rgba(20,20,20,.04);
+  padding: 16px;
+  word-break: break-word;
+}
+
+.planet-orb {
+  --x: 50%;
+  --y: 50%;
+  width: 92px;
+  height: 92px;
+  border: 4px solid var(--line);
+  border-radius: 50%;
+  background: var(--white);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 800;
+  box-shadow: 10px 10px 0 rgba(20,20,20,.10);
+  z-index: 2;
+}
+
+.planet-orb::after {
+  content: attr(data-name);
+  position: absolute;
+  top: 98px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--bg);
+  border: 2px solid rgba(20,20,20,.18);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.limit-pill {
+  font-family: var(--mono);
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.note-shell {
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  padding: 24px 0 4px;
+}
+
+.note-deck {
+  width: min(100%, 620px);
+  position: relative;
+  margin: 0 auto;
+}
+
+.note-card {
+  min-height: 390px;
+  border: 3px solid var(--line);
+  border-radius: 28px;
+  background: var(--white);
+  padding: 26px;
+  position: relative;
+  box-shadow: 14px 14px 0 rgba(20,20,20,.09);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  z-index: 3;
+}
+
+.note-card::before,
+.note-card::after {
+  content: "";
+  position: absolute;
+  inset: 13px -13px -13px 13px;
+  border: 2px solid rgba(20,20,20,.25);
+  border-radius: 27px;
+  z-index: -1;
+  background: rgba(255,253,248,.58);
+}
+
+.note-card::after {
+  inset: 26px -25px -26px 25px;
+  opacity: .45;
+}
+
+.note-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+.note-title {
+  font-family: var(--mono);
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 1.02;
+  letter-spacing: -2px;
+  word-break: break-word;
+}
+
+.note-content {
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #2d2a27;
+  font-size: 16px;
+  flex: 1;
+}
+
+.note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.deck-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.round-btn {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.counter {
+  font-family: var(--mono);
+  color: var(--muted);
+  min-width: 82px;
+  text-align: center;
+}
+
 .icon {
   width: 16px;
   height: 16px;
@@ -303,144 +440,21 @@ textarea { resize: vertical; min-height: 95px; }
   flex: 0 0 16px;
 }
 
-.icon.planet-i { border: 2px solid currentColor; border-radius: 50%; }
-.icon.planet-i::after { content: ""; position: absolute; width: 22px; height: 7px; border: 2px solid currentColor; border-top: 0; border-radius: 50%; left: -5px; top: 5px; transform: rotate(-18deg); }
 .icon.tag-i { border: 2px solid currentColor; border-radius: 5px 8px 8px 5px; transform: rotate(45deg); }
 .icon.tag-i::after { content: ""; position: absolute; width: 3px; height: 3px; background: currentColor; border-radius: 50%; left: 3px; top: 3px; }
 .icon.note-i { border: 2px solid currentColor; border-radius: 4px; }
 .icon.note-i::after { content: ""; position: absolute; left: 3px; right: 3px; top: 5px; height: 2px; background: currentColor; box-shadow: 0 5px 0 currentColor; }
 
-.note-maker {
-  margin-top: 20px;
-  padding: 18px;
-  border: 2px solid rgba(20,20,20,.22);
-  border-radius: 22px;
-  background: rgba(255,255,255,.42);
-}
-
-.note-maker h3 {
-  font-family: var(--mono);
-  letter-spacing: -1px;
-  margin-bottom: 12px;
-}
-
-.note-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
-  gap: 18px;
-  margin-top: 22px;
-}
-
-.note-card {
-  min-height: 260px;
-  border: 3px solid var(--line);
-  border-radius: 24px;
-  background: var(--white);
-  padding: 20px;
-  position: relative;
-  box-shadow:
-    10px 10px 0 rgba(20,20,20,.08),
-    -8px 8px 0 rgba(20,20,20,.035);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.note-card::before,
-.note-card::after {
-  content: "";
-  position: absolute;
-  inset: 10px -9px -10px 9px;
-  border: 2px solid rgba(20,20,20,.25);
-  border-radius: 23px;
-  z-index: -1;
-}
-
-.note-card::after {
-  inset: 20px -17px -20px 17px;
-  opacity: .45;
-}
-
-.note-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-  font-family: var(--mono);
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.note-title {
-  font-family: var(--mono);
-  font-size: 24px;
-  line-height: 1.05;
-  letter-spacing: -1.5px;
-  word-break: break-word;
-}
-
-.note-content {
-  color: #2d2a27;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  word-break: break-word;
-  flex: 1;
-}
-
-.note-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  font-family: var(--mono);
-  font-size: 12px;
-}
-
-.mini-btn {
-  padding: 7px 10px;
-  font-size: 12px;
-  border-width: 2px;
-}
-
-.empty-state {
-  min-height: 440px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  color: var(--muted);
-  font-family: var(--mono);
-  line-height: 1.7;
-}
-
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.searchbar {
-  display: flex;
-  gap: 10px;
-  margin-top: 18px;
-  align-items: center;
-}
-
-.searchbar input { flex: 1; }
-
-@media (max-width: 870px) {
-  .layout { grid-template-columns: 1fr; }
-  .galaxy { position: relative; top: 0; min-height: auto; }
-  .orbit-wrap { height: 320px; }
-  .detail-head { grid-template-columns: 1fr; }
+@media (max-width: 720px) {
+  .topbar, .section-head, .backline { align-items: flex-start; flex-direction: column; }
   .actions { justify-content: flex-start; }
-}
-
-@media (max-width: 560px) {
-  .topbar { align-items: flex-start; flex-direction: column; }
+  .hero { padding: 20px; min-height: 560px; }
   .field-row { grid-template-columns: 1fr; }
-  .workspace, .galaxy { padding: 18px; }
-  .note-grid { grid-template-columns: 1fr; }
+  .galaxy-stage { height: 390px; }
+  .planet-orb { width: 76px; height: 76px; font-size: 23px; }
+  .planet-orb::after { top: 80px; font-size: 11px; }
+  .vault-core { width: 124px; height: 124px; font-size: 13px; }
+  .note-card { min-height: 360px; padding: 22px; }
 }
 
   </style>
@@ -454,7 +468,7 @@ textarea { resize: vertical; min-height: 95px; }
         </div>
         <div>
           <h1>Chimptopus</h1>
-          <p class="subtitle">galaxy based note vault</p>
+          <p class="subtitle">vaults · planets · note cards</p>
         </div>
       </div>
       <div class="actions">
@@ -462,58 +476,28 @@ textarea { resize: vertical; min-height: 95px; }
         <button class="ghost" id="importBtn">İçe Aktar</button>
         <button class="danger" id="wipeBtn">Sıfırla</button>
       </div>
-    </header><section class="layout">
-  <aside class="panel galaxy">
-    <div class="galaxy-head">
-      <div>
-        <h2 class="galaxy-title">Chimptopus Galaxy</h2>
-        <p class="hint">Her gezegen ayrı bir not kasasıdır.</p>
-      </div>
-      <button class="mini-btn" id="sampleBtn">Örnek</button>
-    </div>
-
-    <div class="orbit-wrap" id="orbit">
-      <div class="core">CHIMP<br/>TOPUS</div>
-    </div>
-
-    <form class="planet-form" id="planetForm">
-      <input id="planetName" maxlength="28" placeholder="Gezegen adı" required />
-      <div class="field-row">
-        <input id="planetPurpose" maxlength="48" placeholder="İçin: proje, fikir, günlük..." />
-        <input id="planetTags" maxlength="70" placeholder="Etiketler: ui, araştırma" />
-      </div>
-      <button type="submit">+ Yeni Gezegen</button>
-      <p class="hint">Gezegen kartına tıklayınca içindeki not blokları açılır.</p>
-    </form>
-  </aside>
-
-  <section class="panel workspace" id="workspace">
-    <div class="empty-state" id="emptyState">
-      <div>
-        <h2 class="galaxy-title">Henüz gezegen yok.</h2>
-        <p>Soldan bir not kasası oluştur ve Chimptopus galaksisine bağla.</p>
-      </div>
-    </div>
-  </section>
+    </header><section class="panel hero">
+  <div class="view active" id="vaultView"></div>
+  <div class="view" id="planetView"></div>
+  <div class="view" id="noteView"></div>
 </section>
 
   </main>  <input type="file" id="fileInput" accept="application/json" hidden />  <script>
-    const STORAGE_KEY = "chimptopus-notes-v1";
+    const STORAGE_KEY = "chimptopus-notes-v2";
+    const MAX_PLANETS = 5;
 
     let state = loadState();
-    let activePlanetId = state.planets[0]?.id || null;
+    let activeVaultId = state.vaults[0]?.id || null;
+    let activePlanetId = null;
+    let activeNoteIndex = 0;
+    let currentView = "vault";
 
-    const orbit = document.getElementById("orbit");
-    const workspace = document.getElementById("workspace");
-    const emptyState = document.getElementById("emptyState");
-    const planetForm = document.getElementById("planetForm");
-    const planetName = document.getElementById("planetName");
-    const planetPurpose = document.getElementById("planetPurpose");
-    const planetTags = document.getElementById("planetTags");
+    const vaultView = document.getElementById("vaultView");
+    const planetView = document.getElementById("planetView");
+    const noteView = document.getElementById("noteView");
     const exportBtn = document.getElementById("exportBtn");
     const importBtn = document.getElementById("importBtn");
     const wipeBtn = document.getElementById("wipeBtn");
-    const sampleBtn = document.getElementById("sampleBtn");
     const fileInput = document.getElementById("fileInput");
 
     function uid(prefix = "id") {
@@ -522,10 +506,10 @@ textarea { resize: vertical; min-height: 95px; }
 
     function loadState() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { planets: [] };
-      } catch {
-        return { planets: [] };
-      }
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved?.vaults) return saved;
+      } catch {}
+      return { vaults: [] };
     }
 
     function saveState() {
@@ -533,7 +517,7 @@ textarea { resize: vertical; min-height: 95px; }
     }
 
     function escapeHtml(text = "") {
-      return text
+      return String(text)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -542,204 +526,327 @@ textarea { resize: vertical; min-height: 95px; }
     }
 
     function parseTags(text = "") {
-      return text
-        .split(",")
-        .map(tag => tag.trim())
-        .filter(Boolean)
-        .slice(0, 6);
+      return String(text).split(",").map(t => t.trim()).filter(Boolean).slice(0, 6);
     }
 
-    function getActivePlanet() {
-      return state.planets.find(p => p.id === activePlanetId) || null;
+    function getVault() {
+      return state.vaults.find(v => v.id === activeVaultId) || null;
+    }
+
+    function getPlanet() {
+      const vault = getVault();
+      return vault?.planets.find(p => p.id === activePlanetId) || null;
+    }
+
+    function showView(name) {
+      currentView = name;
+      [vaultView, planetView, noteView].forEach(v => v.classList.remove("active"));
+      if (name === "vault") vaultView.classList.add("active");
+      if (name === "planet") planetView.classList.add("active");
+      if (name === "note") noteView.classList.add("active");
+      render();
     }
 
     function render() {
       saveState();
-      renderGalaxy();
-      renderWorkspace();
+      renderVaults();
+      renderPlanets();
+      renderNotes();
     }
 
-    function renderGalaxy() {
-      orbit.querySelectorAll(".planet").forEach(el => el.remove());
+    function renderVaults() {
+      const cards = state.vaults.length ? state.vaults.map(vault => {
+        const noteCount = vault.planets.reduce((sum, p) => sum + p.notes.length, 0);
+        return `
+          <article class="vault-card" data-open-vault="${vault.id}">
+            <div class="card-kicker"><span>kasa</span><span>${vault.planets.length}/${MAX_PLANETS} gezegen</span></div>
+            <div>
+              <h2 class="card-title">${escapeHtml(vault.name)}</h2>
+              <div class="meta-row">
+                <span class="chip">${noteCount} not</span>
+                <span class="chip">${escapeHtml(vault.purpose || "serbest")}</span>
+              </div>
+            </div>
+            <p class="hint">Açmak için tıkla.</p>
+          </article>
+        `;
+      }).join("") : `<div class="empty-state"><div><h2 class="title">Henüz kasa yok.</h2><p>İlk not kasanı oluştur.</p></div></div>`;
 
-      if (!state.planets.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty-galaxy";
-        empty.textContent = "Yeni gezegenler burada yörüngeye girer.";
-        empty.dataset.empty = "true";
-        orbit.appendChild(empty);
-        return;
-      }
+      vaultView.innerHTML = `
+        <div class="section-head">
+          <div>
+            <h2 class="title">Kasalar</h2>
+            <p class="hint">Ana kasa yok. Her oluşturduğun kasa kendi küçük galaksisidir.</p>
+          </div>
+          <button class="mini-btn" id="sampleBtn">Örnek</button>
+        </div>
+        <div class="grid">${cards}</div>
+        <div class="form-box">
+          <h3>&gt; yeni kasa oluştur _</h3>
+          <form class="stack-form" id="vaultForm">
+            <input name="name" maxlength="32" placeholder="Kasa adı" required />
+            <input name="purpose" maxlength="60" placeholder="İçin: proje, fikir, günlük..." />
+            <button type="submit">+ Kasa Ekle</button>
+          </form>
+        </div>
+      `;
 
-      orbit.querySelectorAll("[data-empty='true']").forEach(el => el.remove());
-
-      const total = state.planets.length;
-      state.planets.forEach((planet, index) => {
-        const angle = (Math.PI * 2 * index) / Math.max(total, 1) - Math.PI / 2;
-        const radiusX = 43;
-        const radiusY = 43;
-        const x = 50 + Math.cos(angle) * radiusX;
-        const y = 50 + Math.sin(angle) * radiusY;
-        const btn = document.createElement("button");
-        btn.className = `planet ${planet.id === activePlanetId ? "active" : ""}`;
-        btn.style.setProperty("--x", `${x}%`);
-        btn.style.setProperty("--y", `${y}%`);
-        btn.dataset.name = planet.name;
-        btn.title = planet.name;
-        btn.textContent = planet.name.slice(0, 2).toUpperCase();
-        btn.addEventListener("click", () => {
-          activePlanetId = planet.id;
-          render();
+      vaultView.querySelector("#vaultForm").addEventListener("submit", addVault);
+      vaultView.querySelector("#sampleBtn").addEventListener("click", addSample);
+      vaultView.querySelectorAll("[data-open-vault]").forEach(card => {
+        card.addEventListener("click", () => {
+          activeVaultId = card.dataset.openVault;
+          activePlanetId = getVault()?.planets[0]?.id || null;
+          activeNoteIndex = 0;
+          showView("planet");
         });
-        orbit.appendChild(btn);
       });
     }
 
-    function renderWorkspace() {
-      const planet = getActivePlanet();
-      workspace.innerHTML = "";
-
-      if (!planet) {
-        workspace.appendChild(emptyState);
+    function renderPlanets() {
+      const vault = getVault();
+      if (!vault) {
+        planetView.innerHTML = "";
         return;
       }
 
-      const tags = planet.tags.map(tag => `<span class="chip"><span class="icon tag-i"></span>${escapeHtml(tag)}</span>`).join("");
-      const notes = planet.notes || [];
+      const planetButtons = vault.planets.map((planet, index) => {
+        const positions = [
+          [50, 11], [83, 38], [70, 81], [30, 81], [17, 38]
+        ];
+        const [x, y] = positions[index] || [50, 50];
+        return `
+          <button class="planet-orb" style="--x:${x}%; --y:${y}%" data-open-planet="${planet.id}" data-name="${escapeHtml(planet.name)}">
+            ${escapeHtml(planet.name.slice(0, 2).toUpperCase())}
+          </button>
+        `;
+      }).join("");
 
-      workspace.innerHTML = `
-        <div class="planet-detail active">
-          <div class="detail-head">
-            <div>
-              <h2 class="galaxy-title"><span class="icon planet-i"></span> ${escapeHtml(planet.name)}</h2>
-              <div class="meta-row">
-                <span class="chip"><span class="icon note-i"></span>${notes.length} not</span>
-                <span class="chip">için: ${escapeHtml(planet.purpose || "serbest")}</span>
-                ${tags || `<span class="chip">etiketsiz</span>`}
-              </div>
+      const planetList = vault.planets.length ? vault.planets.map(planet => `
+        <article class="planet-card" data-open-planet="${planet.id}">
+          <div class="card-kicker"><span>gezegen</span><span>${planet.notes.length} not</span></div>
+          <div>
+            <h2 class="card-title">${escapeHtml(planet.name)}</h2>
+            <div class="meta-row">
+              <span class="chip">${escapeHtml(planet.purpose || "serbest")}</span>
+              ${(planet.tags || []).map(tag => `<span class="chip"><span class="icon tag-i"></span>${escapeHtml(tag)}</span>`).join("") || `<span class="chip">etiketsiz</span>`}
             </div>
-            <button class="danger mini-btn" data-delete-planet="${planet.id}">Gezegeni Sil</button>
           </div>
+          <p class="hint">Not kartlarına git.</p>
+        </article>
+      `).join("") : `<div class="empty-state"><div><h2 class="title">Bu kasada gezegen yok.</h2><p>Maksimum 5 gezegen ekleyebilirsin.</p></div></div>`;
 
-          <div class="note-maker">
-            <h3>&gt; yeni çekirdek not oluştur _</h3>
-            <form class="note-form" data-note-form="${planet.id}">
-              <input name="title" maxlength="48" placeholder="Not başlığı" required />
-              <textarea name="content" maxlength="1200" placeholder="Not içeriği..." required></textarea><div class="field-row">
-            <input name="tags" maxlength="70" placeholder="Etiketler: fikir, yapılacak" />
-            <select name="mood">
-              <option value="core">Çekirdek</option>
-              <option value="idea">Fikir</option>
-              <option value="todo">Yapılacak</option>
-              <option value="archive">Arşiv</option>
-            </select>
+      const limitReached = vault.planets.length >= MAX_PLANETS;
+
+      planetView.innerHTML = `
+        <div class="backline">
+          <div>
+            <button class="ghost mini-btn" id="backVaults">← Kasalar</button>
+            <span class="breadcrumb"> / ${escapeHtml(vault.name)}</span>
           </div>
-          <button type="submit">+ Not Bloğu Ekle</button>
-        </form>
-      </div>
+          <button class="danger mini-btn" id="deleteVault">Kasayı Sil</button>
+        </div>
 
-      <div class="searchbar">
-        <input id="noteSearch" placeholder="Bu gezegende ara..." />
-      </div>
+        <div class="section-head">
+          <div>
+            <h2 class="title">${escapeHtml(vault.name)}</h2>
+            <p class="hint">Bu kasanın içinde en fazla 5 gezegen bulunur.</p>
+          </div>
+          <span class="chip">${vault.planets.length}/${MAX_PLANETS} gezegen</span>
+        </div>
 
-      <div class="note-grid" id="noteGrid">
-        ${renderNotes(notes)}
-      </div>
+        <div class="galaxy-stage">
+          <div class="vault-core">${escapeHtml(vault.name.slice(0, 18))}</div>
+          ${planetButtons}
+        </div>
+
+        <p class="limit-pill">${limitReached ? "Gezegen limiti doldu." : "Yeni gezegen ekleyebilirsin."}</p>
+        <div class="grid">${planetList}</div>
+
+        <div class="form-box">
+          <h3>&gt; yeni gezegen oluştur _</h3>
+          <form class="stack-form" id="planetForm">
+            <input name="name" maxlength="28" placeholder="Gezegen adı" required ${limitReached ? "disabled" : ""} />
+            <div class="field-row">
+              <input name="purpose" maxlength="48" placeholder="İçin: konu, modül, bölüm..." ${limitReached ? "disabled" : ""} />
+              <input name="tags" maxlength="70" placeholder="Etiketler: ui, araştırma" ${limitReached ? "disabled" : ""} />
+            </div>
+            <button type="submit" ${limitReached ? "disabled" : ""}>+ Gezegen Ekle</button>
+          </form>
+        </div>
+      `;
+
+      planetView.querySelector("#backVaults").addEventListener("click", () => showView("vault"));
+      planetView.querySelector("#deleteVault").addEventListener("click", deleteVault);
+      planetView.querySelector("#planetForm").addEventListener("submit", addPlanet);
+      planetView.querySelectorAll("[data-open-planet]").forEach(el => {
+        el.addEventListener("click", () => {
+          activePlanetId = el.dataset.openPlanet;
+          activeNoteIndex = 0;
+          showView("note");
+        });
+      });
+    }
+
+    function renderNotes() {
+      const vault = getVault();
+      const planet = getPlanet();
+      if (!vault || !planet) {
+        noteView.innerHTML = "";
+        return;
+      }
+
+      const notes = planet.notes || [];
+      if (activeNoteIndex > notes.length - 1) activeNoteIndex = Math.max(0, notes.length - 1);
+      const note = notes[activeNoteIndex];
+
+      const cardHtml = note ? `
+        <div class="note-deck">
+          <article class="note-card">
+            <div class="note-top">
+              <span>${activeNoteIndex + 1} / ${notes.length}</span>
+              <span>${escapeHtml(note.mood || "core")}</span>
+            </div>
+            <h2 class="note-title">${escapeHtml(note.title)}</h2>
+            <p class="note-content">${escapeHtml(note.content)}</p>
+            <div class="note-footer">
+              <span>${(note.tags || []).map(tag => `#${escapeHtml(tag)}`).join(" ") || "çekirdek not"}</span>
+              <button class="danger mini-btn" id="deleteNote">Notu Sil</button>
+            </div>
+          </article>
+          <div class="deck-controls">
+            <button class="round-btn" id="prevNote" ${activeNoteIndex === 0 ? "disabled" : ""}>‹</button>
+            <span class="counter">${activeNoteIndex + 1} / ${notes.length}</span>
+            <button class="round-btn" id="nextNote" ${activeNoteIndex === notes.length - 1 ? "disabled" : ""}>›</button>
+          </div>
+        </div>
+      ` : `<div class="empty-state"><div><h2 class="title">Henüz not yok.</h2><p>İlk kartını oluştur.</p></div></div>`;
+
+      noteView.innerHTML = `
+        <div class="backline">
+          <div>
+            <button class="ghost mini-btn" id="backPlanets">← Gezegenler</button>
+            <span class="breadcrumb"> / ${escapeHtml(vault.name)} / ${escapeHtml(planet.name)}</span>
+          </div>
+          <button class="danger mini-btn" id="deletePlanet">Gezegeni Sil</button>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <h2 class="title">${escapeHtml(planet.name)}</h2>
+            <p class="hint">Notlar tek tek kart olarak görüntülenir. İleri/geri ile sayfa değiştir.</p>
+          </div>
+          <span class="chip"><span class="icon note-i"></span>${notes.length} not</span>
+        </div>
+
+        <div class="note-shell">${cardHtml}</div>
+
+        <div class="form-box">
+          <h3>&gt; yeni not kartı oluştur _</h3>
+          <form class="stack-form" id="noteForm">
+            <input name="title" maxlength="50" placeholder="Not başlığı" required />
+            <textarea name="content" maxlength="1400" placeholder="Not içeriği..." required></textarea><div class="field-row">
+          <input name="tags" maxlength="70" placeholder="Etiketler: fikir, yapılacak" />
+          <select name="mood">
+            <option value="core">Çekirdek</option>
+            <option value="idea">Fikir</option>
+            <option value="todo">Yapılacak</option>
+            <option value="archive">Arşiv</option>
+          </select>
+        </div>
+        <button type="submit">+ Kart Ekle</button>
+      </form>
     </div>
   `;
 
-  workspace.querySelector("[data-note-form]").addEventListener("submit", addNote);
-  workspace.querySelector("[data-delete-planet]").addEventListener("click", deletePlanet);
-  workspace.querySelectorAll("[data-delete-note]").forEach(btn => btn.addEventListener("click", deleteNote));
-  workspace.querySelector("#noteSearch").addEventListener("input", filterNotes);
+  noteView.querySelector("#backPlanets").addEventListener("click", () => showView("planet"));
+  noteView.querySelector("#deletePlanet").addEventListener("click", deletePlanet);
+  noteView.querySelector("#noteForm").addEventListener("submit", addNote);
+  noteView.querySelector("#prevNote")?.addEventListener("click", () => { activeNoteIndex--; render(); });
+  noteView.querySelector("#nextNote")?.addEventListener("click", () => { activeNoteIndex++; render(); });
+  noteView.querySelector("#deleteNote")?.addEventListener("click", deleteNote);
 }
 
-function renderNotes(notes) {
-  if (!notes.length) {
-    return `<div class="empty-state"><div><h2 class="galaxy-title">Boş not kasası.</h2><p>İlk çekirdek notunu ekle.</p></div></div>`;
-  }
-
-  return notes.map((note, index) => {
-    const tags = (note.tags || []).map(tag => `<span>#${escapeHtml(tag)}</span>`).join(" ");
-    return `
-      <article class="note-card" data-note-card data-search="${escapeHtml((note.title + " " + note.content + " " + (note.tags || []).join(" ")).toLowerCase())}">
-        <div class="note-top">
-          <span>${String(index + 1).padStart(2, "0")} / ${String(notes.length).padStart(2, "0")}</span>
-          <span>${escapeHtml(note.mood || "core")}</span>
-        </div>
-        <h3 class="note-title">${escapeHtml(note.title)}</h3>
-        <p class="note-content">${escapeHtml(note.content)}</p>
-        <div class="note-footer">
-          <span>${tags || "çekirdek not"}</span>
-          <button class="mini-btn danger" data-delete-note="${note.id}">Sil</button>
-        </div>
-      </article>
-    `;
-  }).join("");
+function addVault(event) {
+  event.preventDefault();
+  const data = new FormData(event.target);
+  const vault = {
+    id: uid("vault"),
+    name: data.get("name").trim(),
+    purpose: data.get("purpose").trim(),
+    planets: [],
+    createdAt: new Date().toISOString()
+  };
+  state.vaults.unshift(vault);
+  activeVaultId = vault.id;
+  activePlanetId = null;
+  event.target.reset();
+  showView("planet");
 }
 
 function addPlanet(event) {
   event.preventDefault();
-  const name = planetName.value.trim();
-  if (!name) return;
-
+  const vault = getVault();
+  if (!vault || vault.planets.length >= MAX_PLANETS) return;
+  const data = new FormData(event.target);
   const planet = {
     id: uid("planet"),
-    name,
-    purpose: planetPurpose.value.trim(),
-    tags: parseTags(planetTags.value),
+    name: data.get("name").trim(),
+    purpose: data.get("purpose").trim(),
+    tags: parseTags(data.get("tags")),
     notes: [],
     createdAt: new Date().toISOString()
   };
-
-  state.planets.push(planet);
+  vault.planets.push(planet);
   activePlanetId = planet.id;
-  planetForm.reset();
+  event.target.reset();
   render();
 }
 
 function addNote(event) {
   event.preventDefault();
-  const planet = getActivePlanet();
+  const planet = getPlanet();
   if (!planet) return;
-
   const data = new FormData(event.target);
   const note = {
     id: uid("note"),
     title: data.get("title").trim(),
     content: data.get("content").trim(),
-    tags: parseTags(data.get("tags") || ""),
+    tags: parseTags(data.get("tags")),
     mood: data.get("mood"),
     createdAt: new Date().toISOString()
   };
-
-  planet.notes.unshift(note);
+  planet.notes.push(note);
+  activeNoteIndex = planet.notes.length - 1;
   event.target.reset();
   render();
 }
 
-function deletePlanet(event) {
-  const id = event.currentTarget.dataset.deletePlanet;
-  const planet = state.planets.find(p => p.id === id);
-  if (!planet || !confirm(`"${planet.name}" gezegeni ve içindeki notlar silinsin mi?`)) return;
-  state.planets = state.planets.filter(p => p.id !== id);
-  activePlanetId = state.planets[0]?.id || null;
-  render();
+function deleteVault() {
+  const vault = getVault();
+  if (!vault || !confirm(`"${vault.name}" kasası silinsin mi?`)) return;
+  state.vaults = state.vaults.filter(v => v.id !== vault.id);
+  activeVaultId = state.vaults[0]?.id || null;
+  activePlanetId = null;
+  showView("vault");
 }
 
-function deleteNote(event) {
-  const planet = getActivePlanet();
+function deletePlanet() {
+  const vault = getVault();
+  const planet = getPlanet();
+  if (!vault || !planet || !confirm(`"${planet.name}" gezegeni ve notları silinsin mi?`)) return;
+  vault.planets = vault.planets.filter(p => p.id !== planet.id);
+  activePlanetId = vault.planets[0]?.id || null;
+  activeNoteIndex = 0;
+  showView("planet");
+}
+
+function deleteNote() {
+  const planet = getPlanet();
   if (!planet) return;
-  const id = event.currentTarget.dataset.deleteNote;
-  planet.notes = planet.notes.filter(note => note.id !== id);
+  planet.notes.splice(activeNoteIndex, 1);
+  activeNoteIndex = Math.max(0, activeNoteIndex - 1);
   render();
-}
-
-function filterNotes(event) {
-  const query = event.target.value.trim().toLowerCase();
-  workspace.querySelectorAll("[data-note-card]").forEach(card => {
-    card.style.display = card.dataset.search.includes(query) ? "flex" : "none";
-  });
 }
 
 function exportData() {
@@ -757,50 +864,60 @@ function importData(file) {
   reader.onload = () => {
     try {
       const imported = JSON.parse(reader.result);
-      if (!Array.isArray(imported.planets)) throw new Error("Invalid file");
+      if (!Array.isArray(imported.vaults)) throw new Error("Invalid file");
       state = imported;
-      activePlanetId = state.planets[0]?.id || null;
-      render();
+      activeVaultId = state.vaults[0]?.id || null;
+      activePlanetId = null;
+      activeNoteIndex = 0;
+      showView("vault");
     } catch {
-      alert("Bu dosya Chimptopus formatında görünmüyor.");
+      alert("Bu dosya Chimptopus v2 formatında görünmüyor.");
     }
   };
   reader.readAsText(file);
 }
 
 function addSample() {
-  if (state.planets.length && !confirm("Örnek veriler mevcut galaksiye eklensin mi?")) return;
-  const sample = {
-    id: uid("planet"),
+  const vault = {
+    id: uid("vault"),
     name: "Nebula UI",
     purpose: "arayüz fikirleri",
-    tags: ["design", "frontend"],
     createdAt: new Date().toISOString(),
-    notes: [
+    planets: [
       {
-        id: uid("note"),
-        title: "Designer Soul. Developer Brain.",
-        content: "Kart mantığı: kısa, çekirdek, sayfa sayfa okunabilir not blokları. Her blok tek fikri taşımalı.",
-        tags: ["kart", "minimal"],
-        mood: "core",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: uid("note"),
-        title: "Kasayı hafif tut",
-        content: "Ağır animasyon yok. Sadece hover ve küçük geçişler. Veri localStorage içinde tutulur.",
-        tags: ["performans"],
-        mood: "todo",
-        createdAt: new Date().toISOString()
+        id: uid("planet"),
+        name: "Kartlar",
+        purpose: "not sunumu",
+        tags: ["minimal", "slide"],
+        createdAt: new Date().toISOString(),
+        notes: [
+          {
+            id: uid("note"),
+            title: "Designer Soul. Developer Brain.",
+            content: "Her not tek bir çekirdek fikir gibi tutulur. Kart destesi mantığıyla ileri/geri gezilir.",
+            tags: ["kart", "çekirdek"],
+            mood: "core",
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: uid("note"),
+            title: "Az animasyon",
+            content: "Performans için ağır hareket yok. Sadece küçük hover ve sade geçişler var.",
+            tags: ["performans"],
+            mood: "todo",
+            createdAt: new Date().toISOString()
+          }
+        ]
       }
     ]
   };
-  state.planets.push(sample);
-  activePlanetId = sample.id;
-  render();
+  state.vaults.unshift(vault);
+  activeVaultId = vault.id;
+  activePlanetId = vault.planets[0].id;
+  activeNoteIndex = 0;
+  showView("note");
 }
 
-planetForm.addEventListener("submit", addPlanet);
 exportBtn.addEventListener("click", exportData);
 importBtn.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", event => {
@@ -809,12 +926,13 @@ fileInput.addEventListener("change", event => {
   event.target.value = "";
 });
 wipeBtn.addEventListener("click", () => {
-  if (!confirm("Tüm Chimptopus galaksisi silinsin mi?")) return;
-  state = { planets: [] };
+  if (!confirm("Tüm Chimptopus verileri silinsin mi?")) return;
+  state = { vaults: [] };
+  activeVaultId = null;
   activePlanetId = null;
-  render();
+  activeNoteIndex = 0;
+  showView("vault");
 });
-sampleBtn.addEventListener("click", addSample);
 
 render();
 
