@@ -1,633 +1,851 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>İpek Yolu Not Defteri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Silkroad Temalı Not Defteri</title>
   <style>
-    :root {
-      --bg: #140d08;
-      --panel: rgba(45, 27, 13, 0.88);
-      --panel-2: rgba(75, 45, 18, 0.82);
-      --gold: #d8a842;
-      --gold-light: #ffe19a;
-      --bronze: #8a5720;
-      --ink: #f2dfba;
-      --muted: #b99662;
-      --danger: #b8452e;
-      --shadow: rgba(0, 0, 0, 0.55);
-    }* {
-  box-sizing: border-box;
-}
+    :root{
+      --bg:#3a2a1a;
+      --panel:#1c1c1d;
+      --panel-2:#262626;
+      --panel-3:#111;
+      --gold:#9f8a57;
+      --gold-2:#cbb476;
+      --gold-3:#6f603b;
+      --blue:#4f5f8d;
+      --blue-2:#6678a9;
+      --line:#5d5d5d;
+      --text:#e7d9b8;
+      --muted:#b7aa86;
+      --danger:#8d3a32;
+      --success:#5f7b44;
+      --shadow: rgba(0,0,0,.45);
+    }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Georgia, "Times New Roman", serif;
-  color: var(--ink);
-  background:
-    radial-gradient(circle at top, rgba(216, 168, 66, 0.18), transparent 30%),
-    linear-gradient(rgba(20, 13, 8, 0.75), rgba(20, 13, 8, 0.96)),
-    repeating-linear-gradient(45deg, #1b1008 0, #1b1008 12px, #130b06 12px, #130b06 24px);
-  overflow-x: hidden;
-}
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
+    html, body{
+      margin:0;
+      padding:0;
+      width:100%;
+      min-height:100%;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.06), transparent 25%),
+        linear-gradient(180deg, #7d5f34 0%, #4e3b21 16%, #2a2117 100%);
+      color:var(--text);
+      font-family: Tahoma, Verdana, Arial, sans-serif;
+      overflow-x:hidden;
+    }
 
-body::before {
-  background:
-    radial-gradient(circle at 18% 28%, rgba(216, 168, 66, 0.16), transparent 9%),
-    radial-gradient(circle at 82% 18%, rgba(168, 76, 32, 0.14), transparent 11%),
-    radial-gradient(circle at 70% 78%, rgba(216, 168, 66, 0.09), transparent 14%);
-  filter: blur(1px);
-}
+    body{
+      min-height:100dvh;
+    }
 
-body::after {
-  background-image:
-    linear-gradient(90deg, transparent 0 96%, rgba(216, 168, 66, 0.05) 97% 100%),
-    linear-gradient(0deg, transparent 0 96%, rgba(216, 168, 66, 0.04) 97% 100%);
-  background-size: 64px 64px;
-  opacity: 0.45;
-}
+    .app{
+      width:100%;
+      min-height:100dvh;
+      padding:10px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
 
-.app {
-  position: relative;
-  z-index: 1;
-  width: min(1180px, calc(100% - 32px));
-  margin: 28px auto;
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 22px;
-}
+    .window{
+      width:100%;
+      max-width:460px;
+      background:linear-gradient(180deg, #2d2d2d 0%, #181818 100%);
+      border:2px solid var(--gold-3);
+      box-shadow:
+        0 0 0 1px #000 inset,
+        0 0 0 2px #4b4b4b inset,
+        0 10px 30px var(--shadow);
+      border-radius:8px;
+      overflow:hidden;
+    }
 
-.frame {
-  border: 1px solid rgba(255, 225, 154, 0.42);
-  border-radius: 18px;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.05), transparent 35%),
-    var(--panel);
-  box-shadow: 0 18px 50px var(--shadow), inset 0 0 22px rgba(216, 168, 66, 0.08);
-  backdrop-filter: blur(6px);
-}
+    /* ÜST BAŞLIK */
+    .titlebar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 12px;
+      background:
+        linear-gradient(180deg, #0b0b0b 0%, #171717 100%);
+      border-bottom:1px solid #444;
+      box-shadow: inset 0 -1px 0 #000;
+    }
 
-.sidebar {
-  padding: 18px;
-  min-height: calc(100vh - 56px);
-}
+    .titlebar h1{
+      margin:0;
+      font-size:15px;
+      font-weight:700;
+      color:#f3f0e3;
+      letter-spacing:.3px;
+      text-align:center;
+      flex:1;
+    }
 
-.brand {
-  padding: 16px 14px 18px;
-  text-align: center;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(216,168,66,0.18), rgba(50,28,12,0.42));
-  border: 1px solid rgba(216, 168, 66, 0.34);
-  margin-bottom: 16px;
-}
+    .title-deco{
+      width:24px;
+      height:24px;
+      border:1px solid var(--gold-3);
+      background:linear-gradient(180deg, #7b6a3d, #534525);
+      border-radius:3px;
+      display:grid;
+      place-items:center;
+      color:#efe2b8;
+      font-size:13px;
+      font-weight:bold;
+      flex:0 0 24px;
+    }
 
-.brand .sigil {
-  width: 66px;
-  height: 66px;
-  margin: 0 auto 10px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: var(--gold-light);
-  font-size: 32px;
-  background:
-    radial-gradient(circle, rgba(255,225,154,0.2), transparent 58%),
-    conic-gradient(from 20deg, #7b3f16, #d8a842, #7b3f16, #3b1d0c, #d8a842, #7b3f16);
-  border: 2px solid rgba(255, 225, 154, 0.58);
-  box-shadow: 0 0 24px rgba(216, 168, 66, 0.28);
-}
+    /* MAVI BAR */
+    .namebar{
+      margin:8px;
+      background:linear-gradient(180deg, var(--blue-2) 0%, var(--blue) 100%);
+      border:1px solid #7e8ebc;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
+      border-radius:4px;
+      padding:6px 10px;
+      text-align:center;
+      color:#f1f4ff;
+      font-weight:700;
+      font-size:16px;
+    }
 
-.brand h1 {
-  margin: 0;
-  font-size: 25px;
-  letter-spacing: 0.8px;
-  color: var(--gold-light);
-  text-shadow: 0 2px 0 #4b270d, 0 0 18px rgba(216,168,66,0.35);
-}
+    /* İÇ PANEL */
+    .content{
+      padding:8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 10%),
+        linear-gradient(180deg, #1c1c1c, #151515);
+      border-top:1px solid #2d2d2d;
+    }
 
-.brand p {
-  margin: 7px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-}
+    .section{
+      background:linear-gradient(180deg, #252525 0%, #1a1a1a 100%);
+      border:1px solid #474747;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      padding:10px;
+      margin-bottom:8px;
+      border-radius:4px;
+    }
 
-.toolbar,
-.note-tools {
-  display: grid;
-  gap: 10px;
-}
+    .row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
 
-button,
-input,
-textarea {
-  font: inherit;
-}
+    .row + .row{
+      margin-top:8px;
+    }
 
-button {
-  border: 1px solid rgba(255, 225, 154, 0.38);
-  color: var(--gold-light);
-  background: linear-gradient(180deg, #6c3d16, #2b170a);
-  border-radius: 12px;
-  padding: 11px 12px;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 8px 18px rgba(0,0,0,0.28);
-  transition: transform 0.15s ease, filter 0.15s ease, border-color 0.15s ease;
-}
+    .label{
+      color:var(--gold-2);
+      font-size:13px;
+      min-width:88px;
+      flex:0 0 auto;
+    }
 
-button:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.12);
-  border-color: rgba(255, 225, 154, 0.65);
-}
+    .value{
+      color:#fff;
+      font-size:13px;
+      flex:1 1 auto;
+      min-width:0;
+    }
 
-button:active {
-  transform: translateY(0);
-}
+    .field{
+      width:100%;
+      border:1px solid #4e4e4e;
+      background:linear-gradient(180deg, #0a0a0a, #151515);
+      color:#fff;
+      border-radius:4px;
+      padding:10px 12px;
+      outline:none;
+      font-size:14px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.7);
+    }
 
-.danger {
-  background: linear-gradient(180deg, #7a2f22, #2a100d);
-  color: #ffd7cb;
-}
+    .field::placeholder,
+    textarea::placeholder{
+      color:#8e8e8e;
+    }
 
-.ghost {
-  background: rgba(24, 14, 8, 0.62);
-  color: var(--ink);
-}
+    .field:focus,
+    textarea:focus{
+      border-color:#8d9fd3;
+      box-shadow:
+        inset 0 1px 2px rgba(0,0,0,.7),
+        0 0 0 1px rgba(141,159,211,.25);
+    }
 
-.search {
-  width: 100%;
-  padding: 12px 13px;
-  border-radius: 12px;
-  border: 1px solid rgba(216, 168, 66, 0.34);
-  background: rgba(17, 10, 5, 0.72);
-  color: var(--ink);
-  outline: none;
-  margin: 14px 0 12px;
-}
+    .editor-title{
+      font-size:13px;
+      color:var(--gold-2);
+      margin-bottom:6px;
+    }
 
-.search:focus,
-.title:focus,
-textarea:focus {
-  border-color: var(--gold-light);
-  box-shadow: 0 0 0 3px rgba(216, 168, 66, 0.16);
-}
+    textarea{
+      width:100%;
+      min-height:280px;
+      resize:vertical;
+      border:1px solid #4e4e4e;
+      background:
+        linear-gradient(180deg, #171717 0%, #0f0f0f 100%);
+      color:#ececec;
+      border-radius:4px;
+      padding:12px;
+      outline:none;
+      font-size:14px;
+      line-height:1.55;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.7);
+    }
 
-.notes-list {
-  display: grid;
-  gap: 10px;
-  max-height: calc(100vh - 330px);
-  overflow: auto;
-  padding-right: 4px;
-}
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
 
-.note-card {
-  padding: 12px;
-  border-radius: 13px;
-  border: 1px solid rgba(216,168,66,0.22);
-  background: rgba(24, 13, 6, 0.66);
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
-}
+    .statbox{
+      background:linear-gradient(180deg, #2e2e2e, #222);
+      border:1px solid #4d4d4d;
+      border-radius:4px;
+      padding:8px;
+    }
 
-.note-card:hover,
-.note-card.active {
-  background: linear-gradient(180deg, rgba(138,87,32,0.46), rgba(24,13,6,0.72));
-  border-color: rgba(255,225,154,0.55);
-  transform: translateX(2px);
-}
+    .statbox .small{
+      color:var(--gold-2);
+      font-size:12px;
+      margin-bottom:4px;
+    }
 
-.note-card strong {
-  display: block;
-  color: var(--gold-light);
-  font-size: 15px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .statbox .big{
+      color:#fff;
+      font-size:13px;
+      font-weight:700;
+    }
 
-.note-card span {
-  display: block;
-  margin-top: 5px;
-  color: var(--muted);
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .bar-group{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
 
-.editor {
-  min-height: calc(100vh - 56px);
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  overflow: hidden;
-}
+    .barline{
+      display:grid;
+      grid-template-columns:42px 1fr;
+      gap:8px;
+      align-items:center;
+    }
 
-.editor-header {
-  padding: 20px 22px 14px;
-  border-bottom: 1px solid rgba(216,168,66,0.22);
-  background: linear-gradient(90deg, rgba(216,168,66,0.12), transparent);
-}
+    .barline span{
+      color:#ddd;
+      font-size:12px;
+      font-weight:700;
+    }
 
-.title {
-  width: 100%;
-  border: 1px solid rgba(216, 168, 66, 0.28);
-  background: rgba(17, 10, 5, 0.56);
-  color: var(--gold-light);
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-size: clamp(24px, 3vw, 38px);
-  outline: none;
-  text-shadow: 0 0 12px rgba(216,168,66,0.18);
-}
+    .bar{
+      height:18px;
+      background:#060606;
+      border:1px solid #444;
+      border-radius:3px;
+      overflow:hidden;
+      position:relative;
+    }
 
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  color: var(--muted);
-  padding: 12px 22px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(216,168,66,0.16);
-}
+    .fill{
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+    }
 
-textarea {
-  width: 100%;
-  height: 100%;
-  resize: none;
-  border: 0;
-  outline: none;
-  color: #2b1608;
-  padding: 28px;
-  line-height: 1.65;
-  font-size: 18px;
-  background:
-    linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.05)),
-    repeating-linear-gradient(#ead2a0 0 31px, #d0ad6b 32px),
-    #e2c482;
-  box-shadow: inset 0 12px 30px rgba(54,29,8,0.28);
-}
+    .fill.red{
+      width:100%;
+      background:linear-gradient(180deg, #ff4157, #be0b1f);
+    }
 
-.bottom-bar {
-  padding: 13px 18px;
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(216,168,66,0.22);
-  background: rgba(20, 12, 7, 0.82);
-}
+    .fill.blue{
+      width:72%;
+      background:linear-gradient(180deg, #4a70ff, #1430a9);
+    }
 
-.status {
-  color: var(--muted);
-  font-size: 13px;
-}
+    .bartext{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      color:#fff;
+      text-shadow:0 1px 1px #000;
+      padding:0 6px;
+    }
 
-.bottom-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
+    /* BUTONLAR */
+    .actions{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:8px;
+    }
 
-.empty {
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-  padding: 18px 10px;
-  border: 1px dashed rgba(216,168,66,0.26);
-  border-radius: 14px;
-}
+    .btn{
+      appearance:none;
+      border:1px solid var(--gold-3);
+      background:
+        linear-gradient(180deg, #6d603d 0%, #4d432b 48%, #3b321f 49%, #2a2418 100%);
+      color:#f1e7c8;
+      border-radius:4px;
+      padding:10px 8px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 1px 0 rgba(0,0,0,.45);
+      min-height:42px;
+    }
 
-::selection {
-  background: rgba(216, 168, 66, 0.42);
-}
+    .btn:active{
+      transform:translateY(1px);
+      filter:brightness(.96);
+    }
 
-::-webkit-scrollbar {
-  width: 10px;
-}
+    .btn.blue{
+      border-color:#5a6b9f;
+      background:linear-gradient(180deg, #7085bf, #4d608e 52%, #3a4a72 53%, #2c3857);
+    }
 
-::-webkit-scrollbar-track {
-  background: rgba(20, 12, 7, 0.65);
-}
+    .btn.red{
+      border-color:#77413c;
+      background:linear-gradient(180deg, #94514a, #713a35 52%, #5a2e2a 53%, #42211e);
+    }
 
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--gold), var(--bronze));
-  border-radius: 999px;
-  border: 2px solid rgba(20,12,7,0.85);
-}
+    .btn.green{
+      border-color:#576c40;
+      background:linear-gradient(180deg, #7b9860, #5d7645 52%, #496036 53%, #354629);
+    }
 
-@media (max-width: 860px) {
-  .app {
-    grid-template-columns: 1fr;
-    margin: 16px auto;
-  }
+    .btn.full{
+      grid-column:1 / -1;
+    }
 
-  .sidebar,
-  .editor {
-    min-height: auto;
-  }
+    .footer{
+      padding:10px;
+      border-top:1px solid #454545;
+      background:linear-gradient(180deg, #161616, #0d0d0d);
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+      font-size:12px;
+      color:var(--muted);
+    }
 
-  .notes-list {
-    max-height: 220px;
-  }
+    .chip{
+      background:#0a0a0a;
+      border:1px solid #3b3b3b;
+      border-radius:4px;
+      padding:5px 8px;
+      white-space:nowrap;
+    }
 
-  textarea {
-    min-height: 55vh;
-  }
-}
+    /* NOTLAR PANELİ */
+    .drawer{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:flex-end;
+      z-index:100;
+    }
 
+    .drawer.open{
+      display:flex;
+    }
+
+    .drawer-panel{
+      width:100%;
+      max-width:460px;
+      margin:0 auto;
+      background:linear-gradient(180deg, #262626, #171717);
+      border:2px solid var(--gold-3);
+      border-bottom:none;
+      border-radius:10px 10px 0 0;
+      max-height:78dvh;
+      overflow:hidden;
+      box-shadow:0 -10px 30px rgba(0,0,0,.45);
+    }
+
+    .drawer-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px;
+      border-bottom:1px solid #444;
+      background:linear-gradient(180deg, #0f0f0f, #1a1a1a);
+    }
+
+    .drawer-head h2{
+      margin:0;
+      font-size:14px;
+      color:#f0e6c7;
+    }
+
+    .drawer-body{
+      padding:10px;
+    }
+
+    .search{
+      width:100%;
+      margin-bottom:10px;
+    }
+
+    .notes{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-height:56dvh;
+      overflow:auto;
+    }
+
+    .note-item{
+      width:100%;
+      text-align:left;
+      border:1px solid #4d4d4d;
+      background:linear-gradient(180deg, #2b2b2b, #1e1e1e);
+      border-radius:4px;
+      padding:10px;
+      color:#ececec;
+      cursor:pointer;
+    }
+
+    .note-item.active{
+      border-color:#92a3d6;
+      background:linear-gradient(180deg, #41527d, #2a3450);
+    }
+
+    .note-title{
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      color:#fff;
+      margin-bottom:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .note-preview{
+      display:block;
+      font-size:12px;
+      color:#bdbdbd;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .empty{
+      text-align:center;
+      color:#a9a9a9;
+      font-size:13px;
+      padding:16px;
+      border:1px dashed #575757;
+      border-radius:4px;
+      background:#121212;
+    }
+
+    @media (min-width: 700px){
+      .window{
+        max-width:560px;
+      }
+
+      .actions{
+        grid-template-columns:repeat(3, 1fr);
+      }
+
+      .drawer-panel{
+        max-width:560px;
+      }
+    }
   </style>
 </head>
 <body>
-  <main class="app">
-    <aside class="sidebar frame">
-      <section class="brand">
-        <div class="sigil">✦</div>
-        <h1>İpek Yolu Defteri</h1>
-        <p>Kervan notları, görev fikirleri ve günlük kayıtlar</p>
-      </section><div class="toolbar">
-    <button id="newNote">Yeni Parşömen</button>
-    <button id="duplicateNote" class="ghost">Notu Çoğalt</button>
-  </div>
+  <div class="app">
+    <div class="window">
+      <div class="titlebar">
+        <div class="title-deco">◄</div>
+        <h1>Character</h1>
+        <div class="title-deco">×</div>
+      </div>
 
-  <input id="search" class="search" type="search" placeholder="Notlarda ara..." />
+      <div class="namebar">Not Defteri</div>
 
-  <section id="notesList" class="notes-list"></section>
-</aside>
+      <div class="content">
+        <div class="section">
+          <div class="bar-group">
+            <div class="barline">
+              <span>HP</span>
+              <div class="bar">
+                <div class="fill red"></div>
+                <div class="bartext">Hazır</div>
+              </div>
+            </div>
+            <div class="barline">
+              <span>MP</span>
+              <div class="bar">
+                <div class="fill blue"></div>
+                <div class="bartext" id="autosaveText">Otomatik kayıt açık</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<section class="editor frame">
-  <header class="editor-header">
-    <input id="title" class="title" type="text" placeholder="Başlık yaz..." />
-  </header>
+        <div class="section">
+          <div class="editor-title">Not Başlığı</div>
+          <input id="titleInput" class="field" type="text" placeholder="Başlık gir..." />
+        </div>
 
-  <div class="meta">
-    <span id="createdAt">Oluşturulma: -</span>
-    <span id="updatedAt">Son kayıt: -</span>
-    <span id="wordCount">0 kelime</span>
-    <span id="charCount">0 karakter</span>
-  </div>
+        <div class="section">
+          <div class="editor-title">Not İçeriği</div>
+          <textarea id="contentInput" placeholder="Buraya notunu yaz..."></textarea>
+        </div>
 
-  <textarea id="content" placeholder="Buraya notunu yaz...\n\nÖrn: Hotan pazarında satılacak eşyalar, kervan rotası, görev notları..."></textarea>
+        <div class="section">
+          <div class="stats">
+            <div class="statbox">
+              <div class="small">Not Sayısı</div>
+              <div class="big" id="noteCount">0</div>
+            </div>
+            <div class="statbox">
+              <div class="small">Aktif Not</div>
+              <div class="big" id="activeInfo">Yok</div>
+            </div>
+            <div class="statbox">
+              <div class="small">Kelime</div>
+              <div class="big" id="wordCount">0</div>
+            </div>
+            <div class="statbox">
+              <div class="small">Karakter</div>
+              <div class="big" id="charCount">0</div>
+            </div>
+          </div>
+        </div>
 
-  <footer class="bottom-bar">
-    <div id="status" class="status">Hazır</div>
-    <div class="bottom-actions">
-      <button id="exportNote" class="ghost">.txt Dışa Aktar</button>
-      <button id="clearNote" class="danger">Temizle</button>
-      <button id="deleteNote" class="danger">Sil</button>
+        <div class="section">
+          <div class="actions">
+            <button class="btn blue" id="openNotesBtn">Notlar</button>
+            <button class="btn green" id="newBtn">Yeni</button>
+            <button class="btn" id="saveBtn">Kaydet</button>
+            <button class="btn" id="duplicateBtn">Kopyala</button>
+            <button class="btn red" id="clearBtn">Temizle</button>
+            <button class="btn red" id="deleteBtn">Sil</button>
+            <button class="btn full" id="exportBtn">TXT Dışa Aktar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="chip" id="statusText">Durum: Hazır</div>
+        <div class="chip" id="updatedText">Son kayıt: -</div>
+      </div>
     </div>
-  </footer>
-</section>
+  </div>
 
-  </main>  <script>
-    const STORAGE_KEY = "silkroad_not_defteri_v1";
+  <!-- Notlar Paneli -->
+  <div class="drawer" id="drawer">
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <h2>Not Listesi</h2>
+        <button class="btn" id="closeDrawerBtn" style="padding:8px 12px; min-height:auto;">Kapat</button>
+      </div>
+      <div class="drawer-body">
+        <input id="searchInput" class="field search" type="search" placeholder="Not ara..." />
+        <div class="notes" id="notesList"></div>
+      </div>
+    </div>
+  </div>
 
-    const elements = {
-      newNote: document.getElementById("newNote"),
-      duplicateNote: document.getElementById("duplicateNote"),
-      search: document.getElementById("search"),
-      notesList: document.getElementById("notesList"),
-      title: document.getElementById("title"),
-      content: document.getElementById("content"),
-      createdAt: document.getElementById("createdAt"),
-      updatedAt: document.getElementById("updatedAt"),
+  <script>
+    const STORAGE_KEY = "sro_mobile_notes_v2";
+
+    const el = {
+      titleInput: document.getElementById("titleInput"),
+      contentInput: document.getElementById("contentInput"),
+      noteCount: document.getElementById("noteCount"),
+      activeInfo: document.getElementById("activeInfo"),
       wordCount: document.getElementById("wordCount"),
       charCount: document.getElementById("charCount"),
-      status: document.getElementById("status"),
-      exportNote: document.getElementById("exportNote"),
-      clearNote: document.getElementById("clearNote"),
-      deleteNote: document.getElementById("deleteNote")
+      statusText: document.getElementById("statusText"),
+      updatedText: document.getElementById("updatedText"),
+      autosaveText: document.getElementById("autosaveText"),
+
+      openNotesBtn: document.getElementById("openNotesBtn"),
+      closeDrawerBtn: document.getElementById("closeDrawerBtn"),
+      drawer: document.getElementById("drawer"),
+      searchInput: document.getElementById("searchInput"),
+      notesList: document.getElementById("notesList"),
+
+      newBtn: document.getElementById("newBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      duplicateBtn: document.getElementById("duplicateBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      deleteBtn: document.getElementById("deleteBtn"),
+      exportBtn: document.getElementById("exportBtn"),
     };
 
     let notes = loadNotes();
-    let activeId = notes[0]?.id || null;
+    let activeId = notes[0]?.id ?? null;
     let saveTimer = null;
 
-    function uid() {
+    function uid(){
       return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
     }
 
-    function now() {
+    function nowISO(){
       return new Date().toISOString();
     }
 
-    function formatDate(value) {
+    function formatDate(iso){
+      if(!iso) return "-";
       return new Intl.DateTimeFormat("tr-TR", {
-        dateStyle: "medium",
-        timeStyle: "short"
-      }).format(new Date(value));
+        dateStyle:"short",
+        timeStyle:"short"
+      }).format(new Date(iso));
     }
 
-    function loadNotes() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        if (Array.isArray(saved) && saved.length) return saved;
-      } catch (error) {
-        console.warn("Notlar okunamadı", error);
-      }
-
-      const seedTime = now();
-      return [
-        {
-          id: uid(),
-          title: "Kervan Günlüğü",
-          content: "Jangan kapısından çıkmadan önce:\n- İksirleri tamamla\n- Depodaki eski eşyaları sat\n- Kervan rotasını kontrol et\n\nBugünün hedefi: güvenli ticaret, temiz kazanç.",
-          createdAt: seedTime,
-          updatedAt: seedTime
+    function loadNotes(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          if(Array.isArray(parsed) && parsed.length) return parsed;
         }
-      ];
+      }catch(e){}
+
+      const t = nowISO();
+      return [{
+        id: uid(),
+        title: "Yeni Not",
+        content: "",
+        createdAt: t,
+        updatedAt: t
+      }];
     }
 
-    function persist() {
+    function persist(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
     }
 
-    function activeNote() {
-      return notes.find(note => note.id === activeId) || null;
+    function getActiveNote(){
+      return notes.find(n => n.id === activeId) || null;
     }
 
-    function renderList() {
-      const term = elements.search.value.trim().toLowerCase();
-      const filtered = notes.filter(note => {
-        return note.title.toLowerCase().includes(term) || note.content.toLowerCase().includes(term);
+    function setStatus(text){
+      el.statusText.textContent = "Durum: " + text;
+    }
+
+    function updateStats(){
+      const content = el.contentInput.value || "";
+      const trimmed = content.trim();
+      const words = trimmed ? trimmed.split(/\s+/).length : 0;
+      const chars = content.length;
+
+      el.wordCount.textContent = words;
+      el.charCount.textContent = chars;
+      el.noteCount.textContent = notes.length;
+
+      const active = getActiveNote();
+      el.activeInfo.textContent = active ? "Seçili" : "Yok";
+      el.updatedText.textContent = "Son kayıt: " + (active ? formatDate(active.updatedAt) : "-");
+    }
+
+    function renderEditor(){
+      const note = getActiveNote();
+      if(!note) return;
+
+      el.titleInput.value = note.title || "";
+      el.contentInput.value = note.content || "";
+      updateStats();
+    }
+
+    function renderNotes(){
+      const q = el.searchInput.value.trim().toLowerCase();
+      const filtered = [...notes]
+        .sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        .filter(n => {
+          return (n.title || "").toLowerCase().includes(q) ||
+                 (n.content || "").toLowerCase().includes(q);
+        });
+
+      el.notesList.innerHTML = "";
+
+      if(!filtered.length){
+        el.notesList.innerHTML = '<div class="empty">Aramaya uygun not bulunamadı.</div>';
+        return;
+      }
+
+      filtered.forEach(note => {
+        const btn = document.createElement("button");
+        btn.className = "note-item" + (note.id === activeId ? " active" : "");
+        btn.innerHTML = `
+          <span class="note-title">${escapeHtml(note.title || "Başlıksız Not")}</span>
+          <span class="note-preview">${escapeHtml((note.content || "Boş not").replace(/\s+/g," ").slice(0, 60))}</span>
+        `;
+        btn.addEventListener("click", () => {
+          activeId = note.id;
+          renderEditor();
+          renderNotes();
+          closeDrawer();
+          setStatus("Not açıldı");
+        });
+        el.notesList.appendChild(btn);
       });
 
-      elements.notesList.innerHTML = "";
-
-      if (!filtered.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "Aramaya uygun not bulunamadı.";
-        elements.notesList.appendChild(empty);
-        return;
-      }
-
-      filtered
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-        .forEach(note => {
-          const card = document.createElement("article");
-          card.className = "note-card" + (note.id === activeId ? " active" : "");
-          card.innerHTML = `
-            <strong>${escapeHtml(note.title || "Başlıksız Parşömen")}</strong>
-            <span>${escapeHtml((note.content || "Boş not").replace(/\s+/g, " ").slice(0, 90))}</span>
-          `;
-          card.addEventListener("click", () => selectNote(note.id));
-          elements.notesList.appendChild(card);
-        });
+      updateStats();
     }
 
-    function renderEditor() {
-      const note = activeNote();
-      if (!note) {
-        createNote();
-        return;
-      }
+    function saveActiveNote(){
+      const note = getActiveNote();
+      if(!note) return;
 
-      elements.title.value = note.title;
-      elements.content.value = note.content;
-      elements.createdAt.textContent = `Oluşturulma: ${formatDate(note.createdAt)}`;
-      elements.updatedAt.textContent = `Son kayıt: ${formatDate(note.updatedAt)}`;
-      updateCounts();
-    }
+      note.title = (el.titleInput.value || "").trim() || "Başlıksız Not";
+      note.content = el.contentInput.value || "";
+      note.updatedAt = nowISO();
 
-    function selectNote(id) {
-      activeId = id;
-      renderEditor();
-      renderList();
-      setStatus("Parşömen açıldı");
-    }
-
-    function createNote() {
-      const timestamp = now();
-      const note = {
-        id: uid(),
-        title: "Yeni Parşömen",
-        content: "",
-        createdAt: timestamp,
-        updatedAt: timestamp
-      };
-      notes.unshift(note);
-      activeId = note.id;
       persist();
-      renderEditor();
-      renderList();
-      elements.title.select();
-      setStatus("Yeni not oluşturuldu");
-    }
-
-    function saveActiveNote() {
-      const note = activeNote();
-      if (!note) return;
-
-      note.title = elements.title.value.trim() || "Başlıksız Parşömen";
-      note.content = elements.content.value;
-      note.updatedAt = now();
-      persist();
-      renderList();
-      elements.updatedAt.textContent = `Son kayıt: ${formatDate(note.updatedAt)}`;
+      renderNotes();
+      updateStats();
       setStatus("Kaydedildi");
+      el.autosaveText.textContent = "Kaydedildi";
     }
 
-    function scheduleSave() {
-      updateCounts();
+    function scheduleSave(){
+      updateStats();
       setStatus("Yazılıyor...");
+      el.autosaveText.textContent = "Yazılıyor...";
       clearTimeout(saveTimer);
       saveTimer = setTimeout(saveActiveNote, 350);
     }
 
-    function updateCounts() {
-      const text = elements.content.value.trim();
-      const words = text ? text.split(/\s+/).length : 0;
-      const chars = elements.content.value.length;
-      elements.wordCount.textContent = `${words} kelime`;
-      elements.charCount.textContent = `${chars} karakter`;
+    function createNote(){
+      const t = nowISO();
+      const newNote = {
+        id: uid(),
+        title: "Yeni Not",
+        content: "",
+        createdAt: t,
+        updatedAt: t
+      };
+      notes.unshift(newNote);
+      activeId = newNote.id;
+      persist();
+      renderEditor();
+      renderNotes();
+      setStatus("Yeni not oluşturuldu");
+      el.autosaveText.textContent = "Hazır";
+      el.titleInput.focus();
+      el.titleInput.select();
     }
 
-    function duplicateNote() {
-      const note = activeNote();
-      if (!note) return;
-      const timestamp = now();
+    function duplicateNote(){
+      const current = getActiveNote();
+      if(!current) return;
+
+      const t = nowISO();
       const copy = {
         id: uid(),
-        title: `${note.title} - Kopya`,
-        content: note.content,
-        createdAt: timestamp,
-        updatedAt: timestamp
+        title: (current.title || "Not") + " - Kopya",
+        content: current.content || "",
+        createdAt: t,
+        updatedAt: t
       };
+
       notes.unshift(copy);
       activeId = copy.id;
       persist();
       renderEditor();
-      renderList();
-      setStatus("Not çoğaltıldı");
+      renderNotes();
+      setStatus("Not kopyalandı");
     }
 
-    function clearNote() {
-      const note = activeNote();
-      if (!note) return;
-      if (!confirm("Bu notun içeriği temizlensin mi?")) return;
-      elements.content.value = "";
+    function clearCurrent(){
+      const current = getActiveNote();
+      if(!current) return;
+
+      if(!confirm("Bu notun içeriği temizlensin mi?")) return;
+      el.contentInput.value = "";
       saveActiveNote();
-      updateCounts();
       setStatus("İçerik temizlendi");
     }
 
-    function deleteNote() {
-      const note = activeNote();
-      if (!note) return;
-      if (!confirm(`“${note.title}” silinsin mi?`)) return;
-      notes = notes.filter(item => item.id !== note.id);
-      if (!notes.length) {
-        activeId = null;
-        createNote();
-        return;
+    function deleteCurrent(){
+      const current = getActiveNote();
+      if(!current) return;
+
+      if(!confirm("Bu not silinsin mi?")) return;
+
+      notes = notes.filter(n => n.id !== current.id);
+
+      if(!notes.length){
+        const t = nowISO();
+        notes = [{
+          id: uid(),
+          title: "Yeni Not",
+          content: "",
+          createdAt: t,
+          updatedAt: t
+        }];
       }
+
       activeId = notes[0].id;
       persist();
       renderEditor();
-      renderList();
+      renderNotes();
       setStatus("Not silindi");
     }
 
-    function exportNote() {
-      const note = activeNote();
-      if (!note) return;
-      const blob = new Blob([`${note.title}\n\n${note.content}`], { type: "text/plain;charset=utf-8" });
+    function exportCurrent(){
+      const current = getActiveNote();
+      if(!current) return;
+
+      const text = (current.title || "Not") + "\\n\\n" + (current.content || "");
+      const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${slugify(note.title)}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = slugify(current.title || "not") + ".txt";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
       URL.revokeObjectURL(url);
+
       setStatus("Dışa aktarıldı");
     }
 
-    function slugify(text) {
-      return (text || "not")
+    function slugify(str){
+      return String(str || "not")
         .toLowerCase()
-        .replace(/[ğ]/g, "g")
-        .replace(/[ü]/g, "u")
-        .replace(/[ş]/g, "s")
-        .replace(/[ı]/g, "i")
-        .replace(/[ö]/g, "o")
-        .replace(/[ç]/g, "c")
+        .replace(/ğ/g, "g")
+        .replace(/ü/g, "u")
+        .replace(/ş/g, "s")
+        .replace(/ı/g, "i")
+        .replace(/ö/g, "o")
+        .replace(/ç/g, "c")
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "") || "not";
     }
 
-    function escapeHtml(text) {
-      return String(text)
+    function escapeHtml(str){
+      return String(str)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -635,24 +853,34 @@ textarea {
         .replace(/'/g, "&#039;");
     }
 
-    function setStatus(message) {
-      elements.status.textContent = message;
-      clearTimeout(setStatus.timer);
-      setStatus.timer = setTimeout(() => {
-        elements.status.textContent = "Hazır";
-      }, 1800);
+    function openDrawer(){
+      el.drawer.classList.add("open");
     }
 
-    elements.newNote.addEventListener("click", createNote);
-    elements.duplicateNote.addEventListener("click", duplicateNote);
-    elements.clearNote.addEventListener("click", clearNote);
-    elements.deleteNote.addEventListener("click", deleteNote);
-    elements.exportNote.addEventListener("click", exportNote);
-    elements.search.addEventListener("input", renderList);
-    elements.title.addEventListener("input", scheduleSave);
-    elements.content.addEventListener("input", scheduleSave);
+    function closeDrawer(){
+      el.drawer.classList.remove("open");
+    }
+
+    el.openNotesBtn.addEventListener("click", openDrawer);
+    el.closeDrawerBtn.addEventListener("click", closeDrawer);
+    el.drawer.addEventListener("click", (e) => {
+      if(e.target === el.drawer) closeDrawer();
+    });
+
+    el.newBtn.addEventListener("click", createNote);
+    el.saveBtn.addEventListener("click", saveActiveNote);
+    el.duplicateBtn.addEventListener("click", duplicateNote);
+    el.clearBtn.addEventListener("click", clearCurrent);
+    el.deleteBtn.addEventListener("click", deleteCurrent);
+    el.exportBtn.addEventListener("click", exportCurrent);
+
+    el.titleInput.addEventListener("input", scheduleSave);
+    el.contentInput.addEventListener("input", scheduleSave);
+    el.searchInput.addEventListener("input", renderNotes);
 
     renderEditor();
-    renderList();
-  </script></body>
+    renderNotes();
+    setStatus("Hazır");
+  </script>
+</body>
 </html>
