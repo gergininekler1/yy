@@ -1,692 +1,653 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Not Yazma ve Yardımcı Araç</title>
-  <style>
-    :root {
-      --bg: #f4f1ea;
-      --panel: #fffaf2;
-      --panel-2: #ffffff;
-      --text: #27231d;
-      --muted: #7c7368;
-      --line: #ded6ca;
-      --accent: #8b5e34;
-      --accent-dark: #62401f;
-      --soft: #efe5d8;
-      --info: #f1eadf;
-      --shadow: 0 14px 35px rgba(61, 47, 31, 0.10);
-      --radius: 22px;
-    }* { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Retro Notes Final</title>
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--text);
-  background: radial-gradient(circle at top left, #fff7e9 0, var(--bg) 36%, #eee8df 100%);
+<style>
+:root{
+--bg:#d9edf5;
+--bg2:#eef8fb;
+--panel:#edf4f7;
+--panel2:#dfeaf0;
+--line:#8ba6b3;
+--line2:#5f7986;
+--text:#10222b;
+--muted:#5e737d;
+--title1:#2f62b6;
+--title2:#5ea7cf;
+--white:#fff;
+
+--btn:#e8f0f4;
+--btnh:#f8fcff;
+
+--terminal:#071107;
+--terminal2:#0d180d;
+--green:#8cff9d;
+--green2:#5cb66a;
 }
 
-button, input, textarea, select {
-  font: inherit;
+body.dark{
+--bg:#22343d;
+--bg2:#304851;
+--panel:#31454f;
+--panel2:#3d5560;
+--line:#7f98a4;
+--line2:#c6d4dc;
+--text:#edf5f8;
+--muted:#bdd0d8;
+--title1:#21408f;
+--title2:#4476d8;
+--white:#fff;
+--btn:#415963;
+--btnh:#56717d;
 }
 
-button {
-  border: 0;
-  cursor: pointer;
-  border-radius: 999px;
-  padding: 11px 16px;
-  background: var(--accent);
-  color: white;
-  font-weight: 700;
-  transition: 0.18s ease;
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Verdana,sans-serif;
+font-size:13px;
+background:linear-gradient(135deg,var(--bg2),var(--bg));
+color:var(--text);
+min-height:100vh;
 }
 
-button:hover { transform: translateY(-1px); background: var(--accent-dark); }
-button.secondary { background: var(--soft); color: var(--text); }
-button.secondary:hover { background: #e6d8c7; }
-button.danger { background: #9d3c32; }
-button.ghost { background: transparent; color: var(--accent-dark); padding: 8px 10px; }
-
-input, textarea, select {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: white;
-  color: var(--text);
-  border-radius: 16px;
-  padding: 13px 14px;
-  outline: none;
+#app{
+max-width:1200px;
+margin:auto;
+padding:18px;
 }
 
-textarea {
-  min-height: 220px;
-  resize: vertical;
-  line-height: 1.55;
+.window{
+border:2px solid;
+border-color:#fff var(--line2) var(--line2) #fff;
+background:var(--panel);
+box-shadow:3px 3px 0 rgba(0,0,0,.12);
 }
 
-input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(139, 94, 52, 0.12);
+.titlebar{
+padding:5px 8px;
+color:white;
+font-weight:bold;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:linear-gradient(90deg,var(--title1),var(--title2));
 }
 
-.app {
-  width: min(1180px, calc(100% - 34px));
-  margin: 0 auto;
-  padding: 32px 0;
+.titlebtn{
+width:18px;height:18px;
+background:#d9dde0;
+color:#000;
+text-align:center;
+line-height:14px;
+border:2px solid;
+border-color:#fff #555 #555 #fff;
+font-size:11px;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 24px;
+.content{padding:12px}
+
+.toolbar{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-bottom:12px;
 }
 
-.brand h1 {
-  margin: 0;
-  font-size: clamp(28px, 4vw, 44px);
-  letter-spacing: -0.04em;
+button,.btn,input,textarea,select{
+font-family:Tahoma,Verdana,sans-serif;
+font-size:13px;
 }
 
-.brand p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 15px;
+button,.btn{
+padding:7px 12px;
+cursor:pointer;
+background:var(--btn);
+color:var(--text);
+border:2px solid;
+border-color:#fff var(--line2) var(--line2) #fff;
 }
 
-.screen { display: none; }
-.screen.active { display: block; }
-
-.home-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 22px;
+button:hover,.btn:hover{
+background:var(--btnh);
 }
 
-.card {
-  background: rgba(255, 250, 242, 0.82);
-  border: 1px solid rgba(222, 214, 202, 0.8);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 22px;
-  backdrop-filter: blur(10px);
+button:active,.btn:active{
+border-color:var(--line2) #fff #fff var(--line2);
+transform:translateY(1px);
 }
 
-.card h2, .card h3 {
-  margin: 0 0 14px;
-  letter-spacing: -0.02em;
+input,textarea,select{
+width:100%;
+padding:7px;
+background:white;
+border:2px solid;
+border-color:var(--line2) #fff #fff var(--line2);
+color:#111;
 }
 
-.muted { color: var(--muted); }
-
-.note-actions {
-  display: grid;
-  gap: 14px;
-  margin-top: 18px;
+body.dark input,
+body.dark textarea,
+body.dark select{
+background:#edf4f7;
 }
 
-.recent-list, .archive-list, .chip-list {
-  display: grid;
-  gap: 10px;
+.section{
+background:var(--panel2);
+padding:10px;
+margin-bottom:12px;
+border:2px solid;
+border-color:#fff var(--line) var(--line) #fff;
 }
 
-.recent-item, .archive-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px;
-  border: 1px solid var(--line);
-  border-radius: 17px;
-  background: var(--panel-2);
+.section h3{
+margin:0 0 10px;
+font-size:14px;
 }
 
-.recent-title, .archive-title {
-  font-weight: 800;
-  margin-bottom: 3px;
+.grid{
+display:grid;
+grid-template-columns:320px 1fr;
+gap:12px;
 }
 
-.small { font-size: 13px; color: var(--muted); }
-
-.box-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+.cards{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
 }
 
-.note-box-card {
-  text-align: left;
-  border-radius: 20px;
-  padding: 18px;
-  min-height: 118px;
-  background: linear-gradient(145deg, #fff, #f3e9dc);
-  border: 1px solid var(--line);
-  color: var(--text);
-  box-shadow: 0 9px 22px rgba(61, 47, 31, 0.07);
+.card{
+padding:12px;
+min-height:90px;
+cursor:pointer;
+background:linear-gradient(180deg,#fafdff,#dfeaf0);
+border:2px solid;
+border-color:#fff var(--line2) var(--line2) #fff;
+display:flex;
+flex-direction:column;
+justify-content:center;
+gap:6px;
 }
 
-.note-box-card strong {
-  display: block;
-  font-size: 20px;
-  margin-bottom: 8px;
+body.dark .card{
+background:linear-gradient(180deg,#4a626d,#354952);
 }
 
-.note-editor-layout {
-  display: grid;
-  gap: 18px;
+.card:hover{
+transform:translateY(-1px);
 }
 
-.editor-head {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 14px;
+.card b{
+font-size:15px;
 }
 
-.selected-info {
-  min-height: 42px;
-  margin-bottom: 14px;
-  padding: 12px 14px;
-  border: 1px dashed #d1c3b2;
-  border-radius: 16px;
-  background: rgba(241, 234, 223, 0.72);
-  color: #756a5f;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+.listitem{
+padding:8px;
+margin-bottom:8px;
+cursor:pointer;
+background:#f9fcff;
+border:1px solid var(--line);
 }
 
-.info-empty { opacity: 0.75; }
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border-radius: 999px;
-  padding: 7px 10px;
-  background: white;
-  border: 1px solid var(--line);
-  font-size: 13px;
-  color: #574b3f;
+body.dark .listitem{
+background:#3c4f58;
 }
 
-.tag b { color: var(--accent-dark); }
+.muted{color:var(--muted);font-size:12px}
 
-.selection-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+.tags{
+padding:8px;
+min-height:40px;
+background:rgba(255,255,255,.5);
+border:1px solid #b8cad2;
+margin-bottom:0;
 }
 
-.selector-card {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 14px;
+.tag{
+display:inline-block;
+margin:2px 6px 2px 0;
+padding:4px 8px;
+font-size:12px;
+background:#eef8fb;
+border:1px solid #bdd1db;
+color:#607985;
 }
 
-.selector-card h4 {
-  margin: 0 0 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+.terminal-wrap{
+border:2px solid;
+border-color:#fff var(--line2) var(--line2) #fff;
+background:#bcc5c9;
+overflow:hidden;
 }
 
-.selector-card select { padding: 10px 12px; }
-
-.archive-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
+.terminal-top{
+padding:5px 8px;
+background:linear-gradient(180deg,#d7d7d7,#bdbdbd);
+font-weight:bold;
+color:#111;
 }
 
-.tabs {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+.terminal{
+background:
+repeating-linear-gradient(
+0deg,
+rgba(255,255,255,.02),
+rgba(255,255,255,.02) 1px,
+transparent 2px,
+transparent 4px),
+linear-gradient(180deg,var(--terminal),var(--terminal2));
+padding:10px;
 }
 
-.tab {
-  background: var(--soft);
-  color: var(--text);
+.terminal-tags{
+font-family:"Courier New",monospace;
+color:var(--green2);
+font-size:13px;
+margin-bottom:8px;
+line-height:1.6;
 }
 
-.tab.active {
-  background: var(--accent);
-  color: white;
+.terminal textarea{
+background:transparent;
+border:none;
+padding:0;
+min-height:360px;
+resize:vertical;
+font-family:"Courier New",monospace;
+font-size:15px;
+line-height:1.65;
+color:var(--green);
+caret-color:var(--green);
 }
 
-.archive-tools {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 18px;
+.terminal textarea::placeholder{
+color:#5f9164;
 }
 
-.tool-box {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 16px;
+.row2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
 }
 
-.tool-box h3 { margin-bottom: 10px; }
-
-.inline-form {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
+.archiveItem{
+display:grid;
+grid-template-columns:1fr auto auto;
+gap:8px;
+align-items:center;
+padding:8px;
+margin-bottom:8px;
+background:#f8fcff;
+border:1px solid var(--line);
 }
 
-.archive-item button {
-  flex: 0 0 auto;
+body.dark .archiveItem{
+background:#3b4d56;
 }
 
-.empty {
-  padding: 18px;
-  border: 1px dashed var(--line);
-  border-radius: 18px;
-  color: var(--muted);
-  background: rgba(255,255,255,0.55);
+hr{
+border:0;
+border-top:1px solid var(--line);
+margin:10px 0;
 }
 
-@media (max-width: 900px) {
-  .home-grid, .archive-tools { grid-template-columns: 1fr; }
-  .selection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+::-webkit-scrollbar{width:12px}
+::-webkit-scrollbar-thumb{
+background:#b9c8cf;
+border:2px solid #eef6fa;
 }
 
-@media (max-width: 620px) {
-  .app { width: min(100% - 22px, 1180px); padding: 18px 0; }
-  .topbar, .archive-header, .editor-head { align-items: stretch; flex-direction: column; display: flex; }
-  .box-grid, .selection-grid, .inline-form { grid-template-columns: 1fr; }
-  button { width: 100%; }
+@media(max-width:900px){
+.grid{grid-template-columns:1fr}
+.cards{grid-template-columns:1fr 1fr}
 }
 
-  </style>
+@media(max-width:650px){
+.cards,.row2{grid-template-columns:1fr}
+.archiveItem{grid-template-columns:1fr}
+.toolbar{flex-direction:column}
+#app{padding:10px}
+}
+</style>
 </head>
+
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand">
-        <h1>Not Yazma Yardımcısı</h1>
-        <p>Not al, kutulardan referans seç, fikirlerini düzenli arşivle.</p>
-      </div>
-      <button class="secondary" id="homeBtn" style="display:none;">Ana sayfa</button>
-    </header><section id="homeScreen" class="screen active">
-  <div class="home-grid">
-    <section class="card">
-      <h2>Notlar</h2>
-      <p class="muted">Yeni bir not yarat veya en son oluşturduğun notlardan devam et.</p>
-      <div class="note-actions">
-        <button id="newNoteBtn">+ Yeni not yarat</button>
-        <div>
-          <h3>Son notlar</h3>
-          <div id="recentNotes" class="recent-list"></div>
-        </div>
-      </div>
-    </section>
+<div id="app"></div>
 
-    <section class="card">
-      <h2>Not kutuları</h2>
-      <p class="muted">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini düzenle.</p>
-      <div id="boxGrid" class="box-grid"></div>
-    </section>
-  </div>
-</section>
+<script>
+const CATS=["Mekan","Nesne","Zaman","Kişi","Eylem","Duygu"];
 
-<section id="editorScreen" class="screen">
-  <div class="note-editor-layout">
-    <section class="card">
-      <div class="editor-head">
-        <input id="noteTitle" placeholder="Not başlığı" />
-        <button id="saveNoteBtn">Kaydet</button>
-      </div>
-      <div id="selectedInfo" class="selected-info"></div>
-      <textarea id="noteBody" placeholder="Notunu buraya yaz..."></textarea>
-    </section>
+let state=JSON.parse(localStorage.getItem("retroFinalState")||"null")||{
+theme:"light",
+notes:[],
+refs:{
+Mekan:["Kafe","Orman","Metro"],
+Nesne:["Anahtar","Defter","Saat"],
+Zaman:["Gece","1998","Sabah"],
+Kişi:["Dedektif","Garson","Yabancı"],
+Eylem:["Kaçmak","Beklemek","Araştırmak"],
+Duygu:["Gerilim","Merak","Hüzün"]
+}
+};
 
-    <section class="card">
-      <h2>Not kutusundan referans seç</h2>
-      <p class="muted">Seçtiğin öğeler not alma bloğunun tepesinde soluk bilgi olarak görünür.</p>
-      <div id="selectors" class="selection-grid"></div>
-    </section>
-  </div>
-</section>
+if(state.theme==="dark")document.body.classList.add("dark");
 
-<section id="archiveScreen" class="screen">
-  <section class="card">
-    <div class="archive-header">
-      <div>
-        <h2 id="archiveTitle">Not kutusu arşivi</h2>
-        <p class="muted" id="archiveDesc">Tek tek veya toplu ekleme yap.</p>
-      </div>
-    </div>
+function save(){
+localStorage.setItem("retroFinalState",JSON.stringify(state));
+}
 
-    <div id="archiveTabs" class="tabs"></div>
+function esc(t){
+return String(t||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+}
 
-    <div class="archive-tools">
-      <div class="tool-box">
-        <h3>Tek tek ekle</h3>
-        <div class="inline-form">
-          <input id="singleAddInput" placeholder="Örn: Eski tren istasyonu" />
-          <button id="singleAddBtn">Ekle</button>
-        </div>
-      </div>
+function fmt(t){
+return new Date(t).toLocaleString("tr-TR");
+}
 
-      <div class="tool-box">
-        <h3>Toplu ekle</h3>
-        <textarea id="bulkAddInput" placeholder="Her satıra bir öğe yaz.\nÖrn:\nKütüphane\nKıyı kasabası\nÇatı katı"></textarea>
-        <button id="bulkAddBtn" style="margin-top:10px;">Toplu ekle</button>
-      </div>
-    </div>
+function top(title,body){
+app.innerHTML=`
+<div class="window">
+<div class="titlebar">
+<div>${title}</div>
+<div class="titlebtn">×</div>
+</div>
+<div class="content">
+${toolbar()}
+${body}
+</div>
+</div>
+`;
+}
 
-    <h3>Kayıtlı öğeler</h3>
-    <div id="archiveItems" class="archive-list"></div>
-  </section>
-</section>
+function toolbar(){
+return `
+<div class="toolbar">
+<button onclick="home()">🏠 Ana Sayfa</button>
+<button onclick="newNote()">📝 Yeni Not</button>
+<button onclick="randomIdea()">🎲 İlham Üret</button>
+<button onclick="toggleTheme()">🌙 Tema</button>
+<button onclick="exportJSON()">💾 Dışa Aktar</button>
+<label class="btn">📥 İçe Aktar<input hidden type="file" onchange="importJSON(event)"></label>
+</div>
+`;
+}
 
-  </main>  <script>
-    const BOXES = ["Mekan", "Nesne", "Zaman", "Kişi", "Eylem", "Duygu"];
-    const STORAGE_KEY = "not-yazma-yardimcisi-v1";
+function home(){
+top("Retro Notes",`
+<div class="grid">
 
-    let state = loadState();
-    let currentNoteId = null;
-    let currentArchiveBox = "Mekan";
+<div>
+<div class="section">
+<h3>Son Notlara Devam Et</h3>
+${recentNotes()}
+</div>
+</div>
 
-    const homeScreen = document.getElementById("homeScreen");
-    const editorScreen = document.getElementById("editorScreen");
-    const archiveScreen = document.getElementById("archiveScreen");
-    const homeBtn = document.getElementById("homeBtn");
+<div>
+<div class="section">
+<h3>Referans Kutuları</h3>
+<div class="cards">
+${CATS.map(c=>`
+<div class="card" onclick="archive('${c}')">
+<b>${c}</b>
+<div class="muted">${state.refs[c].length} kayıt</div>
+</div>`).join("")}
+</div>
+</div>
 
-    const noteTitle = document.getElementById("noteTitle");
-    const noteBody = document.getElementById("noteBody");
-    const selectedInfo = document.getElementById("selectedInfo");
+<div class="section">
+<h3>Bugünün İlham Kartı</h3>
+<div class="tags">${ideaTags()}</div>
+</div>
+</div>
 
-    function loadState() {
-      const fallback = {
-        notes: [],
-        boxes: {
-          "Mekan": ["Kütüphane", "Sahil", "Eski apartman"],
-          "Nesne": ["Anahtar", "Defter", "Kırık saat"],
-          "Zaman": ["Sabah", "Gece yarısı", "Sonbahar"],
-          "Kişi": ["Yabancı", "Çocukluk arkadaşı", "Komşu"],
-          "Eylem": ["Beklemek", "Aramak", "Hatırlamak"],
-          "Duygu": ["Merak", "Huzur", "Tedirginlik"]
-        }
-      };
+</div>
+`);
+}
 
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!saved) return fallback;
-        BOXES.forEach(box => {
-          if (!saved.boxes[box]) saved.boxes[box] = [];
-        });
-        return saved;
-      } catch {
-        return fallback;
-      }
-    }
+function recentNotes(){
+if(!state.notes.length)return `<div class="muted">Henüz not yok.</div>`;
+return [...state.notes]
+.sort((a,b)=>b.updated-a.updated)
+.slice(0,8)
+.map(n=>`
+<div class="listitem" onclick="openNote(${n.id})">
+<b>${esc(n.title||"Adsız Not")}</b><br>
+<span class="muted">${fmt(n.updated)}</span>
+</div>
+`).join("");
+}
 
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+function ideaTags(){
+return CATS.map(c=>{
+let arr=state.refs[c];
+let val=arr[Math.floor(Math.random()*arr.length)]||"-";
+return `<span class="tag">${c}: ${esc(val)}</span>`;
+}).join("");
+}
 
-    function showScreen(screen) {
-      [homeScreen, editorScreen, archiveScreen].forEach(s => s.classList.remove("active"));
-      screen.classList.add("active");
-      homeBtn.style.display = screen === homeScreen ? "none" : "inline-flex";
-    }
+function newNote(){
+let n={
+id:Date.now(),
+title:"",
+body:"",
+refs:{},
+created:Date.now(),
+updated:Date.now()
+};
+state.notes.unshift(n);
+save();
+openNote(n.id);
+}
 
-    function uid() {
-      return Date.now().toString(36) + Math.random().toString(36).slice(2);
-    }
+function openNote(id){
+let n=state.notes.find(x=>x.id==id);
+if(!n)return home();
 
-    function formatDate(ts) {
-      return new Date(ts).toLocaleString("tr-TR", {
-        day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
-      });
-    }
+top("Not Düzenleyici",`
+<div class="section">
+<h3>Not Başlığı</h3>
+<input id="ttl" value="${esc(n.title)}" oninput="upd(${id})">
+</div>
 
-    function renderHome() {
-      renderRecentNotes();
-      renderBoxGrid();
-    }
+<div class="section">
+<h3>Not Bloğu</h3>
 
-    function renderRecentNotes() {
-      const wrap = document.getElementById("recentNotes");
-      const notes = [...state.notes].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 5);
+<div class="terminal-wrap">
+<div class="terminal-top">C:\\NOTLAR\\EDITOR.EXE</div>
 
-      if (!notes.length) {
-        wrap.innerHTML = `<div class="empty">Henüz not yok. İlk notunu yarat.</div>`;
-        return;
-      }
+<div class="terminal">
+<div class="terminal-tags">
+${renderRefTags(n)}
+</div>
 
-      wrap.innerHTML = notes.map(note => `
-        <div class="recent-item">
-          <div>
-            <div class="recent-title">${escapeHtml(note.title || "Başlıksız not")}</div>
-            <div class="small">${formatDate(note.updatedAt)}</div>
-          </div>
-          <button class="secondary" onclick="openNote('${note.id}')">Devam et</button>
-        </div>
-      `).join("");
-    }
+<textarea id="bod" placeholder="> yazmaya başla..." oninput="upd(${id})">${esc(n.body)}</textarea>
+</div>
+</div>
 
-    function renderBoxGrid() {
-      const grid = document.getElementById("boxGrid");
-      grid.innerHTML = BOXES.map(box => `
-        <button class="note-box-card" onclick="openArchive('${box}')">
-          <strong>${box}</strong>
-          <span>${state.boxes[box].length} kayıtlı öğe</span>
-        </button>
-      `).join("");
-    }
+<div class="muted" style="margin-top:8px">
+Oluşturuldu: ${fmt(n.created)} • Son düzenleme: ${fmt(n.updated)}
+</div>
+</div>
 
-    function createNote() {
-      const now = Date.now();
-      const note = {
-        id: uid(),
-        title: "Yeni not",
-        body: "",
-        selected: {},
-        createdAt: now,
-        updatedAt: now
-      };
-      BOXES.forEach(box => note.selected[box] = "");
-      state.notes.unshift(note);
-      saveState();
-      openNote(note.id);
-    }
+<div class="section">
+<h3>Referans Seçimi</h3>
+<div class="row2">
+${CATS.map(c=>`
+<div>
+<label>${c}</label>
+<select onchange="setRef(${id},'${c}',this.value)">
+<option value="">Seçilmedi</option>
+${state.refs[c].map(v=>`
+<option ${n.refs[c]===v?"selected":""}>${esc(v)}</option>
+`).join("")}
+</select>
+</div>
+`).join("")}
+</div>
 
-    function openNote(id) {
-      currentNoteId = id;
-      const note = getCurrentNote();
-      if (!note) return;
-      noteTitle.value = note.title;
-      noteBody.value = note.body;
-      renderSelectedInfo();
-      renderSelectors();
-      showScreen(editorScreen);
-    }
+<hr>
 
-    function getCurrentNote() {
-      return state.notes.find(note => note.id === currentNoteId);
-    }
+<button onclick="randomRefs(${id})">🎲 Rastgele Referans</button>
+<button onclick="delNote(${id})">🗑 Notu Sil</button>
+</div>
+`);
+}
 
-    function saveCurrentNote() {
-      const note = getCurrentNote();
-      if (!note) return;
-      note.title = noteTitle.value.trim() || "Başlıksız not";
-      note.body = noteBody.value;
-      note.updatedAt = Date.now();
-      saveState();
-      renderHome();
-      alert("Not kaydedildi.");
-    }
+function renderRefTags(n){
+let html=CATS.filter(c=>n.refs[c]).map(c=>`[${c}: ${n.refs[c]}]`).join(" ");
+return html || "[ Referans etiketi yok ]";
+}
 
-    function renderSelectedInfo() {
-      const note = getCurrentNote();
-      if (!note) return;
-      const selected = BOXES
-        .filter(box => note.selected[box])
-        .map(box => `<span class="tag"><b>${box}:</b> ${escapeHtml(note.selected[box])}<button class="ghost" onclick="clearSelection('${box}')">×</button></span>`)
-        .join("");
+function upd(id){
+let n=state.notes.find(x=>x.id==id);
+n.title=ttl.value;
+n.body=bod.value;
+n.updated=Date.now();
+save();
+}
 
-      selectedInfo.innerHTML = selected || `<span class="info-empty">Henüz referans seçilmedi. Aşağıdaki not kutularından seçim yapabilirsin.</span>`;
-    }
+function setRef(id,c,v){
+let n=state.notes.find(x=>x.id==id);
+if(v)n.refs[c]=v;
+else delete n.refs[c];
+n.updated=Date.now();
+save();
+openNote(id);
+}
 
-    function renderSelectors() {
-      const note = getCurrentNote();
-      const wrap = document.getElementById("selectors");
-      wrap.innerHTML = BOXES.map(box => {
-        const options = state.boxes[box].map(item => `
-          <option value="${escapeAttr(item)}" ${note.selected[box] === item ? "selected" : ""}>${escapeHtml(item)}</option>
-        `).join("");
+function randomRefs(id){
+let n=state.notes.find(x=>x.id==id);
+CATS.forEach(c=>{
+let arr=state.refs[c];
+n.refs[c]=arr[Math.floor(Math.random()*arr.length)];
+});
+save();
+openNote(id);
+}
 
-        return `
-          <div class="selector-card">
-            <h4>${box}<button class="ghost" onclick="openArchive('${box}')">Düzenle</button></h4>
-            <select onchange="selectReference('${box}', this.value)">
-              <option value="">Seçim yok</option>
-              ${options}
-            </select>
-          </div>
-        `;
-      }).join("");
-    }
+function delNote(id){
+if(confirm("Not silinsin mi?")){
+state.notes=state.notes.filter(x=>x.id!=id);
+save();
+home();
+}
+}
 
-    function selectReference(box, value) {
-      const note = getCurrentNote();
-      if (!note) return;
-      note.selected[box] = value;
-      note.updatedAt = Date.now();
-      saveState();
-      renderSelectedInfo();
-    }
+function archive(cat){
+top(cat+" Arşivi",`
+<div class="grid">
 
-    function clearSelection(box) {
-      selectReference(box, "");
-      renderSelectors();
-    }
+<div>
+<div class="section">
+<h3>Yeni Öğe</h3>
+<input id="single" placeholder="Tek giriş">
+<button onclick="addOne('${cat}')">Ekle</button>
 
-    function openArchive(box) {
-      currentArchiveBox = box;
-      renderArchive();
-      showScreen(archiveScreen);
-    }
+<hr>
 
-    function renderArchive() {
-      document.getElementById("archiveTitle").textContent = `${currentArchiveBox} kutusu`;
-      document.getElementById("archiveDesc").textContent = `${currentArchiveBox.toLowerCase()} referanslarını tek tek veya toplu olarak ekle.`;
+<h3>Toplu Ekle</h3>
+<textarea id="bulk" rows="7" placeholder="Ev&#10;Kafe&#10;Metro&#10;veya virgüllü"></textarea>
+<button onclick="addBulk('${cat}')">Toplu Ekle</button>
+</div>
+</div>
 
-      document.getElementById("archiveTabs").innerHTML = BOXES.map(box => `
-        <button class="tab ${box === currentArchiveBox ? "active" : ""}" onclick="openArchive('${box}')">${box}</button>
-      `).join("");
+<div>
+<div class="section">
+<h3>Mevcut Öğeler</h3>
+<input id="search" placeholder="Ara..." oninput="renderArchive('${cat}')">
+<div id="alist"></div>
+</div>
+</div>
 
-      const items = state.boxes[currentArchiveBox];
-      const wrap = document.getElementById("archiveItems");
+</div>
+`);
+renderArchive(cat);
+}
 
-      if (!items.length) {
-        wrap.innerHTML = `<div class="empty">Bu kutuda henüz öğe yok.</div>`;
-        return;
-      }
+function renderArchive(cat){
+let q=(search.value||"").toLowerCase();
+alist.innerHTML=state.refs[cat]
+.filter(v=>v.toLowerCase().includes(q))
+.map((v,i)=>`
+<div class="archiveItem">
+<div>${esc(v)}</div>
+<button onclick="editItem('${cat}',${i})">Düzenle</button>
+<button onclick="delItem('${cat}',${i})">Sil</button>
+</div>
+`).join("");
+}
 
-      wrap.innerHTML = items.map((item, index) => `
-        <div class="archive-item">
-          <div>
-            <div class="archive-title">${escapeHtml(item)}</div>
-            <div class="small">${currentArchiveBox} referansı</div>
-          </div>
-          <button class="danger" onclick="deleteArchiveItem(${index})">Sil</button>
-        </div>
-      `).join("");
-    }
+function addOne(cat){
+if(!single.value.trim())return;
+state.refs[cat].push(single.value.trim());
+save();
+archive(cat);
+}
 
-    function addSingleItem() {
-      const input = document.getElementById("singleAddInput");
-      addItems([input.value]);
-      input.value = "";
-    }
+function addBulk(cat){
+bulk.value.split(/,|\n/)
+.map(x=>x.trim())
+.filter(Boolean)
+.forEach(v=>state.refs[cat].push(v));
+save();
+archive(cat);
+}
 
-    function addBulkItems() {
-      const input = document.getElementById("bulkAddInput");
-      addItems(input.value.split("\n"));
-      input.value = "";
-    }
+function editItem(cat,i){
+let nv=prompt("Yeni değer",state.refs[cat][i]);
+if(nv){
+state.refs[cat][i]=nv.trim();
+save();
+archive(cat);
+}
+}
 
-    function addItems(rawItems) {
-      const cleanItems = rawItems
-        .map(item => item.trim())
-        .filter(Boolean)
-        .filter(item => !state.boxes[currentArchiveBox].some(existing => existing.toLowerCase() === item.toLowerCase()));
+function delItem(cat,i){
+state.refs[cat].splice(i,1);
+save();
+archive(cat);
+}
 
-      state.boxes[currentArchiveBox].push(...cleanItems);
-      state.boxes[currentArchiveBox].sort((a, b) => a.localeCompare(b, "tr"));
-      saveState();
-      renderArchive();
-      renderHome();
-      if (currentNoteId) renderSelectors();
-    }
+function toggleTheme(){
+document.body.classList.toggle("dark");
+state.theme=document.body.classList.contains("dark")?"dark":"light";
+save();
+home();
+}
 
-    function deleteArchiveItem(index) {
-      const item = state.boxes[currentArchiveBox][index];
-      if (!confirm(`"${item}" öğesi silinsin mi?`)) return;
+function randomIdea(){
+alert(CATS.map(c=>{
+let arr=state.refs[c];
+return c+": "+arr[Math.floor(Math.random()*arr.length)];
+}).join("\n"));
+}
 
-      state.boxes[currentArchiveBox].splice(index, 1);
-      state.notes.forEach(note => {
-        if (note.selected[currentArchiveBox] === item) note.selected[currentArchiveBox] = "";
-      });
-      saveState();
-      renderArchive();
-      renderHome();
-      if (currentNoteId) {
-        renderSelectors();
-        renderSelectedInfo();
-      }
-    }
+function exportJSON(){
+let a=document.createElement("a");
+a.href=URL.createObjectURL(new Blob([JSON.stringify(state)],{type:"application/json"}));
+a.download="retro-notes.json";
+a.click();
+}
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+function importJSON(e){
+let f=e.target.files[0];
+if(!f)return;
+let r=new FileReader();
+r.onload=()=>{
+state=JSON.parse(r.result);
+save();
+location.reload();
+};
+r.readAsText(f);
+}
 
-    function escapeAttr(value) {
-      return escapeHtml(value).replaceAll("`", "&#096;");
-    }
-
-    document.getElementById("newNoteBtn").addEventListener("click", createNote);
-    document.getElementById("saveNoteBtn").addEventListener("click", saveCurrentNote);
-    document.getElementById("singleAddBtn").addEventListener("click", addSingleItem);
-    document.getElementById("bulkAddBtn").addEventListener("click", addBulkItems);
-    homeBtn.addEventListener("click", () => {
-      if (currentNoteId && editorScreen.classList.contains("active")) saveCurrentNoteWithoutAlert();
-      showScreen(homeScreen);
-      renderHome();
-    });
-
-    noteTitle.addEventListener("input", saveCurrentNoteWithoutAlert);
-    noteBody.addEventListener("input", saveCurrentNoteWithoutAlert);
-
-    function saveCurrentNoteWithoutAlert() {
-      const note = getCurrentNote();
-      if (!note) return;
-      note.title = noteTitle.value.trim() || "Başlıksız not";
-      note.body = noteBody.value;
-      note.updatedAt = Date.now();
-      saveState();
-    }
-
-    renderHome();
-  </script></body>
+home();
+</script>
+</body>
 </html>
