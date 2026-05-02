@@ -1,8 +1,14 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notes – Not Yazma ve Yardımcı Araç</title>
+  <title>Notes</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #fffdfa;
@@ -14,858 +20,978 @@
       --blue: #2f6ff6;
       --blue-soft: #eef4ff;
       --danger: #c84f43;
-      --shadow: 0 14px 34px rgba(24, 24, 24, 0.07);
-      --radius-xl: 20px;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-    }* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 14px;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-body.theme-dark {
-  --bg: #171717;
-  --paper: #202020;
-  --paper-soft: #24211d;
-  --text: #f2eee7;
-  --muted: #aaa39a;
-  --line: #3a342d;
-  --blue: #7aa2ff;
-  --blue-soft: #1f2d47;
-  --shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
-}
-
-body.theme-scifi {
-  --bg: #060c08;
-  --paper: #0b160f;
-  --paper-soft: #0f1b13;
-  --text: #c9ffd3;
-  --muted: #79a883;
-  --line: #18351f;
-  --blue: #7cff9a;
-  --blue-soft: #112719;
-  --shadow: 0 0 30px rgba(93, 255, 130, 0.08);
-}
-
-body.theme-notebook {
-  --bg: #f4ead8;
-  --paper: #fff9e9;
-  --paper-soft: #efe0c3;
-  --text: #352718;
-  --muted: #8d7457;
-  --line: #dfcda9;
-  --blue: #8a5a2b;
-  --blue-soft: #f0ddbd;
-  --shadow: 0 14px 34px rgba(74, 42, 18, 0.11);
-}
-
-button, input, textarea, select {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  border-radius: 12px;
-  padding: 11px 12px;
-  color: var(--text);
-  outline: none;
-  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-
-.page-header, .note-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.brand-icon, .box-icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  background: #fff;
-  border: 1px solid #d9edf9;
-  box-shadow: 0 8px 20px rgba(40, 120, 180, 0.06);
-}
-
-.brand-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
-  font-size: 28px;
-}
-
-.box-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  font-size: 18px;
-  background: #f8f5ef;
-  border-color: #eee7dc;
-  box-shadow: none;
-}
-
-h1 {
-  font-size: clamp(34px, 5vw, 58px);
-  margin: 0;
-  letter-spacing: -0.06em;
-  line-height: 0.95;
-}
-
-.compact-title {
-  font-size: clamp(30px, 4vw, 48px) !important;
-}
-
-.top-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.ghost-btn, .primary-btn, .soft-btn, .mini-btn, .danger-btn, .delete-btn {
-  border-radius: 11px;
-  transition: 0.15s ease;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.primary-btn {
-  background: var(--blue);
-  color: white;
-  padding: 11px 15px;
-  box-shadow: 0 10px 20px rgba(47, 111, 246, 0.18);
-}
-
-.primary-btn:hover, .recent-item:hover, .box-card:hover, .archive-item:hover, .note-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-}
-
-.soft-btn {
-  background: var(--blue-soft);
-  color: var(--blue);
-  padding: 10px 13px;
-}
-
-.ghost-btn {
-  background: #f0ece5;
-  color: #444;
-  padding: 10px 13px;
-}
-
-.mini-btn {
-  padding: 8px 10px;
-  background: #f5f2ed;
-  color: #4a4a4a;
-  font-size: 13px;
-}
-
-.danger-btn, .delete-btn {
-  background: #fff0ed;
-  color: var(--danger);
-  padding: 10px 13px;
-}
-
-.delete-btn { padding: 8px 10px; }
-.danger-btn:hover, .delete-btn:hover { background: #ffe2dc; }
-
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 1.05fr;
-  gap: 20px;
-  align-items: start;
-}
-
-.panel, .selector-panel, .editor, .archive-main {
-  border: 1px solid rgba(232, 227, 218, 0.95);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
-}
-
-.panel, .selector-panel {
-  background: var(--paper-soft);
-  padding: 20px;
-}
-
-.editor, .archive-main {
-  background: white;
-  padding: 20px;
-}
-
-.panel-title {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.panel-title h2 {
-  margin: 0;
-  font-size: 21px;
-  letter-spacing: -0.035em;
-}
-
-.hint {
-  margin: 4px 0 0;
-  color: var(--muted);
-  line-height: 1.45;
-  font-size: 13px;
-}
-
-.create-card {
-  background: white;
-  border-radius: 16px;
-  padding: 17px;
-  display: grid;
-  gap: 12px;
-  margin-bottom: 18px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
-}
-
-.input-row { display: flex; gap: 10px; }
-
-input, textarea, select {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: #fff;
-  border-radius: 12px;
-  padding: 11px 12px;
-  color: var(--text);
-  outline: none;
-  transition: border 0.15s ease, box-shadow 0.15s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: #9cbcff;
-  box-shadow: 0 0 0 3px rgba(47, 111, 246, 0.1);
-}
-
-.recent-list, .side-list { display: grid; gap: 9px; }
-
-.recent-item, .box-card, .archive-item, .note-card {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(232, 227, 218, 0.95);
-  border-radius: 15px;
-  padding: 14px;
-  transition: 0.15s ease;
-}
-
-.recent-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  text-align: left;
-  width: 100%;
-}
-
-.recent-item strong, .box-card strong, .archive-item strong, .note-card strong {
-  display: block;
-  font-size: 15px;
-  margin-bottom: 4px;
-}
-
-.recent-item span, .box-card span, .archive-item span, .note-card span {
-  color: var(--muted);
-  font-size: 12.5px;
-}
-
-.boxes-grid, .notes-archive-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.box-card, .note-card {
-  text-align: left;
-  min-height: 104px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: white;
-}
-
-.box-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.count-badge {
-  align-self: flex-start;
-  background: #f1eee8;
-  color: #67625a;
-  border-radius: 999px;
-  padding: 6px 9px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.screen { display: none; }
-.screen.active { display: block; }
-.editor-shell { display: grid; gap: 18px; }
-
-.selected-info {
-  min-height: 44px;
-  border-radius: 14px;
-  background: rgba(47, 111, 246, 0.07);
-  color: rgba(36, 36, 36, 0.64);
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-  border: 1px solid rgba(47, 111, 246, 0.1);
-}
-
-.info-empty { color: #9a9a9a; }
-
-.tag {
-  background: rgba(255, 255, 255, 0.78);
-  color: rgba(36, 36, 36, 0.72);
-  border: 1px solid rgba(47, 111, 246, 0.14);
-  border-radius: 999px;
-  padding: 6px 9px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-textarea.note-area {
-  min-height: 250px;
-  resize: vertical;
-  font-size: 15px;
-  line-height: 1.65;
-  border-radius: 16px;
-  background: #fffefa;
-}
-
-.selector-workspace {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 14px;
-  margin-top: 14px;
-}
-
-.selector-tabs {
-  display: grid;
-  gap: 8px;
-  align-content: start;
-  max-height: 390px;
-  overflow: auto;
-  padding-right: 3px;
-}
-
-.selector-tab, .side-tab {
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 12px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-weight: 800;
-}
-
-.selector-tab.active, .side-tab.active {
-  background: var(--blue);
-  color: white;
-  border-color: var(--blue);
-}
-
-.selector-content {
-  background: white;
-  border-radius: 16px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  min-height: 390px;
-}
-
-.selector-content-head {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.selector-controls {
-  display: grid;
-  grid-template-columns: 1fr 180px;
-  gap: 8px;
-}
-
-.usage-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: rgba(47, 111, 246, 0.08);
-  color: var(--blue);
-  padding: 5px 8px;
-  font-size: 11.5px;
-  font-weight: 800;
-  margin-top: 6px;
-}
-
-.editor-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.theme-select {
-  width: auto;
-  min-width: 170px;
-  padding: 10px 12px;
-  font-weight: 700;
-}
-
-.selector-content-head h3 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: -0.03em;
-}
-
-.reference-list {
-  display: grid;
-  gap: 8px;
-  max-height: 288px;
-  overflow: auto;
-  padding-right: 3px;
-}
-
-.reference-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 11px;
-  border-radius: 12px;
-  background: #fbf9f4;
-  color: #343434;
-  text-align: left;
-  border: 1px solid #ede7dd;
-  font-weight: 700;
-}
-
-.reference-option.active {
-  background: var(--blue-soft);
-  color: var(--blue);
-  border-color: rgba(47, 111, 246, 0.22);
-}
-
-.reference-option small {
-  color: var(--muted);
-  font-weight: 800;
-}
-
-.archive-layout {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 18px;
-  align-items: start;
-}
-
-.archive-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin: 18px 0;
-}
-
-.action-box {
-  background: #fbf9f4;
-  border-radius: 15px;
-  padding: 14px;
-  border: 1px solid var(--line);
-}
-
-.action-box h3 {
-  margin: 0 0 10px;
-  font-size: 16px;
-}
-
-.bulk-area { min-height: 108px; resize: vertical; }
-
-.archive-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.archive-item {
-  background: #fffefa;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.note-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.empty-state {
-  padding: 24px;
-  text-align: center;
-  background: color-mix(in srgb, var(--paper) 78%, var(--paper-soft));
-  border: 1px dashed var(--line);
-  color: var(--muted);
-  border-radius: 15px;
-}
-
-body.theme-scifi .app { max-width: 1120px; }
-body.theme-scifi .brand-icon,
-body.theme-scifi .box-icon {
-  background: #08110b;
-  border-color: #255a30;
-  box-shadow: 0 0 18px rgba(124, 255, 154, 0.08);
-}
-
-body.theme-scifi .editor {
-  position: relative;
-  background:
-    repeating-linear-gradient(0deg, rgba(124,255,154,0.035), rgba(124,255,154,0.035) 1px, transparent 1px, transparent 5px),
-    linear-gradient(180deg, #08140c, #030805);
-  border-color: #1c4b28;
-  box-shadow: inset 0 0 35px rgba(124,255,154,0.04), 0 0 26px rgba(124,255,154,0.08);
-  padding-top: 58px;
-  overflow: hidden;
-}
-
-body.theme-scifi .editor::before {
-  content: "C:\NOTLAR\EDITOR.EXE";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  padding: 0 18px;
-  background: linear-gradient(#d6d6d6, #bfbfbf);
-  color: #101010;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0.01em;
-}
-
-body.theme-scifi .selected-info {
-  background: transparent;
-  border-color: transparent;
-  color: #7cff9a;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 15px;
-}
-
-body.theme-scifi textarea.note-area {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  color: #7cff9a;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 20px;
-  line-height: 1.65;
-  caret-color: #7cff9a;
-}
-
-body.theme-scifi textarea.note-area::placeholder { color: rgba(124, 255, 154, 0.45); }
-body.theme-scifi .tag { background: rgba(124,255,154,0.08); color: #7cff9a; border-color: rgba(124,255,154,0.2); }
-body.theme-scifi .primary-btn,
-body.theme-scifi .selector-tab.active,
-body.theme-scifi .side-tab.active { color: #061007; background: #7cff9a; }
-
-body.theme-notebook .editor {
-  background: #fff9e9;
-  border-color: #d6b98e;
-}
-
-body.theme-notebook textarea.note-area {
-  background:
-    linear-gradient(90deg, transparent 0 42px, rgba(190, 84, 64, 0.25) 42px 44px, transparent 44px),
-    repeating-linear-gradient(#fff9e9 0 30px, #ead9b7 31px 32px);
-  border-color: #d6b98e;
-  border-radius: 10px;
-  padding-left: 58px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 17px;
-  line-height: 32px;
-  color: #352718;
-}
-
-body.theme-notebook h1,
-body.theme-notebook h2,
-body.theme-notebook h3 { font-family: Georgia, "Times New Roman", serif; }
-
-body.theme-dark .recent-item,
-body.theme-dark .box-card,
-body.theme-dark .note-card,
-body.theme-dark .archive-item,
-body.theme-dark .selector-content,
-body.theme-dark .selector-tab,
-body.theme-dark .side-tab,
-body.theme-dark .action-box,
-body.theme-dark .create-card { background: var(--paper); }
-
-@media (max-width: 920px) {
-  .layout, .archive-layout, .archive-actions, .selector-workspace { grid-template-columns: 1fr; }
-  .selector-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
-}
-
-@media (max-width: 640px) {
-  .app { padding: 28px 16px 56px; }
-  .page-header, .note-toolbar { align-items: flex-start; flex-direction: column; }
-  .brand-icon { width: 48px; height: 48px; font-size: 24px; }
-  .boxes-grid, .archive-list, .notes-archive-grid, .selector-tabs { grid-template-columns: 1fr; }
-  .input-row, .top-actions { flex-direction: column; align-items: stretch; width: 100%; }
-  .top-actions button { width: 100%; }
-}
-
-/* Tema düzeltmeleri ve daha kompakt genel görünüm */
-body {
-  font-size: 12.5px;
-}
-
-h1 { font-size: clamp(28px, 4.4vw, 48px); }
-.compact-title { font-size: clamp(26px, 3.8vw, 40px) !important; }
-.panel-title h2 { font-size: 18px; }
-.selector-content-head h3 { font-size: 16px; }
-
-.app { max-width: 1020px; padding-top: 28px; }
-.brand { gap: 11px; }
-.brand-icon { width: 46px; height: 46px; font-size: 23px; border-radius: 12px; }
-.box-icon { width: 30px; height: 30px; font-size: 16px; }
-
-.ghost-btn, .primary-btn, .soft-btn, .mini-btn, .danger-btn, .delete-btn, .theme-select {
-  font-size: 12.5px;
-  border-radius: 9px;
-}
-
-.primary-btn, .soft-btn, .ghost-btn, .danger-btn { padding: 8px 11px; }
-.delete-btn, .mini-btn { padding: 7px 9px; }
-.theme-select { padding: 8px 10px; min-width: 150px; }
-
-.panel, .selector-panel, .editor, .archive-main { padding: 16px; border-radius: 16px; }
-.create-card, .recent-item, .box-card, .archive-item, .note-card, .selector-content, .action-box { border-radius: 13px; }
-.create-card, .recent-item, .box-card, .archive-item, .note-card { padding: 12px; }
-.box-card, .note-card { min-height: 92px; }
-.recent-item strong, .box-card strong, .archive-item strong, .note-card strong { font-size: 13.5px; }
-.recent-item span, .box-card span, .archive-item span, .note-card span, .hint { font-size: 11.5px; }
-
-input, textarea, select { padding: 9px 10px; border-radius: 10px; }
-textarea.note-area { font-size: 13.5px; min-height: 220px; }
-.selected-info { min-height: 38px; padding: 8px 10px; border-radius: 12px; }
-.tag { font-size: 11px; padding: 5px 8px; }
-.reference-option { padding: 9px 10px; border-radius: 10px; }
-
-body.theme-dark {
-  --bg: #121212;
-  --paper: #1d1d1d;
-  --paper-soft: #181818;
-  --text: #ece7df;
-  --muted: #b7ada2;
-  --line: #34302c;
-  --blue: #9bbcff;
-  --blue-soft: #202b3e;
-  --shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
-}
-
-body.theme-dark .panel,
-body.theme-dark .selector-panel {
-  background: #181818;
-  border-color: #34302c;
-}
-
-body.theme-dark .editor,
-body.theme-dark .archive-main,
-body.theme-dark .create-card,
-body.theme-dark .recent-item,
-body.theme-dark .box-card,
-body.theme-dark .note-card,
-body.theme-dark .archive-item,
-body.theme-dark .selector-content,
-body.theme-dark .selector-tab,
-body.theme-dark .side-tab,
-body.theme-dark .action-box,
-body.theme-dark input,
-body.theme-dark textarea,
-body.theme-dark select {
-  background: #202020;
-  color: #ece7df;
-  border-color: #39332e;
-}
-
-body.theme-dark .ghost-btn { background: #282828; color: #ece7df; border: 1px solid #3a3a3a; }
-body.theme-dark .soft-btn { background: #202b3e; color: #bfd1ff; }
-body.theme-dark .selected-info { background: #1d2533; border-color: #303d55; color: #d8e2ff; }
-body.theme-dark .tag { background: #263246; color: #dfe7ff; border-color: #40516f; }
-body.theme-dark .reference-option { background: #252525; color: #ece7df; border-color: #39332e; }
-body.theme-dark .reference-option.active { background: #253553; color: #dce6ff; }
-body.theme-dark .empty-state { background: #202020; border-color: #39332e; }
-
-body.theme-scifi {
-  --bg: #08100b;
-  --paper: #0e1a12;
-  --paper-soft: #0b160f;
-  --text: #d6f7dc;
-  --muted: #8fba98;
-  --line: #20462a;
-  --blue: #74e891;
-  --blue-soft: #102619;
-  --shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
-}
-
-body.theme-scifi .panel,
-body.theme-scifi .selector-panel,
-body.theme-scifi .archive-main,
-body.theme-scifi .create-card,
-body.theme-scifi .recent-item,
-body.theme-scifi .box-card,
-body.theme-scifi .note-card,
-body.theme-scifi .archive-item,
-body.theme-scifi .selector-content,
-body.theme-scifi .selector-tab,
-body.theme-scifi .side-tab,
-body.theme-scifi .action-box,
-body.theme-scifi input,
-body.theme-scifi select {
-  background: #0e1a12;
-  color: #d6f7dc;
-  border-color: #20462a;
-}
-
-body.theme-scifi .ghost-btn { background: #132319; color: #d6f7dc; border: 1px solid #285a35; }
-body.theme-scifi .soft-btn { background: #102619; color: #9df8b1; }
-body.theme-scifi .danger-btn,
-body.theme-scifi .delete-btn { background: #251715; color: #ff9f92; }
-body.theme-scifi .reference-option { background: #122018; color: #d6f7dc; border-color: #20462a; }
-body.theme-scifi .reference-option.active { background: #193922; color: #a9ffb8; }
-body.theme-scifi .empty-state { background: #101b14; border-color: #254d30; }
-
-body.theme-scifi .editor {
-  background:
-    repeating-linear-gradient(0deg, rgba(116,232,145,0.045), rgba(116,232,145,0.045) 1px, transparent 1px, transparent 6px),
-    linear-gradient(180deg, #08140c, #050b07);
-  border-color: #285a35;
-  box-shadow: inset 0 0 26px rgba(116,232,145,0.05), 0 0 18px rgba(116,232,145,0.08);
-  padding-top: 48px;
-}
-
-body.theme-scifi .editor::before {
-  height: 34px;
-  padding: 0 14px;
-  font-size: 14px;
-  content: "C:\NOTLAR\EDITOR.EXE";
-}
-
-body.theme-scifi .selected-info {
-  background: rgba(116,232,145,0.06);
-  border-color: rgba(116,232,145,0.16);
-  color: #9df8b1;
-  font-size: 12.5px;
-}
-
-body.theme-scifi textarea.note-area {
-  min-height: 270px;
-  background: transparent;
-  border-color: rgba(116,232,145,0.12);
-  color: #9df8b1;
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-body.theme-scifi .tag { background: rgba(116,232,145,0.1); color: #9df8b1; border-color: rgba(116,232,145,0.24); }
-
-body.theme-notebook {
-  --bg: #f3ead9;
-  --paper: #fffaf0;
-  --paper-soft: #eadcc4;
-  --text: #2f251a;
-  --muted: #7f6b55;
-  --line: #d8c49f;
-  --blue: #79522c;
-  --blue-soft: #ead8b9;
-  --shadow: 0 14px 34px rgba(74, 42, 18, 0.09);
-}
-
-body.theme-notebook .panel,
-body.theme-notebook .selector-panel {
-  background: #eadcc4;
-  border-color: #dac5a0;
-}
-
-body.theme-notebook .editor,
-body.theme-notebook .archive-main,
-body.theme-notebook .create-card,
-body.theme-notebook .recent-item,
-body.theme-notebook .box-card,
-body.theme-notebook .note-card,
-body.theme-notebook .archive-item,
-body.theme-notebook .selector-content,
-body.theme-notebook .selector-tab,
-body.theme-notebook .side-tab,
-body.theme-notebook .action-box,
-body.theme-notebook input,
-body.theme-notebook select {
-  background: #fffaf0;
-  color: #2f251a;
-  border-color: #d8c49f;
-}
-
-body.theme-notebook .ghost-btn { background: #ead8b9; color: #3a2a1b; border: 1px solid #c9aa7c; }
-body.theme-notebook .soft-btn { background: #ead8b9; color: #6e4826; }
-body.theme-notebook .primary-btn,
-body.theme-notebook .selector-tab.active,
-body.theme-notebook .side-tab.active { background: #79522c; color: #fff7e6; }
-body.theme-notebook .selected-info { background: #f3e6cc; border-color: #d8c49f; }
-body.theme-notebook .tag { background: #fffaf0; color: #5a4028; border-color: #d8c49f; }
-body.theme-notebook .reference-option { background: #f7eddb; color: #2f251a; border-color: #d8c49f; }
-body.theme-notebook .reference-option.active { background: #ead8b9; color: #4a321f; }
-
-body.theme-notebook textarea.note-area {
-  background:
-    linear-gradient(90deg, transparent 0 38px, rgba(156, 70, 56, 0.20) 38px 40px, transparent 40px),
-    repeating-linear-gradient(#fffaf0 0 27px, #e7d7b9 28px 29px);
-  color: #2f251a;
-  border-color: #d8c49f;
-  padding-left: 50px;
-  font-size: 15px;
-  line-height: 29px;
-}
-
-@media (max-width: 640px) {
-  body { font-size: 12px; }
-  .app { padding: 22px 14px 48px; }
-  .brand-icon { width: 42px; height: 42px; font-size: 21px; }
-  h1 { font-size: 34px; }
-  .compact-title { font-size: 30px !important; }
-}
-
+      --shadow: 0 10px 28px rgba(24, 24, 24, 0.06);
+      --radius-xl: 14px;
+      --radius-lg: 12px;
+      --radius-md: 9px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 1020px;
+      margin: 0 auto;
+      padding: 28px 24px 64px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .page-header,
+    .note-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon,
+    .box-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: #fff;
+      border: 1px solid #d9edf9;
+      box-shadow: 0 6px 14px rgba(40, 120, 180, 0.05);
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      font-size: 21px;
+    }
+
+    .box-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      font-size: 15px;
+      background: #f8f5ef;
+      border-color: #eee7dc;
+      box-shadow: none;
+    }
+
+    h1 {
+      font-size: clamp(26px, 4vw, 44px);
+      margin: 0;
+      letter-spacing: -0.055em;
+      line-height: 0.98;
+    }
+
+    .compact-title {
+      font-size: clamp(24px, 3.5vw, 36px) !important;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ghost-btn,
+    .primary-btn,
+    .soft-btn,
+    .mini-btn,
+    .danger-btn,
+    .delete-btn,
+    .theme-select {
+      border-radius: 8px;
+      transition: 0.15s ease;
+      font-weight: 700;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .primary-btn {
+      background: var(--blue);
+      color: white;
+      padding: 7px 10px;
+      box-shadow: 0 8px 18px rgba(47, 111, 246, 0.16);
+    }
+
+    .soft-btn {
+      background: var(--blue-soft);
+      color: var(--blue);
+      padding: 7px 10px;
+    }
+
+    .ghost-btn {
+      background: #f0ece5;
+      color: #444;
+      padding: 7px 10px;
+    }
+
+    .danger-btn,
+    .delete-btn {
+      background: #fff0ed;
+      color: var(--danger);
+      padding: 7px 10px;
+    }
+
+    .delete-btn,
+    .mini-btn {
+      padding: 6px 8px;
+    }
+
+    .theme-select {
+      width: auto;
+      min-width: 145px;
+      padding: 7px 9px;
+      background: var(--paper);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .primary-btn:hover,
+    .recent-item:hover,
+    .box-card:hover,
+    .archive-item:hover,
+    .note-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .selector-panel,
+    .editor,
+    .archive-main {
+      border: 1px solid rgba(232, 227, 218, 0.95);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .panel,
+    .selector-panel {
+      background: var(--paper-soft);
+    }
+
+    .editor,
+    .archive-main {
+      background: var(--paper);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.035em;
+    }
+
+    .hint {
+      margin: 4px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 11.5px;
+    }
+
+    .create-card {
+      background: var(--paper);
+      border-radius: 12px;
+      padding: 11px;
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.035);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      border-radius: 9px;
+      padding: 8px 9px;
+      color: var(--text);
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #9cbcff;
+      box-shadow: 0 0 0 3px rgba(47, 111, 246, 0.1);
+    }
+
+    .recent-list,
+    .side-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .recent-item,
+    .box-card,
+    .archive-item,
+    .note-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(232, 227, 218, 0.95);
+      border-radius: 12px;
+      padding: 11px;
+      transition: 0.15s ease;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .recent-item strong,
+    .box-card strong,
+    .archive-item strong,
+    .note-card strong {
+      display: block;
+      font-size: 13.5px;
+      margin-bottom: 4px;
+    }
+
+    .recent-item span,
+    .box-card span,
+    .archive-item span,
+    .note-card span {
+      color: var(--muted);
+      font-size: 11.5px;
+    }
+
+    .boxes-grid,
+    .notes-archive-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .box-card,
+    .note-card {
+      text-align: left;
+      min-height: 92px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--paper);
+    }
+
+    .box-top {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .count-badge {
+      align-self: flex-start;
+      background: #f1eee8;
+      color: #67625a;
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    .editor-shell {
+      display: grid;
+      gap: 16px;
+    }
+
+    .terminal-title {
+      display: none;
+    }
+
+    .selected-info {
+      min-height: 36px;
+      border-radius: 12px;
+      background: rgba(47, 111, 246, 0.07);
+      color: rgba(36, 36, 36, 0.66);
+      padding: 7px 9px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      border: 1px solid rgba(47, 111, 246, 0.1);
+    }
+
+    .info-empty {
+      color: #9a9a9a;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.78);
+      color: rgba(36, 36, 36, 0.72);
+      border: 1px solid rgba(47, 111, 246, 0.14);
+      border-radius: 999px;
+      padding: 4px 7px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    textarea.note-area {
+      min-height: 210px;
+      resize: vertical;
+      font-size: 13px;
+      line-height: 1.65;
+      border-radius: 12px;
+      background: #fffefa;
+    }
+
+    .editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-workspace {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .selector-tabs {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      max-height: 370px;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .selector-tab,
+    .side-tab {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 800;
+    }
+
+    .selector-tab.active,
+    .side-tab.active {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    .selector-content {
+      background: var(--paper);
+      border-radius: 12px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      min-height: 370px;
+    }
+
+    .selector-content-head {
+      display: grid;
+      gap: 9px;
+      margin-bottom: 10px;
+    }
+
+    .selector-content-head h3 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: -0.03em;
+    }
+
+    .selector-controls {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 8px;
+    }
+
+    .reference-list {
+      display: grid;
+      gap: 7px;
+      max-height: 270px;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .reference-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: #fbf9f4;
+      color: #343434;
+      text-align: left;
+      border: 1px solid #ede7dd;
+      font-weight: 700;
+    }
+
+    .reference-option.active {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: rgba(47, 111, 246, 0.22);
+    }
+
+    .reference-option small {
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 10.5px;
+    }
+
+    .archive-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .archive-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .action-box {
+      background: #fbf9f4;
+      border-radius: 12px;
+      padding: 11px;
+      border: 1px solid var(--line);
+    }
+
+    .action-box h3 {
+      margin: 0 0 9px;
+      font-size: 14px;
+    }
+
+    .bulk-area {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .archive-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .archive-item {
+      background: #fffefa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .note-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      background: color-mix(in srgb, var(--paper) 78%, var(--paper-soft));
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      border-radius: 12px;
+    }
+
+    body.theme-dark {
+      --bg: #111111;
+      --paper: #1d1d1d;
+      --paper-soft: #151515;
+      --text: #ece8e2;
+      --muted: #b4aba0;
+      --line: #323232;
+      --blue: #a7c2ff;
+      --blue-soft: #222c3d;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.30);
+    }
+
+    body.theme-dark .panel,
+    body.theme-dark .selector-panel {
+      background: #151515;
+      border-color: #323232;
+    }
+
+    body.theme-dark .editor,
+    body.theme-dark .archive-main,
+    body.theme-dark .create-card,
+    body.theme-dark .recent-item,
+    body.theme-dark .box-card,
+    body.theme-dark .note-card,
+    body.theme-dark .archive-item,
+    body.theme-dark .selector-content,
+    body.theme-dark .selector-tab,
+    body.theme-dark .side-tab,
+    body.theme-dark .action-box,
+    body.theme-dark input,
+    body.theme-dark textarea,
+    body.theme-dark select {
+      background: #1d1d1d;
+      color: #ece8e2;
+      border-color: #323232;
+    }
+
+    body.theme-dark .ghost-btn {
+      background: #242424;
+      color: #ece8e2;
+      border: 1px solid #363636;
+    }
+
+    body.theme-dark .soft-btn {
+      background: #222c3d;
+      color: #d7e2ff;
+    }
+
+    body.theme-dark .selected-info {
+      background: #1d2533;
+      border-color: #303d55;
+      color: #d8e2ff;
+    }
+
+    body.theme-dark .tag {
+      background: #263246;
+      color: #dfe7ff;
+      border-color: #40516f;
+    }
+
+    body.theme-dark .reference-option {
+      background: #252525;
+      color: #ece8e2;
+      border-color: #363636;
+    }
+
+    body.theme-dark .reference-option.active {
+      background: #253553;
+      color: #dce6ff;
+    }
+
+    body.theme-dark .count-badge {
+      background: #2a2a2a;
+      color: #d7d0c8;
+    }
+
+    body.theme-dark .empty-state {
+      background: #202020;
+      border-color: #393939;
+    }
+
+    body.theme-scifi {
+      --bg: #07110c;
+      --paper: #0d1712;
+      --paper-soft: #0a1410;
+      --text: #d7ffe0;
+      --muted: #8db79a;
+      --line: #1d4730;
+      --blue: #72f29a;
+      --blue-soft: #10231a;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    body.theme-scifi,
+    body.theme-scifi button,
+    body.theme-scifi input,
+    body.theme-scifi textarea,
+    body.theme-scifi select {
+      font-family: "Share Tech Mono", ui-monospace, monospace;
+    }
+
+    body.theme-scifi h1,
+    body.theme-scifi h2,
+    body.theme-scifi h3,
+    body.theme-scifi .primary-btn,
+    body.theme-scifi .ghost-btn,
+    body.theme-scifi .soft-btn,
+    body.theme-scifi .danger-btn,
+    body.theme-scifi .theme-select {
+      font-family: "Orbitron", "Share Tech Mono", sans-serif;
+    }
+
+    body.theme-scifi .panel,
+    body.theme-scifi .selector-panel,
+    body.theme-scifi .archive-main,
+    body.theme-scifi .create-card,
+    body.theme-scifi .recent-item,
+    body.theme-scifi .box-card,
+    body.theme-scifi .note-card,
+    body.theme-scifi .archive-item,
+    body.theme-scifi .selector-content,
+    body.theme-scifi .selector-tab,
+    body.theme-scifi .side-tab,
+    body.theme-scifi .action-box,
+    body.theme-scifi input,
+    body.theme-scifi select {
+      background: #0d1712;
+      color: #d7ffe0;
+      border-color: #1d4730;
+    }
+
+    body.theme-scifi .brand-icon,
+    body.theme-scifi .box-icon {
+      background: #0d1712;
+      border-color: #27643c;
+      box-shadow: 0 0 14px rgba(114, 242, 154, 0.05);
+    }
+
+    body.theme-scifi .ghost-btn {
+      background: #112019;
+      color: #d7ffe0;
+      border: 1px solid #27643c;
+    }
+
+    body.theme-scifi .soft-btn {
+      background: #12261b;
+      color: #9ef8b8;
+    }
+
+    body.theme-scifi .primary-btn,
+    body.theme-scifi .selector-tab.active,
+    body.theme-scifi .side-tab.active {
+      background: #72f29a;
+      color: #07110c;
+    }
+
+    body.theme-scifi .danger-btn,
+    body.theme-scifi .delete-btn {
+      background: #2a1717;
+      color: #ffb0a5;
+    }
+
+    body.theme-scifi .editor {
+      position: relative;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(114, 242, 154, 0.035),
+          rgba(114, 242, 154, 0.035) 1px,
+          transparent 1px,
+          transparent 6px
+        ),
+        linear-gradient(180deg, #08130d, #040906);
+      border: 1px solid #235736;
+      box-shadow:
+        inset 0 0 24px rgba(114, 242, 154, 0.04),
+        0 0 14px rgba(114, 242, 154, 0.06);
+      padding-top: 0;
+      overflow: hidden;
+    }
+
+    body.theme-scifi .terminal-title {
+      display: flex;
+      align-items: center;
+      height: 32px;
+      margin: -14px -14px 12px;
+      padding: 0 12px;
+      background: linear-gradient(#d8d8d8, #bdbdbd);
+      color: #101010;
+      font-family: "Orbitron", sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    body.theme-scifi .selected-info {
+      background: rgba(114, 242, 154, 0.06);
+      border: 1px solid rgba(114, 242, 154, 0.15);
+      color: #9ef8b8;
+      font-size: 12.5px;
+    }
+
+    body.theme-scifi .tag {
+      background: rgba(114, 242, 154, 0.08);
+      color: #aefbc2;
+      border-color: rgba(114, 242, 154, 0.18);
+    }
+
+    body.theme-scifi textarea.note-area {
+      min-height: 260px;
+      background: transparent;
+      border-color: rgba(114, 242, 154, 0.12);
+      color: #aefbc2;
+      font-family: "Share Tech Mono", ui-monospace, monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      caret-color: #72f29a;
+    }
+
+    body.theme-scifi textarea.note-area::placeholder {
+      color: rgba(174, 251, 194, 0.42);
+    }
+
+    body.theme-scifi .reference-option {
+      background: #112019;
+      color: #d7ffe0;
+      border-color: #1d4730;
+    }
+
+    body.theme-scifi .reference-option.active {
+      background: #173324;
+      color: #aefbc2;
+    }
+
+    body.theme-scifi .count-badge {
+      background: #12261b;
+      color: #aefbc2;
+    }
+
+    body.theme-notebook {
+      --bg: #efe4cf;
+      --paper: #fffdf7;
+      --paper-soft: #e7d7bb;
+      --text: #2d2218;
+      --muted: #7a6755;
+      --line: #d5c09d;
+      --blue: #6f4b2a;
+      --blue-soft: #efe0c4;
+      --shadow: 0 10px 28px rgba(88, 60, 32, 0.08);
+    }
+
+    body.theme-notebook,
+    body.theme-notebook button,
+    body.theme-notebook input,
+    body.theme-notebook textarea,
+    body.theme-notebook select {
+      font-family: Inter, sans-serif;
+    }
+
+    body.theme-notebook h1,
+    body.theme-notebook h2,
+    body.theme-notebook h3 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+
+    body.theme-notebook .panel,
+    body.theme-notebook .selector-panel {
+      background: #e7d7bb;
+      border-color: #d5c09d;
+    }
+
+    body.theme-notebook .editor,
+    body.theme-notebook .archive-main,
+    body.theme-notebook .create-card,
+    body.theme-notebook .recent-item,
+    body.theme-notebook .box-card,
+    body.theme-notebook .note-card,
+    body.theme-notebook .archive-item,
+    body.theme-notebook .selector-content,
+    body.theme-notebook .selector-tab,
+    body.theme-notebook .side-tab,
+    body.theme-notebook .action-box,
+    body.theme-notebook input,
+    body.theme-notebook select {
+      background: #fffdf7;
+      color: #2d2218;
+      border-color: #d5c09d;
+    }
+
+    body.theme-notebook .brand-icon,
+    body.theme-notebook .box-icon {
+      background: #f7efe1;
+      border-color: #d8c3a0;
+      box-shadow: 0 6px 14px rgba(109, 76, 40, 0.08);
+    }
+
+    body.theme-notebook .ghost-btn {
+      background: #f2e4ca;
+      color: #3c2c1d;
+      border: 1px solid #cfb186;
+    }
+
+    body.theme-notebook .soft-btn {
+      background: #efe0c4;
+      color: #6f4b2a;
+    }
+
+    body.theme-notebook .primary-btn,
+    body.theme-notebook .selector-tab.active,
+    body.theme-notebook .side-tab.active {
+      background: #6f4b2a;
+      color: #fffaf0;
+    }
+
+    body.theme-notebook .danger-btn,
+    body.theme-notebook .delete-btn {
+      background: #f9e1dc;
+      color: #a14f42;
+    }
+
+    body.theme-notebook .selected-info {
+      background: #f5ead6;
+      border-color: #d9c29e;
+      color: #4a3624;
+    }
+
+    body.theme-notebook .tag {
+      background: #fffaf0;
+      color: #5c4330;
+      border-color: #d7c19c;
+    }
+
+    body.theme-notebook .reference-option {
+      background: #fbf3e4;
+      color: #2d2218;
+      border-color: #d5c09d;
+    }
+
+    body.theme-notebook .reference-option.active {
+      background: #efe0c4;
+      color: #4d3421;
+    }
+
+    body.theme-notebook .count-badge {
+      background: #f2e4ca;
+      color: #5c4330;
+    }
+
+    body.theme-notebook textarea.note-area {
+      background:
+        linear-gradient(90deg, transparent 0 34px, rgba(191, 89, 73, 0.20) 34px 36px, transparent 36px),
+        repeating-linear-gradient(#fffdf7 0 25px, #e8dcc4 26px 27px);
+      color: #2d2218;
+      border: 1px solid #d5c09d;
+      padding-left: 46px;
+      font-family: "Special Elite", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 27px;
+    }
+
+    @media (max-width: 920px) {
+      .layout,
+      .archive-layout,
+      .archive-actions,
+      .selector-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .selector-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        font-size: 12px;
+      }
+
+      .app {
+        padding: 22px 14px 48px;
+      }
+
+      .page-header,
+      .note-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .brand-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 21px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .compact-title {
+        font-size: 30px !important;
+      }
+
+      .boxes-grid,
+      .archive-list,
+      .notes-archive-grid,
+      .selector-tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .selector-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .input-row,
+      .top-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+
+      .top-actions button,
+      .top-actions select {
+        width: 100%;
+      }
+    }
   </style>
 </head>
+
 <body>
   <main class="app">
     <section id="homeScreen" class="screen active">
@@ -874,6 +1000,7 @@ body.theme-notebook textarea.note-area {
           <div class="brand-icon">📝</div>
           <h1>Notes</h1>
         </div>
+
         <div class="top-actions">
           <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
           <select class="theme-select" onchange="changeTheme(this.value)">
@@ -883,286 +1010,359 @@ body.theme-notebook textarea.note-area {
             <option value="notebook">Defter / edebiyatçı</option>
           </select>
         </div>
-      </div><div class="layout">
-    <section class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Alanı</h2>
-          <p class="hint">Yeni not oluştur ya da son notlarına devam et.</p>
-        </div>
       </div>
 
-      <div class="create-card">
-        <label>
-          <strong>Yeni not başlığı</strong>
-          <input id="newNoteTitle" type="text" placeholder="Örn. Karakter fikri, bölüm taslağı..." />
-        </label>
-        <button class="primary-btn" onclick="createNote()">Yeni Not Yarat</button>
-      </div>
-
-      <div class="panel-title">
-        <h2>Son Notlar</h2>
-      </div>
-      <div id="recentNotes" class="recent-list"></div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Kutuları</h2>
-          <p class="hint">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini yönet.</p>
-        </div>
-      </div>
-      <div id="boxGrid" class="boxes-grid"></div>
-    </section>
-  </div>
-</section>
-
-<section id="noteScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📝</div>
-      <div>
-        <h1 id="noteTitleDisplay" class="compact-title">Yeni Not</h1>
-        <p class="hint">Seçtiğin kutu öğeleri üstte soluk bilgi olarak görünür.</p>
-      </div>
-    </div>
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <div class="editor-shell">
-    <section class="editor">
-      <div id="selectedInfo" class="selected-info">
-        <span class="info-empty">Henüz referans seçilmedi. Aşağıdaki not kutularından seçim yap.</span>
-      </div>
-      <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
-      <div class="editor-actions">
-        <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
-        <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
-      </div>
-    </section>
-
-    <section class="selector-panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Kutusundan Seç</h2>
-          <p class="hint">Çok kalabalık listeler için kategori seç, ara ve tek tek referans ekle.</p>
-        </div>
-        <button class="soft-btn" onclick="clearSelections()">Seçimleri Temizle</button>
-      </div>
-      <div class="selector-workspace">
-        <div id="selectorTabs" class="selector-tabs"></div>
-        <div class="selector-content">
-          <div class="selector-content-head">
-            <h3 id="selectorActiveTitle">Mekan</h3>
-            <div class="selector-controls">
-              <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
-              <select id="referenceSort" onchange="renderReferenceList()">
-                <option value="recent">Son eklenen</option>
-                <option value="mostUsed">En çok kullanılan</option>
-                <option value="az">A-Z</option>
-              </select>
+      <div class="layout">
+        <section class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>Not Alanı</h2>
+              <p class="hint">Yeni not oluştur ya da son notlarına devam et.</p>
             </div>
           </div>
-          <div id="referenceList" class="reference-list"></div>
-        </div>
+
+          <div class="create-card">
+            <label>
+              <strong>Yeni not başlığı</strong>
+              <input id="newNoteTitle" type="text" placeholder="Örn. Karakter fikri, bölüm taslağı..." />
+            </label>
+            <button class="primary-btn" onclick="createNote()">Yeni Not Yarat</button>
+          </div>
+
+          <div class="panel-title">
+            <h2>Son Notlar</h2>
+          </div>
+          <div id="recentNotes" class="recent-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>Not Kutuları</h2>
+              <p class="hint">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini yönet.</p>
+            </div>
+          </div>
+          <div id="boxGrid" class="boxes-grid"></div>
+        </section>
       </div>
     </section>
-  </div>
-</section>
 
-<section id="archiveScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📦</div>
-      <div>
-        <h1 class="compact-title">Not Kutuları</h1>
-        <p class="hint">Tek tek ya da toplu ekleme yaparak referans arşivini büyüt.</p>
-      </div>
-    </div>
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <div class="archive-layout">
-    <aside class="panel">
-      <div class="panel-title">
-        <h2>Kategoriler</h2>
-      </div>
-      <div id="archiveTabs" class="side-list"></div>
-    </aside>
-
-    <section class="archive-main">
-      <div class="panel-title">
-        <div>
-          <h2 id="archiveTitle">Mekan</h2>
-          <p id="archiveDescription" class="hint">Bu kutuya aklına gelen mekanları yaz.</p>
-        </div>
-      </div>
-
-      <div class="archive-actions">
-        <div class="action-box">
-          <h3>Tek Tek Ekle</h3>
-          <div class="input-row">
-            <input id="singleItemInput" type="text" placeholder="Örn. Eski tren garı" />
-            <button class="primary-btn" onclick="addSingleItem()">Ekle</button>
+    <section id="noteScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📝</div>
+          <div>
+            <h1 id="noteTitleDisplay" class="compact-title">Yeni Not</h1>
+            <p class="hint">Seçtiğin kutu öğeleri üstte soluk bilgi olarak görünür.</p>
           </div>
         </div>
 
-        <div class="action-box">
-          <h3>Toplu Ekle</h3>
-          <textarea id="bulkItemInput" class="bulk-area" placeholder="Her satıra bir öğe yaz:\nKütüphane\nSahil\nÇatı katı"></textarea>
-          <button class="soft-btn" style="margin-top: 12px;" onclick="addBulkItems()">Toplu Ekle</button>
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
         </div>
       </div>
 
-      <div id="archiveList" class="archive-list"></div>
+      <div class="editor-shell">
+        <section class="editor">
+          <div class="terminal-title">C:\NOTLAR\EDITOR.EXE</div>
+
+          <div id="selectedInfo" class="selected-info">
+            <span class="info-empty">Referans etiketi yok.</span>
+          </div>
+
+          <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
+
+          <div class="editor-actions">
+            <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
+            <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
+          </div>
+        </section>
+
+        <section class="selector-panel">
+          <div class="panel-title">
+            <div>
+              <h2>Not Kutusundan Seç</h2>
+              <p class="hint">Kategori seç, ara, sırala ve referansları tek tek nota bağla.</p>
+            </div>
+            <button class="soft-btn" onclick="clearSelections()">Seçimleri Temizle</button>
+          </div>
+
+          <div class="selector-workspace">
+            <div id="selectorTabs" class="selector-tabs"></div>
+
+            <div class="selector-content">
+              <div class="selector-content-head">
+                <h3 id="selectorActiveTitle">Mekan</h3>
+
+                <div class="selector-controls">
+                  <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
+                  <select id="referenceSort" onchange="renderReferenceList()">
+                    <option value="recent">Son eklenen</option>
+                    <option value="mostUsed">En çok kullanılan</option>
+                    <option value="az">A-Z</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="referenceList" class="reference-list"></div>
+            </div>
+          </div>
+        </section>
+      </div>
     </section>
-  </div>
-</section>
 
-<section id="notesArchiveScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📚</div>
-      <div>
-        <h1 class="compact-title">Not Arşivi</h1>
-        <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
+    <section id="archiveScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📦</div>
+          <div>
+            <h1 class="compact-title">Not Kutuları</h1>
+            <p class="hint">Tek tek ya da toplu ekleme yaparak referans arşivini büyüt.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+        </div>
       </div>
-    </div>
-    <div class="top-actions">
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
 
-  <section class="panel">
-    <div class="panel-title">
-      <div>
-        <h2>Kayıtlı Notlar</h2>
-        <p class="hint">Bir nota tıklayarak yazmaya devam edebilirsin.</p>
+      <div class="archive-layout">
+        <aside class="panel">
+          <div class="panel-title">
+            <h2>Kategoriler</h2>
+          </div>
+          <div id="archiveTabs" class="side-list"></div>
+        </aside>
+
+        <section class="archive-main">
+          <div class="panel-title">
+            <div>
+              <h2 id="archiveTitle">Mekan</h2>
+              <p id="archiveDescription" class="hint">Bu kutuya aklına gelen mekanları yaz.</p>
+            </div>
+          </div>
+
+          <div class="archive-actions">
+            <div class="action-box">
+              <h3>Tek Tek Ekle</h3>
+              <div class="input-row">
+                <input id="singleItemInput" type="text" placeholder="Örn. Eski tren garı" />
+                <button class="primary-btn" onclick="addSingleItem()">Ekle</button>
+              </div>
+            </div>
+
+            <div class="action-box">
+              <h3>Toplu Ekle</h3>
+              <textarea id="bulkItemInput" class="bulk-area" placeholder="Her satıra bir öğe yaz..."></textarea>
+              <button class="soft-btn" style="margin-top: 10px;" onclick="addBulkItems()">Toplu Ekle</button>
+            </div>
+          </div>
+
+          <div id="archiveList" class="archive-list"></div>
+        </section>
       </div>
-    </div>
-    <div id="notesArchiveGrid" class="notes-archive-grid"></div>
-  </section>
-</section>
+    </section>
 
-  </main>  <script>
+    <section id="notesArchiveScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📚</div>
+          <div>
+            <h1 class="compact-title">Not Arşivi</h1>
+            <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Kayıtlı Notlar</h2>
+            <p class="hint">Bir nota tıklayarak yazmaya devam edebilirsin.</p>
+          </div>
+        </div>
+        <div id="notesArchiveGrid" class="notes-archive-grid"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
     const defaultBoxes = {
-      mekan: { label: "Mekan", icon: "📍", description: "Bu kutuya aklına gelen mekanları yaz.", items: [
-        "Kırmızı ışıklı eski bar", "Terk edilmiş tren istasyonu", "Yağmurlu ara sokak", "Sahile bakan çatı katı", "Sessiz kasaba kütüphanesi",
-        "Gece açık benzinlik", "Sisli orman yolu", "Kalabalık hastane koridoru", "Eski apartman boşluğu", "Neon tabelalı motel",
-        "Bodrum kattaki plak dükkanı", "Boş lunapark", "Dağ başındaki gözlemevi", "Kapalı sinema salonu", "Deniz fenerinin merdivenleri",
-        "Eski okul bahçesi", "Karanlık otobüs terminali", "Küçük balıkçı lokantası", "Tozlu antikacı dükkanı", "Şehrin altındaki metro tüneli",
-        "Çatısı akan pansiyon", "Paslı fabrika deposu", "Kum fırtınasına yakalanmış kasaba", "Gizli arka oda", "Apartman çatısındaki sera",
-        "Gece pazarı", "Uzun hastane bekleme salonu", "Kar altında kalmış kulübe", "Terk edilmiş yazlık site", "Eski radyo istasyonu",
-        "Sahil kenarında boş bank", "Dar taş merdivenli sokak", "Çökmek üzere olan köprü", "Küçük kasaba mezarlığı", "Kapanmış kitapçı",
-        "Ormanın içindeki kamp alanı", "Bir vapurun arka güvertesi", "Yeraltı sığınağı", "Göl kenarında ahşap iskele", "Beyaz floresanlı market",
-        "Kalabalık düğün salonu", "Eski belediye binası", "Kırık aynalı soyunma odası", "Rüzgarlı tepe", "Deniz kenarında paslı depo",
-        "Dar otel koridoru", "Şehrin en yüksek terası", "Gizli bodrum arşivi", "Kapanmak üzere olan lokanta", "Uçurum kenarındaki yol"
-      ] },
-      nesne: { label: "Nesne", icon: "🧩", description: "Notlarına referans olacak nesneleri burada tut.", items: [
-        "Paslı anahtar", "Kırık pusula", "Sarı kapaklı defter", "Çatlamış cep saati", "Üzerinde tarih yazan fotoğraf",
-        "Yarım kalmış mektup", "Bozuk kasetçalar", "Mavi cam şişe", "Eski otel anahtarlığı", "İsimsiz harita",
-        "Kırmızı kurdele", "Yanmış kibrit kutusu", "Gümüş yüzük", "Boş ilaç kutusu", "Yırtık tren bileti",
-        "Eski daktilo", "Kilitli tahta sandık", "Çatlamış gözlük", "Kurumuş çiçek", "Pasaport kabı",
-        "Siyah şemsiye", "Kayıp düğme", "Üzeri çizilmiş kartpostal", "Bozuk fotoğraf makinesi", "Kırık oyuncak araba",
-        "Tahta satranç taşı", "Üzerinde baş harf olan mendil", "Küçük pirinç çan", "Eski ev tapusu", "Mürekkebi bitmiş kalem",
-        "Kilitli günlük", "Küçük müzik kutusu", "Lekeli masa örtüsü", "Dikiş iğnesi kutusu", "Eski telefon rehberi",
-        "Yıpranmış deri çanta", "Kırık ayna parçası", "Tozlu cam küre", "Eski sinema bileti", "Beyaz eldiven",
-        "Sönmüş fener", "Kurşun kalem ucu", "Taşınabilir radyo", "Gizli bölmeli kutu", "Üzerinde numara olan anahtar",
-        "Yarım kalmış örgü", "Çatlak porselen fincan", "Boş zarf", "Eski posta pulu", "Kırmızı kapaklı kibritlik"
-      ] },
-      zaman: { label: "Zaman", icon: "⏳", description: "Saat, dönem, mevsim ya da tarih fikirlerini ekle.", items: [
-        "Yağmurdan hemen önce", "Sabaha karşı 04.17", "Kışın ilk karı", "Yaz sonunda bir pazar", "Elektrikler kesildikten sonra",
-        "Bayram sabahı", "1998 sonbaharı", "Gün batımından on dakika önce", "Okulların kapandığı gün", "Gece yarısından hemen sonra",
-        "Fırtınanın başladığı gece", "Son tren kalkmadan önce", "Yılbaşı gecesi", "Öğle sıcağında", "İlkbaharın ilk günü",
-        "Sabah ezanından sonra", "Akşam vardiyası bitince", "Saatler geri alındığında", "Ay tutulması gecesi", "Kar erimeye başladığında",
-        "Pazartesi sabahı", "Cuma akşamı", "Eski bir fotoğrafın çekildiği gün", "Doğum gününden bir gün önce", "Mezuniyet töreninden sonra",
-        "Düğünden hemen önce", "Cenazeden sonraki sessizlikte", "Sabahın ilk vapurunda", "Şehir uyurken", "Otobüs kaçtıktan sonra",
-        "Elektriklerin geri geldiği an", "Yaz yağmuru başladığında", "Kış tatilinin son gecesi", "Güneş doğmadan az önce", "Saat tam 03.03",
-        "Sonbahar rüzgarı çıkınca", "Bir telefon geldikten sonra", "Kapı çalınmadan birkaç saniye önce", "Uzun bir suskunluğun ardından", "Çocukluk yazlarından birinde",
-        "Takvimde işaretli gün", "Eski defterin bulunduğu gece", "Deniz çekildiğinde", "Sokak lambaları yanınca", "Sabah pazarı kurulurken",
-        "Gece nöbetinin ortasında", "Uykudan uyanır uyanmaz", "Sis dağılırken", "Kütüphane kapanmadan önce", "Son otobüs durağa geldiğinde"
-      ] },
-      kisi: { label: "Kişi", icon: "👤", description: "Karakter, tanıdık ya da kişi referanslarını ekle.", items: [
-        "Her şeyi hatırlayan barmen", "Yorgun edebiyat öğretmeni", "Kasabanın sessiz postacısı", "Kayıp kardeşini arayan genç", "Emekli dedektif",
-        "Otobüs terminalinde bekleyen kadın", "Eski bir sahaf", "Konuşmayan çocuk", "Gece vardiyası hemşiresi", "Yanlış kapıyı çalan yabancı",
-        "Yaşlı denizci", "Kendi cenazesini planlayan adam", "Kayıp köpeğini arayan kız", "Köşedeki çiçekçi", "Her sabah aynı bankta oturan adam",
-        "Aynı şarkıyı söyleyen sokak müzisyeni", "Mahallenin eski terzisi", "Kimseye adını söylemeyen yolcu", "Eski radyo spikeri", "Kapıcı dairesinde yaşayan kadın",
-        "Gizemli taksi şoförü", "Köyden yeni gelen öğrenci", "Unutkan antikacı", "Kapanmış sinemanın makinisti", "Hep siyah giyinen komşu",
-        "Yalan söylediği hemen anlaşılan çocuk", "Çok konuşan berber", "Savaş görmüş fotoğrafçı", "Babasının izini süren genç kadın", "Mektup dağıtmayan postacı",
-        "Kendi geçmişinden kaçan aşçı", "Eski okul müdürü", "Gece kulübünün güvenlikçisi", "Bir sırrı saklayan doktor", "Yarım kalan romanını arayan yazar",
-        "Sürekli aynı rüyayı gören adam", "Mahalleye yeni taşınan aile", "İstasyonda unutulan çocuk", "Kayıp eşyalar bürosu memuru", "Gözlüklerini hiç çıkarmayan kadın",
-        "Eski tiyatro oyuncusu", "Kimsesizler yurdunda büyümüş genç", "Dedikoducu apartman sakini", "Sessiz otel resepsiyonisti", "Kendi adını kullanmayan adam",
-        "Sürekli not alan öğrenci", "Yanında hep bavul taşıyan kadın", "Eski polis muhabiri", "Kasabanın en yaşlı kadını", "Yıllar sonra dönen kardeş"
-      ] },
-      eylem: { label: "Eylem", icon: "⚡", description: "Sahnelerde kullanabileceğin eylemleri burada topla.", items: [
-        "Kapının arkasını dinlemek", "Bir notu aceleyle saklamak", "Yağmurda koşarak uzaklaşmak", "Eski bir kutuyu açmak", "Telefonu açmadan susturmak",
-        "Yanlış trene binmek", "Birinin gölgesini takip etmek", "Mektubu yırtıp çöpe atmak", "Kalabalığın içinde kaybolmak", "Aynı rüyayı tekrar anlatmak",
-        "Eski bir fotoğrafı saklamak", "Anahtarı başkasına vermek", "Bir ismi defalarca yazmak", "Boş odaya seslenmek", "Gece yarısı dışarı çıkmak",
-        "Bir kapıyı kilitleyip pişman olmak", "Gizlice telefon konuşması yapmak", "Yanlış numarayı aramak", "Bir bavulu istasyonda bırakmak", "Birinin yerine imza atmak",
-        "Eski kaseti dinlemek", "Bilinmeyen bir adrese gitmek", "Yarım kalan cümleyi tamamlamamak", "Birini kalabalıkta izlemek", "Aynanın üzerini örtmek",
-        "Eski bir defteri yakmak", "Karanlıkta merdiven inmek", "Bir yalanı sürdürmek", "Aniden masadan kalkmak", "Birinin adını unutmuş gibi yapmak",
-        "Sahte gülümsemek", "Bir sırrı başka bir sırla kapatmak", "Çekmeceyi kilitlemek", "Bir şarkıyı duyunca duraksamak", "Pencereden aşağı bakmak",
-        "Kimseye haber vermeden gitmek", "Kayıp bir şeyi bulmuş gibi davranmak", "Bir mesajı silmek", "Fotoğrafın arkasını çevirmek", "Yolda yön değiştirmek",
-        "Saatini bilerek durdurmak", "Birini affetmiş gibi yapmak", "Eski eve geri dönmek", "Adını söylemeden tanışmak", "Yanlış kişiye güvenmek",
-        "Bir kutuyu hiç açmadan saklamak", "Son anda vazgeçmek", "Bir anahtarı denize atmak", "Boş sandalyeye bakmak", "Yarım kalmış mektubu tamamlamak"
-      ] },
-      duygu: { label: "Duygu", icon: "💭", description: "Duygu ve atmosfer referanslarını ekle.", items: [
-        "İç sıkıntısı", "Geç kalmışlık hissi", "Sessiz sevinç", "Sebepsiz tedirginlik", "Eski bir özlem",
-        "Güvenmek istememe", "Yakalanma korkusu", "Beklenmedik rahatlama", "Kırgın gurur", "Bir şey olacak hissi",
-        "Saklanmış öfke", "Yavaş yavaş artan panik", "Eve dönememe hissi", "Yanlış yerde olma duygusu", "Çocukluk kokusu gibi gelen huzur",
-        "Kimseden yardım isteyememe", "Ani pişmanlık", "Bilinmeyene merak", "Kayıp bir şeyi hatırlama acısı", "Duyulmak istemeyen utanç",
-        "Üstü örtülü kıskançlık", "Soğuk bir kabulleniş", "Ait olamama", "Geçici cesaret", "Derin bir yorgunluk",
-        "İçten içe umutlanma", "Birine inanmak isteme", "Kendinden şüphe etme", "Boşluğa düşmüşlük", "Eski bir neşenin izi",
-        "Sıkışmışlık", "Sessiz suçluluk", "Kırılgan mutluluk", "Aniden gelen korku", "Uzaklaşma isteği",
-        "Yarım kalmış sevgi", "İçeride tutulan çığlık", "Kontrolü kaybetme hissi", "Bir sırra yaklaşma heyecanı", "Tanıdık bir yabancılık",
-        "Zoraki sakinlik", "İçten gelen direnç", "Görmezden gelinme acısı", "Birine geç kalmış olma hissi", "Kendini kandırma rahatlığı",
-        "Geri dönülmezlik", "Bekleyişin ağırlığı", "Anlaşılmama öfkesi", "Kaybolmuş güven", "Sessiz bir vedanın hüznü"
-      ] }
+      mekan: {
+        label: "Mekan",
+        icon: "📍",
+        description: "Bu kutuya aklına gelen mekanları yaz.",
+        items: [
+          "Kırmızı ışıklı eski bar", "Terk edilmiş tren istasyonu", "Yağmurlu ara sokak", "Sahile bakan çatı katı", "Sessiz kasaba kütüphanesi",
+          "Gece açık benzinlik", "Sisli orman yolu", "Kalabalık hastane koridoru", "Eski apartman boşluğu", "Neon tabelalı motel",
+          "Bodrum kattaki plak dükkanı", "Boş lunapark", "Dağ başındaki gözlemevi", "Kapalı sinema salonu", "Deniz fenerinin merdivenleri",
+          "Eski okul bahçesi", "Karanlık otobüs terminali", "Küçük balıkçı lokantası", "Tozlu antikacı dükkanı", "Şehrin altındaki metro tüneli",
+          "Çatısı akan pansiyon", "Paslı fabrika deposu", "Kum fırtınasına yakalanmış kasaba", "Gizli arka oda", "Apartman çatısındaki sera",
+          "Gece pazarı", "Uzun hastane bekleme salonu", "Kar altında kalmış kulübe", "Terk edilmiş yazlık site", "Eski radyo istasyonu",
+          "Sahil kenarında boş bank", "Dar taş merdivenli sokak", "Çökmek üzere olan köprü", "Küçük kasaba mezarlığı", "Kapanmış kitapçı",
+          "Ormanın içindeki kamp alanı", "Bir vapurun arka güvertesi", "Yeraltı sığınağı", "Göl kenarında ahşap iskele", "Beyaz floresanlı market",
+          "Kalabalık düğün salonu", "Eski belediye binası", "Kırık aynalı soyunma odası", "Rüzgarlı tepe", "Deniz kenarında paslı depo",
+          "Dar otel koridoru", "Şehrin en yüksek terası", "Gizli bodrum arşivi", "Kapanmak üzere olan lokanta", "Uçurum kenarındaki yol"
+        ]
+      },
+
+      nesne: {
+        label: "Nesne",
+        icon: "🧩",
+        description: "Notlarına referans olacak nesneleri burada tut.",
+        items: [
+          "Paslı anahtar", "Kırık pusula", "Sarı kapaklı defter", "Çatlamış cep saati", "Üzerinde tarih yazan fotoğraf",
+          "Yarım kalmış mektup", "Bozuk kasetçalar", "Mavi cam şişe", "Eski otel anahtarlığı", "İsimsiz harita",
+          "Kırmızı kurdele", "Yanmış kibrit kutusu", "Gümüş yüzük", "Boş ilaç kutusu", "Yırtık tren bileti",
+          "Eski daktilo", "Kilitli tahta sandık", "Çatlamış gözlük", "Kurumuş çiçek", "Pasaport kabı",
+          "Siyah şemsiye", "Kayıp düğme", "Üzeri çizilmiş kartpostal", "Bozuk fotoğraf makinesi", "Kırık oyuncak araba",
+          "Tahta satranç taşı", "Üzerinde baş harf olan mendil", "Küçük pirinç çan", "Eski ev tapusu", "Mürekkebi bitmiş kalem",
+          "Kilitli günlük", "Küçük müzik kutusu", "Lekeli masa örtüsü", "Dikiş iğnesi kutusu", "Eski telefon rehberi",
+          "Yıpranmış deri çanta", "Kırık ayna parçası", "Tozlu cam küre", "Eski sinema bileti", "Beyaz eldiven",
+          "Sönmüş fener", "Kurşun kalem ucu", "Taşınabilir radyo", "Gizli bölmeli kutu", "Üzerinde numara olan anahtar",
+          "Yarım kalmış örgü", "Çatlak porselen fincan", "Boş zarf", "Eski posta pulu", "Kırmızı kapaklı kibritlik"
+        ]
+      },
+
+      zaman: {
+        label: "Zaman",
+        icon: "⏳",
+        description: "Saat, dönem, mevsim ya da tarih fikirlerini ekle.",
+        items: [
+          "Yağmurdan hemen önce", "Sabaha karşı 04.17", "Kışın ilk karı", "Yaz sonunda bir pazar", "Elektrikler kesildikten sonra",
+          "Bayram sabahı", "1998 sonbaharı", "Gün batımından on dakika önce", "Okulların kapandığı gün", "Gece yarısından hemen sonra",
+          "Fırtınanın başladığı gece", "Son tren kalkmadan önce", "Yılbaşı gecesi", "Öğle sıcağında", "İlkbaharın ilk günü",
+          "Sabah ezanından sonra", "Akşam vardiyası bitince", "Saatler geri alındığında", "Ay tutulması gecesi", "Kar erimeye başladığında",
+          "Pazartesi sabahı", "Cuma akşamı", "Eski bir fotoğrafın çekildiği gün", "Doğum gününden bir gün önce", "Mezuniyet töreninden sonra",
+          "Düğünden hemen önce", "Cenazeden sonraki sessizlikte", "Sabahın ilk vapurunda", "Şehir uyurken", "Otobüs kaçtıktan sonra",
+          "Elektriklerin geri geldiği an", "Yaz yağmuru başladığında", "Kış tatilinin son gecesi", "Güneş doğmadan az önce", "Saat tam 03.03",
+          "Sonbahar rüzgarı çıkınca", "Bir telefon geldikten sonra", "Kapı çalınmadan birkaç saniye önce", "Uzun bir suskunluğun ardından", "Çocukluk yazlarından birinde",
+          "Takvimde işaretli gün", "Eski defterin bulunduğu gece", "Deniz çekildiğinde", "Sokak lambaları yanınca", "Sabah pazarı kurulurken",
+          "Gece nöbetinin ortasında", "Uykudan uyanır uyanmaz", "Sis dağılırken", "Kütüphane kapanmadan önce", "Son otobüs durağa geldiğinde"
+        ]
+      },
+
+      kisi: {
+        label: "Kişi",
+        icon: "👤",
+        description: "Karakter, tanıdık ya da kişi referanslarını ekle.",
+        items: [
+          "Her şeyi hatırlayan barmen", "Yorgun edebiyat öğretmeni", "Kasabanın sessiz postacısı", "Kayıp kardeşini arayan genç", "Emekli dedektif",
+          "Otobüs terminalinde bekleyen kadın", "Eski bir sahaf", "Konuşmayan çocuk", "Gece vardiyası hemşiresi", "Yanlış kapıyı çalan yabancı",
+          "Yaşlı denizci", "Kendi cenazesini planlayan adam", "Kayıp köpeğini arayan kız", "Köşedeki çiçekçi", "Her sabah aynı bankta oturan adam",
+          "Aynı şarkıyı söyleyen sokak müzisyeni", "Mahallenin eski terzisi", "Kimseye adını söylemeyen yolcu", "Eski radyo spikeri", "Kapıcı dairesinde yaşayan kadın",
+          "Gizemli taksi şoförü", "Köyden yeni gelen öğrenci", "Unutkan antikacı", "Kapanmış sinemanın makinisti", "Hep siyah giyinen komşu",
+          "Yalan söylediği hemen anlaşılan çocuk", "Çok konuşan berber", "Savaş görmüş fotoğrafçı", "Babasının izini süren genç kadın", "Mektup dağıtmayan postacı",
+          "Kendi geçmişinden kaçan aşçı", "Eski okul müdürü", "Gece kulübünün güvenlikçisi", "Bir sırrı saklayan doktor", "Yarım kalan romanını arayan yazar",
+          "Sürekli aynı rüyayı gören adam", "Mahalleye yeni taşınan aile", "İstasyonda unutulan çocuk", "Kayıp eşyalar bürosu memuru", "Gözlüklerini hiç çıkarmayan kadın",
+          "Eski tiyatro oyuncusu", "Kimsesizler yurdunda büyümüş genç", "Dedikoducu apartman sakini", "Sessiz otel resepsiyonisti", "Kendi adını kullanmayan adam",
+          "Sürekli not alan öğrenci", "Yanında hep bavul taşıyan kadın", "Eski polis muhabiri", "Kasabanın en yaşlı kadını", "Yıllar sonra dönen kardeş"
+        ]
+      },
+
+      eylem: {
+        label: "Eylem",
+        icon: "⚡",
+        description: "Sahnelerde kullanabileceğin eylemleri burada topla.",
+        items: [
+          "Kapının arkasını dinlemek", "Bir notu aceleyle saklamak", "Yağmurda koşarak uzaklaşmak", "Eski bir kutuyu açmak", "Telefonu açmadan susturmak",
+          "Yanlış trene binmek", "Birinin gölgesini takip etmek", "Mektubu yırtıp çöpe atmak", "Kalabalığın içinde kaybolmak", "Aynı rüyayı tekrar anlatmak",
+          "Eski bir fotoğrafı saklamak", "Anahtarı başkasına vermek", "Bir ismi defalarca yazmak", "Boş odaya seslenmek", "Gece yarısı dışarı çıkmak",
+          "Bir kapıyı kilitleyip pişman olmak", "Gizlice telefon konuşması yapmak", "Yanlış numarayı aramak", "Bir bavulu istasyonda bırakmak", "Birinin yerine imza atmak",
+          "Eski kaseti dinlemek", "Bilinmeyen bir adrese gitmek", "Yarım kalan cümleyi tamamlamamak", "Birini kalabalıkta izlemek", "Aynanın üzerini örtmek",
+          "Eski bir defteri yakmak", "Karanlıkta merdiven inmek", "Bir yalanı sürdürmek", "Aniden masadan kalkmak", "Birinin adını unutmuş gibi yapmak",
+          "Sahte gülümsemek", "Bir sırrı başka bir sırla kapatmak", "Çekmeceyi kilitlemek", "Bir şarkıyı duyunca duraksamak", "Pencereden aşağı bakmak",
+          "Kimseye haber vermeden gitmek", "Kayıp bir şeyi bulmuş gibi davranmak", "Bir mesajı silmek", "Fotoğrafın arkasını çevirmek", "Yolda yön değiştirmek",
+          "Saatini bilerek durdurmak", "Birini affetmiş gibi yapmak", "Eski eve geri dönmek", "Adını söylemeden tanışmak", "Yanlış kişiye güvenmek",
+          "Bir kutuyu hiç açmadan saklamak", "Son anda vazgeçmek", "Bir anahtarı denize atmak", "Boş sandalyeye bakmak", "Yarım kalmış mektubu tamamlamak"
+        ]
+      },
+
+      duygu: {
+        label: "Duygu",
+        icon: "💭",
+        description: "Duygu ve atmosfer referanslarını ekle.",
+        items: [
+          "İç sıkıntısı", "Geç kalmışlık hissi", "Sessiz sevinç", "Sebepsiz tedirginlik", "Eski bir özlem",
+          "Güvenmek istememe", "Yakalanma korkusu", "Beklenmedik rahatlama", "Kırgın gurur", "Bir şey olacak hissi",
+          "Saklanmış öfke", "Yavaş yavaş artan panik", "Eve dönememe hissi", "Yanlış yerde olma duygusu", "Çocukluk kokusu gibi gelen huzur",
+          "Kimseden yardım isteyememe", "Ani pişmanlık", "Bilinmeyene merak", "Kayıp bir şeyi hatırlama acısı", "Duyulmak istemeyen utanç",
+          "Üstü örtülü kıskançlık", "Soğuk bir kabulleniş", "Ait olamama", "Geçici cesaret", "Derin bir yorgunluk",
+          "İçten içe umutlanma", "Birine inanmak isteme", "Kendinden şüphe etme", "Boşluğa düşmüşlük", "Eski bir neşenin izi",
+          "Sıkışmışlık", "Sessiz suçluluk", "Kırılgan mutluluk", "Aniden gelen korku", "Uzaklaşma isteği",
+          "Yarım kalmış sevgi", "İçeride tutulan çığlık", "Kontrolü kaybetme hissi", "Bir sırra yaklaşma heyecanı", "Tanıdık bir yabancılık",
+          "Zoraki sakinlik", "İçten gelen direnç", "Görmezden gelinme acısı", "Birine geç kalmış olma hissi", "Kendini kandırma rahatlığı",
+          "Geri dönülmezlik", "Bekleyişin ağırlığı", "Anlaşılmama öfkesi", "Kaybolmuş güven", "Sessiz bir vedanın hüznü"
+        ]
+      }
     };
 
+    function cloneData(data) {
+      return JSON.parse(JSON.stringify(data));
+    }
+
     function mergeDefaultBoxes(storedBoxes) {
-      if (!storedBoxes) return defaultBoxes;
-      const merged = structuredClone(defaultBoxes);
+      if (!storedBoxes) return cloneData(defaultBoxes);
+
+      const merged = cloneData(defaultBoxes);
+
       Object.entries(storedBoxes).forEach(([key, box]) => {
-        if (!merged[key]) merged[key] = box;
-        else {
-          merged[key] = { ...merged[key], ...box };
-          const combinedItems = [...(box.items || []), ...defaultBoxes[key].items];
-          merged[key].items = [...new Set(combinedItems)];
+        if (!merged[key]) {
+          merged[key] = box;
+          return;
         }
+
+        merged[key] = {
+          ...merged[key],
+          ...box,
+          items: [...new Set([...(box.items || []), ...(defaultBoxes[key].items || [])])]
+        };
       });
+
       return merged;
     }
 
-    let boxes = mergeDefaultBoxes(JSON.parse(localStorage.getItem("noteBoxes")));
-    let notes = JSON.parse(localStorage.getItem("notes")) || [
-      { id: crypto.randomUUID(), title: "İlk hikaye fikri", body: "", refs: [], updatedAt: new Date(Date.now() - 86400000).toISOString() },
-      { id: crypto.randomUUID(), title: "Karakter notları", body: "", refs: [], updatedAt: new Date(Date.now() - 172800000).toISOString() }
+    let boxes = mergeDefaultBoxes(JSON.parse(localStorage.getItem("noteBoxes") || "null"));
+
+    let notes = JSON.parse(localStorage.getItem("notes") || "null") || [
+      {
+        id: crypto.randomUUID(),
+        title: "İlk hikaye fikri",
+        body: "",
+        refs: [],
+        updatedAt: new Date(Date.now() - 86400000).toISOString()
+      },
+      {
+        id: crypto.randomUUID(),
+        title: "Karakter notları",
+        body: "",
+        refs: [],
+        updatedAt: new Date(Date.now() - 172800000).toISOString()
+      }
     ];
 
     let currentNoteId = null;
@@ -1170,37 +1370,26 @@ body.theme-notebook textarea.note-area {
     let activeSelectorKey = "mekan";
     let selectedRefs = [];
 
-    function getUsageMap() {
-      const usage = {};
-      Object.keys(boxes).forEach(key => usage[key] = {});
-      notes.forEach(note => {
-        (note.refs || []).forEach(ref => {
-          if (!usage[ref.key]) usage[ref.key] = {};
-          usage[ref.key][ref.value] = (usage[ref.key][ref.value] || 0) + 1;
-        });
-      });
-      return usage;
-    }
-
-    function getBoxUsageCount(key) {
-      const usage = getUsageMap()[key] || {};
-      return Object.values(usage).reduce((total, count) => total + count, 0);
+    function saveAll() {
+      localStorage.setItem("noteBoxes", JSON.stringify(boxes));
+      localStorage.setItem("notes", JSON.stringify(notes));
     }
 
     function applyTheme(theme = localStorage.getItem("notesTheme") || "light") {
       document.body.classList.remove("theme-dark", "theme-scifi", "theme-notebook");
-      if (theme !== "light") document.body.classList.add(`theme-${theme}`);
-      document.querySelectorAll(".theme-select").forEach(select => select.value = theme);
+
+      if (theme !== "light") {
+        document.body.classList.add(`theme-${theme}`);
+      }
+
+      document.querySelectorAll(".theme-select").forEach(select => {
+        select.value = theme;
+      });
     }
 
     function changeTheme(theme) {
       localStorage.setItem("notesTheme", theme);
       applyTheme(theme);
-    }
-
-    function saveAll() {
-      localStorage.setItem("noteBoxes", JSON.stringify(boxes));
-      localStorage.setItem("notes", JSON.stringify(notes));
     }
 
     function showScreen(id) {
@@ -1216,7 +1405,12 @@ body.theme-notebook textarea.note-area {
     }
 
     function formatDate(iso) {
-      return new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+      return new Intl.DateTimeFormat("tr-TR", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(new Date(iso));
     }
 
     function notePreview(body) {
@@ -1224,17 +1418,49 @@ body.theme-notebook textarea.note-area {
       return clean ? clean.slice(0, 90) + (clean.length > 90 ? "..." : "") : "Henüz içerik eklenmedi.";
     }
 
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getUsageMap() {
+      const usage = {};
+
+      Object.keys(boxes).forEach(key => {
+        usage[key] = {};
+      });
+
+      notes.forEach(note => {
+        (note.refs || []).forEach(ref => {
+          if (!usage[ref.key]) usage[ref.key] = {};
+          usage[ref.key][ref.value] = (usage[ref.key][ref.value] || 0) + 1;
+        });
+      });
+
+      return usage;
+    }
+
+    function getBoxUsageCount(key) {
+      const usage = getUsageMap()[key] || {};
+      return Object.values(usage).reduce((total, count) => total + count, 0);
+    }
+
     function renderHome() {
       const recentNotes = document.getElementById("recentNotes");
       const boxGrid = document.getElementById("boxGrid");
 
-      recentNotes.innerHTML = "";
       const sortedNotes = [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
+      recentNotes.innerHTML = "";
       sortedNotes.slice(0, 5).forEach(note => {
         const item = document.createElement("button");
         item.className = "recent-item";
         item.onclick = () => openNote(note.id);
+
         item.innerHTML = `
           <div>
             <strong>${escapeHtml(note.title)}</strong>
@@ -1242,6 +1468,7 @@ body.theme-notebook textarea.note-area {
           </div>
           <span>Devam et →</span>
         `;
+
         recentNotes.appendChild(item);
       });
 
@@ -1254,6 +1481,7 @@ body.theme-notebook textarea.note-area {
         const card = document.createElement("button");
         card.className = "box-card";
         card.onclick = () => openArchive(key);
+
         card.innerHTML = `
           <div class="box-top">
             <div class="box-icon">${box.icon}</div>
@@ -1264,6 +1492,7 @@ body.theme-notebook textarea.note-area {
           </div>
           <span class="count-badge">${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</span>
         `;
+
         boxGrid.appendChild(card);
       });
     }
@@ -1271,7 +1500,15 @@ body.theme-notebook textarea.note-area {
     function createNote() {
       const input = document.getElementById("newNoteTitle");
       const title = input.value.trim() || "Başlıksız Not";
-      const note = { id: crypto.randomUUID(), title, body: "", refs: [], updatedAt: new Date().toISOString() };
+
+      const note = {
+        id: crypto.randomUUID(),
+        title,
+        body: "",
+        refs: [],
+        updatedAt: new Date().toISOString()
+      };
+
       notes.unshift(note);
       input.value = "";
       saveAll();
@@ -1280,11 +1517,17 @@ body.theme-notebook textarea.note-area {
 
     function openNote(id) {
       currentNoteId = id;
+
       const note = notes.find(n => n.id === id);
+      if (!note) return;
+
       selectedRefs = Array.isArray(note.refs) ? [...note.refs] : [];
+
       document.getElementById("noteTitleDisplay").textContent = note.title;
       document.getElementById("noteBody").value = note.body || "";
+
       activeSelectorKey = Object.keys(boxes)[0] || "mekan";
+
       renderSelectedInfo();
       renderSelectorTabs();
       renderReferenceList();
@@ -1293,58 +1536,105 @@ body.theme-notebook textarea.note-area {
 
     function saveCurrentNote(showFeedback = false) {
       if (!currentNoteId) return;
+
       const note = notes.find(n => n.id === currentNoteId);
       if (!note) return;
-      note.body = document.getElementById("noteBody")?.value || note.body || "";
+
+      const noteBody = document.getElementById("noteBody");
+      note.body = noteBody ? noteBody.value : note.body || "";
       note.refs = [...selectedRefs];
       note.updatedAt = new Date().toISOString();
+
       saveAll();
+
       if (showFeedback) {
-        const original = document.querySelector("#noteScreen .soft-btn").textContent;
-        document.querySelector("#noteScreen .soft-btn").textContent = "Kaydedildi ✓";
-        setTimeout(() => document.querySelector("#noteScreen .soft-btn").textContent = original, 900);
+        const btn = [...document.querySelectorAll(".editor-actions .soft-btn")][0];
+        if (!btn) return;
+
+        const original = btn.textContent;
+        btn.textContent = "Kaydedildi ✓";
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 900);
       }
     }
 
-    document.getElementById("noteBody").addEventListener("input", () => saveCurrentNote());
+    document.getElementById("noteBody").addEventListener("input", () => {
+      saveCurrentNote();
+    });
+
+    function renderSelectedInfo() {
+      const selectedInfo = document.getElementById("selectedInfo");
+
+      if (!selectedRefs.length) {
+        selectedInfo.innerHTML = `<span class="info-empty">Referans etiketi yok.</span>`;
+        return;
+      }
+
+      selectedInfo.innerHTML = selectedRefs
+        .map(ref => `<span class="tag">${escapeHtml(ref.label)}: ${escapeHtml(ref.value)}</span>`)
+        .join("");
+    }
+
+    function clearSelections() {
+      selectedRefs = [];
+      saveCurrentNote();
+      renderSelectedInfo();
+      renderSelectorTabs();
+      renderReferenceList();
+    }
 
     function renderSelectorTabs() {
       const tabs = document.getElementById("selectorTabs");
       tabs.innerHTML = "";
 
       Object.entries(boxes).forEach(([key, box]) => {
-        const selectedCount = selectedRefs.filter(ref => ref.key === key).length;
         const tab = document.createElement("button");
         tab.className = `selector-tab ${key === activeSelectorKey ? "active" : ""}`;
+
         tab.onclick = () => {
           activeSelectorKey = key;
           document.getElementById("referenceSearch").value = "";
           renderSelectorTabs();
           renderReferenceList();
         };
-        tab.innerHTML = `<span>${box.icon} ${box.label}</span><small>${getBoxUsageCount(key)} kullanım</small>`;
+
+        tab.innerHTML = `
+          <span>${box.icon} ${box.label}</span>
+          <small>${getBoxUsageCount(key)} kullanım</small>
+        `;
+
         tabs.appendChild(tab);
       });
     }
 
     function renderReferenceList() {
       const activeBox = boxes[activeSelectorKey];
+      if (!activeBox) return;
+
       const title = document.getElementById("selectorActiveTitle");
       const list = document.getElementById("referenceList");
       const search = (document.getElementById("referenceSearch")?.value || "").toLowerCase().trim();
+      const sortMode = document.getElementById("referenceSort")?.value || "recent";
+      const usageMap = getUsageMap()[activeSelectorKey] || {};
 
       title.textContent = `${activeBox.icon} ${activeBox.label}`;
       list.innerHTML = "";
 
-      const usageMap = getUsageMap()[activeSelectorKey] || {};
-      const sortMode = document.getElementById("referenceSort")?.value || "recent";
       const filteredItems = activeBox.items
         .filter(item => item.toLowerCase().includes(search))
         .sort((a, b) => {
-          if (sortMode === "mostUsed") return (usageMap[b] || 0) - (usageMap[a] || 0) || a.localeCompare(b, "tr");
-          if (sortMode === "az") return a.localeCompare(b, "tr");
+          if (sortMode === "mostUsed") {
+            return (usageMap[b] || 0) - (usageMap[a] || 0) || a.localeCompare(b, "tr");
+          }
+
+          if (sortMode === "az") {
+            return a.localeCompare(b, "tr");
+          }
+
           return activeBox.items.indexOf(b) - activeBox.items.indexOf(a);
         });
+
       if (!filteredItems.length) {
         list.innerHTML = `<div class="empty-state">Bu aramada sonuç yok.</div>`;
         return;
@@ -1352,35 +1642,33 @@ body.theme-notebook textarea.note-area {
 
       filteredItems.forEach(item => {
         const exists = selectedRefs.some(ref => ref.key === activeSelectorKey && ref.value === item);
+
         const option = document.createElement("button");
         option.className = `reference-option ${exists ? "active" : ""}`;
         option.onclick = () => toggleReference(activeSelectorKey, item);
-        option.innerHTML = `<span>${escapeHtml(item)}</span><small>${exists ? "Seçildi" : `${usageMap[item] || 0} kullanım`}</small>`;
+
+        option.innerHTML = `
+          <span>${escapeHtml(item)}</span>
+          <small>${exists ? "Seçildi" : `${usageMap[item] || 0} kullanım`}</small>
+        `;
+
         list.appendChild(option);
       });
     }
 
     function toggleReference(key, value) {
       const index = selectedRefs.findIndex(ref => ref.key === key && ref.value === value);
-      if (index >= 0) selectedRefs.splice(index, 1);
-      else selectedRefs.push({ key, label: boxes[key].label, value });
-      saveCurrentNote();
-      renderSelectedInfo();
-      renderSelectorTabs();
-      renderReferenceList();
-    }
 
-    function renderSelectedInfo() {
-      const selectedInfo = document.getElementById("selectedInfo");
-      if (!selectedRefs.length) {
-        selectedInfo.innerHTML = `<span class="info-empty">Henüz referans seçilmedi. Aşağıdaki not kutularından seçim yap.</span>`;
-        return;
+      if (index >= 0) {
+        selectedRefs.splice(index, 1);
+      } else {
+        selectedRefs.push({
+          key,
+          label: boxes[key].label,
+          value
+        });
       }
-      selectedInfo.innerHTML = selectedRefs.map(ref => `<span class="tag">${escapeHtml(ref.label)}: ${escapeHtml(ref.value)}</span>`).join("");
-    }
 
-    function clearSelections() {
-      selectedRefs = [];
       saveCurrentNote();
       renderSelectedInfo();
       renderSelectorTabs();
@@ -1408,12 +1696,22 @@ body.theme-notebook textarea.note-area {
       Object.entries(boxes).forEach(([key, box]) => {
         const tab = document.createElement("button");
         tab.className = `side-tab ${key === activeArchiveKey ? "active" : ""}`;
-        tab.onclick = () => { activeArchiveKey = key; renderArchive(); };
-        tab.innerHTML = `<span>${box.icon} ${box.label}</span><small>${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</small>`;
+
+        tab.onclick = () => {
+          activeArchiveKey = key;
+          renderArchive();
+        };
+
+        tab.innerHTML = `
+          <span>${box.icon} ${box.label}</span>
+          <small>${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</small>
+        `;
+
         tabs.appendChild(tab);
       });
 
       list.innerHTML = "";
+
       if (!activeBox.items.length) {
         list.innerHTML = `<div class="empty-state">Bu not kutusunda henüz öğe yok.</div>`;
         return;
@@ -1422,6 +1720,7 @@ body.theme-notebook textarea.note-area {
       activeBox.items.forEach((item, index) => {
         const row = document.createElement("div");
         row.className = "archive-item";
+
         row.innerHTML = `
           <div>
             <strong>${escapeHtml(item)}</strong>
@@ -1429,8 +1728,68 @@ body.theme-notebook textarea.note-area {
           </div>
           <button class="delete-btn" onclick="deleteItem(${index})">Sil</button>
         `;
+
         list.appendChild(row);
       });
+    }
+
+    function addSingleItem() {
+      const input = document.getElementById("singleItemInput");
+      const value = input.value.trim();
+
+      if (!value) return;
+
+      addItems([value]);
+      input.value = "";
+    }
+
+    function addBulkItems() {
+      const textarea = document.getElementById("bulkItemInput");
+
+      const values = textarea.value
+        .split("\n")
+        .map(item => item.trim())
+        .filter(Boolean);
+
+      if (!values.length) return;
+
+      addItems(values);
+      textarea.value = "";
+    }
+
+    function addItems(values) {
+      const target = boxes[activeArchiveKey].items;
+
+      values.forEach(value => {
+        if (!target.some(item => item.toLowerCase() === value.toLowerCase())) {
+          target.push(value);
+        }
+      });
+
+      saveAll();
+      renderArchive();
+      renderHome();
+    }
+
+    function deleteItem(index) {
+      const item = boxes[activeArchiveKey].items[index];
+
+      const confirmed = confirm(`"${item}" adlı öğe silinsin mi?`);
+      if (!confirmed) return;
+
+      boxes[activeArchiveKey].items.splice(index, 1);
+
+      notes = notes.map(note => ({
+        ...note,
+        refs: (note.refs || []).filter(ref => !(ref.key === activeArchiveKey && ref.value === item))
+      }));
+
+      selectedRefs = selectedRefs.filter(ref => !(ref.key === activeArchiveKey && ref.value === item));
+
+      saveAll();
+      renderArchive();
+      renderHome();
+      renderSelectedInfo();
     }
 
     function openNotesArchive() {
@@ -1444,6 +1803,7 @@ body.theme-notebook textarea.note-area {
       grid.innerHTML = "";
 
       const sortedNotes = [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
       if (!sortedNotes.length) {
         grid.innerHTML = `<div class="empty-state">Henüz kayıtlı not yok.</div>`;
         return;
@@ -1452,9 +1812,10 @@ body.theme-notebook textarea.note-area {
       sortedNotes.forEach(note => {
         const card = document.createElement("div");
         card.className = "note-card";
+
         card.innerHTML = `
-          <div onclick="openNote('${note.id}')" style="cursor: pointer;">
-            <div class="box-top" style="margin-bottom: 12px;">
+          <div style="cursor:pointer;">
+            <div class="box-top" style="margin-bottom: 10px;">
               <div class="box-icon">🗒️</div>
               <div>
                 <strong>${escapeHtml(note.title)}</strong>
@@ -1463,11 +1824,17 @@ body.theme-notebook textarea.note-area {
             </div>
             <span>${escapeHtml(notePreview(note.body))}</span>
           </div>
+
           <div class="note-actions">
-            <span class="count-badge" onclick="openNote('${note.id}')" style="cursor: pointer;">Aç ve devam et</span>
-            <button class="delete-btn" onclick="deleteNote('${note.id}')">Sil</button>
+            <span class="count-badge" style="cursor:pointer;">Aç ve devam et</span>
+            <button class="delete-btn">Sil</button>
           </div>
         `;
+
+        card.querySelector("div").onclick = () => openNote(note.id);
+        card.querySelector(".count-badge").onclick = () => openNote(note.id);
+        card.querySelector(".delete-btn").onclick = () => deleteNote(note.id);
+
         grid.appendChild(card);
       });
     }
@@ -1475,10 +1842,17 @@ body.theme-notebook textarea.note-area {
     function deleteNote(id) {
       const note = notes.find(n => n.id === id);
       if (!note) return;
+
       const confirmed = confirm(`"${note.title}" adlı not silinsin mi?`);
       if (!confirmed) return;
+
       notes = notes.filter(n => n.id !== id);
-      if (currentNoteId === id) currentNoteId = null;
+
+      if (currentNoteId === id) {
+        currentNoteId = null;
+        selectedRefs = [];
+      }
+
       saveAll();
       renderHome();
       renderNotesArchive();
@@ -1486,53 +1860,25 @@ body.theme-notebook textarea.note-area {
 
     function deleteCurrentNote() {
       if (!currentNoteId) return;
-      deleteNote(currentNoteId);
-      goHome();
-    }
 
-    function addSingleItem() {
-      const input = document.getElementById("singleItemInput");
-      const value = input.value.trim();
-      if (!value) return;
-      addItems([value]);
-      input.value = "";
-    }
+      const note = notes.find(n => n.id === currentNoteId);
+      if (!note) return;
 
-    function addBulkItems() {
-      const textarea = document.getElementById("bulkItemInput");
-      const values = textarea.value.split("\n").map(item => item.trim()).filter(Boolean);
-      if (!values.length) return;
-      addItems(values);
-      textarea.value = "";
-    }
+      const confirmed = confirm(`"${note.title}" adlı not silinsin mi?`);
+      if (!confirmed) return;
 
-    function addItems(values) {
-      const target = boxes[activeArchiveKey].items;
-      values.forEach(value => {
-        if (!target.some(item => item.toLowerCase() === value.toLowerCase())) target.push(value);
-      });
+      notes = notes.filter(n => n.id !== currentNoteId);
+      currentNoteId = null;
+      selectedRefs = [];
+
       saveAll();
-      renderArchive();
       renderHome();
-    }
-
-    function deleteItem(index) {
-      boxes[activeArchiveKey].items.splice(index, 1);
-      saveAll();
-      renderArchive();
-      renderHome();
-    }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+      showScreen("homeScreen");
     }
 
     applyTheme();
+    saveAll();
     renderHome();
-  </script></body>
+  </script>
+</body>
 </html>
