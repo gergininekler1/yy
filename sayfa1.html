@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -6,9 +7,13 @@
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#fffdfa">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Notes">  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <meta name="apple-mobile-web-app-title" content="Notes">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+
+  <style>
     :root {
       --bg: #fffdfa;
       --paper: #ffffff;
@@ -279,294 +284,303 @@
       .input-row, .top-actions, .editor-actions, .editor-actions-left, .editor-actions-right { flex-direction: column; align-items: stretch; width: 100%; }
       .top-actions button, .top-actions select, .editor-actions button, .editor-actions select { width: 100%; }
     }
-  </style></head><body>
+  </style>
+</head>
+
+<body>
   <main class="app">
     <section id="homeScreen" class="screen active">
       <div class="page-header">
         <div class="brand">
           <div class="brand-icon">📝</div>
           <h1>Notes</h1>
-        </div><div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
-      <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-    </div>
-  </div>
+        </div>
 
-  <div class="layout">
-    <section class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Alanı</h2>
-          <p class="hint">Yeni not oluştur ya da son notlarına devam et.</p>
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
+          <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
+          <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
         </div>
       </div>
 
-      <div class="create-card">
-        <label>
-          <strong>Yeni not başlığı</strong>
-          <input id="newNoteTitle" type="text" placeholder="Örn. Karakter fikri, bölüm taslağı..." />
-        </label>
-        <button class="primary-btn" onclick="createNote()">Yeni Not Yarat</button>
-      </div>
-
-      <div class="panel-title"><h2>Son Notlar</h2></div>
-      <div id="recentNotes" class="recent-list"></div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Kutuları</h2>
-          <p class="hint">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini yönet.</p>
-        </div>
-      </div>
-
-      <div class="quick-add-card">
-        <strong>Hızlı kutu ekle</strong>
-        <div class="input-row">
-          <select id="quickBoxCategory"></select>
-          <input id="quickBoxItem" type="text" placeholder="Örn. Kırmızı bir bar" />
-          <button class="primary-btn" onclick="quickAddBoxItem()">Ekle</button>
-        </div>
-      </div>
-
-      <div id="boxGrid" class="boxes-grid"></div>
-    </section>
-  </div>
-</section>
-
-<section id="noteScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📝</div>
-      <div>
-        <h1 id="noteTitleDisplay" class="compact-title">Yeni Not</h1>
-        <p class="hint">Seçtiğin kutu öğeleri üstte soluk bilgi olarak görünür.</p>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
-      <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <div class="editor-shell">
-    <section class="editor">
-      <div class="terminal-title">C:\NOTLAR\EDITOR.EXE</div>
-
-      <div id="selectedInfo" class="selected-info">
-        <span class="info-empty">Referans etiketi yok.</span>
-      </div>
-
-      <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
-
-      <div id="noteDate" class="note-date"></div>
-
-      <div class="editor-actions">
-        <div class="editor-actions-left">
-          <button class="ghost-btn" onclick="copyFullNote()">Tüm Notu Kopyala</button>
-          <select id="templateInsertSelect"></select>
-          <button class="soft-btn" onclick="insertSelectedTemplate()">Şablon Ekle</button>
-        </div>
-        <div class="editor-actions-right">
-          <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
-          <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="selector-panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Kutusundan Seç</h2>
-          <p class="hint">Kategori seç, ara, sırala ve referansları tek tek nota bağla.</p>
-        </div>
-        <button class="soft-btn" onclick="clearSelections()">Seçimleri Temizle</button>
-      </div>
-
-      <div class="selector-workspace">
-        <div id="selectorTabs" class="selector-tabs"></div>
-
-        <div class="selector-content">
-          <div class="selector-content-head">
-            <h3 id="selectorActiveTitle">Mekan</h3>
-            <div class="selector-controls">
-              <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
-              <select id="referenceSort" onchange="renderReferenceList()">
-                <option value="recent">Son eklenen</option>
-                <option value="mostUsed">En çok kullanılan</option>
-                <option value="az">A-Z</option>
-              </select>
+      <div class="layout">
+        <section class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>Not Alanı</h2>
+              <p class="hint">Yeni not oluştur ya da son notlarına devam et.</p>
             </div>
           </div>
-          <div id="referenceList" class="reference-list"></div>
-        </div>
+
+          <div class="create-card">
+            <label>
+              <strong>Yeni not başlığı</strong>
+              <input id="newNoteTitle" type="text" placeholder="Örn. Karakter fikri, bölüm taslağı..." />
+            </label>
+            <button class="primary-btn" onclick="createNote()">Yeni Not Yarat</button>
+          </div>
+
+          <div class="panel-title"><h2>Son Notlar</h2></div>
+          <div id="recentNotes" class="recent-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>Not Kutuları</h2>
+              <p class="hint">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini yönet.</p>
+            </div>
+          </div>
+
+          <div class="quick-add-card">
+            <strong>Hızlı kutu ekle</strong>
+            <div class="input-row">
+              <select id="quickBoxCategory"></select>
+              <input id="quickBoxItem" type="text" placeholder="Örn. Kırmızı bir bar" />
+              <button class="primary-btn" onclick="quickAddBoxItem()">Ekle</button>
+            </div>
+          </div>
+
+          <div id="boxGrid" class="boxes-grid"></div>
+        </section>
       </div>
     </section>
-  </div>
-</section>
 
-<section id="archiveScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📦</div>
-      <div>
-        <h1 class="compact-title">Not Kutuları</h1>
-        <p class="hint">Tek tek ya da toplu ekleme yaparak referans arşivini büyüt.</p>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
-      <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <div class="archive-layout">
-    <aside class="panel">
-      <div class="panel-title"><h2>Kategoriler</h2></div>
-      <div id="archiveTabs" class="side-list"></div>
-    </aside>
-
-    <section class="archive-main">
-      <div class="panel-title">
-        <div>
-          <h2 id="archiveTitle">Mekan</h2>
-          <p id="archiveDescription" class="hint">Bu kutuya aklına gelen mekanları yaz.</p>
-        </div>
-      </div>
-
-      <div class="archive-actions">
-        <div class="action-box">
-          <h3>Tek Tek Ekle</h3>
-          <div class="input-row">
-            <input id="singleItemInput" type="text" placeholder="Örn. Eski tren garı" />
-            <button class="primary-btn" onclick="addSingleItem()">Ekle</button>
+    <section id="noteScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📝</div>
+          <div>
+            <h1 id="noteTitleDisplay" class="compact-title">Yeni Not</h1>
+            <p class="hint">Seçtiğin kutu öğeleri üstte soluk bilgi olarak görünür.</p>
           </div>
         </div>
 
-        <div class="action-box">
-          <h3>Toplu Ekle</h3>
-          <textarea id="bulkItemInput" class="bulk-area" placeholder="Her satıra bir öğe yaz..."></textarea>
-          <button class="soft-btn" style="margin-top: 10px;" onclick="addBulkItems()">Toplu Ekle</button>
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
+          <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
+          <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
         </div>
       </div>
 
-      <div id="archiveList" class="archive-list"></div>
+      <div class="editor-shell">
+        <section class="editor">
+          <div class="terminal-title">C:\NOTLAR\EDITOR.EXE</div>
+
+          <div id="selectedInfo" class="selected-info">
+            <span class="info-empty">Referans etiketi yok.</span>
+          </div>
+
+          <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
+
+          <div id="noteDate" class="note-date"></div>
+
+          <div class="editor-actions">
+            <div class="editor-actions-left">
+              <button class="ghost-btn" onclick="copyFullNote()">Tüm Notu Kopyala</button>
+              <select id="templateInsertSelect"></select>
+              <button class="soft-btn" onclick="insertSelectedTemplate()">Şablon Ekle</button>
+            </div>
+            <div class="editor-actions-right">
+              <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
+              <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="selector-panel">
+          <div class="panel-title">
+            <div>
+              <h2>Not Kutusundan Seç</h2>
+              <p class="hint">Kategori seç, ara, sırala ve referansları tek tek nota bağla.</p>
+            </div>
+            <button class="soft-btn" onclick="clearSelections()">Seçimleri Temizle</button>
+          </div>
+
+          <div class="selector-workspace">
+            <div id="selectorTabs" class="selector-tabs"></div>
+
+            <div class="selector-content">
+              <div class="selector-content-head">
+                <h3 id="selectorActiveTitle">Mekan</h3>
+                <div class="selector-controls">
+                  <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
+                  <select id="referenceSort" onchange="renderReferenceList()">
+                    <option value="recent">Son eklenen</option>
+                    <option value="mostUsed">En çok kullanılan</option>
+                    <option value="az">A-Z</option>
+                  </select>
+                </div>
+              </div>
+              <div id="referenceList" class="reference-list"></div>
+            </div>
+          </div>
+        </section>
+      </div>
     </section>
-  </div>
-</section>
 
-<section id="notesArchiveScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📚</div>
-      <div>
-        <h1 class="compact-title">Not Arşivi</h1>
-        <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
+    <section id="archiveScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📦</div>
+          <div>
+            <h1 class="compact-title">Not Kutuları</h1>
+            <p class="hint">Tek tek ya da toplu ekleme yaparak referans arşivini büyüt.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
+          <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
+          <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+        </div>
       </div>
-    </div>
 
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
-      <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
+      <div class="archive-layout">
+        <aside class="panel">
+          <div class="panel-title"><h2>Kategoriler</h2></div>
+          <div id="archiveTabs" class="side-list"></div>
+        </aside>
 
-  <section class="panel">
-    <div class="panel-title">
-      <div>
-        <h2>Kayıtlı Notlar</h2>
-        <p class="hint">Bir nota tıklayarak yazmaya devam edebilirsin.</p>
+        <section class="archive-main">
+          <div class="panel-title">
+            <div>
+              <h2 id="archiveTitle">Mekan</h2>
+              <p id="archiveDescription" class="hint">Bu kutuya aklına gelen mekanları yaz.</p>
+            </div>
+          </div>
+
+          <div class="archive-actions">
+            <div class="action-box">
+              <h3>Tek Tek Ekle</h3>
+              <div class="input-row">
+                <input id="singleItemInput" type="text" placeholder="Örn. Eski tren garı" />
+                <button class="primary-btn" onclick="addSingleItem()">Ekle</button>
+              </div>
+            </div>
+
+            <div class="action-box">
+              <h3>Toplu Ekle</h3>
+              <textarea id="bulkItemInput" class="bulk-area" placeholder="Her satıra bir öğe yaz..."></textarea>
+              <button class="soft-btn" style="margin-top: 10px;" onclick="addBulkItems()">Toplu Ekle</button>
+            </div>
+          </div>
+
+          <div id="archiveList" class="archive-list"></div>
+        </section>
       </div>
-    </div>
-    <div id="notesArchiveGrid" class="notes-archive-grid"></div>
-  </section>
-</section>
+    </section>
 
-<section id="templatesScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📄</div>
-      <div>
-        <h1 class="compact-title">Şablonlar</h1>
-        <p class="hint">Sık kullandığın not yapılarını oluştur ve notlara ekle.</p>
+    <section id="notesArchiveScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📚</div>
+          <div>
+            <h1 class="compact-title">Not Arşivi</h1>
+            <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
+          <button class="ghost-btn" onclick="backupToFirebase()">☁️ Yedekle</button>
+          <button class="ghost-btn" onclick="loadFromFirebase()">⬇️ Yükle</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+        </div>
       </div>
-    </div>
 
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Kayıtlı Notlar</h2>
+            <p class="hint">Bir nota tıklayarak yazmaya devam edebilirsin.</p>
+          </div>
+        </div>
+        <div id="notesArchiveGrid" class="notes-archive-grid"></div>
+      </section>
+    </section>
 
-  <section class="panel">
-    <div class="panel-title">
-      <div>
-        <h2>Şablon Oluştur</h2>
-        <p class="hint">Başlık ve içerik gir. Not ekranında seçip ekleyebilirsin.</p>
+    <section id="templatesScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📄</div>
+          <div>
+            <h1 class="compact-title">Şablonlar</h1>
+            <p class="hint">Sık kullandığın not yapılarını oluştur ve notlara ekle.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
+          <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+        </div>
       </div>
-    </div>
 
-    <div class="template-actions">
-      <div class="action-box">
-        <h3>Şablon adı</h3>
-        <input id="templateTitleInput" type="text" placeholder="Örn. Sahne taslağı" />
-      </div>
-      <div class="action-box">
-        <h3>Şablon içeriği</h3>
-        <textarea id="templateBodyInput" class="template-area" placeholder="Mekan:\nKişi:\nÇatışma:\nDuygu:"></textarea>
-        <button class="primary-btn" style="margin-top: 10px;" onclick="createTemplate()">Şablon Oluştur</button>
-      </div>
-    </div>
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Şablon Oluştur</h2>
+            <p class="hint">Başlık ve içerik gir. Not ekranında seçip ekleyebilirsin.</p>
+          </div>
+        </div>
 
-    <div class="panel-title"><h2>Kayıtlı Şablonlar</h2></div>
-    <div id="templatesGrid" class="templates-grid"></div>
-  </section>
-</section>
+        <div class="template-actions">
+          <div class="action-box">
+            <h3>Şablon adı</h3>
+            <input id="templateTitleInput" type="text" placeholder="Örn. Sahne taslağı" />
+          </div>
+          <div class="action-box">
+            <h3>Şablon içeriği</h3>
+            <textarea id="templateBodyInput" class="template-area" placeholder="Mekan:\nKişi:\nÇatışma:\nDuygu:"></textarea>
+            <button class="primary-btn" style="margin-top: 10px;" onclick="createTemplate()">Şablon Oluştur</button>
+          </div>
+        </div>
 
-  </main>  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>  <script>
+        <div class="panel-title"><h2>Kayıtlı Şablonlar</h2></div>
+        <div id="templatesGrid" class="templates-grid"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+  <script>
     const defaultBoxes = {
       mekan: { label: "Mekan", icon: "📍", description: "Bu kutuya aklına gelen mekanları yaz.", items: ["Kırmızı ışıklı eski bar", "Terk edilmiş tren istasyonu", "Yağmurlu ara sokak", "Sahile bakan çatı katı", "Sessiz kasaba kütüphanesi", "Gece açık benzinlik", "Sisli orman yolu", "Kalabalık hastane koridoru", "Eski apartman boşluğu", "Neon tabelalı motel", "Bodrum kattaki plak dükkanı", "Boş lunapark", "Dağ başındaki gözlemevi", "Kapalı sinema salonu", "Deniz fenerinin merdivenleri", "Eski okul bahçesi", "Karanlık otobüs terminali", "Küçük balıkçı lokantası", "Tozlu antikacı dükkanı", "Şehrin altındaki metro tüneli", "Çatısı akan pansiyon", "Paslı fabrika deposu", "Kum fırtınasına yakalanmış kasaba", "Gizli arka oda", "Apartman çatısındaki sera", "Gece pazarı", "Uzun hastane bekleme salonu", "Kar altında kalmış kulübe", "Terk edilmiş yazlık site", "Eski radyo istasyonu", "Sahil kenarında boş bank", "Dar taş merdivenli sokak", "Çökmek üzere olan köprü", "Küçük kasaba mezarlığı", "Kapanmış kitapçı", "Ormanın içindeki kamp alanı", "Bir vapurun arka güvertesi", "Yeraltı sığınağı", "Göl kenarında ahşap iskele", "Beyaz floresanlı market", "Kalabalık düğün salonu", "Eski belediye binası", "Kırık aynalı soyunma odası", "Rüzgarlı tepe", "Deniz kenarında paslı depo", "Dar otel koridoru", "Şehrin en yüksek terası", "Gizli bodrum arşivi", "Kapanmak üzere olan lokanta", "Uçurum kenarındaki yol"] },
       nesne: { label: "Nesne", icon: "🧩", description: "Notlarına referans olacak nesneleri burada tut.", items: ["Paslı anahtar", "Kırık pusula", "Sarı kapaklı defter", "Çatlamış cep saati", "Üzerinde tarih yazan fotoğraf", "Yarım kalmış mektup", "Bozuk kasetçalar", "Mavi cam şişe", "Eski otel anahtarlığı", "İsimsiz harita", "Kırmızı kurdele", "Yanmış kibrit kutusu", "Gümüş yüzük", "Boş ilaç kutusu", "Yırtık tren bileti", "Eski daktilo", "Kilitli tahta sandık", "Çatlamış gözlük", "Kurumuş çiçek", "Pasaport kabı", "Siyah şemsiye", "Kayıp düğme", "Üzeri çizilmiş kartpostal", "Bozuk fotoğraf makinesi", "Kırık oyuncak araba", "Tahta satranç taşı", "Üzerinde baş harf olan mendil", "Küçük pirinç çan", "Eski ev tapusu", "Mürekkebi bitmiş kalem", "Kilitli günlük", "Küçük müzik kutusu", "Lekeli masa örtüsü", "Dikiş iğnesi kutusu", "Eski telefon rehberi", "Yıpranmış deri çanta", "Kırık ayna parçası", "Tozlu cam küre", "Eski sinema bileti", "Beyaz eldiven", "Sönmüş fener", "Kurşun kalem ucu", "Taşınabilir radyo", "Gizli bölmeli kutu", "Üzerinde numara olan anahtar", "Yarım kalmış örgü", "Çatlak porselen fincan", "Boş zarf", "Eski posta pulu", "Kırmızı kapaklı kibritlik"] },
@@ -1073,5 +1087,6 @@ Son yedek: " + formatDate(data.updatedAt) : ""}`);
     applyTheme();
     saveAll();
     renderHome();
-  </script></body>
+  </script>
+</body>
 </html>
