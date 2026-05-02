@@ -1,10 +1,13 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notes</title>  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>Notes</title>  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">  
+  <style>
     :root {
       --bg: #fffdfa;
       --paper: #ffffff;
@@ -80,20 +83,37 @@
     .ghost-btn { background: #f0ece5; color: #444; padding: 7px 10px; }
     .danger-btn, .delete-btn { background: #fff0ed; color: var(--danger); padding: 7px 10px; }
     .delete-btn, .mini-btn { padding: 6px 8px; }
-    .theme-select { width: auto; min-width: 145px; padding: 7px 9px; background: var(--paper); color: var(--text); border: 1px solid var(--line); }
+    .theme-select { width: auto; min-width: 110px; padding: 7px 9px; background: var(--paper); color: var(--text); border: 1px solid var(--line); height: 36px; }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+    .minimal-text-btn {
+      height: 36px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     .primary-btn:hover, .recent-item:hover, .box-card:hover, .archive-item:hover, .note-card:hover, .template-card:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06); }
 
     .layout { display: grid; grid-template-columns: 1fr 1.05fr; gap: 18px; align-items: start; }
 
-    .panel, .selector-panel, .editor, .archive-main {
+    .panel, .editor, .archive-main {
       border: 1px solid rgba(232, 227, 218, 0.95);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
       padding: 14px;
     }
 
-    .panel, .selector-panel { background: var(--paper-soft); }
+    .panel { background: var(--paper-soft); }
     .editor, .archive-main { background: var(--paper); }
 
     .panel-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
@@ -127,6 +147,46 @@
 
     .recent-list, .side-list { display: grid; gap: 8px; }
 
+    .horizontal-scroll-list {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .horizontal-scroll-list::-webkit-scrollbar {
+      height: 6px;
+    }
+    .horizontal-scroll-list::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.03);
+      border-radius: 10px;
+    }
+    .horizontal-scroll-list::-webkit-scrollbar-thumb {
+      background: var(--muted);
+      border-radius: 10px;
+    }
+
+    .recent-item-card {
+      flex: 0 0 240px;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      transition: 0.15s ease;
+      text-align: left;
+    }
+
+    .recent-item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+      border-color: var(--blue);
+    }
+
     .recent-item, .box-card, .archive-item, .note-card, .template-card {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(232, 227, 218, 0.95);
@@ -145,7 +205,7 @@
 
     .count-badge { align-self: flex-start; background: #f1eee8; color: #67625a; border-radius: 999px; padding: 5px 8px; font-size: 10.5px; font-weight: 700; }
 
-    .editor-shell { display: grid; gap: 16px; }
+    .editor-shell { display: block; } /* Grid kaldırıldı, editör tam genişlikte */
     .terminal-title { display: none; }
 
     .selected-info {
@@ -158,7 +218,6 @@
       align-items: center;
       gap: 7px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
       border: 1px solid rgba(47, 111, 246, 0.1);
     }
 
@@ -166,12 +225,60 @@
     .tag { background: rgba(255, 255, 255, 0.78); color: rgba(36, 36, 36, 0.72); border: 1px solid rgba(47, 111, 246, 0.14); border-radius: 999px; padding: 4px 7px; font-size: 10.5px; font-weight: 700; cursor: pointer; }
     .tag:hover { filter: brightness(0.96); text-decoration: line-through; }
 
-    textarea.note-area { min-height: 210px; resize: vertical; font-size: 13px; line-height: 1.65; border-radius: 12px; background: #fffefa; }
-    .editor-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    textarea.note-area { 
+      min-height: 350px; /* Daha geniş editör alanı */
+      resize: vertical; 
+      font-size: 15px; 
+      line-height: 1.65; 
+      border-radius: 12px; 
+      background: #fffefa; 
+      font-family: "Special Elite", "Courier New", monospace; 
+    }
+    
+    .editor-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
     .editor-actions-left, .editor-actions-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .note-date { color: var(--muted); font-size: 11px; margin-top: 8px; text-align: right; }
 
-    .selector-workspace { display: grid; grid-template-columns: 210px 1fr; gap: 12px; margin-top: 12px; }
+    /* YENİ: MODAL (AÇILIR PENCERE) CSS KODLARI */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 999;
+      backdrop-filter: blur(3px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--paper-soft);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+    .modal-header h2 { margin: 0; font-size: 18px; }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .selector-workspace { display: grid; grid-template-columns: 210px 1fr; gap: 12px; }
     .selector-tabs { display: grid; gap: 8px; align-content: start; max-height: 370px; overflow: auto; padding-right: 3px; }
 
     .selector-tab, .side-tab {
@@ -210,9 +317,10 @@
     .note-actions, .template-card-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; }
     .empty-state { padding: 20px; text-align: center; background: color-mix(in srgb, var(--paper) 78%, var(--paper-soft)); border: 1px dashed var(--line); color: var(--muted); border-radius: 12px; }
 
+    /* GECE MODU */
     body.theme-dark { --bg: #111111; --paper: #1d1d1d; --paper-soft: #151515; --text: #ece8e2; --muted: #b4aba0; --line: #323232; --blue: #a7c2ff; --blue-soft: #222c3d; --shadow: 0 10px 28px rgba(0, 0, 0, 0.30); }
-    body.theme-dark .panel, body.theme-dark .selector-panel { background: #151515; border-color: #323232; }
-    body.theme-dark .editor, body.theme-dark .archive-main, body.theme-dark .create-card, body.theme-dark .quick-add-card, body.theme-dark .recent-item, body.theme-dark .box-card, body.theme-dark .note-card, body.theme-dark .template-card, body.theme-dark .archive-item, body.theme-dark .selector-content, body.theme-dark .selector-tab, body.theme-dark .side-tab, body.theme-dark .action-box, body.theme-dark input, body.theme-dark textarea, body.theme-dark select { background: #1d1d1d; color: #ece8e2; border-color: #323232; }
+    body.theme-dark .panel, body.theme-dark .modal-content, body.theme-dark .modal-header { background: #151515; border-color: #323232; }
+    body.theme-dark .editor, body.theme-dark .archive-main, body.theme-dark .create-card, body.theme-dark .quick-add-card, body.theme-dark .recent-item, body.theme-dark .box-card, body.theme-dark .note-card, body.theme-dark .template-card, body.theme-dark .archive-item, body.theme-dark .selector-content, body.theme-dark .selector-tab, body.theme-dark .side-tab, body.theme-dark .action-box, body.theme-dark input, body.theme-dark textarea, body.theme-dark select, body.theme-dark .recent-item-card { background: #1d1d1d; color: #ece8e2; border-color: #323232; }
     body.theme-dark .ghost-btn { background: #242424; color: #ece8e2; border: 1px solid #363636; }
     body.theme-dark .soft-btn { background: #222c3d; color: #d7e2ff; }
     body.theme-dark .selected-info { background: #1d2533; border-color: #303d55; color: #d8e2ff; }
@@ -222,10 +330,11 @@
     body.theme-dark .count-badge { background: #2a2a2a; color: #d7d0c8; }
     body.theme-dark .empty-state { background: #202020; border-color: #393939; }
 
+    /* SCI-FI MODU */
     body.theme-scifi { --bg: #07110c; --paper: #0d1712; --paper-soft: #0a1410; --text: #d7ffe0; --muted: #8db79a; --line: #1d4730; --blue: #72f29a; --blue-soft: #10231a; --shadow: 0 10px 28px rgba(0, 0, 0, 0.28); }
     body.theme-scifi, body.theme-scifi button, body.theme-scifi input, body.theme-scifi textarea, body.theme-scifi select { font-family: "Share Tech Mono", ui-monospace, monospace; }
     body.theme-scifi h1, body.theme-scifi h2, body.theme-scifi h3, body.theme-scifi .primary-btn, body.theme-scifi .ghost-btn, body.theme-scifi .soft-btn, body.theme-scifi .danger-btn, body.theme-scifi .theme-select { font-family: "Orbitron", "Share Tech Mono", sans-serif; }
-    body.theme-scifi .panel, body.theme-scifi .selector-panel, body.theme-scifi .archive-main, body.theme-scifi .create-card, body.theme-scifi .quick-add-card, body.theme-scifi .recent-item, body.theme-scifi .box-card, body.theme-scifi .note-card, body.theme-scifi .template-card, body.theme-scifi .archive-item, body.theme-scifi .selector-content, body.theme-scifi .selector-tab, body.theme-scifi .side-tab, body.theme-scifi .action-box, body.theme-scifi input, body.theme-scifi select { background: #0d1712; color: #d7ffe0; border-color: #1d4730; }
+    body.theme-scifi .panel, body.theme-scifi .modal-content, body.theme-scifi .modal-header, body.theme-scifi .archive-main, body.theme-scifi .create-card, body.theme-scifi .quick-add-card, body.theme-scifi .recent-item, body.theme-scifi .box-card, body.theme-scifi .note-card, body.theme-scifi .template-card, body.theme-scifi .archive-item, body.theme-scifi .selector-content, body.theme-scifi .selector-tab, body.theme-scifi .side-tab, body.theme-scifi .action-box, body.theme-scifi input, body.theme-scifi select, body.theme-scifi .recent-item-card { background: #0d1712; color: #d7ffe0; border-color: #1d4730; }
     body.theme-scifi .brand-icon, body.theme-scifi .box-icon { background: #0d1712; border-color: #27643c; box-shadow: 0 0 14px rgba(114, 242, 154, 0.05); }
     body.theme-scifi .ghost-btn { background: #112019; color: #d7ffe0; border: 1px solid #27643c; }
     body.theme-scifi .soft-btn { background: #12261b; color: #9ef8b8; }
@@ -235,28 +344,11 @@
     body.theme-scifi .terminal-title { display: flex; align-items: center; height: 32px; margin: -14px -14px 12px; padding: 0 12px; background: linear-gradient(#d8d8d8, #bdbdbd); color: #101010; font-family: "Share Tech Mono", ui-monospace, monospace; font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
     body.theme-scifi .selected-info { background: rgba(114, 242, 154, 0.06); border: 1px solid rgba(114, 242, 154, 0.15); color: #9ef8b8; font-size: 12.5px; }
     body.theme-scifi .tag { background: rgba(114, 242, 154, 0.08); color: #aefbc2; border-color: rgba(114, 242, 154, 0.18); }
-    body.theme-scifi textarea.note-area { min-height: 260px; background: transparent; border-color: rgba(114, 242, 154, 0.12); color: #aefbc2; font-family: "Share Tech Mono", ui-monospace, monospace; font-size: 15px; line-height: 1.6; caret-color: #72f29a; }
+    body.theme-scifi textarea.note-area { background: transparent; border-color: rgba(114, 242, 154, 0.12); color: #aefbc2; font-family: "Share Tech Mono", ui-monospace, monospace; caret-color: #72f29a; }
     body.theme-scifi textarea.note-area::placeholder { color: rgba(174, 251, 194, 0.42); }
     body.theme-scifi .reference-option { background: #112019; color: #d7ffe0; border-color: #1d4730; }
     body.theme-scifi .reference-option.active { background: #173324; color: #aefbc2; }
     body.theme-scifi .count-badge { background: #12261b; color: #aefbc2; }
-
-    body.theme-notebook { --bg: #efe4cf; --paper: #fffdf7; --paper-soft: #e7d7bb; --text: #2d2218; --muted: #7a6755; --line: #d5c09d; --blue: #6f4b2a; --blue-soft: #efe0c4; --shadow: 0 10px 28px rgba(88, 60, 32, 0.08); }
-    body.theme-notebook, body.theme-notebook button, body.theme-notebook input, body.theme-notebook textarea, body.theme-notebook select { font-family: Inter, sans-serif; }
-    body.theme-notebook h1, body.theme-notebook h2, body.theme-notebook h3 { font-family: "Cormorant Garamond", Georgia, serif; letter-spacing: -0.02em; }
-    body.theme-notebook .panel, body.theme-notebook .selector-panel { background: #e7d7bb; border-color: #d5c09d; }
-    body.theme-notebook .editor, body.theme-notebook .archive-main, body.theme-notebook .create-card, body.theme-notebook .quick-add-card, body.theme-notebook .recent-item, body.theme-notebook .box-card, body.theme-notebook .note-card, body.theme-notebook .template-card, body.theme-notebook .archive-item, body.theme-notebook .selector-content, body.theme-notebook .selector-tab, body.theme-notebook .side-tab, body.theme-notebook .action-box, body.theme-notebook input, body.theme-notebook select { background: #fffdf7; color: #2d2218; border-color: #d5c09d; }
-    body.theme-notebook .brand-icon, body.theme-notebook .box-icon { background: #f7efe1; border-color: #d8c3a0; box-shadow: 0 6px 14px rgba(109, 76, 40, 0.08); }
-    body.theme-notebook .ghost-btn { background: #f2e4ca; color: #3c2c1d; border: 1px solid #cfb186; }
-    body.theme-notebook .soft-btn { background: #efe0c4; color: #6f4b2a; }
-    body.theme-notebook .primary-btn, body.theme-notebook .selector-tab.active, body.theme-notebook .side-tab.active { background: #6f4b2a; color: #fffaf0; }
-    body.theme-notebook .danger-btn, body.theme-notebook .delete-btn { background: #f9e1dc; color: #a14f42; }
-    body.theme-notebook .selected-info { background: #f5ead6; border-color: #d9c29e; color: #4a3624; }
-    body.theme-notebook .tag { background: #fffaf0; color: #5c4330; border-color: #d7c19c; }
-    body.theme-notebook .reference-option { background: #fbf3e4; color: #2d2218; border-color: #d5c09d; }
-    body.theme-notebook .reference-option.active { background: #efe0c4; color: #4d3421; }
-    body.theme-notebook .count-badge { background: #f2e4ca; color: #5c4330; }
-    body.theme-notebook textarea.note-area { background: linear-gradient(90deg, transparent 0 34px, rgba(191, 89, 73, 0.20) 34px 36px, transparent 36px), repeating-linear-gradient(#fffdf7 0 25px, #e8dcc4 26px 27px); color: #2d2218; border: 1px solid #d5c09d; padding-left: 46px; font-family: "Special Elite", "Courier New", monospace; font-size: 14px; line-height: 27px; }
 
     @media (max-width: 920px) {
       .layout, .archive-layout, .archive-actions, .template-actions, .selector-workspace { grid-template-columns: 1fr; }
@@ -266,295 +358,339 @@
     @media (max-width: 640px) {
       body { font-size: 12px; }
       .app { padding: 22px 14px 48px; }
-      .page-header, .note-toolbar { align-items: flex-start; flex-direction: column; }
+      .page-header, .note-toolbar { align-items: flex-start; flex-direction: column; gap: 12px; }
       .brand-icon { width: 42px; height: 42px; font-size: 21px; }
       h1 { font-size: 34px; }
       .compact-title { font-size: 30px !important; }
       .boxes-grid, .archive-list, .notes-archive-grid, .templates-grid, .selector-tabs { grid-template-columns: 1fr; }
       .selector-controls { grid-template-columns: 1fr; }
-      .input-row, .top-actions, .editor-actions, .editor-actions-left, .editor-actions-right { flex-direction: column; align-items: stretch; width: 100%; }
-      .top-actions button, .top-actions select, .editor-actions button, .editor-actions select { width: 100%; }
+      .input-row { flex-direction: column; align-items: stretch; width: 100%; }
+      .top-actions { width: 100%; display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+      .theme-select { flex-grow: 1; }
     }
-  </style></head><body>
+  </style>
+</head>
+<body>
   <main class="app">
+
     <section id="homeScreen" class="screen active">
       <div class="page-header">
         <div class="brand">
           <div class="brand-icon">📝</div>
           <h1>Notes</h1>
-        </div><div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="layout">
-    <section class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Alanı</h2>
-          <p class="hint">Yeni not oluştur ya da son notlarına devam et.</p>
+        </div>
+        
+        <div class="top-actions">
+          <button class="icon-btn ghost-btn" title="Ana Sayfa" onclick="goHome()">🏠</button>
+          <button class="icon-btn ghost-btn" title="Not Kutuları" onclick="openBoxesOverview()">🧩</button>
+          <button class="icon-btn ghost-btn" title="Not Arşivi" onclick="openNotesArchive()">📚</button>
+          <button class="icon-btn ghost-btn" title="Şablonlar" onclick="openTemplatesScreen()">📄</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+          </select>
         </div>
       </div>
 
-      <div class="create-card">
-        <label>
-          <strong>Yeni not başlığı</strong>
-          <input id="newNoteTitle" type="text" placeholder="Örn. Karakter fikri, bölüm taslağı..." />
-        </label>
-        <button class="primary-btn" onclick="createNote()">Yeni Not Yarat</button>
-      </div>
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Hızlı Başlangıç</h2>
+            <p class="hint">Yeni bir fikir oluştur.</p>
+          </div>
+        </div>
 
-      <div class="panel-title"><h2>Son Notlar</h2></div>
-      <div id="recentNotes" class="recent-list"></div>
+        <div class="create-card">
+          <label>
+            <strong>Yeni not başlığı</strong>
+            <input id="newNoteTitle" type="text" placeholder="Örn. Karakter fikri, bölüm taslağı..." />
+          </label>
+          <button class="primary-btn minimal-text-btn" style="width: max-content;" onclick="createNote()">Yeni Not Yarat</button>
+        </div>
+
+        <div class="panel-title" style="margin-top: 28px;">
+          <h2>Son Notlar</h2>
+        </div>
+        <div id="recentNotes" class="horizontal-scroll-list"></div>
+      </section>
     </section>
 
-    <section class="panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Kutuları</h2>
-          <p class="hint">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini yönet.</p>
+    <section id="boxesOverviewScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">🧩</div>
+          <div>
+            <h1 class="compact-title">Kutu Özeti</h1>
+            <p class="hint">Tüm kategorilerini buradan yönet ve hızlıca yeni referans ekle.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-btn ghost-btn" title="Ana Sayfa" onclick="goHome()">🏠</button>
+          <button class="icon-btn ghost-btn" title="Not Kutuları" onclick="openBoxesOverview()">🧩</button>
+          <button class="icon-btn ghost-btn" title="Not Arşivi" onclick="openNotesArchive()">📚</button>
+          <button class="icon-btn ghost-btn" title="Şablonlar" onclick="openTemplatesScreen()">📄</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+          </select>
         </div>
       </div>
 
-      <div class="quick-add-card">
-        <strong>Hızlı kutu ekle</strong>
-        <div class="input-row">
-          <select id="quickBoxCategory"></select>
-          <input id="quickBoxItem" type="text" placeholder="Örn. Kırmızı bir bar" />
-          <button class="primary-btn" onclick="quickAddBoxItem()">Ekle</button>
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Kutu Yönetimi</h2>
+            <p class="hint">Mekan, nesne, zaman, kişi, eylem ve duygu arşivlerini yönet.</p>
+          </div>
         </div>
-      </div>
 
-      <div id="boxGrid" class="boxes-grid"></div>
-    </section>
-  </div>
-</section>
-
-<section id="noteScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📝</div>
-      <div>
-        <h1 id="noteTitleDisplay" class="compact-title">Yeni Not</h1>
-        <p class="hint">Seçtiğin kutu öğeleri üstte soluk bilgi olarak görünür.</p>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <div class="editor-shell">
-    <section class="editor">
-      <div class="terminal-title">C:\NOTLAR\EDITOR.EXE</div>
-
-      <div id="selectedInfo" class="selected-info">
-        <span class="info-empty">Referans etiketi yok.</span>
-      </div>
-
-      <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
-
-      <div id="noteDate" class="note-date"></div>
-
-      <div class="editor-actions">
-        <div class="editor-actions-left">
-          <button class="ghost-btn" onclick="copyFullNote()">Tüm Notu Kopyala</button>
-          <select id="templateInsertSelect"></select>
-          <button class="soft-btn" onclick="insertSelectedTemplate()">Şablon Ekle</button>
+        <div class="quick-add-card">
+          <strong>Hızlı kutu ekle</strong>
+          <div class="input-row">
+            <select id="quickBoxCategory"></select>
+            <input id="quickBoxItem" type="text" placeholder="Örn. Kırmızı bir bar" />
+            <button class="primary-btn minimal-text-btn" style="width: max-content;" onclick="quickAddBoxItem()">Ekle</button>
+          </div>
         </div>
-        <div class="editor-actions-right">
-          <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
-          <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
-        </div>
-      </div>
+
+        <div id="boxGrid" class="boxes-grid"></div>
+      </section>
     </section>
 
-    <section class="selector-panel">
-      <div class="panel-title">
-        <div>
-          <h2>Not Kutusundan Seç</h2>
-          <p class="hint">Kategori seç, ara, sırala ve referansları tek tek nota bağla.</p>
+    <section id="noteScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📝</div>
+          <div>
+            <h1 id="noteTitleDisplay" class="compact-title">Yeni Not</h1>
+            <p class="hint">Seçtiğin kutu öğeleri üstte soluk bilgi olarak görünür.</p>
+          </div>
         </div>
-        <button class="soft-btn" onclick="clearSelections()">Seçimleri Temizle</button>
+
+        <div class="top-actions">
+          <button class="icon-btn ghost-btn" title="Ana Sayfa" onclick="goHome()">🏠</button>
+          <button class="icon-btn ghost-btn" title="Not Kutuları" onclick="openBoxesOverview()">🧩</button>
+          <button class="icon-btn ghost-btn" title="Not Arşivi" onclick="openNotesArchive()">📚</button>
+          <button class="icon-btn ghost-btn" title="Şablonlar" onclick="openTemplatesScreen()">📄</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+          </select>
+        </div>
       </div>
 
-      <div class="selector-workspace">
-        <div id="selectorTabs" class="selector-tabs"></div>
+      <div class="editor-shell">
+        <section class="editor">
+          <div class="terminal-title">C:\NOTLAR\EDITOR.EXE</div>
 
-        <div class="selector-content">
-          <div class="selector-content-head">
-            <h3 id="selectorActiveTitle">Mekan</h3>
-            <div class="selector-controls">
-              <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
-              <select id="referenceSort" onchange="renderReferenceList()">
-                <option value="recent">Son eklenen</option>
-                <option value="mostUsed">En çok kullanılan</option>
-                <option value="az">A-Z</option>
-              </select>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; gap: 8px;">
+            <div id="selectedInfo" class="selected-info" style="margin-bottom: 0; flex-grow: 1;">
+              <span class="info-empty">Referans etiketi yok.</span>
+            </div>
+            <button class="soft-btn minimal-text-btn" style="height: 36px; flex: 0 0 auto;" onclick="openReferenceModal()">🧩 Referans Ekle</button>
+          </div>
+
+          <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
+
+          <div id="noteDate" class="note-date"></div>
+
+          <div class="editor-actions">
+            <div class="editor-actions-left">
+              <button class="ghost-btn icon-btn" title="Tüm Notu Kopyala" onclick="copyFullNote()">📋</button>
+              <select id="templateInsertSelect" style="padding: 4px 8px; font-size: 12px; height: 36px; border-radius: 8px; width: auto;"></select>
+              <button class="soft-btn icon-btn" title="Şablon Ekle" onclick="insertSelectedTemplate()">➕</button>
+            </div>
+            <div class="editor-actions-right">
+              <button class="soft-btn minimal-text-btn" onclick="saveCurrentNote(true)">💾 Kaydet</button>
+              <button class="danger-btn icon-btn" title="Notu Sil" onclick="deleteCurrentNote()">🗑️</button>
             </div>
           </div>
-          <div id="referenceList" class="reference-list"></div>
-        </div>
+        </section>
       </div>
     </section>
-  </div>
-</section>
 
-<section id="archiveScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📦</div>
-      <div>
-        <h1 class="compact-title">Not Kutuları</h1>
-        <p class="hint">Tek tek ya da toplu ekleme yaparak referans arşivini büyüt.</p>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <div class="archive-layout">
-    <aside class="panel">
-      <div class="panel-title"><h2>Kategoriler</h2></div>
-      <div id="archiveTabs" class="side-list"></div>
-    </aside>
-
-    <section class="archive-main">
-      <div class="panel-title">
-        <div>
-          <h2 id="archiveTitle">Mekan</h2>
-          <p id="archiveDescription" class="hint">Bu kutuya aklına gelen mekanları yaz.</p>
-        </div>
-      </div>
-
-      <div class="archive-actions">
-        <div class="action-box">
-          <h3>Tek Tek Ekle</h3>
-          <div class="input-row">
-            <input id="singleItemInput" type="text" placeholder="Örn. Eski tren garı" />
-            <button class="primary-btn" onclick="addSingleItem()">Ekle</button>
+    <section id="archiveScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📦</div>
+          <div>
+            <h1 class="compact-title">Not Kutuları</h1>
+            <p class="hint">Tek tek ya da toplu ekleme yaparak referans arşivini büyüt.</p>
           </div>
         </div>
 
-        <div class="action-box">
-          <h3>Toplu Ekle</h3>
-          <textarea id="bulkItemInput" class="bulk-area" placeholder="Her satıra bir öğe yaz..."></textarea>
-          <button class="soft-btn" style="margin-top: 10px;" onclick="addBulkItems()">Toplu Ekle</button>
+        <div class="top-actions">
+          <button class="icon-btn ghost-btn" title="Ana Sayfa" onclick="goHome()">🏠</button>
+          <button class="icon-btn ghost-btn" title="Not Kutuları" onclick="openBoxesOverview()">🧩</button>
+          <button class="icon-btn ghost-btn" title="Not Arşivi" onclick="openNotesArchive()">📚</button>
+          <button class="icon-btn ghost-btn" title="Şablonlar" onclick="openTemplatesScreen()">📄</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+          </select>
         </div>
       </div>
 
-      <div id="archiveList" class="archive-list"></div>
+      <div class="archive-layout">
+        <aside class="panel">
+          <div class="panel-title"><h2>Kategoriler</h2></div>
+          <div id="archiveTabs" class="side-list"></div>
+        </aside>
+
+        <section class="archive-main">
+          <div class="panel-title">
+            <div>
+              <h2 id="archiveTitle">Mekan</h2>
+              <p id="archiveDescription" class="hint">Bu kutuya aklına gelen mekanları yaz.</p>
+            </div>
+          </div>
+
+          <div class="archive-actions">
+            <div class="action-box">
+              <h3>Tek Tek Ekle</h3>
+              <div class="input-row">
+                <input id="singleItemInput" type="text" placeholder="Örn. Eski tren garı" />
+                <button class="primary-btn minimal-text-btn" style="width: max-content;" onclick="addSingleItem()">Ekle</button>
+              </div>
+            </div>
+
+            <div class="action-box">
+              <h3>Toplu Ekle</h3>
+              <textarea id="bulkItemInput" class="bulk-area" placeholder="Her satıra bir öğe yaz..."></textarea>
+              <button class="soft-btn minimal-text-btn" style="margin-top: 10px;" onclick="addBulkItems()">Toplu Ekle</button>
+            </div>
+          </div>
+
+          <div id="archiveList" class="archive-list"></div>
+        </section>
+      </div>
     </section>
+
+    <section id="notesArchiveScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📚</div>
+          <div>
+            <h1 class="compact-title">Not Arşivi</h1>
+            <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-btn ghost-btn" title="Ana Sayfa" onclick="goHome()">🏠</button>
+          <button class="icon-btn ghost-btn" title="Not Kutuları" onclick="openBoxesOverview()">🧩</button>
+          <button class="icon-btn ghost-btn" title="Not Arşivi" onclick="openNotesArchive()">📚</button>
+          <button class="icon-btn ghost-btn" title="Şablonlar" onclick="openTemplatesScreen()">📄</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+          </select>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Kayıtlı Notlar</h2>
+            <p class="hint">Bir nota tıklayarak yazmaya devam edebilirsin.</p>
+          </div>
+        </div>
+        <div id="notesArchiveGrid" class="notes-archive-grid"></div>
+      </section>
+    </section>
+
+    <section id="templatesScreen" class="screen">
+      <div class="note-toolbar">
+        <div class="brand">
+          <div class="brand-icon">📄</div>
+          <div>
+            <h1 class="compact-title">Şablonlar</h1>
+            <p class="hint">Sık kullandığın not yapılarını oluştur ve notlara ekle.</p>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-btn ghost-btn" title="Ana Sayfa" onclick="goHome()">🏠</button>
+          <button class="icon-btn ghost-btn" title="Not Kutuları" onclick="openBoxesOverview()">🧩</button>
+          <button class="icon-btn ghost-btn" title="Not Arşivi" onclick="openNotesArchive()">📚</button>
+          <button class="icon-btn ghost-btn" title="Şablonlar" onclick="openTemplatesScreen()">📄</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+          </select>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="panel-title">
+          <div>
+            <h2>Şablon Oluştur</h2>
+            <p class="hint">Başlık ve içerik gir. Not ekranında seçip ekleyebilirsin.</p>
+          </div>
+        </div>
+
+        <div class="template-actions">
+          <div class="action-box">
+            <h3>Şablon adı</h3>
+            <input id="templateTitleInput" type="text" placeholder="Örn. Sahne taslağı" />
+          </div>
+          <div class="action-box">
+            <h3>Şablon içeriği</h3>
+            <textarea id="templateBodyInput" class="template-area" placeholder="Mekan:\nKişi:\nÇatışma:\nDuygu:"></textarea>
+            <button class="primary-btn minimal-text-btn" style="margin-top: 10px;" onclick="createTemplate()">Şablon Oluştur</button>
+          </div>
+        </div>
+
+        <div class="panel-title"><h2>Kayıtlı Şablonlar</h2></div>
+        <div id="templatesGrid" class="templates-grid"></div>
+      </section>
+    </section>
+
+  </main>
+
+  <div id="referenceModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Referans Ekle</h2>
+        <button class="ghost-btn icon-btn" title="Kapat" onclick="closeReferenceModal()">✖</button>
+      </div>
+      <div class="modal-body">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <p class="hint" style="margin: 0;">Seçimlerin anında nota eklenir.</p>
+          <button class="soft-btn minimal-text-btn" style="height: 28px; font-size: 11px;" onclick="clearSelections()">Hepsini Temizle</button>
+        </div>
+
+        <div class="selector-workspace">
+          <div id="selectorTabs" class="selector-tabs"></div>
+
+          <div class="selector-content">
+            <div class="selector-content-head">
+              <h3 id="selectorActiveTitle">Mekan</h3>
+              <div class="selector-controls">
+                <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
+                <select id="referenceSort" onchange="renderReferenceList()">
+                  <option value="recent">Son eklenen</option>
+                  <option value="mostUsed">En çok kullanılan</option>
+                  <option value="az">A-Z</option>
+                </select>
+              </div>
+            </div>
+            <div id="referenceList" class="reference-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</section>
 
-<section id="notesArchiveScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📚</div>
-      <div>
-        <h1 class="compact-title">Not Arşivi</h1>
-        <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openTemplatesScreen()">📄 Şablonlar</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <section class="panel">
-    <div class="panel-title">
-      <div>
-        <h2>Kayıtlı Notlar</h2>
-        <p class="hint">Bir nota tıklayarak yazmaya devam edebilirsin.</p>
-      </div>
-    </div>
-    <div id="notesArchiveGrid" class="notes-archive-grid"></div>
-  </section>
-</section>
-
-<section id="templatesScreen" class="screen">
-  <div class="note-toolbar">
-    <div class="brand">
-      <div class="brand-icon">📄</div>
-      <div>
-        <h1 class="compact-title">Şablonlar</h1>
-        <p class="hint">Sık kullandığın not yapılarını oluştur ve notlara ekle.</p>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Açık tema</option>
-        <option value="dark">Gece modu</option>
-        <option value="scifi">Sci-fi terminal</option>
-        <option value="notebook">Defter / edebiyatçı</option>
-      </select>
-      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
-    </div>
-  </div>
-
-  <section class="panel">
-    <div class="panel-title">
-      <div>
-        <h2>Şablon Oluştur</h2>
-        <p class="hint">Başlık ve içerik gir. Not ekranında seçip ekleyebilirsin.</p>
-      </div>
-    </div>
-
-    <div class="template-actions">
-      <div class="action-box">
-        <h3>Şablon adı</h3>
-        <input id="templateTitleInput" type="text" placeholder="Örn. Sahne taslağı" />
-      </div>
-      <div class="action-box">
-        <h3>Şablon içeriği</h3>
-        <textarea id="templateBodyInput" class="template-area" placeholder="Mekan:\nKişi:\nÇatışma:\nDuygu:"></textarea>
-        <button class="primary-btn" style="margin-top: 10px;" onclick="createTemplate()">Şablon Oluştur</button>
-      </div>
-    </div>
-
-    <div class="panel-title"><h2>Kayıtlı Şablonlar</h2></div>
-    <div id="templatesGrid" class="templates-grid"></div>
-  </section>
-</section>
-
-  </main>  <script>
+  <script>
     const defaultBoxes = {
       mekan: { label: "Mekan", icon: "📍", description: "Bu kutuya aklına gelen mekanları yaz.", items: ["Kırmızı ışıklı eski bar", "Terk edilmiş tren istasyonu", "Yağmurlu ara sokak", "Sahile bakan çatı katı", "Sessiz kasaba kütüphanesi", "Gece açık benzinlik", "Sisli orman yolu", "Kalabalık hastane koridoru", "Eski apartman boşluğu", "Neon tabelalı motel", "Bodrum kattaki plak dükkanı", "Boş lunapark", "Dağ başındaki gözlemevi", "Kapalı sinema salonu", "Deniz fenerinin merdivenleri", "Eski okul bahçesi", "Karanlık otobüs terminali", "Küçük balıkçı lokantası", "Tozlu antikacı dükkanı", "Şehrin altındaki metro tüneli", "Çatısı akan pansiyon", "Paslı fabrika deposu", "Kum fırtınasına yakalanmış kasaba", "Gizli arka oda", "Apartman çatısındaki sera", "Gece pazarı", "Uzun hastane bekleme salonu", "Kar altında kalmış kulübe", "Terk edilmiş yazlık site", "Eski radyo istasyonu", "Sahil kenarında boş bank", "Dar taş merdivenli sokak", "Çökmek üzere olan köprü", "Küçük kasaba mezarlığı", "Kapanmış kitapçı", "Ormanın içindeki kamp alanı", "Bir vapurun arka güvertesi", "Yeraltı sığınağı", "Göl kenarında ahşap iskele", "Beyaz floresanlı market", "Kalabalık düğün salonu", "Eski belediye binası", "Kırık aynalı soyunma odası", "Rüzgarlı tepe", "Deniz kenarında paslı depo", "Dar otel koridoru", "Şehrin en yüksek terası", "Gizli bodrum arşivi", "Kapanmak üzere olan lokanta", "Uçurum kenarındaki yol"] },
       nesne: { label: "Nesne", icon: "🧩", description: "Notlarına referans olacak nesneleri burada tut.", items: ["Paslı anahtar", "Kırık pusula", "Sarı kapaklı defter", "Çatlamış cep saati", "Üzerinde tarih yazan fotoğraf", "Yarım kalmış mektup", "Bozuk kasetçalar", "Mavi cam şişe", "Eski otel anahtarlığı", "İsimsiz harita", "Kırmızı kurdele", "Yanmış kibrit kutusu", "Gümüş yüzük", "Boş ilaç kutusu", "Yırtık tren bileti", "Eski daktilo", "Kilitli tahta sandık", "Çatlamış gözlük", "Kurumuş çiçek", "Pasaport kabı", "Siyah şemsiye", "Kayıp düğme", "Üzeri çizilmiş kartpostal", "Bozuk fotoğraf makinesi", "Kırık oyuncak araba", "Tahta satranç taşı", "Üzerinde baş harf olan mendil", "Küçük pirinç çan", "Eski ev tapusu", "Mürekkebi bitmiş kalem", "Kilitli günlük", "Küçük müzik kutusu", "Lekeli masa örtüsü", "Dikiş iğnesi kutusu", "Eski telefon rehberi", "Yıpranmış deri çanta", "Kırık ayna parçası", "Tozlu cam küre", "Eski sinema bileti", "Beyaz eldiven", "Sönmüş fener", "Kurşun kalem ucu", "Taşınabilir radyo", "Gizli bölmeli kutu", "Üzerinde numara olan anahtar", "Yarım kalmış örgü", "Çatlak porselen fincan", "Boş zarf", "Eski posta pulu", "Kırmızı kapaklı kibritlik"] },
@@ -600,7 +736,8 @@
     }
 
     function applyTheme(theme = localStorage.getItem("notesTheme") || "light") {
-      document.body.classList.remove("theme-dark", "theme-scifi", "theme-notebook");
+      if (theme === "notebook") theme = "light"; 
+      document.body.classList.remove("theme-dark", "theme-scifi");
       if (theme !== "light") document.body.classList.add(`theme-${theme}`);
       document.querySelectorAll(".theme-select").forEach(select => { select.value = theme; });
     }
@@ -614,6 +751,7 @@
     }
 
     function goHome() { saveCurrentNote(); renderHome(); showScreen("homeScreen"); }
+    function openBoxesOverview() { saveCurrentNote(); renderHome(); showScreen("boxesOverviewScreen"); }
 
     function formatDate(iso) {
       return new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
@@ -640,23 +778,25 @@
       quickCategory.innerHTML = Object.entries(boxes).map(([key, box]) => `<option value="${key}">${box.icon} ${box.label}</option>`).join("");
 
       recentNotes.innerHTML = "";
-      sortedNotes.slice(0, 5).forEach(note => {
+      sortedNotes.slice(0, 8).forEach(note => {
         const item = document.createElement("button");
-        item.className = "recent-item";
+        item.className = "recent-item-card";
         item.onclick = () => openNote(note.id);
-        item.innerHTML = `<div><strong>${escapeHtml(note.title)}</strong><span>Son düzenleme: ${formatDate(note.updatedAt)}</span></div><span>Devam et →</span>`;
+        item.innerHTML = `<div><strong style="display:block; font-size: 15px; margin-bottom: 6px;">${escapeHtml(note.title)}</strong><span style="color: var(--muted); font-size: 11px;">Son düzenleme: ${formatDate(note.updatedAt)}</span></div><div style="font-size: 12px; color: var(--text); opacity: 0.8; margin-bottom: auto; line-height: 1.5;">${escapeHtml(notePreview(note.body))}</div><span style="font-weight: 700; color: var(--blue); margin-top: 8px;">Yazmaya devam et →</span>`;
         recentNotes.appendChild(item);
       });
-      if (!sortedNotes.length) recentNotes.innerHTML = `<div class="empty-state">Henüz kayıtlı not yok.</div>`;
+      if (!sortedNotes.length) recentNotes.innerHTML = `<div class="empty-state" style="width: 100%;">Henüz kayıtlı not yok.</div>`;
 
-      boxGrid.innerHTML = "";
-      Object.entries(boxes).forEach(([key, box]) => {
-        const card = document.createElement("button");
-        card.className = "box-card";
-        card.onclick = () => openArchive(key);
-        card.innerHTML = `<div class="box-top"><div class="box-icon">${box.icon}</div><div><strong>${box.label}</strong><span>${box.description}</span></div></div><span class="count-badge">${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</span>`;
-        boxGrid.appendChild(card);
-      });
+      if(boxGrid) {
+        boxGrid.innerHTML = "";
+        Object.entries(boxes).forEach(([key, box]) => {
+          const card = document.createElement("button");
+          card.className = "box-card";
+          card.onclick = () => openArchive(key);
+          card.innerHTML = `<div class="box-top"><div class="box-icon">${box.icon}</div><div><strong>${box.label}</strong><span>${box.description}</span></div></div><span class="count-badge">${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</span>`;
+          boxGrid.appendChild(card);
+        });
+      }
     }
 
     function quickAddBoxItem() {
@@ -709,11 +849,11 @@
       saveAll();
       renderNoteDate();
       if (showFeedback) {
-        const btn = [...document.querySelectorAll(".editor-actions .soft-btn")][0];
+        const btn = [...document.querySelectorAll(".editor-actions-right .soft-btn")][0];
         if (!btn) return;
-        const original = btn.textContent;
-        btn.textContent = "Kaydedildi ✓";
-        setTimeout(() => { btn.textContent = original; }, 900);
+        const original = btn.innerHTML;
+        btn.innerHTML = "✓ Kaydedildi";
+        setTimeout(() => { btn.innerHTML = original; }, 900);
       }
     }
 
@@ -725,6 +865,11 @@
       if (!note || !noteDate) return;
       noteDate.textContent = `Oluşturuldu: ${formatDate(note.createdAt || note.updatedAt)} · Son düzenleme: ${formatDate(note.updatedAt)}`;
     }
+
+    // YENİ: MODAL KONTROL FONKSİYONLARI
+    function openReferenceModal() { document.getElementById('referenceModal').classList.add('active'); }
+    function closeReferenceModal() { document.getElementById('referenceModal').classList.remove('active'); }
+    function closeModalOnOutsideClick(e) { if (e.target === document.getElementById('referenceModal')) closeReferenceModal(); }
 
     function renderSelectedInfo() {
       const selectedInfo = document.getElementById("selectedInfo");
@@ -822,7 +967,7 @@
       activeBox.items.forEach((item, index) => {
         const row = document.createElement("div");
         row.className = "archive-item";
-        row.innerHTML = `<div><strong>${escapeHtml(item)}</strong><span>${activeBox.label} referansı</span></div><button class="delete-btn" onclick="deleteItem(${index})">Sil</button>`;
+        row.innerHTML = `<div><strong>${escapeHtml(item)}</strong><span>${activeBox.label} referansı</span></div><button class="delete-btn minimal-text-btn" onclick="deleteItem(${index})">Sil</button>`;
         list.appendChild(row);
       });
     }
@@ -854,7 +999,7 @@
       sortedNotes.forEach(note => {
         const card = document.createElement("div");
         card.className = "note-card";
-        card.innerHTML = `<div style="cursor:pointer;"><div class="box-top" style="margin-bottom: 10px;"><div class="box-icon">🗒️</div><div><strong>${escapeHtml(note.title)}</strong><span>${formatDate(note.updatedAt)}</span></div></div><span>${escapeHtml(notePreview(note.body))}</span></div><div class="note-actions"><span class="count-badge" style="cursor:pointer;">Aç ve devam et</span><button class="delete-btn">Sil</button></div>`;
+        card.innerHTML = `<div style="cursor:pointer;"><div class="box-top" style="margin-bottom: 10px;"><div class="box-icon">🗒️</div><div><strong>${escapeHtml(note.title)}</strong><span>${formatDate(note.updatedAt)}</span></div></div><span>${escapeHtml(notePreview(note.body))}</span></div><div class="note-actions"><span class="count-badge" style="cursor:pointer;">Aç ve devam et</span><button class="delete-btn minimal-text-btn">Sil</button></div>`;
         card.querySelector("div").onclick = () => openNote(note.id);
         card.querySelector(".count-badge").onclick = () => openNote(note.id);
         card.querySelector(".delete-btn").onclick = () => deleteNote(note.id);
@@ -911,7 +1056,7 @@
       templates.forEach(template => {
         const card = document.createElement("div");
         card.className = "template-card";
-        card.innerHTML = `<div><strong>${escapeHtml(template.title)}</strong><span>${escapeHtml(notePreview(template.body))}</span></div><div class="template-card-actions"><button class="soft-btn">Nota Ekle</button><button class="delete-btn">Sil</button></div>`;
+        card.innerHTML = `<div><strong>${escapeHtml(template.title)}</strong><span>${escapeHtml(notePreview(template.body))}</span></div><div class="template-card-actions"><button class="soft-btn minimal-text-btn">Nota Ekle</button><button class="delete-btn minimal-text-btn">Sil</button></div>`;
         card.querySelector(".soft-btn").onclick = () => insertTemplate(template.id);
         card.querySelector(".delete-btn").onclick = () => deleteTemplate(template.id);
         grid.appendChild(card);
@@ -960,5 +1105,6 @@
     applyTheme();
     saveAll();
     renderHome();
-  </script></body>
+  </script>
+</body>
 </html>
