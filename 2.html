@@ -85,7 +85,6 @@
     .delete-btn, .mini-btn { padding: 6px 8px; }
     .theme-select { width: auto; min-width: 110px; padding: 7px 9px; background: var(--paper); color: var(--text); border: 1px solid var(--line); height: 36px; }
 
-    /* YENİ: MİNİMAL İKON BUTONLARI EKLENDİ */
     .icon-btn {
       width: 36px;
       height: 36px;
@@ -107,14 +106,14 @@
 
     .layout { display: grid; grid-template-columns: 1fr 1.05fr; gap: 18px; align-items: start; }
 
-    .panel, .selector-panel, .editor, .archive-main {
+    .panel, .editor, .archive-main {
       border: 1px solid rgba(232, 227, 218, 0.95);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
       padding: 14px;
     }
 
-    .panel, .selector-panel { background: var(--paper-soft); }
+    .panel { background: var(--paper-soft); }
     .editor, .archive-main { background: var(--paper); }
 
     .panel-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
@@ -206,7 +205,7 @@
 
     .count-badge { align-self: flex-start; background: #f1eee8; color: #67625a; border-radius: 999px; padding: 5px 8px; font-size: 10.5px; font-weight: 700; }
 
-    .editor-shell { display: grid; gap: 16px; }
+    .editor-shell { display: block; } /* Grid kaldırıldı, editör tam genişlikte */
     .terminal-title { display: none; }
 
     .selected-info {
@@ -219,7 +218,6 @@
       align-items: center;
       gap: 7px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
       border: 1px solid rgba(47, 111, 246, 0.1);
     }
 
@@ -227,9 +225,8 @@
     .tag { background: rgba(255, 255, 255, 0.78); color: rgba(36, 36, 36, 0.72); border: 1px solid rgba(47, 111, 246, 0.14); border-radius: 999px; padding: 4px 7px; font-size: 10.5px; font-weight: 700; cursor: pointer; }
     .tag:hover { filter: brightness(0.96); text-decoration: line-through; }
 
-    /* YENİ FONT: Daktilo fontu genel temaya aktarıldı */
     textarea.note-area { 
-      min-height: 260px; 
+      min-height: 350px; /* Daha geniş editör alanı */
       resize: vertical; 
       font-size: 15px; 
       line-height: 1.65; 
@@ -242,7 +239,46 @@
     .editor-actions-left, .editor-actions-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .note-date { color: var(--muted); font-size: 11px; margin-top: 8px; text-align: right; }
 
-    .selector-workspace { display: grid; grid-template-columns: 210px 1fr; gap: 12px; margin-top: 12px; }
+    /* YENİ: MODAL (AÇILIR PENCERE) CSS KODLARI */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 999;
+      backdrop-filter: blur(3px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--paper-soft);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+    .modal-header h2 { margin: 0; font-size: 18px; }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .selector-workspace { display: grid; grid-template-columns: 210px 1fr; gap: 12px; }
     .selector-tabs { display: grid; gap: 8px; align-content: start; max-height: 370px; overflow: auto; padding-right: 3px; }
 
     .selector-tab, .side-tab {
@@ -283,7 +319,7 @@
 
     /* GECE MODU */
     body.theme-dark { --bg: #111111; --paper: #1d1d1d; --paper-soft: #151515; --text: #ece8e2; --muted: #b4aba0; --line: #323232; --blue: #a7c2ff; --blue-soft: #222c3d; --shadow: 0 10px 28px rgba(0, 0, 0, 0.30); }
-    body.theme-dark .panel, body.theme-dark .selector-panel { background: #151515; border-color: #323232; }
+    body.theme-dark .panel, body.theme-dark .modal-content, body.theme-dark .modal-header { background: #151515; border-color: #323232; }
     body.theme-dark .editor, body.theme-dark .archive-main, body.theme-dark .create-card, body.theme-dark .quick-add-card, body.theme-dark .recent-item, body.theme-dark .box-card, body.theme-dark .note-card, body.theme-dark .template-card, body.theme-dark .archive-item, body.theme-dark .selector-content, body.theme-dark .selector-tab, body.theme-dark .side-tab, body.theme-dark .action-box, body.theme-dark input, body.theme-dark textarea, body.theme-dark select, body.theme-dark .recent-item-card { background: #1d1d1d; color: #ece8e2; border-color: #323232; }
     body.theme-dark .ghost-btn { background: #242424; color: #ece8e2; border: 1px solid #363636; }
     body.theme-dark .soft-btn { background: #222c3d; color: #d7e2ff; }
@@ -298,7 +334,7 @@
     body.theme-scifi { --bg: #07110c; --paper: #0d1712; --paper-soft: #0a1410; --text: #d7ffe0; --muted: #8db79a; --line: #1d4730; --blue: #72f29a; --blue-soft: #10231a; --shadow: 0 10px 28px rgba(0, 0, 0, 0.28); }
     body.theme-scifi, body.theme-scifi button, body.theme-scifi input, body.theme-scifi textarea, body.theme-scifi select { font-family: "Share Tech Mono", ui-monospace, monospace; }
     body.theme-scifi h1, body.theme-scifi h2, body.theme-scifi h3, body.theme-scifi .primary-btn, body.theme-scifi .ghost-btn, body.theme-scifi .soft-btn, body.theme-scifi .danger-btn, body.theme-scifi .theme-select { font-family: "Orbitron", "Share Tech Mono", sans-serif; }
-    body.theme-scifi .panel, body.theme-scifi .selector-panel, body.theme-scifi .archive-main, body.theme-scifi .create-card, body.theme-scifi .quick-add-card, body.theme-scifi .recent-item, body.theme-scifi .box-card, body.theme-scifi .note-card, body.theme-scifi .template-card, body.theme-scifi .archive-item, body.theme-scifi .selector-content, body.theme-scifi .selector-tab, body.theme-scifi .side-tab, body.theme-scifi .action-box, body.theme-scifi input, body.theme-scifi select, body.theme-scifi .recent-item-card { background: #0d1712; color: #d7ffe0; border-color: #1d4730; }
+    body.theme-scifi .panel, body.theme-scifi .modal-content, body.theme-scifi .modal-header, body.theme-scifi .archive-main, body.theme-scifi .create-card, body.theme-scifi .quick-add-card, body.theme-scifi .recent-item, body.theme-scifi .box-card, body.theme-scifi .note-card, body.theme-scifi .template-card, body.theme-scifi .archive-item, body.theme-scifi .selector-content, body.theme-scifi .selector-tab, body.theme-scifi .side-tab, body.theme-scifi .action-box, body.theme-scifi input, body.theme-scifi select, body.theme-scifi .recent-item-card { background: #0d1712; color: #d7ffe0; border-color: #1d4730; }
     body.theme-scifi .brand-icon, body.theme-scifi .box-icon { background: #0d1712; border-color: #27643c; box-shadow: 0 0 14px rgba(114, 242, 154, 0.05); }
     body.theme-scifi .ghost-btn { background: #112019; color: #d7ffe0; border: 1px solid #27643c; }
     body.theme-scifi .soft-btn { background: #12261b; color: #9ef8b8; }
@@ -308,13 +344,12 @@
     body.theme-scifi .terminal-title { display: flex; align-items: center; height: 32px; margin: -14px -14px 12px; padding: 0 12px; background: linear-gradient(#d8d8d8, #bdbdbd); color: #101010; font-family: "Share Tech Mono", ui-monospace, monospace; font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
     body.theme-scifi .selected-info { background: rgba(114, 242, 154, 0.06); border: 1px solid rgba(114, 242, 154, 0.15); color: #9ef8b8; font-size: 12.5px; }
     body.theme-scifi .tag { background: rgba(114, 242, 154, 0.08); color: #aefbc2; border-color: rgba(114, 242, 154, 0.18); }
-    body.theme-scifi textarea.note-area { min-height: 260px; background: transparent; border-color: rgba(114, 242, 154, 0.12); color: #aefbc2; font-family: "Share Tech Mono", ui-monospace, monospace; font-size: 15px; line-height: 1.6; caret-color: #72f29a; }
+    body.theme-scifi textarea.note-area { background: transparent; border-color: rgba(114, 242, 154, 0.12); color: #aefbc2; font-family: "Share Tech Mono", ui-monospace, monospace; caret-color: #72f29a; }
     body.theme-scifi textarea.note-area::placeholder { color: rgba(174, 251, 194, 0.42); }
     body.theme-scifi .reference-option { background: #112019; color: #d7ffe0; border-color: #1d4730; }
     body.theme-scifi .reference-option.active { background: #173324; color: #aefbc2; }
     body.theme-scifi .count-badge { background: #12261b; color: #aefbc2; }
 
-    /* MOBİL VE EKRAN DARALMA DÜZENLEMELERİ (Ferahlık için revize edildi) */
     @media (max-width: 920px) {
       .layout, .archive-layout, .archive-actions, .template-actions, .selector-workspace { grid-template-columns: 1fr; }
       .selector-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
@@ -329,8 +364,6 @@
       .compact-title { font-size: 30px !important; }
       .boxes-grid, .archive-list, .notes-archive-grid, .templates-grid, .selector-tabs { grid-template-columns: 1fr; }
       .selector-controls { grid-template-columns: 1fr; }
-      
-      /* İnputları alt alta, butonları yan yana tut */
       .input-row { flex-direction: column; align-items: stretch; width: 100%; }
       .top-actions { width: 100%; display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; }
       .theme-select { flex-grow: 1; }
@@ -454,8 +487,11 @@
         <section class="editor">
           <div class="terminal-title">C:\NOTLAR\EDITOR.EXE</div>
 
-          <div id="selectedInfo" class="selected-info">
-            <span class="info-empty">Referans etiketi yok.</span>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; gap: 8px;">
+            <div id="selectedInfo" class="selected-info" style="margin-bottom: 0; flex-grow: 1;">
+              <span class="info-empty">Referans etiketi yok.</span>
+            </div>
+            <button class="soft-btn minimal-text-btn" style="height: 36px; flex: 0 0 auto;" onclick="openReferenceModal()">🧩 Referans Ekle</button>
           </div>
 
           <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
@@ -471,36 +507,6 @@
             <div class="editor-actions-right">
               <button class="soft-btn minimal-text-btn" onclick="saveCurrentNote(true)">💾 Kaydet</button>
               <button class="danger-btn icon-btn" title="Notu Sil" onclick="deleteCurrentNote()">🗑️</button>
-            </div>
-          </div>
-
-        </section>
-
-        <section class="selector-panel">
-          <div class="panel-title">
-            <div>
-              <h2>Not Kutusundan Seç</h2>
-              <p class="hint">Kategori seç, ara, sırala ve referansları tek tek nota bağla.</p>
-            </div>
-            <button class="soft-btn minimal-text-btn" onclick="clearSelections()">Seçimleri Temizle</button>
-          </div>
-
-          <div class="selector-workspace">
-            <div id="selectorTabs" class="selector-tabs"></div>
-
-            <div class="selector-content">
-              <div class="selector-content-head">
-                <h3 id="selectorActiveTitle">Mekan</h3>
-                <div class="selector-controls">
-                  <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
-                  <select id="referenceSort" onchange="renderReferenceList()">
-                    <option value="recent">Son eklenen</option>
-                    <option value="mostUsed">En çok kullanılan</option>
-                    <option value="az">A-Z</option>
-                  </select>
-                </div>
-              </div>
-              <div id="referenceList" class="reference-list"></div>
             </div>
           </div>
         </section>
@@ -649,6 +655,41 @@
 
   </main>
 
+  <div id="referenceModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Referans Ekle</h2>
+        <button class="ghost-btn icon-btn" title="Kapat" onclick="closeReferenceModal()">✖</button>
+      </div>
+      <div class="modal-body">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <p class="hint" style="margin: 0;">Seçimlerin anında nota eklenir.</p>
+          <button class="soft-btn minimal-text-btn" style="height: 28px; font-size: 11px;" onclick="clearSelections()">Hepsini Temizle</button>
+        </div>
+
+        <div class="selector-workspace">
+          <div id="selectorTabs" class="selector-tabs"></div>
+
+          <div class="selector-content">
+            <div class="selector-content-head">
+              <h3 id="selectorActiveTitle">Mekan</h3>
+              <div class="selector-controls">
+                <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
+                <select id="referenceSort" onchange="renderReferenceList()">
+                  <option value="recent">Son eklenen</option>
+                  <option value="mostUsed">En çok kullanılan</option>
+                  <option value="az">A-Z</option>
+                </select>
+              </div>
+            </div>
+            <div id="referenceList" class="reference-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const defaultBoxes = {
       mekan: { label: "Mekan", icon: "📍", description: "Bu kutuya aklına gelen mekanları yaz.", items: ["Kırmızı ışıklı eski bar", "Terk edilmiş tren istasyonu", "Yağmurlu ara sokak", "Sahile bakan çatı katı", "Sessiz kasaba kütüphanesi", "Gece açık benzinlik", "Sisli orman yolu", "Kalabalık hastane koridoru", "Eski apartman boşluğu", "Neon tabelalı motel", "Bodrum kattaki plak dükkanı", "Boş lunapark", "Dağ başındaki gözlemevi", "Kapalı sinema salonu", "Deniz fenerinin merdivenleri", "Eski okul bahçesi", "Karanlık otobüs terminali", "Küçük balıkçı lokantası", "Tozlu antikacı dükkanı", "Şehrin altındaki metro tüneli", "Çatısı akan pansiyon", "Paslı fabrika deposu", "Kum fırtınasına yakalanmış kasaba", "Gizli arka oda", "Apartman çatısındaki sera", "Gece pazarı", "Uzun hastane bekleme salonu", "Kar altında kalmış kulübe", "Terk edilmiş yazlık site", "Eski radyo istasyonu", "Sahil kenarında boş bank", "Dar taş merdivenli sokak", "Çökmek üzere olan köprü", "Küçük kasaba mezarlığı", "Kapanmış kitapçı", "Ormanın içindeki kamp alanı", "Bir vapurun arka güvertesi", "Yeraltı sığınağı", "Göl kenarında ahşap iskele", "Beyaz floresanlı market", "Kalabalık düğün salonu", "Eski belediye binası", "Kırık aynalı soyunma odası", "Rüzgarlı tepe", "Deniz kenarında paslı depo", "Dar otel koridoru", "Şehrin en yüksek terası", "Gizli bodrum arşivi", "Kapanmak üzere olan lokanta", "Uçurum kenarındaki yol"] },
@@ -695,9 +736,7 @@
     }
 
     function applyTheme(theme = localStorage.getItem("notesTheme") || "light") {
-      // Eğer kullanıcı önceden notebook temasını kaydettiyse, light temaya yönlendiriyoruz.
       if (theme === "notebook") theme = "light"; 
-      
       document.body.classList.remove("theme-dark", "theme-scifi");
       if (theme !== "light") document.body.classList.add(`theme-${theme}`);
       document.querySelectorAll(".theme-select").forEach(select => { select.value = theme; });
@@ -712,7 +751,6 @@
     }
 
     function goHome() { saveCurrentNote(); renderHome(); showScreen("homeScreen"); }
-    
     function openBoxesOverview() { saveCurrentNote(); renderHome(); showScreen("boxesOverviewScreen"); }
 
     function formatDate(iso) {
@@ -744,17 +782,7 @@
         const item = document.createElement("button");
         item.className = "recent-item-card";
         item.onclick = () => openNote(note.id);
-        
-        item.innerHTML = `
-          <div>
-            <strong style="display:block; font-size: 15px; margin-bottom: 6px;">${escapeHtml(note.title)}</strong>
-            <span style="color: var(--muted); font-size: 11px;">Son düzenleme: ${formatDate(note.updatedAt)}</span>
-          </div>
-          <div style="font-size: 12px; color: var(--text); opacity: 0.8; margin-bottom: auto; line-height: 1.5;">
-            ${escapeHtml(notePreview(note.body))}
-          </div>
-          <span style="font-weight: 700; color: var(--blue); margin-top: 8px;">Yazmaya devam et →</span>
-        `;
+        item.innerHTML = `<div><strong style="display:block; font-size: 15px; margin-bottom: 6px;">${escapeHtml(note.title)}</strong><span style="color: var(--muted); font-size: 11px;">Son düzenleme: ${formatDate(note.updatedAt)}</span></div><div style="font-size: 12px; color: var(--text); opacity: 0.8; margin-bottom: auto; line-height: 1.5;">${escapeHtml(notePreview(note.body))}</div><span style="font-weight: 700; color: var(--blue); margin-top: 8px;">Yazmaya devam et →</span>`;
         recentNotes.appendChild(item);
       });
       if (!sortedNotes.length) recentNotes.innerHTML = `<div class="empty-state" style="width: 100%;">Henüz kayıtlı not yok.</div>`;
@@ -837,6 +865,11 @@
       if (!note || !noteDate) return;
       noteDate.textContent = `Oluşturuldu: ${formatDate(note.createdAt || note.updatedAt)} · Son düzenleme: ${formatDate(note.updatedAt)}`;
     }
+
+    // YENİ: MODAL KONTROL FONKSİYONLARI
+    function openReferenceModal() { document.getElementById('referenceModal').classList.add('active'); }
+    function closeReferenceModal() { document.getElementById('referenceModal').classList.remove('active'); }
+    function closeModalOnOutsideClick(e) { if (e.target === document.getElementById('referenceModal')) closeReferenceModal(); }
 
     function renderSelectedInfo() {
       const selectedInfo = document.getElementById("selectedInfo");
