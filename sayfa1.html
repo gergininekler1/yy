@@ -27,15 +27,54 @@ body {
   color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-button, input, textarea, select { font: inherit; }
-button { border: 0; cursor: pointer; }
+body.theme-dark {
+  --bg: #171717;
+  --paper: #202020;
+  --paper-soft: #24211d;
+  --text: #f2eee7;
+  --muted: #aaa39a;
+  --line: #3a342d;
+  --blue: #7aa2ff;
+  --blue-soft: #1f2d47;
+  --shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+}
 
-.app {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 36px 24px 70px;
+body.theme-scifi {
+  --bg: #060c08;
+  --paper: #0b160f;
+  --paper-soft: #0f1b13;
+  --text: #c9ffd3;
+  --muted: #79a883;
+  --line: #18351f;
+  --blue: #7cff9a;
+  --blue-soft: #112719;
+  --shadow: 0 0 30px rgba(93, 255, 130, 0.08);
+}
+
+body.theme-notebook {
+  --bg: #f4ead8;
+  --paper: #fff9e9;
+  --paper-soft: #efe0c3;
+  --text: #352718;
+  --muted: #8d7457;
+  --line: #dfcda9;
+  --blue: #8a5a2b;
+  --blue-soft: #f0ddbd;
+  --shadow: 0 14px 34px rgba(74, 42, 18, 0.11);
+}
+
+button, input, textarea, select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 11px 12px;
+  color: var(--text);
+  outline: none;
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .page-header, .note-toolbar {
@@ -364,6 +403,40 @@ textarea.note-area {
   margin-bottom: 12px;
 }
 
+.selector-controls {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 8px;
+}
+
+.usage-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(47, 111, 246, 0.08);
+  color: var(--blue);
+  padding: 5px 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.theme-select {
+  width: auto;
+  min-width: 170px;
+  padding: 10px 12px;
+  font-weight: 700;
+}
+
 .selector-content-head h3 {
   margin: 0;
   font-size: 18px;
@@ -457,11 +530,105 @@ textarea.note-area {
 .empty-state {
   padding: 24px;
   text-align: center;
-  background: #fbf9f4;
-  border: 1px dashed #ded7ca;
+  background: color-mix(in srgb, var(--paper) 78%, var(--paper-soft));
+  border: 1px dashed var(--line);
   color: var(--muted);
   border-radius: 15px;
 }
+
+body.theme-scifi .app { max-width: 1120px; }
+body.theme-scifi .brand-icon,
+body.theme-scifi .box-icon {
+  background: #08110b;
+  border-color: #255a30;
+  box-shadow: 0 0 18px rgba(124, 255, 154, 0.08);
+}
+
+body.theme-scifi .editor {
+  position: relative;
+  background:
+    repeating-linear-gradient(0deg, rgba(124,255,154,0.035), rgba(124,255,154,0.035) 1px, transparent 1px, transparent 5px),
+    linear-gradient(180deg, #08140c, #030805);
+  border-color: #1c4b28;
+  box-shadow: inset 0 0 35px rgba(124,255,154,0.04), 0 0 26px rgba(124,255,154,0.08);
+  padding-top: 58px;
+  overflow: hidden;
+}
+
+body.theme-scifi .editor::before {
+  content: "C:\NOTLAR\EDITOR.EXE";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: linear-gradient(#d6d6d6, #bfbfbf);
+  color: #101010;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+body.theme-scifi .selected-info {
+  background: transparent;
+  border-color: transparent;
+  color: #7cff9a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 15px;
+}
+
+body.theme-scifi textarea.note-area {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: #7cff9a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 20px;
+  line-height: 1.65;
+  caret-color: #7cff9a;
+}
+
+body.theme-scifi textarea.note-area::placeholder { color: rgba(124, 255, 154, 0.45); }
+body.theme-scifi .tag { background: rgba(124,255,154,0.08); color: #7cff9a; border-color: rgba(124,255,154,0.2); }
+body.theme-scifi .primary-btn,
+body.theme-scifi .selector-tab.active,
+body.theme-scifi .side-tab.active { color: #061007; background: #7cff9a; }
+
+body.theme-notebook .editor {
+  background: #fff9e9;
+  border-color: #d6b98e;
+}
+
+body.theme-notebook textarea.note-area {
+  background:
+    linear-gradient(90deg, transparent 0 42px, rgba(190, 84, 64, 0.25) 42px 44px, transparent 44px),
+    repeating-linear-gradient(#fff9e9 0 30px, #ead9b7 31px 32px);
+  border-color: #d6b98e;
+  border-radius: 10px;
+  padding-left: 58px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 32px;
+  color: #352718;
+}
+
+body.theme-notebook h1,
+body.theme-notebook h2,
+body.theme-notebook h3 { font-family: Georgia, "Times New Roman", serif; }
+
+body.theme-dark .recent-item,
+body.theme-dark .box-card,
+body.theme-dark .note-card,
+body.theme-dark .archive-item,
+body.theme-dark .selector-content,
+body.theme-dark .selector-tab,
+body.theme-dark .side-tab,
+body.theme-dark .action-box,
+body.theme-dark .create-card { background: var(--paper); }
 
 @media (max-width: 920px) {
   .layout, .archive-layout, .archive-actions, .selector-workspace { grid-template-columns: 1fr; }
@@ -489,6 +656,12 @@ textarea.note-area {
         </div>
         <div class="top-actions">
           <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+          <select class="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Açık tema</option>
+            <option value="dark">Gece modu</option>
+            <option value="scifi">Sci-fi terminal</option>
+            <option value="notebook">Defter / edebiyatçı</option>
+          </select>
         </div>
       </div><div class="layout">
     <section class="panel">
@@ -535,9 +708,13 @@ textarea.note-area {
       </div>
     </div>
     <div class="top-actions">
-      <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
-      <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
       <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+      <select class="theme-select" onchange="changeTheme(this.value)">
+        <option value="light">Açık tema</option>
+        <option value="dark">Gece modu</option>
+        <option value="scifi">Sci-fi terminal</option>
+        <option value="notebook">Defter / edebiyatçı</option>
+      </select>
       <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
     </div>
   </div>
@@ -547,7 +724,11 @@ textarea.note-area {
       <div id="selectedInfo" class="selected-info">
         <span class="info-empty">Henüz referans seçilmedi. Aşağıdaki not kutularından seçim yap.</span>
       </div>
-      <textarea id="noteBody" class="note-area" placeholder="Notunu buraya yaz..."></textarea>
+      <textarea id="noteBody" class="note-area" placeholder="> yazmaya başla..."></textarea>
+      <div class="editor-actions">
+        <button class="soft-btn" onclick="saveCurrentNote(true)">Kaydet</button>
+        <button class="danger-btn" onclick="deleteCurrentNote()">Notu Sil</button>
+      </div>
     </section>
 
     <section class="selector-panel">
@@ -563,7 +744,14 @@ textarea.note-area {
         <div class="selector-content">
           <div class="selector-content-head">
             <h3 id="selectorActiveTitle">Mekan</h3>
-            <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
+            <div class="selector-controls">
+              <input id="referenceSearch" type="search" placeholder="Bu kutuda ara..." oninput="renderReferenceList()" />
+              <select id="referenceSort" onchange="renderReferenceList()">
+                <option value="recent">Son eklenen</option>
+                <option value="mostUsed">En çok kullanılan</option>
+                <option value="az">A-Z</option>
+              </select>
+            </div>
           </div>
           <div id="referenceList" class="reference-list"></div>
         </div>
@@ -583,6 +771,12 @@ textarea.note-area {
     </div>
     <div class="top-actions">
       <button class="ghost-btn" onclick="openNotesArchive()">📚 Not Arşivi</button>
+      <select class="theme-select" onchange="changeTheme(this.value)">
+        <option value="light">Açık tema</option>
+        <option value="dark">Gece modu</option>
+        <option value="scifi">Sci-fi terminal</option>
+        <option value="notebook">Defter / edebiyatçı</option>
+      </select>
       <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
     </div>
   </div>
@@ -633,7 +827,15 @@ textarea.note-area {
         <p class="hint">Kaydettiğin notları görsel kartlar halinde burada bul.</p>
       </div>
     </div>
-    <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+    <div class="top-actions">
+      <select class="theme-select" onchange="changeTheme(this.value)">
+        <option value="light">Açık tema</option>
+        <option value="dark">Gece modu</option>
+        <option value="scifi">Sci-fi terminal</option>
+        <option value="notebook">Defter / edebiyatçı</option>
+      </select>
+      <button class="ghost-btn" onclick="goHome()">← Ana Sayfa</button>
+    </div>
   </div>
 
   <section class="panel">
@@ -748,6 +950,34 @@ textarea.note-area {
     let activeSelectorKey = "mekan";
     let selectedRefs = [];
 
+    function getUsageMap() {
+      const usage = {};
+      Object.keys(boxes).forEach(key => usage[key] = {});
+      notes.forEach(note => {
+        (note.refs || []).forEach(ref => {
+          if (!usage[ref.key]) usage[ref.key] = {};
+          usage[ref.key][ref.value] = (usage[ref.key][ref.value] || 0) + 1;
+        });
+      });
+      return usage;
+    }
+
+    function getBoxUsageCount(key) {
+      const usage = getUsageMap()[key] || {};
+      return Object.values(usage).reduce((total, count) => total + count, 0);
+    }
+
+    function applyTheme(theme = localStorage.getItem("notesTheme") || "light") {
+      document.body.classList.remove("theme-dark", "theme-scifi", "theme-notebook");
+      if (theme !== "light") document.body.classList.add(`theme-${theme}`);
+      document.querySelectorAll(".theme-select").forEach(select => select.value = theme);
+    }
+
+    function changeTheme(theme) {
+      localStorage.setItem("notesTheme", theme);
+      applyTheme(theme);
+    }
+
     function saveAll() {
       localStorage.setItem("noteBoxes", JSON.stringify(boxes));
       localStorage.setItem("notes", JSON.stringify(notes));
@@ -812,7 +1042,7 @@ textarea.note-area {
               <span>${box.description}</span>
             </div>
           </div>
-          <span class="count-badge">${box.items.length} öğe</span>
+          <span class="count-badge">${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</span>
         `;
         boxGrid.appendChild(card);
       });
@@ -872,7 +1102,7 @@ textarea.note-area {
           renderSelectorTabs();
           renderReferenceList();
         };
-        tab.innerHTML = `<span>${box.icon} ${box.label}</span><small>${selectedCount || box.items.length}</small>`;
+        tab.innerHTML = `<span>${box.icon} ${box.label}</span><small>${getBoxUsageCount(key)} kullanım</small>`;
         tabs.appendChild(tab);
       });
     }
@@ -886,7 +1116,15 @@ textarea.note-area {
       title.textContent = `${activeBox.icon} ${activeBox.label}`;
       list.innerHTML = "";
 
-      const filteredItems = activeBox.items.filter(item => item.toLowerCase().includes(search));
+      const usageMap = getUsageMap()[activeSelectorKey] || {};
+      const sortMode = document.getElementById("referenceSort")?.value || "recent";
+      const filteredItems = activeBox.items
+        .filter(item => item.toLowerCase().includes(search))
+        .sort((a, b) => {
+          if (sortMode === "mostUsed") return (usageMap[b] || 0) - (usageMap[a] || 0) || a.localeCompare(b, "tr");
+          if (sortMode === "az") return a.localeCompare(b, "tr");
+          return activeBox.items.indexOf(b) - activeBox.items.indexOf(a);
+        });
       if (!filteredItems.length) {
         list.innerHTML = `<div class="empty-state">Bu aramada sonuç yok.</div>`;
         return;
@@ -897,7 +1135,7 @@ textarea.note-area {
         const option = document.createElement("button");
         option.className = `reference-option ${exists ? "active" : ""}`;
         option.onclick = () => toggleReference(activeSelectorKey, item);
-        option.innerHTML = `<span>${escapeHtml(item)}</span><small>${exists ? "Seçildi" : "Seç"}</small>`;
+        option.innerHTML = `<span>${escapeHtml(item)}</span><small>${exists ? "Seçildi" : `${usageMap[item] || 0} kullanım`}</small>`;
         list.appendChild(option);
       });
     }
@@ -951,7 +1189,7 @@ textarea.note-area {
         const tab = document.createElement("button");
         tab.className = `side-tab ${key === activeArchiveKey ? "active" : ""}`;
         tab.onclick = () => { activeArchiveKey = key; renderArchive(); };
-        tab.innerHTML = `<span>${box.icon} ${box.label}</span><small>${box.items.length}</small>`;
+        tab.innerHTML = `<span>${box.icon} ${box.label}</span><small>${box.items.length} öğe · ${getBoxUsageCount(key)} kullanım</small>`;
         tabs.appendChild(tab);
       });
 
@@ -1074,6 +1312,7 @@ textarea.note-area {
         .replaceAll("'", "&#039;");
     }
 
+    applyTheme();
     renderHome();
   </script></body>
 </html>
