@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cep Hikayeleri - Klasik Bilgelik ArÅŸivi</title>
+  <style>
+    :root {
+      --bg: #080b12;
+      --text: #eef4ff;
+      --muted: rgba(238, 244, 255, 0.62);
+      --accent: #7dd3fc;
+      --accent-2: #a78bfa;
+      --line: rgba(255, 255, 255, 0.13);
+      --danger: #fb7185;
+      --warn: #ffd580;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 5%, rgba(125, 211, 252, 0.18), transparent 34%),
+        radial-gradient(circle at 92% 16%, rgba(167, 139, 250, 0.18), transparent 30%),
+        linear-gradient(135deg, #070912 0%, #101827 45%, #090b12 100%);
+      overflow: hidden;
+    }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 372px 1fr; }
+    aside {
+      border-right: 1px solid var(--line);
+      background: rgba(8, 11, 18, 0.58);
+      backdrop-filter: blur(22px) saturate(145%);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header { padding: 18px 18px 12px; border-bottom: 1px solid var(--line); }
+    .brand {
+      display: inline-flex;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(125, 211, 252, 0.16), rgba(167, 139, 250, 0.14));
+      color: var(--accent);
+      font-weight: 750;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      border: 1px solid rgba(125, 211, 252, 0.18);
+    }
+    h1 { margin: 0; font-size: 25px; line-height: 1.05; font-weight: 780; letter-spacing: -0.04em; }
+    .intro { margin: 8px 0 0; color: var(--muted); font-size: 12.2px; line-height: 1.45; }
+    .controls { padding: 12px 14px 9px; display: grid; gap: 8px; border-bottom: 1px solid var(--line); }
+    .search, .sortSelect {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.075);
+      color: var(--text);
+      border-radius: 13px;
+      padding: 9px 11px;
+      font-size: 12.5px;
+      outline: none;
+    }
+    .sortSelect option { background: #101827; color: #eef4ff; }
+    .topActions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .shuffleBtn, .restoreDeleted {
+      border: 1px solid rgba(125,211,252,.22);
+      background: rgba(125,211,252,.10);
+      color: #d9f5ff;
+      border-radius: 13px;
+      padding: 9px 10px;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .shuffleBtn:hover { background: linear-gradient(135deg, rgba(125,211,252,.18), rgba(167,139,250,.15)); }
+    .restoreDeleted {
+      display: none;
+      border-color: rgba(251,113,133,.25);
+      background: rgba(251,113,133,.08);
+      color: #fecdd3;
+    }
+    .rail {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      scrollbar-width: thin;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: rgba(238,244,255,.76);
+      border-radius: 999px;
+      padding: 6px 9px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 680;
+      font-size: 10.8px;
+    }
+    .chip.active {
+      background: linear-gradient(135deg, rgba(125,211,252,.24), rgba(167,139,250,.22));
+      color: #fff;
+      border-color: rgba(125,211,252,.42);
+    }
+    .listMeta { color: rgba(238,244,255,.52); font-size: 11.3px; padding-left: 2px; }
+    .storyList { overflow: auto; padding: 9px; display: grid; gap: 6px; }
+    .storyItem {
+      width: 100%;
+      text-align: left;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 16px;
+      padding: 9px;
+      cursor: pointer;
+      color: var(--text);
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
+    }
+    .storyItem:hover { transform: translateY(-1px); background: rgba(255,255,255,.07); border-color: var(--line); }
+    .storyItem.active { background: rgba(255,255,255,.105); border-color: rgba(125,211,252,.32); box-shadow: 0 10px 26px rgba(0,0,0,.18); }
+    .itemTop { display: flex; gap: 9px; align-items: flex-start; }
+    .num {
+      flex: 0 0 auto;
+      width: 25px;
+      height: 25px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: rgba(125,211,252,.12);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 10.5px;
+      border: 1px solid rgba(125,211,252,.12);
+    }
+    .itemTitle { font-weight: 760; font-size: 12.7px; line-height: 1.22; margin: 0; letter-spacing: -0.015em; }
+    .itemPreview {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 11.2px;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .tagRow { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+    .tag {
+      display: inline-flex;
+      border-radius: 999px;
+      background: rgba(125,211,252,.12);
+      color: rgba(190,235,255,.92);
+      padding: 4px 7px;
+      font-size: 9.7px;
+      font-weight: 760;
+      border: 1px solid rgba(125,211,252,.13);
+    }
+    .tag.groupTag { background: rgba(167,139,250,.11); color: #ddd6fe; border-color: rgba(167,139,250,.16); }
+    .itemActions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .actionBtns { display:flex; gap:5px; }
+    .iconBtn {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.065);
+      color: rgba(238,244,255,.72);
+      cursor: pointer;
+      width: 27px;
+      height: 27px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-size: 13px;
+      line-height: 1;
+    }
+    .favSmall.active, .favLarge.active { background: rgba(255,213,128,.16); border-color: rgba(255,213,128,.36); color: var(--warn); }
+    .deleteSmall:hover, .deleteLarge:hover { background: rgba(251,113,133,.13); border-color: rgba(251,113,133,.35); color: #fecdd3; }
+    .reader {
+      min-width: 0;
+      padding: 28px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: auto;
+    }
+    .reader::before {
+      content:"";
+      position: fixed;
+      inset: 18px 18px 18px 390px;
+      pointer-events:none;
+      border-radius:28px;
+      background:
+        linear-gradient(90deg, rgba(125,211,252,.08), transparent 1px),
+        linear-gradient(rgba(125,211,252,.08), transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, transparent, black 12%, black 82%, transparent);
+      opacity:.35;
+    }
+    .readerCard {
+      width: min(770px,100%);
+      min-height: min(620px, calc(100vh - 56px));
+      background: rgba(255,255,255,.085);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: clamp(24px,4vw,42px);
+      display:flex;
+      flex-direction:column;
+      backdrop-filter: blur(22px) saturate(135%);
+      -webkit-backdrop-filter: blur(22px) saturate(135%);
+      position: relative;
+      overflow: hidden;
+    }
+    .readerCard::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background: linear-gradient(135deg, rgba(255,255,255,.13), transparent 32%, rgba(125,211,252,.06));
+    }
+    .readerTop,.reader section,.navButtons { position:relative; z-index:1; }
+    .readerTop { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; border-bottom:1px solid var(--line); padding-bottom:17px; margin-bottom:20px; }
+    .reader h2 { margin:0; font-size: clamp(28px,4.2vw,47px); line-height:1.02; font-weight:780; letter-spacing:-.055em; }
+    .readerCategory,.readerGroup {
+      display:inline-flex;
+      background: rgba(125,211,252,.12);
+      color:#c9f1ff;
+      border:1px solid rgba(125,211,252,.22);
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:11.2px;
+      font-weight:780;
+      margin: 0 0 7px 5px;
+    }
+    .readerGroup { background: rgba(167,139,250,.12); color:#ddd6fe; border-color: rgba(167,139,250,.22); }
+    .favLarge,.deleteLarge {
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.065);
+      color:rgba(238,244,255,.72);
+      cursor:pointer;
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:11.5px;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:8px;
+    }
+    .sectionLabel { margin:0 0 7px; color:rgba(125,211,252,.84); font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; font-weight:850; }
+    .flow { font-size:clamp(15.5px,1.45vw,19px); line-height:1.72; color:rgba(248,251,255,.88); margin:0 0 23px; max-width:68ch; }
+    .lessonBox {
+      margin-top:auto;
+      border:1px solid rgba(125,211,252,.18);
+      background:rgba(125,211,252,.08);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .lessonBox p { margin:0; color:rgba(248,251,255,.9); font-size:clamp(14px,1.35vw,17px); line-height:1.52; font-weight:520; }
+    .lessonBox strong { color:#bdefff; }
+    .navButtons { display:flex; gap:9px; margin-top:16px; flex-wrap: wrap; }
+    .navBtn {
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.075);
+      color:rgba(238,244,255,.86);
+      border-radius:13px;
+      padding:9px 11px;
+      font-weight:750;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .navBtn:disabled { opacity:.38; cursor:not-allowed; }
+    .mobileClose { display:none; }
+    @media (max-width: 860px) {
+      body { overflow:auto; }
+      .app { display:block; }
+      aside { width:100%; height:100vh; border-right:0; }
+      .reader {
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:20;
+        padding:22px;
+        background:rgba(4,7,14,.40);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        overflow:auto;
+        place-items:center;
+      }
+      .reader.open { display:grid; }
+      .reader::before {
+        inset:0;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(125,211,252,.16), transparent 35%),
+          radial-gradient(circle at 90% 90%, rgba(167,139,250,.16), transparent 40%);
+        mask-image:none;
+        opacity:1;
+      }
+      .readerCard {
+        width:min(94vw,640px);
+        min-height:auto;
+        max-height:82vh;
+        overflow:auto;
+        border-radius:24px;
+        padding:20px;
+        box-shadow:0 28px 90px rgba(0,0,0,.48);
+      }
+      .readerTop { display:block; padding-bottom:14px; margin-bottom:16px; }
+      .reader h2 { font-size:clamp(25px,8vw,38px); }
+      .flow { font-size:15.5px; line-height:1.68; }
+      .lessonBox p { font-size:14px; }
+      .mobileClose {
+        display:inline-flex;
+        position:fixed;
+        top:12px;
+        left:50%;
+        transform:translateX(-50%);
+        z-index:21;
+        border:1px solid rgba(255,255,255,.18);
+        background:rgba(255,255,255,.11);
+        color:#f8fbff;
+        border-radius:999px;
+        padding:8px 12px;
+        font-size:12px;
+        font-weight:900;
+        cursor:pointer;
+        backdrop-filter:blur(16px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <header>
+        <div class="brand">Cep Hikayeleri</div>
+        <h1>Ã–ÄŸretici Ã–ykÃ¼ler</h1>
+        <p class="intro">YalnÄ±zca bilinen, anlatÄ±lagelen, klasik fabl, edebi Ã¶ykÃ¼, felsefi alegori ve yaygÄ±n bilgelik kÄ±ssalarÄ± bulunur. Toplam 237 hikaye.</p>
+      </header>
+      <section class="controls">
+        <input class="search" id="searchInput" type="search" placeholder="Ã–ykÃ¼, konu, tÃ¼r veya ders ara..." />
+        <select class="sortSelect" id="sortSelect" aria-label="SÄ±ralama Ã¶lÃ§Ã¼tÃ¼">
+          <option value="default">VarsayÄ±lan sÄ±ra</option>
+          <option value="newest">Son eklenenler</option>
+          <option value="favorites">Favoriler Ã¶nce</option>
+          <option value="az">Aâ€™dan Zâ€™ye</option>
+          <option value="za">Zâ€™den Aâ€™ya</option>
+          <option value="shuffle">KarÄ±ÅŸÄ±k liste</option>
+        </select>
+        <div class="topActions">
+          <button class="shuffleBtn" id="shuffleBtn" type="button">ğŸ”€ Listeyi karÄ±ÅŸtÄ±r</button>
+          <button class="restoreDeleted" id="restoreDeleted" type="button">Silinenleri geri getir</button>
+        </div>
+        <div class="rail" id="categoryRail"></div>
+        <div class="listMeta" id="listMeta"></div>
+      </section>
+      <nav class="storyList" id="storyList" aria-label="Hikaye listesi"></nav>
+    </aside>
+
+    <main class="reader" id="reader">
+      <button class="mobileClose" id="mobileClose">â† Listeye dÃ¶n</button>
+      <article class="readerCard">
+        <div class="readerTop">
+          <div>
+            <p class="sectionLabel">SeÃ§ili Ã¶ykÃ¼</p>
+            <h2 id="readerTitle"></h2>
+          </div>
+          <div>
+            <div><span class="readerCategory" id="readerCategory"></span></div>
+            <div><span class="readerGroup" id="readerGroup"></span></div>
+            <button class="favLarge" id="readerFavorite" type="button">â˜† Favoriye ekle</button>
+            <button class="deleteLarge" id="readerDelete" type="button">âœ• Sil</button>
+          </div>
+        </div>
+        <section>
+          <p class="sectionLabel">Olay akÄ±ÅŸÄ±</p>
+          <p class="flow" id="readerFlow"></p>
+        </section>
+        <section class="lessonBox">
+          <p><strong>Ders:</strong> <span id="readerLesson"></span></p>
+        </section>
+        <div class="navButtons">
+          <button class="navBtn" id="prevBtn">â† Ã–nceki</button>
+          <button class="navBtn" id="nextBtn">Sonraki â†’</button>
+        </div>
+      </article>
+    </main>
+  </div>
+
+<script>
+const stories = [
+  {
+    "title": "Aslan ile Fare",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Aslan, kendisini rahatsÄ±z eden kÃ¼Ã§Ã¼k fareyi yakalar ama onu Ã¶ldÃ¼rmek yerine serbest bÄ±rakÄ±r. Fare bir gÃ¼n bu iyiliÄŸin karÅŸÄ±lÄ±ÄŸÄ±nÄ± vereceÄŸini sÃ¶yler. Aslan buna pek inanmaz; fakat bir gÃ¼n avcÄ±larÄ±n aÄŸÄ±na yakalanÄ±nca fare gelir, ipleri kemirir ve aslanÄ± kurtarÄ±r.",
+    "lesson": "KÃ¼Ã§Ã¼k gÃ¶rÃ¼len kiÅŸiler bile bÃ¼yÃ¼k yardÄ±mlar yapabilir."
+  },
+  {
+    "title": "Ã‡oban ile Kurt",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Bir Ã§oban eÄŸlenmek iÃ§in birkaÃ§ kez kÃ¶ylÃ¼lere â€œKurt geldi!â€ diye baÄŸÄ±rÄ±r. KÃ¶ylÃ¼ler telaÅŸla yardÄ±ma koÅŸar ama her defasÄ±nda kandÄ±rÄ±ldÄ±klarÄ±nÄ± gÃ¶rÃ¼r. GÃ¼nÃ¼n birinde gerÃ§ekten kurt gelir; Ã§oban yine yardÄ±m ister ama artÄ±k kimse ona inanmaz.",
+    "lesson": "SÃ¼rekli yalan sÃ¶yleyen kiÅŸiye, doÄŸru sÃ¶ylediÄŸinde bile inanÄ±lmaz."
+  },
+  {
+    "title": "Tilki ile ÃœzÃ¼mler",
+    "category": "Kendini Bilme",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "AÃ§ bir tilki yÃ¼ksek bir asmada gÃ¼zel Ã¼zÃ¼mler gÃ¶rÃ¼r. ÃœzÃ¼mlere ulaÅŸmak iÃ§in defalarca zÄ±plar ama baÅŸaramaz. Sonunda baÅŸarÄ±sÄ±zlÄ±ÄŸÄ±nÄ± kabul etmek yerine â€œZaten ekÅŸiydiâ€ diyerek oradan uzaklaÅŸÄ±r.",
+    "lesson": "Ä°nsan bazen ulaÅŸamadÄ±ÄŸÄ± ÅŸeyi deÄŸersiz gÃ¶stermeye Ã§alÄ±ÅŸÄ±r."
+  },
+  {
+    "title": "Karga ile Tilki",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Karga aÄŸzÄ±nda peynirle bir dala konar. Tilki peyniri almak ister ve kargayÄ± Ã¶vmeye baÅŸlar; sesinin Ã§ok gÃ¼zel olduÄŸunu sÃ¶yler. Karga bu Ã¶vgÃ¼lere kapÄ±lÄ±p ÅŸarkÄ± sÃ¶ylemek iÃ§in aÄŸzÄ±nÄ± aÃ§Ä±nca peynir yere dÃ¼ÅŸer ve tilki peyniri alÄ±r.",
+    "lesson": "BoÅŸ Ã¶vgÃ¼lere kapÄ±lÄ±p aklÄ± elden bÄ±rakmamak gerekir."
+  },
+  {
+    "title": "SÃ¼tÃ§Ã¼ KÄ±zÄ±n Hayali",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "SÃ¼tÃ§Ã¼ kÄ±z baÅŸÄ±nda taÅŸÄ±dÄ±ÄŸÄ± sÃ¼tÃ¼ pazarda satmayÄ± dÃ¼ÅŸÃ¼nÃ¼r. KazanacaÄŸÄ± parayla tavuklar alacaÄŸÄ±nÄ±, sonra daha Ã§ok kazanacaÄŸÄ±nÄ± ve zenginleÅŸeceÄŸini hayal eder. Hayallere dalÄ±p kendini unutur; baÅŸÄ±ndaki kap dÃ¼ÅŸer ve sÃ¼t dÃ¶kÃ¼lÃ¼r.",
+    "lesson": "GerÃ§ekleÅŸmemiÅŸ kazanca gÃ¼venip dikkati kaybetmemek gerekir."
+  },
+  {
+    "title": "KralÄ±n Yeni Giysileri",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Ä°ki dolandÄ±rÄ±cÄ±, krala yalnÄ±zca akÄ±llÄ± insanlarÄ±n gÃ¶rebileceÄŸi Ã¶zel bir elbise diktiklerini sÃ¶yler. Ortada hiÃ§bir elbise yoktur; ama kimse aptal gÃ¶rÃ¼nmemek iÃ§in bunu sÃ¶yleyemez. Kral halkÄ±n Ã¶nÃ¼ne Ã§Ä±ktÄ±ÄŸÄ±nda herkes susar; sonunda bir Ã§ocuk gerÃ§eÄŸi aÃ§Ä±kÃ§a sÃ¶yler.",
+    "lesson": "GerÃ§eÄŸi gÃ¶rmek kadar sÃ¶ylemek de cesaret ister."
+  },
+  {
+    "title": "KibritÃ§i KÄ±z",
+    "category": "Merhamet ve Nezaket",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "KÃ¼Ã§Ã¼k bir kÄ±z soÄŸuk bir gecede sokakta kibrit satmaya Ã§alÄ±ÅŸÄ±r. Kimse ondan kibrit almaz ve kÄ±z Ä±sÄ±nmak iÃ§in kibritleri yakar. Her kibritte sÄ±caklÄ±k, yemek ve sevgiyle ilgili hayaller gÃ¶rÃ¼r; fakat gerÃ§ek dÃ¼nyada yalnÄ±z ve Ã§aresizdir.",
+    "lesson": "Toplumun yoksul ve Ã§aresiz insanlara karÅŸÄ± duyarsÄ±z kalmasÄ± bÃ¼yÃ¼k acÄ±lara yol aÃ§ar."
+  },
+  {
+    "title": "KÃ¼Ã§Ã¼k Prens ve Tilki",
+    "category": "Dostluk",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "KÃ¼Ã§Ã¼k Prens dÃ¼nyada gezerken bir tilkiyle karÅŸÄ±laÅŸÄ±r. Tilki ona baÄŸ kurmanÄ±n, zaman ayÄ±rmanÄ±n ve birini Ã¶zel kÄ±lmanÄ±n ne demek olduÄŸunu anlatÄ±r. KÃ¼Ã§Ã¼k Prens, sevginin yalnÄ±zca his deÄŸil, aynÄ± zamanda emek ve sorumluluk olduÄŸunu anlar.",
+    "lesson": "Sevgi, emek ve sorumlulukla anlam kazanÄ±r."
+  },
+  {
+    "title": "Nasreddin Hoca ve Kazan DoÄŸurdu",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "Nasreddin Hoca komÅŸusundan bir kazan alÄ±r ve geri verirken iÃ§ine kÃ¼Ã§Ã¼k bir kazan koyar. KomÅŸusuna â€œSenin kazan doÄŸurduâ€ der; komÅŸu buna sevinerek inanÄ±r. Hoca daha sonra kazanÄ± tekrar alÄ±r, geri vermeyince â€œKazan Ã¶ldÃ¼â€ der ve komÅŸunun Ã§Ä±karcÄ± inanÄ±ÅŸÄ±nÄ± ortaya Ã§Ä±karÄ±r.",
+    "lesson": "Ã‡Ä±karÄ±na gelen yalana inanan kiÅŸi, zararÄ±na gelen sonuca ÅŸaÅŸÄ±rmamalÄ±dÄ±r."
+  },
+  {
+    "title": "Nasreddin Hoca ve Ye KÃ¼rkÃ¼m Ye",
+    "category": "Kendini Bilme",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "Nasreddin Hoca sade kÄ±yafetlerle gittiÄŸi bir davette Ã¶nemsenmez. Daha sonra gÃ¶steriÅŸli kÃ¼rkÃ¼nÃ¼ giyip geri gelir ve herkes ona bÃ¼yÃ¼k ilgi gÃ¶sterir. Hoca yemeÄŸi kendi aÄŸzÄ±na deÄŸil, kÃ¼rkÃ¼ne uzatÄ±r; Ã§Ã¼nkÃ¼ saygÄ±nÄ±n kendisine deÄŸil kÄ±yafetine gÃ¶sterildiÄŸini anlatmak ister.",
+    "lesson": "Ä°nsanlara kÄ±yafetlerine gÃ¶re deÄŸil, kiÅŸiliklerine gÃ¶re deÄŸer verilmelidir."
+  },
+  {
+    "title": "KÃ¶r Adamlar ve Fil",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "KÃ¶r adamlar bir fili tanÄ±mak iÃ§in ona dokunur. Biri hortumuna, biri bacaÄŸÄ±na, biri kulaÄŸÄ±na, biri gÃ¶vdesine dokunur ve her biri fili farklÄ± tarif eder. Hepsi kendi deneyiminin tamam olduÄŸunu sanÄ±r; oysa her biri gerÃ§eÄŸin sadece bir parÃ§asÄ±nÄ± bilir.",
+    "lesson": "Bir konunun tamamÄ±nÄ± gÃ¶rmeden kesin hÃ¼kÃ¼m vermemek gerekir."
+  },
+  {
+    "title": "TaÅŸÃ§Ä± UstasÄ±",
+    "category": "Kendini Bilme",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "Bir taÅŸÃ§Ä± hayatÄ±ndan memnun olmaz ve daha gÃ¼Ã§lÃ¼ biri olmak ister. Ã–nce zengin, sonra gÃ¼neÅŸ, bulut, rÃ¼zgÃ¢r ve kaya olmayÄ± diler. En sonunda kayayÄ± bile yontabilen taÅŸÃ§Ä±nÄ±n gÃ¼cÃ¼nÃ¼ fark eder ve kendi iÅŸinin deÄŸerini anlar.",
+    "lesson": "Ä°nsan bazen sahip olduÄŸu deÄŸeri ancak baÅŸka ÅŸeyleri deneyince anlar."
+  },
+  {
+    "title": "AltÄ±n Yumurtlayan Tavuk",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Bir adamÄ±n tavuÄŸu her gÃ¼n bir altÄ±n yumurta yumurtlar. Adam sabretmek yerine bÃ¼tÃ¼n altÄ±nlara hemen ulaÅŸmak ister ve tavuÄŸun iÃ§inde bÃ¼yÃ¼k bir hazine olduÄŸunu dÃ¼ÅŸÃ¼nÃ¼r. TavuÄŸu keser ama hiÃ§bir altÄ±n bulamaz; Ã¼stelik her gÃ¼n gelen kazancÄ± da kaybeder.",
+    "lesson": "AÃ§gÃ¶zlÃ¼lÃ¼k, eldeki nimeti de kaybettirir."
+  },
+  {
+    "title": "Kurt ile Kuzu",
+    "category": "Adalet ve Vicdan",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Kurt, dereden su iÃ§en kuzuyu yemek ister ve ona haksÄ±z suÃ§lamalar yÃ¶neltir. Kuzu her suÃ§lamaya mantÄ±klÄ± cevap verir; fakat kurt zaten onu yemeye karar vermiÅŸtir. Sonunda bahanelerle kuzuyu suÃ§lu gÃ¶sterir ve amacÄ±na ulaÅŸÄ±r.",
+    "lesson": "GÃ¼Ã§lÃ¼ kiÅŸi adil deÄŸilse, haklÄ± olmak her zaman korunmaya yetmeyebilir."
+  },
+  {
+    "title": "Tilki ile Leylek",
+    "category": "Merhamet ve Nezaket",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Tilki, leyleÄŸi yemeÄŸe Ã§aÄŸÄ±rÄ±r ama yemeÄŸi dÃ¼z bir tabaÄŸa koyar; leylek gagasÄ±yla yiyemez. Sonra leylek tilkiyi davet eder ve yemeÄŸi uzun, dar bir kaba koyar. Bu kez tilki yiyemez ve yaptÄ±ÄŸÄ± kabalÄ±ÄŸÄ±n karÅŸÄ±lÄ±ÄŸÄ±nÄ± gÃ¶rÃ¼r.",
+    "lesson": "BaÅŸkalarÄ±na nasÄ±l davranÄ±rsan, benzer davranÄ±ÅŸla karÅŸÄ±laÅŸabilirsin."
+  },
+  {
+    "title": "KÃ¶pek ile GÃ¶lgesi",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "AÄŸzÄ±nda et taÅŸÄ±yan bir kÃ¶pek sudan geÃ§erken kendi yansÄ±masÄ±nÄ± gÃ¶rÃ¼r. Suda baÅŸka bir kÃ¶peÄŸin daha bÃ¼yÃ¼k et taÅŸÄ±dÄ±ÄŸÄ±nÄ± sanÄ±r. Onu almak iÃ§in aÄŸzÄ±nÄ± aÃ§Ä±nca kendi eti suya dÃ¼ÅŸer ve elindekinden de olur.",
+    "lesson": "Daha fazlasÄ±nÄ± isterken eldeki deÄŸer kaybedilebilir."
+  },
+  {
+    "title": "Ä°ki KeÃ§i",
+    "category": "UzlaÅŸma",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Ä°ki keÃ§i dar bir kÃ¶prÃ¼de karÅŸÄ± karÅŸÄ±ya gelir. KÃ¶prÃ¼den aynÄ± anda geÃ§meleri mÃ¼mkÃ¼n deÄŸildir; birinin yol vermesi gerekir. Fakat ikisi de geri adÄ±m atmaz, inatlaÅŸÄ±rlar ve sonunda dengelerini kaybedip suya dÃ¼ÅŸerler.",
+    "lesson": "Ä°nat yerine uzlaÅŸma seÃ§ilirse herkes kazanÄ±r."
+  },
+  {
+    "title": "DeÄŸirmenci, OÄŸlu ve EÅŸeÄŸi",
+    "category": "Kendini Bilme",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "DeÄŸirmenci ve oÄŸlu eÅŸekleriyle yola Ã§Ä±kar. Yolda karÅŸÄ±laÅŸtÄ±klarÄ± herkes onlara farklÄ± bir eleÅŸtiri yapar; kimi eÅŸeÄŸe binsinler, kimi binmesinler, kimi ikisi birden binsin der. Her sÃ¶ze uymaya Ã§alÄ±ÅŸÄ±nca gÃ¼lÃ¼nÃ§ duruma dÃ¼ÅŸerler.",
+    "lesson": "Herkesi memnun etmeye Ã§alÄ±ÅŸan kiÅŸi sonunda kendi aklÄ±nÄ± kaybedebilir."
+  },
+  {
+    "title": "Oduncu ile Hermes",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Bir oduncu baltasÄ±nÄ± nehre dÃ¼ÅŸÃ¼rÃ¼r ve Ã§ok Ã¼zÃ¼lÃ¼r. Hermes ona Ã¶nce altÄ±n, sonra gÃ¼mÃ¼ÅŸ balta gÃ¶sterir; ama oduncu bunlarÄ±n kendisine ait olmadÄ±ÄŸÄ±nÄ± sÃ¶yler. DÃ¼rÃ¼stlÃ¼ÄŸÃ¼ sayesinde hem kendi baltasÄ±na kavuÅŸur hem de Ã¶dÃ¼llendirilir.",
+    "lesson": "DÃ¼rÃ¼stlÃ¼k, kÄ±sa vadede zor gÃ¶rÃ¼nse de sonunda deÄŸer kazandÄ±rÄ±r."
+  },
+  {
+    "title": "KurbaÄŸalar Kral Ä°stiyor",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "KurbaÄŸalar kendilerini yÃ¶netecek bir kral ister. Ã–nce zararsÄ±z bir kÃ¼tÃ¼k gÃ¶nderilir; kurbaÄŸalar bundan sÄ±kÄ±lÄ±r ve daha gÃ¼Ã§lÃ¼ bir kral ister. Sonra gelen leylek onlarÄ± yemeye baÅŸlar ve kurbaÄŸalar yanlÄ±ÅŸ isteklerinin sonucunu yaÅŸar.",
+    "lesson": "Ä°nsan ne istediÄŸini iyi dÃ¼ÅŸÃ¼nmelidir; kÃ¶tÃ¼ yÃ¶netim, yÃ¶netimsizlikten daha zararlÄ± olabilir."
+  },
+  {
+    "title": "EÅŸek Postuna BÃ¼rÃ¼nmÃ¼ÅŸ Aslan",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Bir eÅŸek aslan postu bulur ve onu giyerek diÄŸer hayvanlarÄ± korkutmaya baÅŸlar. Hayvanlar onu gerÃ§ekten aslan sanÄ±r. Fakat eÅŸek bir sÃ¼re sonra anÄ±rÄ±nca herkes onun gerÃ§ek kimliÄŸini anlar.",
+    "lesson": "KiÅŸi gÃ¶rÃ¼nÃ¼ÅŸÃ¼nÃ¼ deÄŸiÅŸtirse de gerÃ§ek karakteri bir ÅŸekilde ortaya Ã§Ä±kar."
+  },
+  {
+    "title": "RÃ¼zgÃ¢r ile GÃ¼neÅŸ",
+    "category": "Merhamet ve Nezaket",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "RÃ¼zgÃ¢r ve gÃ¼neÅŸ hangisinin daha gÃ¼Ã§lÃ¼ olduÄŸunu tartÄ±ÅŸÄ±r. Yoldan geÃ§en bir adamÄ±n paltosunu Ã§Ä±karmasÄ±nÄ± saÄŸlamaya Ã§alÄ±ÅŸÄ±rlar. RÃ¼zgÃ¢r sert estikÃ§e adam paltosuna daha sÄ±kÄ± sarÄ±lÄ±r; gÃ¼neÅŸ Ä±sÄ±tÄ±nca adam paltosunu kendiliÄŸinden Ã§Ä±karÄ±r.",
+    "lesson": "ZorbalÄ±k yerine yumuÅŸaklÄ±k ve anlayÄ±ÅŸ daha etkili olabilir."
+  },
+  {
+    "title": "Åehir Faresi ile KÃ¶y Faresi",
+    "category": "Huzur ve Zaman",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Åehir faresi, kÃ¶y faresini ÅŸehre davet eder ve ona bol yiyecekli bir hayat gÃ¶sterir. Ancak yemek yerlerken sÃ¼rekli insanlar, kediler ve tehlikeler yÃ¼zÃ¼nden kaÃ§mak zorunda kalÄ±rlar. KÃ¶y faresi sonunda sade ama gÃ¼venli hayatÄ±na dÃ¶nmeyi seÃ§er.",
+    "lesson": "Huzur ve gÃ¼ven, gÃ¶steriÅŸli ama tehlikeli bir yaÅŸamdan daha deÄŸerlidir."
+  },
+  {
+    "title": "Bremen MÄ±zÄ±kacÄ±larÄ±",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "YaÅŸlanan eÅŸek, kÃ¶pek, kedi ve horoz sahipleri tarafÄ±ndan iÅŸe yaramaz gÃ¶rÃ¼lÃ¼r. Birlikte yola Ã§Ä±kar, Bremenâ€™e gidip mÃ¼zisyen olmayÄ± hayal ederler. Yolda haydutlarÄ±n kaldÄ±ÄŸÄ± bir evi zekÃ¢ ve birlikle ele geÃ§irir, kendilerine yeni bir yaÅŸam kurarlar.",
+    "lesson": "DayanÄ±ÅŸma ve cesaret, dÄ±ÅŸlanan kiÅŸilere bile yeni bir baÅŸlangÄ±Ã§ saÄŸlayabilir."
+  },
+  {
+    "title": "Platonâ€™un MaÄŸarasÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Bir grup insan doÄŸduklarÄ±ndan beri maÄŸarada zincirlenmiÅŸ halde yalnÄ±zca duvara yansÄ±yan gÃ¶lgeleri gÃ¶rÃ¼r. Onlar iÃ§in gerÃ§eklik bu gÃ¶lgelerden ibarettir. Ä°Ã§lerinden biri dÄ±ÅŸarÄ± Ã§Ä±kÄ±p gÃ¼neÅŸi ve gerÃ§ek nesneleri gÃ¶rÃ¼nce dÃ¼nyayÄ± bambaÅŸka anlar; fakat geri dÃ¶nÃ¼p anlatÄ±nca diÄŸerleri ona inanmak istemez.",
+    "lesson": "AlÄ±ÅŸtÄ±ÄŸÄ±mÄ±z gerÃ§eklik, gerÃ§eÄŸin tamamÄ± olmayabilir; bilmek bazen konfor alanÄ±ndan Ã§Ä±kmayÄ± gerektirir."
+  },
+  {
+    "title": "Gygesâ€™in YÃ¼zÃ¼ÄŸÃ¼",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Ahlaki Ä°kilemler",
+    "flow": "Gyges gÃ¶rÃ¼nmezlik saÄŸlayan bir yÃ¼zÃ¼k bulur. Kimsenin kendisini gÃ¶rmeyeceÄŸini anlayÄ±nca Ã¶nce gizli iÅŸler yapar, sonra gÃ¼cÃ¼ ele geÃ§irmek iÃ§in ahlaki sÄ±nÄ±rlarÄ± aÅŸar. Hikaye, insanÄ±n denetlenmediÄŸinde adil kalÄ±p kalamayacaÄŸÄ±nÄ± sorgular.",
+    "lesson": "GerÃ§ek karakter, cezadan korkulmadÄ±ÄŸÄ±nda nasÄ±l davranÄ±ldÄ±ÄŸÄ±yla ortaya Ã§Ä±kar."
+  },
+  {
+    "title": "Damoklesâ€™in KÄ±lÄ±cÄ±",
+    "category": "Adalet ve Vicdan",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Damokles, kralÄ±n hayatÄ±na Ã¶zenir ve onun ne kadar ÅŸanslÄ± olduÄŸunu sÃ¶yler. Kral onu tahtÄ±na oturtur, Ã¶nÃ¼ne ziyafetler koyar; fakat baÅŸÄ±nÄ±n Ã¼zerine ince bir at kÄ±lÄ±yla asÄ±lÄ± keskin bir kÄ±lÄ±Ã§ yerleÅŸtirir. Damokles, iktidarÄ±n ihtiÅŸamÄ±nÄ±n sÃ¼rekli tehlikeyle birlikte geldiÄŸini anlar.",
+    "lesson": "GÃ¼Ã§ ve makam, dÄ±ÅŸarÄ±dan gÃ¶rÃ¼ndÃ¼ÄŸÃ¼ kadar rahat deÄŸildir; bÃ¼yÃ¼k sorumluluk bÃ¼yÃ¼k kaygÄ± taÅŸÄ±r."
+  },
+  {
+    "title": "Gordion DÃ¼ÄŸÃ¼mÃ¼",
+    "category": "Dikkat ve Karar",
+    "group": "Karar ve Problem Ã‡Ã¶zme",
+    "flow": "Gordionâ€™da Ã§Ã¶zÃ¼lmesi imkÃ¢nsÄ±z gÃ¶rÃ¼nen karmaÅŸÄ±k bir dÃ¼ÄŸÃ¼m vardÄ±r ve onu Ã§Ã¶zen kiÅŸinin Asyaâ€™ya hÃ¼kmedeceÄŸine inanÄ±lÄ±r. Pek Ã§ok kiÅŸi dÃ¼ÄŸÃ¼mÃ¼ aÃ§maya Ã§alÄ±ÅŸÄ±r ama baÅŸaramaz. BÃ¼yÃ¼k Ä°skender dÃ¼ÄŸÃ¼mÃ¼ klasik yolla Ã§Ã¶zmek yerine kÄ±lÄ±cÄ±yla keser.",
+    "lesson": "BazÄ± sorunlar, eski yÃ¶ntemlerde Ä±srar etmek yerine bakÄ±ÅŸ aÃ§Ä±sÄ±nÄ± deÄŸiÅŸtirmeyi gerektirir."
+  },
+  {
+    "title": "Diogenes ve Ä°skender",
+    "category": "Kendini Bilme",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "BÃ¼yÃ¼k Ä°skender, fÄ±Ã§Ä±da sade bir hayat sÃ¼ren filozof Diogenesâ€™i ziyaret eder ve ona bir dileÄŸi olup olmadÄ±ÄŸÄ±nÄ± sorar. Diogenes, kraldan yalnÄ±zca gÃ¼neÅŸinin Ã¶nÃ¼nden Ã§ekilmesini ister. Ä°skender, hiÃ§bir ÅŸeye ihtiyaÃ§ duymayan bir insanÄ±n Ã¶zgÃ¼rlÃ¼ÄŸÃ¼ karÅŸÄ±sÄ±nda etkilenir.",
+    "lesson": "GerÃ§ek Ã¶zgÃ¼rlÃ¼k, sahip olduklarÄ±nÄ±n Ã§okluÄŸunda deÄŸil, ihtiyaÃ§larÄ±nÄ±n azlÄ±ÄŸÄ±nda olabilir."
+  },
+  {
+    "title": "Sokratesâ€™in ÃœÃ§ EleÄŸi",
+    "category": "Dikkat ve Karar",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Bir kiÅŸi Sokratesâ€™e baÅŸkasÄ± hakkÄ±nda bir ÅŸey anlatmak ister. Sokrates Ã¶nce bunun doÄŸru olup olmadÄ±ÄŸÄ±nÄ±, sonra iyi bir ÅŸey olup olmadÄ±ÄŸÄ±nÄ±, son olarak da faydalÄ± olup olmadÄ±ÄŸÄ±nÄ± sorar. ÃœÃ§ soruya da saÄŸlam cevap alamayÄ±nca dedikoduyu dinlemeyi reddeder.",
+    "lesson": "SÃ¶yleyeceÄŸimiz sÃ¶z doÄŸru, iyi veya faydalÄ± deÄŸilse susmak daha deÄŸerlidir."
+  },
+  {
+    "title": "Kral Midasâ€™Ä±n DokunuÅŸu",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Kral Midas, dokunduÄŸu her ÅŸeyin altÄ±na dÃ¶nÃ¼ÅŸmesini diler. BaÅŸta bu gÃ¼cÃ¼ bÃ¼yÃ¼k bir zenginlik sanÄ±r; fakat yiyeceÄŸi, iÃ§eceÄŸi ve sevdikleri bile altÄ±na dÃ¶nÃ¼ÅŸÃ¼nce dileÄŸinin bir lanete dÃ¶nÃ¼ÅŸtÃ¼ÄŸÃ¼nÃ¼ anlar. Sahip olma arzusu, hayatÄ±n kendisini yok etmeye baÅŸlar.",
+    "lesson": "SÄ±nÄ±rsÄ±z zenginlik arzusu, insanÄ± gerÃ§ekten deÄŸerli olan ÅŸeylerden mahrum bÄ±rakabilir."
+  },
+  {
+    "title": "Sisyphosâ€™un KayasÄ±",
+    "category": "SabÄ±r ve Emek",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Sisyphos, bÃ¼yÃ¼k bir kayayÄ± sonsuza kadar tepeye Ã§Ä±karmaya mahkÃ»m edilir. Kaya her seferinde zirveye yaklaÅŸÄ±nca aÅŸaÄŸÄ± yuvarlanÄ±r. Hikaye, bitmeyen Ã§aba, anlamsÄ±z gÃ¶rÃ¼nen emek ve insanÄ±n buna raÄŸmen sÃ¼rdÃ¼rme gÃ¼cÃ¼ Ã¼zerine dÃ¼ÅŸÃ¼nmeye Ã§aÄŸÄ±rÄ±r.",
+    "lesson": "BazÄ± mÃ¼cadeleler sonuca deÄŸil, insanÄ±n direnme biÃ§imine anlam kazandÄ±rÄ±r."
+  },
+  {
+    "title": "Ä°karusâ€™un UÃ§uÅŸu",
+    "category": "Dikkat ve Karar",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Ä°karus ve babasÄ± balmumu kanatlarla tutsaklÄ±ktan kaÃ§ar. BabasÄ± ona ne Ã§ok alÃ§aktan ne de gÃ¼neÅŸe Ã§ok yakÄ±n uÃ§masÄ±nÄ± sÃ¶yler. Ä°karus heyecana kapÄ±lÄ±p yÃ¼kselir; gÃ¼neÅŸ balmumunu eritir ve dÃ¼ÅŸer.",
+    "lesson": "Ã–zgÃ¼ven Ã¶lÃ§Ã¼sÃ¼zleÅŸirse insanÄ± yÃ¼kseltmek yerine dÃ¼ÅŸÃ¼rebilir."
+  },
+  {
+    "title": "Narkissos",
+    "category": "Kendini Bilme",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Narkissos, sudaki kendi yansÄ±masÄ±nÄ± gÃ¶rÃ¼r ve ona Ã¢ÅŸÄ±k olur. GÃ¶rdÃ¼ÄŸÃ¼nÃ¼n kendisi olduÄŸunu anlayamaz; yansÄ±dan kopamaz ve hayatÄ±nÄ± bu gÃ¶rÃ¼ntÃ¼ye takÄ±lÄ± kalarak tÃ¼ketir. Hikaye, kiÅŸinin kendine hayranlÄ±ÄŸÄ±nÄ±n nasÄ±l bir kÃ¶rlÃ¼ÄŸe dÃ¶nÃ¼ÅŸebileceÄŸini gÃ¶sterir.",
+    "lesson": "Kendini sevmek deÄŸerlidir; fakat kendine saplanmak insanÄ± gerÃ§ek iliÅŸkilerden uzaklaÅŸtÄ±rÄ±r."
+  },
+  {
+    "title": "Prokrustesâ€™in YataÄŸÄ±",
+    "category": "Adalet ve Vicdan",
+    "group": "Ahlaki Ä°kilemler",
+    "flow": "Prokrustes, misafirlerini demir bir yataÄŸa yatÄ±rÄ±r. YataÄŸa kÄ±sa gelenleri uzatmaya, uzun gelenleri kesmeye Ã§alÄ±ÅŸÄ±r. Herkesi kendi Ã¶lÃ§Ã¼sÃ¼ne zorla uydurur. Hikaye, insanlarÄ± tek kalÄ±ba sokmanÄ±n zalimliÄŸini anlatÄ±r.",
+    "lesson": "Adalet, herkesi aynÄ± kalÄ±ba zorlamak deÄŸil, gerÃ§eÄŸe uygun Ã¶lÃ§Ã¼ kurmaktÄ±r."
+  },
+  {
+    "title": "Kassandraâ€™nÄ±n Kehaneti",
+    "category": "Dikkat ve Karar",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Kassandra geleceÄŸi gÃ¶rme yeteneÄŸine sahiptir; fakat kimse ona inanmaz. Troyaâ€™nÄ±n felaketini Ã¶nceden sÃ¶yler ama uyarÄ±larÄ± dikkate alÄ±nmaz. HaklÄ± olmak, dinlenmediÄŸi sÃ¼rece felaketi engellemeye yetmez.",
+    "lesson": "DoÄŸru uyarÄ±yÄ± zamanÄ±nda duymamak, sonradan piÅŸmanlÄ±ÄŸÄ± bÃ¼yÃ¼tÃ¼r."
+  },
+  {
+    "title": "BoÅŸ KayÄ±k",
+    "category": "Duygusal FarkÄ±ndalÄ±k",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Bir adam nehirde kayÄ±ÄŸÄ±yla giderken baÅŸka bir kayÄ±k ona Ã§arpar. Ä°Ã§inde biri olduÄŸunu sanÄ±p Ã¶fkelenir; fakat kayÄ±ÄŸÄ±n boÅŸ olduÄŸunu gÃ¶rÃ¼nce Ã¶fkesi daÄŸÄ±lÄ±r. Olay, Ã§oÄŸu zaman Ã¶fkemizin dÄ±ÅŸ olaydan Ã§ok ona yÃ¼klediÄŸimiz niyetten doÄŸduÄŸunu gÃ¶sterir.",
+    "lesson": "Her Ã§arpÄ±ÅŸmanÄ±n ardÄ±nda kasÄ±t aramak, insanÄ±n kendi huzurunu bozar."
+  },
+  {
+    "title": "Ã‡inli Ã‡iftÃ§i ve AtÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Bir Ã§iftÃ§inin atÄ± kaÃ§ar; komÅŸularÄ± bunun bÃ¼yÃ¼k talihsizlik olduÄŸunu sÃ¶yler. Sonra at yanÄ±nda baÅŸka atlarla geri dÃ¶ner; bu kez herkes ÅŸans der. OÄŸlu attan dÃ¼ÅŸÃ¼p sakatlanÄ±r, ardÄ±ndan savaÅŸa Ã§aÄŸrÄ±lmaktan kurtulur. Ã‡iftÃ§i her olayda kesin hÃ¼kÃ¼m vermekten kaÃ§Ä±nÄ±r.",
+    "lesson": "Bir olayÄ±n iyi mi kÃ¶tÃ¼ mÃ¼ olduÄŸunu Ã§oÄŸu zaman zaman gÃ¶stermeden anlayamayÄ±z."
+  },
+  {
+    "title": "Zen UstasÄ±nÄ±n Ã‡ay FincanÄ±",
+    "category": "Kendini Bilme",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Bilgili biri bir Zen ustasÄ±na gider ve ondan hakikati Ã¶ÄŸretmesini ister. Usta Ã§ay doldurmaya baÅŸlar, fincan dolduÄŸu halde dÃ¶kmeye devam eder. Adam fincanÄ±n taÅŸtÄ±ÄŸÄ±nÄ± sÃ¶yleyince usta, zihni dolu olan birine yeni bir ÅŸey Ã¶ÄŸretilemeyeceÄŸini anlatÄ±r.",
+    "lesson": "Ã–ÄŸrenmek iÃ§in Ã¶nce bildiÄŸini sanmanÄ±n yÃ¼kÃ¼nÃ¼ azaltmak gerekir."
+  },
+  {
+    "title": "Tolstoyâ€™un Toprak Hikayesi",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Bir adam, gÃ¼n doÄŸumundan gÃ¼n batÄ±mÄ±na kadar yÃ¼rÃ¼yerek Ã§evrelediÄŸi kadar topraÄŸa sahip olabileceÄŸini Ã¶ÄŸrenir. Daha Ã§ok toprak almak iÃ§in durmadan yÃ¼rÃ¼r, sÄ±nÄ±rÄ± bÃ¼yÃ¼tmeye Ã§alÄ±ÅŸÄ±r. Geri dÃ¶nmeyi baÅŸarÄ±r ama yorgunluktan Ã¶lÃ¼r; sonunda ona gereken toprak yalnÄ±zca mezarÄ± kadardÄ±r.",
+    "lesson": "Sahip olma hÄ±rsÄ±, insanÄ±n yaÅŸayacaÄŸÄ± hayatÄ± tÃ¼ketebilir."
+  },
+  {
+    "title": "Randevu: Semerkant",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "Bir hizmetÃ§i pazarda Ã–lÃ¼mâ€™Ã¼ gÃ¶rÃ¼r ve onun bakÄ±ÅŸÄ±ndan korkup Semerkantâ€™a kaÃ§ar. Efendisi Ã–lÃ¼mâ€™e neden hizmetÃ§iyi korkuttuÄŸunu sorar. Ã–lÃ¼m, onu pazarda gÃ¶rÃ¼nce ÅŸaÅŸÄ±rdÄ±ÄŸÄ±nÄ±, Ã§Ã¼nkÃ¼ o gece onunla Semerkantâ€™ta randevusu olduÄŸunu sÃ¶yler.",
+    "lesson": "BazÄ± kaÃ§Ä±ÅŸlar insanÄ± tam da kaÃ§tÄ±ÄŸÄ± sonuca gÃ¶tÃ¼rebilir."
+  },
+  {
+    "title": "BalÄ±kÃ§Ä± ve Ä°ÅŸ Ä°nsanÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Modern Hayat Ã–ykÃ¼leri",
+    "flow": "Bir iÅŸ insanÄ±, az Ã§alÄ±ÅŸan ama huzurlu yaÅŸayan balÄ±kÃ§Ä±ya daha Ã§ok Ã§alÄ±ÅŸÄ±p bÃ¼yÃ¼mesini, ÅŸirket kurmasÄ±nÄ± ve sonunda emekli olup keyif yapmasÄ±nÄ± Ã¶ÄŸÃ¼tler. BalÄ±kÃ§Ä± ise zaten ailesiyle vakit geÃ§irip denize aÃ§Ä±ldÄ±ÄŸÄ±nÄ± ve sakin bir hayat yaÅŸadÄ±ÄŸÄ±nÄ± sÃ¶yler. Hikaye, baÅŸarÄ± tanÄ±mÄ±nÄ± sorgulatÄ±r.",
+    "lesson": "Bazen ulaÅŸmaya Ã§alÄ±ÅŸtÄ±ÄŸÄ±mÄ±z son hayat, zaten elimizdeki sade huzura benzer."
+  },
+  {
+    "title": "Kavanozdaki TaÅŸlar",
+    "category": "Dikkat ve Karar",
+    "group": "Karar ve Problem Ã‡Ã¶zme",
+    "flow": "Bir Ã¶ÄŸretmen kavanoza Ã¶nce bÃ¼yÃ¼k taÅŸlarÄ±, sonra Ã§akÄ±llarÄ±, kumu ve suyu koyar. EÄŸer Ã¶nce kum konulsa bÃ¼yÃ¼k taÅŸlara yer kalmayacaÄŸÄ±nÄ± gÃ¶sterir. Hikaye, hayatta Ã¶nemli ÅŸeylere Ã¶nce yer aÃ§manÄ±n gerekliliÄŸini anlatÄ±r.",
+    "lesson": "Ã–ncelikler baÅŸta belirlenmezse, kÃ¼Ã§Ã¼k iÅŸler hayatÄ±n bÃ¼yÃ¼k deÄŸerlerini dÄ±ÅŸarÄ±da bÄ±rakÄ±r."
+  },
+  {
+    "title": "Ã‡atlak Testi",
+    "category": "Kendini Bilme",
+    "group": "Psikolojik Mini Hikayeler",
+    "flow": "Bir su taÅŸÄ±yÄ±cÄ±sÄ±nÄ±n testilerinden biri Ã§atlaktÄ±r ve eve varana kadar suyun bir kÄ±smÄ±nÄ± sÄ±zdÄ±rÄ±r. Testi kendini iÅŸe yaramaz sanÄ±r. TaÅŸÄ±yÄ±cÄ±, onun sÄ±zdÄ±rdÄ±ÄŸÄ± yol boyunca Ã§iÃ§ekler yetiÅŸtiÄŸini gÃ¶sterir.",
+    "lesson": "Kusur sandÄ±ÄŸÄ±mÄ±z yÃ¶nler, doÄŸru yerde beklenmedik bir gÃ¼zelliÄŸe hizmet edebilir."
+  },
+  {
+    "title": "TaÅŸ Ã‡orbasÄ±",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "YabancÄ±lar bir kÃ¶ye gelir, kimse yiyecek paylaÅŸmak istemez. Bir taÅŸla Ã§orba yapacaklarÄ±nÄ± sÃ¶yleyip kazanÄ± kaynatÄ±rlar. KÃ¶ylÃ¼ler sÄ±rayla azÄ±cÄ±k sebze, tuz ve malzeme ekler; sonunda herkesin paylaÅŸtÄ±ÄŸÄ± bÃ¼yÃ¼k bir yemek ortaya Ã§Ä±kar.",
+    "lesson": "Birlikte kÃ¼Ã§Ã¼k katkÄ±lar verildiÄŸinde herkesin yararlanacaÄŸÄ± bÃ¼yÃ¼k sonuÃ§lar doÄŸar."
+  },
+  {
+    "title": "Fil ve Ä°nce Ä°p",
+    "category": "Kendini Bilme",
+    "group": "Psikolojik Mini Hikayeler",
+    "flow": "BÃ¼yÃ¼k bir fil yalnÄ±zca ince bir iple baÄŸlÄ± durur ve kaÃ§maya Ã§alÄ±ÅŸmaz. Ã‡Ã¼nkÃ¼ kÃ¼Ã§Ã¼kken daha gÃ¼Ã§lÃ¼ baÄŸlarla tutulmuÅŸ, kurtulamayacaÄŸÄ±na inanmÄ±ÅŸtÄ±r. ArtÄ±k gÃ¼cÃ¼ yettiÄŸi halde eski inancÄ± onu yerinde tutar.",
+    "lesson": "GeÃ§miÅŸteki Ã§aresizlik duygusu, bugÃ¼n sahip olduÄŸumuz gÃ¼cÃ¼ gÃ¶rmemizi engelleyebilir."
+  },
+  {
+    "title": "Nasreddin Hoca ve Kaybolan Anahtar",
+    "category": "Dikkat ve Karar",
+    "group": "Karar ve Problem Ã‡Ã¶zme",
+    "flow": "Nasreddin Hoca anahtarÄ±nÄ± kaybeder ve onu sokak lambasÄ±nÄ±n altÄ±nda arar. Biri anahtarÄ± burada mÄ± dÃ¼ÅŸÃ¼rdÃ¼ÄŸÃ¼nÃ¼ sorar; Hoca, hayÄ±r evde dÃ¼ÅŸÃ¼rdÃ¼ÄŸÃ¼nÃ¼ ama burasÄ± daha aydÄ±nlÄ±k olduÄŸu iÃ§in burada aradÄ±ÄŸÄ±nÄ± sÃ¶yler. Hikaye, kolay yerde aramanÄ±n doÄŸru yerde aramak anlamÄ±na gelmediÄŸini anlatÄ±r.",
+    "lesson": "Sorunun Ã§Ã¶zÃ¼mÃ¼ kolay gÃ¶rÃ¼nen yerde deÄŸil, gerÃ§ekten kaynaÄŸÄ±nda aranmalÄ±dÄ±r."
+  },
+  {
+    "title": "Bilge Kral ve YÃ¼zÃ¼k YazÄ±sÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Bilgelik KÄ±ssalarÄ±",
+    "flow": "Bir kral, hem sevinÃ§te hem kederde kendisini dengeleyecek bir sÃ¶z ister. Bilgeler yÃ¼zÃ¼ÄŸÃ¼ne â€œBu da geÃ§erâ€ anlamÄ±nda bir sÃ¶z yazdÄ±rÄ±r. Kral zor gÃ¼nlerde umudunu, iyi gÃ¼nlerde ise Ã¶lÃ§Ã¼sÃ¼nÃ¼ bu sÃ¶zle korur.",
+    "lesson": "Ne acÄ± ne de sevinÃ§ kalÄ±cÄ±dÄ±r; denge, geÃ§iciliÄŸi hatÄ±rlamakla gÃ¼Ã§lenir."
+  },
+  {
+    "title": "Ä°ki KeÅŸiÅŸ ve KadÄ±n",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Ä°ki keÅŸiÅŸ yolda Ã§amuru geÃ§emeyen bir kadÄ±na rastlar. Biri kadÄ±nÄ± sÄ±rtÄ±nda karÅŸÄ±ya geÃ§irir; diÄŸeri saatlerce bunu eleÅŸtirir. Ä°lk keÅŸiÅŸ, â€œBen onu nehirde bÄ±raktÄ±m, sen hÃ¢lÃ¢ taÅŸÄ±yorsunâ€ der.",
+    "lesson": "Olay geÃ§se bile zihinde taÅŸÄ±mak yÃ¼kÃ¼ sÃ¼rdÃ¼rÃ¼r."
+  },
+  {
+    "title": "Dolu Zihin",
+    "category": "Dikkat ve Karar",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Bir Ã¶ÄŸrenci ustaya Ã§ok ÅŸey bildiÄŸini sÃ¶yleyerek gelir. Usta fincanÄ±nÄ± taÅŸana kadar doldurur. Ã–ÄŸrenci itiraz edince usta, dolu zihne yeni bilginin giremeyeceÄŸini gÃ¶sterir.",
+    "lesson": "Ã–ÄŸrenmenin ilk adÄ±mÄ± boÅŸluk aÃ§maktÄ±r."
+  },
+  {
+    "title": "Bambu Gibi EÄŸilmek",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Usta, fÄ±rtÄ±nada sert dallarÄ±n kÄ±rÄ±ldÄ±ÄŸÄ±nÄ±, bambunun ise eÄŸilip ayakta kaldÄ±ÄŸÄ±nÄ± gÃ¶sterir. Ã–ÄŸrencisine direnmenin her zaman gÃ¼Ã§ olmadÄ±ÄŸÄ±nÄ± sÃ¶yler.",
+    "lesson": "Esneklik, kÄ±rÄ±lmadan dayanmanÄ±n baÅŸka bir yoludur."
+  },
+  {
+    "title": "AyÄ± GÃ¶steren Parmak",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Ã–ÄŸrenci ustanÄ±n parmaÄŸÄ±na bakarak hakikati arar. Usta parmaÄŸÄ±n yalnÄ±zca ayÄ± gÃ¶sterdiÄŸini, ayÄ±n kendisi olmadÄ±ÄŸÄ±nÄ± sÃ¶yler.",
+    "lesson": "AraÃ§la amacÄ± karÄ±ÅŸtÄ±rmak hakikati kaÃ§Ä±rÄ±r."
+  },
+  {
+    "title": "KÄ±rÄ±k Ã‡ay KÃ¢sesi",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Usta en sevdiÄŸi kÃ¢seyi kullanÄ±rken onun zaten kÄ±rÄ±lacak olduÄŸunu hatÄ±rlar. KÃ¢se kÄ±rÄ±ldÄ±ÄŸÄ±nda Ã¼zÃ¼lÃ¼r ama yÄ±kÄ±lmaz; Ã§Ã¼nkÃ¼ geÃ§iciliÄŸi baÅŸtan kabul etmiÅŸtir.",
+    "lesson": "GeÃ§iciliÄŸi kabul eden, kaybÄ± daha bilgece taÅŸÄ±r."
+  },
+  {
+    "title": "Sakin GÃ¶l",
+    "category": "Duygusal FarkÄ±ndalÄ±k",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Ã–ÄŸrenci bulanÄ±k suda yÃ¼zÃ¼nÃ¼ gÃ¶remez. Usta suyun durulmasÄ±nÄ± bekletir; su sakinleÅŸince yansÄ±ma belirir. â€œZihin de bÃ¶yledirâ€ der.",
+    "lesson": "SakinleÅŸmeden verilen karar gerÃ§eÄŸi bozabilir."
+  },
+  {
+    "title": "TaÅŸÄ±n AÄŸÄ±rlÄ±ÄŸÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen ve DoÄŸu BilgeliÄŸi",
+    "flow": "Usta Ã¶ÄŸrencisine bir taÅŸ tutturur ve saatlerce bÄ±rakmamasÄ±nÄ± ister. TaÅŸ kÃ¼Ã§Ã¼k olsa da zamanla acÄ± verir. Ã–ÄŸrenci, kÃ¼Ã§Ã¼k kÄ±rgÄ±nlÄ±klarÄ±n da taÅŸÄ±ndÄ±kÃ§a aÄŸÄ±rlaÅŸtÄ±ÄŸÄ±nÄ± anlar.",
+    "lesson": "YÃ¼kÃ¼ bÃ¼yÃ¼ten Ã§oÄŸu zaman aÄŸÄ±rlÄ±k deÄŸil sÃ¼redir."
+  },
+  {
+    "title": "Epiktetosâ€™un Zinciri",
+    "category": "Kendini Bilme",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "KÃ¶le olarak yaÅŸamÄ±ÅŸ Epiktetos, insanÄ±n dÄ±ÅŸ koÅŸullarÄ± her zaman seÃ§emediÄŸini ama tepkisini seÃ§ebileceÄŸini savunur. Onun hikayesi Ã¶zgÃ¼rlÃ¼ÄŸÃ¼n yalnÄ±zca bedensel olmadÄ±ÄŸÄ±nÄ± gÃ¶sterir.",
+    "lesson": "Ä°Ã§ Ã¶zgÃ¼rlÃ¼k, kontrol edilemeyeni ayÄ±rabilmekle baÅŸlar."
+  },
+  {
+    "title": "Kiniklerin Kasesi",
+    "category": "Huzur ve Zaman",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Diogenes su iÃ§mek iÃ§in kase taÅŸÄ±r. Bir Ã§ocuÄŸun avucuyla su iÃ§tiÄŸini gÃ¶rÃ¼nce kasesini atar. Daha az ÅŸeye ihtiyaÃ§ duyabileceÄŸini anlar.",
+    "lesson": "Sadelik bazen bir eÅŸyayÄ± daha bÄ±rakmakla baÅŸlar."
+  },
+  {
+    "title": "Sokrates ve Pazar",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Sokrates pazarda dolaÅŸÄ±rken satÄ±lan Ã§ok ÅŸeyi inceler ve â€œNe kadar Ã§ok ÅŸeye ihtiyacÄ±m yokâ€ der. KalabalÄ±k arzularÄ±n iÃ§inde Ã¶zgÃ¼rlÃ¼ÄŸÃ¼ gÃ¶rÃ¼r.",
+    "lesson": "Ä°htiyaÃ§ azaldÄ±kÃ§a insanÄ±n iÃ§ alanÄ± geniÅŸler."
+  },
+  {
+    "title": "Herakleitosâ€™un Nehri",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Herakleitos aynÄ± nehre iki kez girilemeyeceÄŸini sÃ¶yler; Ã§Ã¼nkÃ¼ hem nehir hem insan deÄŸiÅŸmiÅŸtir. DeÄŸiÅŸim hayatÄ±n istisnasÄ± deÄŸil kuralÄ±dÄ±r.",
+    "lesson": "DeÄŸiÅŸimi reddetmek, yaÅŸamÄ±n akÄ±ÅŸÄ±nÄ± reddetmektir."
+  },
+  {
+    "title": "Senecaâ€™nÄ±n ZamanÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Seneca insanlarÄ±n parasÄ±nÄ± koruyup zamanÄ±nÄ± savurduÄŸunu sÃ¶yler. Oysa en geri alÄ±namaz servet zamandÄ±r.",
+    "lesson": "Zaman, dikkatsizce harcandÄ±ÄŸÄ±nda en pahalÄ± kayÄ±ptÄ±r."
+  },
+  {
+    "title": "Spinozaâ€™nÄ±n MerceÄŸi",
+    "category": "SabÄ±r ve Emek",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Spinoza mercek taÅŸlarken sabÄ±rla kÃ¼Ã§Ã¼k dÃ¼zeltmeler yapar. Felsefesinde de duygularÄ± anlamaya aynÄ± Ã¶zenle yaklaÅŸÄ±r.",
+    "lesson": "Derin gÃ¶rÃ¼ÅŸ, sabÄ±rlÄ± inceltmeyle oluÅŸur."
+  },
+  {
+    "title": "Kantâ€™Ä±n YÃ¼rÃ¼yÃ¼ÅŸÃ¼",
+    "category": "SabÄ±r ve Emek",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Kantâ€™Ä±n dÃ¼zenli yÃ¼rÃ¼yÃ¼ÅŸleri o kadar bilinir ki komÅŸularÄ± saatlerini ona gÃ¶re ayarlar. DÃ¼ÅŸÃ¼nce hayatÄ± bile gÃ¼ndelik disiplinle taÅŸÄ±nÄ±r.",
+    "lesson": "BÃ¼yÃ¼k fikirler Ã§oÄŸu zaman kÃ¼Ã§Ã¼k dÃ¼zenlerin Ã¼zerinde yÃ¼kselir."
+  },
+  {
+    "title": "Montaigneâ€™in Kulesi",
+    "category": "Kendini Bilme",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Montaigne kendini anlamak iÃ§in kulesine Ã§ekilir ve denemeler yazar. DÃ¼nyayÄ± anlamanÄ±n bir yolunun da kendini gÃ¶zlemlemek olduÄŸunu gÃ¶sterir.",
+    "lesson": "Kendini incelemek, dÃ¼nyadan kaÃ§mak deÄŸil dÃ¼nyayÄ± daha dÃ¼rÃ¼st gÃ¶rmektir."
+  },
+  {
+    "title": "Newtonâ€™un ElmasÄ±",
+    "category": "Dikkat ve Karar",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "ElmanÄ±n dÃ¼ÅŸÃ¼ÅŸÃ¼ sÄ±radan bir olaydÄ±r; Newton onu soru haline getirir. BaÅŸkalarÄ±nÄ±n geÃ§tiÄŸi yerde merak durur.",
+    "lesson": "FarkÄ± yaratan olay deÄŸil, olaya sorulan sorudur."
+  },
+  {
+    "title": "Galileoâ€™nun BakÄ±ÅŸÄ±",
+    "category": "Adalet ve Vicdan",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Galileo gÃ¶kyÃ¼zÃ¼ne farklÄ± bir araÃ§la bakar ve alÄ±ÅŸÄ±lmÄ±ÅŸ kabulleri sorgular. GÃ¶rmek, bedel istemeye baÅŸlar.",
+    "lesson": "Yeni bakÄ±ÅŸ aÃ§Ä±sÄ± bazen eski gÃ¼venlikleri sarsar."
+  },
+  {
+    "title": "Lao Tzuâ€™nun Su Ã–ÄŸÃ¼dÃ¼",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Lao Tzu, suyun herkese fayda verip alÃ§ak yerde durduÄŸunu anlatÄ±r. En yumuÅŸak olanÄ±n en serti aÅŸabildiÄŸini sÃ¶yler.",
+    "lesson": "Tevazu ve esneklik, derin bir gÃ¼Ã§ biÃ§imidir."
+  },
+  {
+    "title": "Aureliusâ€™un Defteri",
+    "category": "Kendini Bilme",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Marcus Aurelius dÃ¼ÅŸÃ¼ncelerini baÅŸkasÄ± iÃ§in deÄŸil kendini terbiye etmek iÃ§in yazar. Ä°mparator olsa da Ã¶nce kendi zihnini yÃ¶netmeye Ã§alÄ±ÅŸÄ±r.",
+    "lesson": "Ä°nsanÄ±n ilk yÃ¶netmesi gereken Ã¼lke kendi iÃ§idir."
+  },
+  {
+    "title": "Diderotâ€™nun SabahlÄ±ÄŸÄ±",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Diderot yeni ve gÃ¼zel bir sabahlÄ±k alÄ±nca eski eÅŸyalarÄ± ona yakÄ±ÅŸmaz bulmaya baÅŸlar. Bir eÅŸya, yeni harcama zinciri doÄŸurur.",
+    "lesson": "Yeni arzu, Ã§oÄŸu zaman eski memnuniyeti bozar."
+  },
+  {
+    "title": "Pascalâ€™Ä±n OdasÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Pascal, insanÄ±n mutsuzluÄŸunun bir odada sessizce kalamamasÄ±ndan doÄŸduÄŸunu sÃ¶yler. KaÃ§Ä±ÅŸlarÄ±n Ã§oÄŸu iÃ§ sÄ±kÄ±ntÄ±dan uzaklaÅŸma Ã§abasÄ±dÄ±r.",
+    "lesson": "Kendiyle kalamayan insan, dÄ±ÅŸ uyaranlara baÄŸÄ±mlÄ± olur."
+  },
+  {
+    "title": "Thalesâ€™in YÄ±ldÄ±zlarÄ±",
+    "category": "Dikkat ve Karar",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Thales gÃ¶kyÃ¼zÃ¼nÃ¼ izlerken kuyuya dÃ¼ÅŸer. Hikaye bazen yÃ¼ksek dÃ¼ÅŸÃ¼ncenin yakÄ±n adÄ±mÄ± unutturabileceÄŸini anlatÄ±r.",
+    "lesson": "BÃ¼yÃ¼k dÃ¼ÅŸÃ¼nceler, basit dikkatle dengelenmelidir."
+  },
+  {
+    "title": "Nietzscheâ€™nin UÃ§urumu",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Ä°nsan uzun sÃ¼re uÃ§uruma baktÄ±ÄŸÄ±nda uÃ§urumun da ona bakacaÄŸÄ±nÄ± sÃ¶yleyen dÃ¼ÅŸÃ¼nce, karanlÄ±kla uÄŸraÅŸÄ±rken ona benzememeyi hatÄ±rlatÄ±r.",
+    "lesson": "MÃ¼cadele ettiÄŸimiz ÅŸey bizi dÃ¶nÃ¼ÅŸtÃ¼rmesin diye uyanÄ±k olmalÄ±yÄ±z."
+  },
+  {
+    "title": "Kediye Zil Takmak",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Fareler kediden kurtulmak iÃ§in boynuna zil takmayÄ± Ã¶nerir. Fikir herkesin hoÅŸuna gider ama zili kimin takacaÄŸÄ± sorulunca sessizlik olur.",
+    "lesson": "Uygulanamayan fikir, iyi gÃ¶rÃ¼nse de Ã§Ã¶zÃ¼m deÄŸildir."
+  },
+  {
+    "title": "Hasta Aslan",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "YaÅŸlÄ± aslan maÄŸarasÄ±na hasta olduÄŸunu sÃ¶yleyerek hayvanlarÄ± Ã§aÄŸÄ±rÄ±r. Tilki iÃ§eride ayak izlerinin yalnÄ±zca giriÅŸ yÃ¶nÃ¼nde olduÄŸunu fark eder ve iÃ§eri girmez.",
+    "lesson": "Dikkatli gÃ¶z, tehlikeyi sÃ¶zlerden Ã¶nce izlerden okur."
+  },
+  {
+    "title": "Tilki ve Maske",
+    "category": "Kendini Bilme",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Tilki gÃ¼zel bir tiyatro maskesi bulur. DÄ±ÅŸÄ± etkileyicidir ama iÃ§i boÅŸtur. Tilki, gÃ¼zelliÄŸin akÄ±l olmadan eksik olduÄŸunu dÃ¼ÅŸÃ¼nÃ¼r.",
+    "lesson": "GÃ¶rÃ¼nÃ¼ÅŸ, iÃ§ deÄŸerle birleÅŸmediÄŸinde yanÄ±ltÄ±cÄ±dÄ±r."
+  },
+  {
+    "title": "KurbaÄŸa ve Ã–kÃ¼z",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "KÃ¼Ã§Ã¼k kurbaÄŸa Ã¶kÃ¼z kadar bÃ¼yÃ¼k gÃ¶rÃ¼nmek ister. Kendini ÅŸiÅŸirdikÃ§e ÅŸiÅŸirir ve sonunda patlar.",
+    "lesson": "BaÅŸkasÄ±na benzemek iÃ§in Ã¶lÃ§Ã¼sÃ¼nÃ¼ kaybeden kendine zarar verir."
+  },
+  {
+    "title": "Kartal ve Ok",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Kartal vurulduÄŸunda okun tÃ¼ylerinden kendi tÃ¼yÃ¼nÃ¼ gÃ¶rÃ¼r. Onu dÃ¼ÅŸÃ¼ren ÅŸeyin bir parÃ§asÄ±nÄ±n kendisinden geldiÄŸini anlar.",
+    "lesson": "Bazen zarar, bizim verdiÄŸimiz gÃ¼Ã§le bÃ¼yÃ¼r."
+  },
+  {
+    "title": "EÅŸek ve Tuz YÃ¼kÃ¼",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "EÅŸek dereye dÃ¼ÅŸÃ¼nce tuz yÃ¼kÃ¼ erir ve hafifler. Bunu alÄ±ÅŸkanlÄ±k yapar; sonra sÃ¼nger yÃ¼kÃ¼yle aynÄ± ÅŸeyi yapÄ±nca yÃ¼kÃ¼ daha da aÄŸÄ±rlaÅŸÄ±r.",
+    "lesson": "Bir kez iÅŸe yarayan hile her durumda iÅŸe yaramaz."
+  },
+  {
+    "title": "Horoz ve Ä°nci",
+    "category": "Kendini Bilme",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Horoz yerde deÄŸerli bir inci bulur ama onu yiyecek sanÄ±p iÅŸine yaramaz gÃ¶rÃ¼r. Onun iÃ§in bir tane buÄŸday daha deÄŸerlidir.",
+    "lesson": "DeÄŸer, ihtiyaca gÃ¶re anlaÅŸÄ±lÄ±r; herkes aynÄ± ÅŸeyi kÄ±ymetli gÃ¶rmez."
+  },
+  {
+    "title": "Ã‡iftÃ§i ve Leylek",
+    "category": "Adalet ve Vicdan",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Leylek, tarlaya zarar veren kuÅŸlarla birlikte yakalanÄ±r. SuÃ§suz olduÄŸunu sÃ¶ylese de kÃ¶tÃ¼ topluluÄŸun iÃ§inde olduÄŸu iÃ§in bedel Ã¶der.",
+    "lesson": "YanlÄ±ÅŸ Ã§evre, insanÄ± yanlÄ±ÅŸ sonuca ortak edebilir."
+  },
+  {
+    "title": "KÃ¶pek ve Kurt",
+    "category": "Huzur ve Zaman",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Kurt, besili kÃ¶peÄŸe Ã¶zenir ama boynundaki tasma izini gÃ¶rÃ¼nce Ã¶zgÃ¼rlÃ¼ÄŸÃ¼n bedelini dÃ¼ÅŸÃ¼nÃ¼r. AÃ§ ama Ã¶zgÃ¼r kalmayÄ± seÃ§er.",
+    "lesson": "Konfor, Ã¶zgÃ¼rlÃ¼ÄŸÃ¼ tamamen satÄ±n alÄ±yorsa pahalÄ± olabilir."
+  },
+  {
+    "title": "Maymun ve BalÄ±kÃ§Ä±lar",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Maymun balÄ±kÃ§Ä±larÄ±n aÄŸ attÄ±ÄŸÄ±nÄ± gÃ¶rÃ¼r ve onlarÄ± taklit etmek ister. AÄŸÄ±n iÃ§inde kalÄ±nca bilmeden taklidin tehlikesini anlar.",
+    "lesson": "Anlamadan taklit etmek insanÄ± tuzaÄŸa dÃ¼ÅŸÃ¼rebilir."
+  },
+  {
+    "title": "Araba ve Sinek",
+    "category": "Kendini Bilme",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Sinek arabanÄ±n tekerine konar ve Ã§Ä±kan tozu kendisinin kaldÄ±rdÄ±ÄŸÄ±nÄ± sanÄ±r. KÃ¼Ã§Ã¼k katkÄ±sÄ±nÄ± bÃ¼yÃ¼k gÃ¼Ã§ zanneder.",
+    "lesson": "Kendi rolÃ¼nÃ¼ abartmak insanÄ± gÃ¼lÃ¼nÃ§ duruma dÃ¼ÅŸÃ¼rÃ¼r."
+  },
+  {
+    "title": "Karga ve SÃ¼rahi",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Susayan karga sÃ¼rahinin dibindeki suya eriÅŸemez. TaÅŸlarÄ± tek tek atarak suyu yÃ¼kseltir ve iÃ§er.",
+    "lesson": "ZekÃ¢, gÃ¼Ã§ yetmeyen yerde yÃ¶ntem bulmaktÄ±r."
+  },
+  {
+    "title": "Aslan PayÄ±",
+    "category": "Adalet ve Vicdan",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Aslan avÄ± ortak yaptÄ±ÄŸÄ±nÄ± sÃ¶yler ama paylarÄ±n Ã§oÄŸunu kendine ayÄ±rÄ±r. DiÄŸerleri gÃ¼cÃ¼n adaleti bozduÄŸunu gÃ¶rÃ¼r.",
+    "lesson": "OrtaklÄ±k, gÃ¼Ã§lÃ¼ olan her ÅŸeyi alÄ±yorsa ortaklÄ±k deÄŸildir."
+  },
+  {
+    "title": "Tilki ve Oduncu",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Tilki avcÄ±lardan kaÃ§Ä±p oduncuya saklanÄ±r. Oduncu sÃ¶zle saklamadÄ±ÄŸÄ±nÄ± sÃ¶ylerken eliyle yerini gÃ¶sterir.",
+    "lesson": "SÃ¶z ve davranÄ±ÅŸ Ã§eliÅŸiyorsa gerÃ§ek niyet davranÄ±ÅŸta gÃ¶rÃ¼nÃ¼r."
+  },
+  {
+    "title": "Kurt ve Ã‡oban KÃ¶pekleri",
+    "category": "Dikkat ve Karar",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "Kurt kÃ¶pekleri dostluk sÃ¶zleriyle kandÄ±rÄ±p sÃ¼rÃ¼den uzaklaÅŸtÄ±rmak ister. KÃ¶pekler sÃ¶zlerin arkasÄ±ndaki niyeti fark eder.",
+    "lesson": "Her barÄ±ÅŸ teklifi iyi niyetli olmayabilir."
+  },
+  {
+    "title": "EÅŸek ve Efendisi",
+    "category": "Kendini Bilme",
+    "group": "Klasik Fabl ve Meseller",
+    "flow": "EÅŸek sahibini deÄŸiÅŸtirirse yÃ¼kÃ¼nÃ¼n azalacaÄŸÄ±nÄ± sanÄ±r. Yeni sahibi daha aÄŸÄ±r yÃ¼k verir. Sorunun sahibin adÄ± deÄŸil, durumun kendisi olduÄŸunu anlar.",
+    "lesson": "DeÄŸiÅŸimin neyi deÄŸiÅŸtirdiÄŸini anlamadan umut baÄŸlamak yanÄ±ltabilir."
+  },
+  {
+    "title": "MeÅŸe ile Saz",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "GÃ¼Ã§lÃ¼ meÅŸe, ince sazÄ± zayÄ±f olmakla kÃ¼Ã§Ã¼mser. FÄ±rtÄ±na Ã§Ä±ktÄ±ÄŸÄ±nda meÅŸe direnmeye Ã§alÄ±ÅŸÄ±r ve devrilir; saz ise eÄŸilir, fÄ±rtÄ±na geÃ§ince yeniden doÄŸrulur.",
+    "lesson": "Bazen esnek olmak, sert gÃ¶rÃ¼nmekten daha gÃ¼Ã§lÃ¼dÃ¼r."
+  },
+  {
+    "title": "Kurt Postuna BÃ¼rÃ¼nmÃ¼ÅŸ Koyun",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Bir koyun, kurt postu giyerek diÄŸer hayvanlarÄ± korkutmaya Ã§alÄ±ÅŸÄ±r. Bir sÃ¼re kandÄ±rsa da davranÄ±ÅŸlarÄ± ve sesi onu ele verir.",
+    "lesson": "KÄ±lÄ±k deÄŸiÅŸtirmek karakteri deÄŸiÅŸtirmez."
+  },
+  {
+    "title": "Kurt ile Turna",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Kurdun boÄŸazÄ±na kemik takÄ±lÄ±r ve turnadan yardÄ±m ister. Turna kemiÄŸi Ã§Ä±karÄ±r; Ã¶dÃ¼l isteyince kurt onu yememiÅŸ olmasÄ±nÄ± Ã¶dÃ¼l sayar.",
+    "lesson": "KÃ¶tÃ¼ niyetli kiÅŸiden iyilik karÅŸÄ±lÄ±ÄŸÄ± beklemek hayal kÄ±rÄ±klÄ±ÄŸÄ± doÄŸurabilir."
+  },
+  {
+    "title": "Tilki ile KeÃ§i",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Tilki kuyuya dÃ¼ÅŸer ve dÄ±ÅŸarÄ± Ã§Ä±kamaz. KeÃ§iyi suyun gÃ¼zel olduÄŸuna inandÄ±rÄ±p kuyuya indirir; sonra keÃ§inin sÄ±rtÄ±na basarak Ã§Ä±kar ve onu kuyuda bÄ±rakÄ±r.",
+    "lesson": "Bir Ã¶neriyi kabul etmeden Ã¶nce sonunu dÃ¼ÅŸÃ¼nmek gerekir."
+  },
+  {
+    "title": "KÃ¶pek ve Yemlik",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "KÃ¶pek, kendisi yemediÄŸi halde Ã¶kÃ¼zlerin saman yemesine de izin vermez. Ne kendi faydalanÄ±r ne de baÅŸkasÄ±nÄ± faydalandÄ±rÄ±r.",
+    "lesson": "KullanmadÄ±ÄŸÄ± ÅŸeyi baÅŸkasÄ±ndan esirgeyen kiÅŸi hem bencil hem faydasÄ±z davranÄ±r."
+  },
+  {
+    "title": "AÃ§gÃ¶zlÃ¼ KÃ¶pek",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "KÃ¶pek, aÄŸzÄ±ndaki eti taÅŸÄ±rken sudaki yansÄ±masÄ±nÄ± baÅŸka bir kÃ¶pek sanÄ±r. Daha bÃ¼yÃ¼k et almak iÃ§in havlayÄ±nca kendi etini de suya dÃ¼ÅŸÃ¼rÃ¼r.",
+    "lesson": "Daha fazlasÄ±nÄ± isterken elindekini kaybetmemek gerekir."
+  },
+  {
+    "title": "Miser ve AltÄ±nÄ±",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Cimri adam altÄ±nÄ±nÄ± topraÄŸa gÃ¶mer ve yalnÄ±zca bakmaya gider. AltÄ±n Ã§alÄ±nÄ±nca komÅŸusu ona aynÄ± yere taÅŸ koymasÄ±nÄ±, Ã§Ã¼nkÃ¼ altÄ±nÄ± hiÃ§ kullanmadÄ±ÄŸÄ±nÄ± sÃ¶yler.",
+    "lesson": "KullanÄ±lmayan servet, sahip olunmayan servetten farksÄ±z hale gelebilir."
+  },
+  {
+    "title": "KÃ¶ylÃ¼ ve YÄ±lan",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "KÃ¶ylÃ¼ donmak Ã¼zere olan yÄ±lanÄ± acÄ±yÄ±p Ä±sÄ±tÄ±r. YÄ±lan kendine gelince onu sokar; kÃ¶ylÃ¼ yanlÄ±ÅŸ kiÅŸiye gÃ¼venmenin bedelini Ã¶der.",
+    "lesson": "Merhamet ederken de kime gÃ¼venildiÄŸine dikkat etmek gerekir."
+  },
+  {
+    "title": "Ä°ki Tencere",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Toprak tencere ile bakÄ±r tencere nehirde yan yana sÃ¼rÃ¼klenir. BakÄ±r tencere dostÃ§a yaklaÅŸmak ister ama toprak tencere, en kÃ¼Ã§Ã¼k Ã§arpÄ±ÅŸmada kÄ±rÄ±lacaÄŸÄ±nÄ± bilir.",
+    "lesson": "GÃ¼Ã§ dengesi Ã§ok farklÄ±ysa yakÄ±nlÄ±k bile zarar verebilir."
+  },
+  {
+    "title": "Karga ile YÄ±lan",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "AÃ§ karga uyuyan yÄ±lanÄ± yiyecek sanÄ±p kapar. YÄ±lan uyanÄ±r ve kargayÄ± sokar. Karga kolay gÃ¶rÃ¼nen avÄ±n Ã¶lÃ¼mcÃ¼l olduÄŸunu anlar.",
+    "lesson": "Kolay kazanÃ§ gibi gÃ¶rÃ¼nen ÅŸey bazen bÃ¼yÃ¼k tehlike taÅŸÄ±r."
+  },
+  {
+    "title": "Kurt ile KÃ¶pek",
+    "category": "Huzur ve Zaman",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "AÃ§ kurt, besili kÃ¶peÄŸin rahat hayatÄ±na Ã¶zenir. KÃ¶peÄŸin boynundaki tasma izini gÃ¶rÃ¼nce Ã¶zgÃ¼rlÃ¼ÄŸÃ¼nÃ¼n bedelini dÃ¼ÅŸÃ¼nÃ¼r ve ormana dÃ¶ner.",
+    "lesson": "Konfor, Ã¶zgÃ¼rlÃ¼ÄŸÃ¼n tamamÄ±nÄ± alÄ±yorsa pahalÄ± olabilir."
+  },
+  {
+    "title": "Tilki ile Kuyruksuz Tilki",
+    "category": "Kendini Bilme",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "KuyruÄŸunu kaybeden tilki, diÄŸer tilkilere kuyruÄŸun gereksiz olduÄŸunu sÃ¶yleyip onlarÄ± da kuyruksuz olmaya Ã§aÄŸÄ±rÄ±r. DiÄŸerleri onun aslÄ±nda kendi eksikliÄŸini yaymaya Ã§alÄ±ÅŸtÄ±ÄŸÄ±nÄ± anlar.",
+    "lesson": "Ä°nsan bazen kendi kaybÄ±nÄ± baÅŸkalarÄ±na erdem gibi gÃ¶stermeye Ã§alÄ±ÅŸÄ±r."
+  },
+  {
+    "title": "Yarasa, KuÅŸlar ve Hayvanlar",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Yarasa savaÅŸta kimin kazanacaÄŸÄ±na gÃ¶re bazen kuÅŸ, bazen hayvan olduÄŸunu sÃ¶yler. SavaÅŸ bitince iki taraf da ona gÃ¼venmez.",
+    "lesson": "SÃ¼rekli taraf deÄŸiÅŸtiren kiÅŸi sonunda hiÃ§bir yere ait olamaz."
+  },
+  {
+    "title": "Aslan, Tilki ve Geyik",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Hasta aslan avlanamaz; tilki geyikleri kandÄ±rÄ±p maÄŸaraya getirmeye Ã§alÄ±ÅŸÄ±r. Ä°lkinde kaÃ§an geyik, ikinci kez kandÄ±rÄ±lÄ±nca sonunu hazÄ±rlar.",
+    "lesson": "AynÄ± tuzaÄŸa ikinci kez dÃ¼ÅŸmek, uyarÄ±yÄ± anlamamaktÄ±r."
+  },
+  {
+    "title": "Horoz, KÃ¶pek ve Tilki",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Tilki aÄŸaÃ§taki horozu barÄ±ÅŸ ilan edildiÄŸine inandÄ±rÄ±p aÅŸaÄŸÄ± indirmek ister. Horoz, yaklaÅŸan kÃ¶pekleri haber verince tilki korkup kaÃ§ar.",
+    "lesson": "KurnazlÄ±k, daha bÃ¼yÃ¼k kurnazlÄ±kla bozulabilir."
+  },
+  {
+    "title": "TavÅŸanlar ve KurbaÄŸalar",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "TavÅŸanlar korkaklÄ±klarÄ±ndan bÄ±kÄ±p kendilerini suya atmaya karar verir. KurbaÄŸalar onlarÄ± gÃ¶rÃ¼nce daha Ã§ok korkup kaÃ§ar. TavÅŸanlar, kendilerinden de Ã¼rkek canlÄ±lar olduÄŸunu gÃ¶rÃ¼r.",
+    "lesson": "Kendi derdini en bÃ¼yÃ¼k sanan kiÅŸi, baÅŸkalarÄ±nÄ±n halini gÃ¶rÃ¼nce bakÄ±ÅŸÄ±nÄ± deÄŸiÅŸtirebilir."
+  },
+  {
+    "title": "At ile Geyik",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "At, geyiÄŸi yenmek iÃ§in insandan yardÄ±m ister. Ä°nsan ona gem ve eyer takar; geyik yenilir ama at Ã¶zgÃ¼rlÃ¼ÄŸÃ¼nÃ¼ kaybeder.",
+    "lesson": "Ä°ntikam iÃ§in alÄ±nan yardÄ±m, insanÄ± daha bÃ¼yÃ¼k baÄŸÄ±mlÄ±lÄ±ÄŸa sokabilir."
+  },
+  {
+    "title": "Bedenin OrganlarÄ±",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "VÃ¼cudun organlarÄ± mideyi tembel sanÄ±p ona hizmet etmeyi bÄ±rakÄ±r. KÄ±sa sÃ¼re sonra hepsi gÃ¼Ã§sÃ¼z dÃ¼ÅŸer ve midenin de bÃ¼tÃ¼ne hizmet ettiÄŸini anlar.",
+    "lesson": "Toplumda gÃ¶rÃ¼nmeyen gÃ¶revler de bÃ¼tÃ¼nÃ¼n yaÅŸamasÄ± iÃ§in gereklidir."
+  },
+  {
+    "title": "Fare ile KurbaÄŸa",
+    "category": "Dikkat ve Karar",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "KurbaÄŸa fareyi eÄŸlenmek iÃ§in ayaÄŸÄ±na baÄŸlayÄ±p suya Ã§eker. Fare Ã¶lÃ¼r; ardÄ±ndan bir kuÅŸ ikisini birden kapar.",
+    "lesson": "BaÅŸkasÄ±na kurulan zarar, Ã§oÄŸu zaman kuranÄ± da iÃ§ine Ã§eker."
+  },
+  {
+    "title": "Kartal ile Tilki",
+    "category": "Adalet ve Vicdan",
+    "group": "Aesop / La Fontaine FabllarÄ±",
+    "flow": "Kartal, tilkinin yavrularÄ±nÄ± alÄ±r. Tilki intikam iÃ§in kartalÄ±n yuvasÄ±na ateÅŸ taÅŸÄ±yÄ±nca kartal yavrularÄ± geri vermek zorunda kalÄ±r.",
+    "lesson": "GÃ¼Ã§lÃ¼ olmak, haksÄ±zlÄ±ÄŸÄ±n sonuÃ§larÄ±ndan kaÃ§mayÄ± garanti etmez."
+  },
+  {
+    "title": "Nasreddin Hoca GÃ¶le Maya Ã‡alÄ±yor",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hoca gÃ¶le maya Ã§alarken gÃ¶renler bunun tutmayacaÄŸÄ±nÄ± sÃ¶yler. Hoca ise â€œYa tutarsa?â€ diyerek imkÃ¢nsÄ±z gÃ¶rÃ¼len bir ÅŸeye umutla bakar.",
+    "lesson": "Bazen insanÄ± harekete geÃ§iren ÅŸey kesin sonuÃ§ deÄŸil, ihtimalin kendisidir."
+  },
+  {
+    "title": "Nasreddin Hoca Damdan DÃ¼ÅŸen Halden Anlar",
+    "category": "Merhamet ve Nezaket",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hoca damdan dÃ¼ÅŸer; Ã§evresindekiler ona Ã¶ÄŸÃ¼t vermeye baÅŸlar. Hoca, kendisini gerÃ§ekten anlayacak kiÅŸinin daha Ã¶nce damdan dÃ¼ÅŸmÃ¼ÅŸ biri olduÄŸunu sÃ¶yler.",
+    "lesson": "Empati, uzaktan akÄ±l vermekten daha derin bir anlayÄ±ÅŸ ister."
+  },
+  {
+    "title": "ParayÄ± Veren DÃ¼dÃ¼ÄŸÃ¼ Ã‡alar",
+    "category": "Adalet ve Vicdan",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Ã‡ocuklar Hocaâ€™dan pazardan dÃ¼dÃ¼k ister; yalnÄ±z biri parasÄ±nÄ± verir. Hoca dÃ¶nÃ¼ÅŸte sadece ona dÃ¼dÃ¼k getirir ve â€œParayÄ± veren dÃ¼dÃ¼ÄŸÃ¼ Ã§alarâ€ der.",
+    "lesson": "Emek veya bedel verilmeden hak iddia etmek doÄŸru deÄŸildir."
+  },
+  {
+    "title": "Nasreddin Hoca ve DÃ¼nyanÄ±n Merkezi",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hocaâ€™ya dÃ¼nyanÄ±n merkezinin neresi olduÄŸu sorulur. Hoca bastonunu yere vurup â€œÄ°ÅŸte burasÄ±â€ der; Ã¶lÃ§mek isteyen varsa buyursun diye ekler.",
+    "lesson": "BazÄ± iddialar, kanÄ±tlanamaz olduklarÄ±nda ciddiyetini kaybeder."
+  },
+  {
+    "title": "Nasreddin Hoca ve BindiÄŸi Dal",
+    "category": "Dikkat ve Karar",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hoca bindiÄŸi dalÄ± keserken gÃ¶renler dÃ¼ÅŸeceÄŸini sÃ¶yler. Dal kÄ±rÄ±lÄ±p dÃ¼ÅŸÃ¼nce uyarÄ±nÄ±n deÄŸerini anlar.",
+    "lesson": "Ä°nsan bazen en aÃ§Ä±k sonucu bile ancak yaÅŸayÄ±nca kabul eder."
+  },
+  {
+    "title": "Nasreddin Hoca ve EÅŸeÄŸin KaybolmasÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hocaâ€™nÄ±n eÅŸeÄŸi kaybolur; o ise ÅŸÃ¼kreder. ÅaÅŸÄ±ranlara, eÅŸeÄŸin Ã¼stÃ¼nde olsaydÄ± kendisinin de kaybolacaÄŸÄ±nÄ± sÃ¶yler.",
+    "lesson": "KayÄ±p gibi gÃ¶rÃ¼nen olayda bile daha bÃ¼yÃ¼k bir kayÄ±ptan kurtuluÅŸ olabilir."
+  },
+  {
+    "title": "Nasreddin Hoca ve Testi",
+    "category": "Dikkat ve Karar",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hoca Ã§ocuÄŸu testiyi kÄ±rmamasÄ± iÃ§in uyarÄ±r. Hikaye, uyarÄ±nÄ±n iÅŸ iÅŸten geÃ§meden yapÄ±lmasÄ± gerektiÄŸini anlatÄ±r.",
+    "lesson": "Tedbir, zarar olduktan sonra deÄŸil Ã¶nce alÄ±nÄ±rsa anlamlÄ±dÄ±r."
+  },
+  {
+    "title": "Nasreddin Hoca ve Ay",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hocaâ€™ya yeni ayÄ±n ne olduÄŸu sorulur. Hoca eski aylarÄ±n kÄ±rpÄ±lÄ±p yÄ±ldÄ±z yapÄ±ldÄ±ÄŸÄ±nÄ± sÃ¶yleyerek soruya mizahla yaklaÅŸÄ±r.",
+    "lesson": "Her soru ciddi cevap istemeyebilir; mizah da dÃ¼ÅŸÃ¼nme biÃ§imidir."
+  },
+  {
+    "title": "Nasreddin Hoca ve TurÅŸu",
+    "category": "Dikkat ve Karar",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hoca turÅŸu satmaya Ã§Ä±kar; eÅŸeÄŸi her satÄ±ÅŸta anÄ±rÄ±r. MÃ¼ÅŸteri azalÄ±nca Hoca, eÅŸeÄŸin turÅŸuya ortak mÄ± olduÄŸunu sorar.",
+    "lesson": "Bir iÅŸte baÅŸarÄ±sÄ±zlÄ±ÄŸÄ± artÄ±ran etken bazen yanÄ±mÄ±zdaki gÃ¶rÃ¼nmez engeldir."
+  },
+  {
+    "title": "Nasreddin Hoca ve Ceviz AÄŸacÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Nasreddin Hoca FÄ±kralarÄ±",
+    "flow": "Hoca kÃ¼Ã§Ã¼k cevizin bÃ¼yÃ¼k aÄŸaÃ§ta, bÃ¼yÃ¼k kabaÄŸÄ±n yerde yetiÅŸmesine ÅŸaÅŸar. Derken baÅŸÄ±na ceviz dÃ¼ÅŸÃ¼nce dÃ¼zenin hikmetini mizahla kabul eder.",
+    "lesson": "Ä°nsan ilk bakÄ±ÅŸta anlayamadÄ±ÄŸÄ± dÃ¼zeni hemen yanlÄ±ÅŸ sanmamalÄ±dÄ±r."
+  },
+  {
+    "title": "Maymun ile Timsah",
+    "category": "Dikkat ve Karar",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Timsah, karÄ±sÄ±nÄ±n isteÄŸiyle maymunun kalbini almak ister ve onu sÄ±rtÄ±na bindirir. Maymun niyeti anlayÄ±nca kalbini aÄŸaÃ§ta bÄ±raktÄ±ÄŸÄ±nÄ± sÃ¶yleyip kurtulur.",
+    "lesson": "ZekÃ¢, tehlike anÄ±nda soÄŸukkanlÄ±lÄ±kla birleÅŸirse hayat kurtarÄ±r."
+  },
+  {
+    "title": "Mavi Ã‡akal",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Ã‡akal boya kazanÄ±na dÃ¼ÅŸÃ¼p mavi renge bÃ¼rÃ¼nÃ¼r ve hayvanlara kendini Ã¶zel bir kral gibi tanÄ±tÄ±r. Bir gÃ¼n Ã§akallar gibi uluyunca gerÃ§ek kimliÄŸi ortaya Ã§Ä±kar.",
+    "lesson": "Sahte kimlik, doÄŸal davranÄ±ÅŸ anÄ±nda aÃ§Ä±ÄŸa Ã§Ä±kar."
+  },
+  {
+    "title": "ÃœÃ§ BalÄ±k",
+    "category": "Dikkat ve Karar",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "ÃœÃ§ balÄ±ktan biri tehlikeyi duyunca hemen kaÃ§ar, biri son anda Ã§are bulur, biri ise hiÃ§bir ÅŸey yapmaz. BalÄ±kÃ§Ä± geldiÄŸinde hazÄ±rlÄ±klÄ± olanlar kurtulur.",
+    "lesson": "Tehlikeyi erken fark etmek, son anda Ã§are aramaktan daha gÃ¼venlidir."
+  },
+  {
+    "title": "DÃ¶rt Dost ve AvcÄ±",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Fare, kaplumbaÄŸa, geyik ve karga birbirinden farklÄ± yeteneklere sahiptir. AvcÄ± tuzak kurduÄŸunda her biri gÃ¼cÃ¼nÃ¼ kullanarak diÄŸerini kurtarÄ±r.",
+    "lesson": "FarklÄ± yetenekler dayanÄ±ÅŸmayla birleÅŸince gÃ¼Ã§lÃ¼ bir koruma saÄŸlar."
+  },
+  {
+    "title": "Brahman ve Firavun Faresi",
+    "category": "Dikkat ve Karar",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Brahman, bebeÄŸini koruyan firavun faresini aÄŸzÄ± kanlÄ± gÃ¶rÃ¼nce suÃ§lu sanÄ±r ve Ã¶ldÃ¼rÃ¼r. Sonra onun yÄ±lanÄ± Ã¶ldÃ¼rerek bebeÄŸi kurtardÄ±ÄŸÄ±nÄ± anlar.",
+    "lesson": "Ã–fkeyle ve eksik bilgiyle verilen karar telafisi zor sonuÃ§lar doÄŸurabilir."
+  },
+  {
+    "title": "AltÄ±n Veren KuÄŸu",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Halk Hikayeleri",
+    "flow": "Yoksul aileye yardÄ±m eden kuÄŸu, onlara zaman zaman altÄ±n tÃ¼y verir. Daha fazlasÄ±nÄ± isteyen aile kuÄŸunun tÃ¼m tÃ¼ylerini almak ister ve bereketi kaybeder.",
+    "lesson": "AÃ§gÃ¶zlÃ¼lÃ¼k, dÃ¼zenli gelen nimeti de yok edebilir."
+  },
+  {
+    "title": "Akrep ile KurbaÄŸa",
+    "category": "Kendini Bilme",
+    "group": "Modern Fabl / AnlatÄ±lagelen Mesel",
+    "flow": "Akrep nehri geÃ§mek iÃ§in kurbaÄŸadan yardÄ±m ister ve sokmayacaÄŸÄ±na sÃ¶z verir. Nehrin ortasÄ±nda kurbaÄŸayÄ± sokar; ikisi de batarken bunun doÄŸasÄ± olduÄŸunu sÃ¶yler.",
+    "lesson": "BazÄ± karakter Ã¶zellikleri, sonuÃ§ kÃ¶tÃ¼ olsa bile kendini gÃ¶sterir."
+  },
+  {
+    "title": "AÄŸlayan TaÅŸÃ§Ä±",
+    "category": "Kendini Bilme",
+    "group": "Halk Hikayeleri",
+    "flow": "TaÅŸÃ§Ä± daha gÃ¼Ã§lÃ¼ olmak ister; zengin, gÃ¼neÅŸ, bulut, rÃ¼zgÃ¢r ve kaya olmayÄ± dener. Sonunda kayayÄ± yontan taÅŸÃ§Ä±nÄ±n gÃ¼cÃ¼nÃ¼ fark eder.",
+    "lesson": "Kendi deÄŸerini anlamayan kiÅŸi onu baÅŸka rollerde arar."
+  },
+  {
+    "title": "KralÄ±n ÃœÃ§ Sorusu",
+    "category": "Dikkat ve Karar",
+    "group": "Tolstoy ve KÄ±sa Alegoriler",
+    "flow": "Kral en doÄŸru zamanÄ±n, en gerekli kiÅŸinin ve en Ã¶nemli iÅŸin ne olduÄŸunu Ã¶ÄŸrenmek ister. YaÅŸadÄ±ÄŸÄ± olaylar ona en Ã¶nemli zamanÄ±n ÅŸimdi, en gerekli kiÅŸinin yanÄ±ndaki insan, en Ã¶nemli iÅŸin iyilik olduÄŸunu Ã¶ÄŸretir.",
+    "lesson": "HayatÄ±n en Ã¶nemli iÅŸi, mevcut anda karÅŸÄ±mÄ±zdaki insana doÄŸru davranmaktÄ±r."
+  },
+  {
+    "title": "Tilkinin YargÄ±sÄ±",
+    "category": "Adalet ve Vicdan",
+    "group": "Halk Hikayeleri",
+    "flow": "Ä°ki kiÅŸi bulduklarÄ± yiyeceÄŸi paylaÅŸamaz ve tilkiden hakemlik ister. Tilki eÅŸitleme bahanesiyle iki taraftan da yer ve sonunda yiyeceÄŸin Ã§oÄŸunu bitirir.",
+    "lesson": "Adaleti kÃ¶tÃ¼ niyetli hakeme bÄ±rakanlar, hakkÄ±nÄ± da kaybedebilir."
+  },
+  {
+    "title": "Hakuin ve 'Ã–yle mi?'",
+    "category": "Huzur ve Zaman",
+    "group": "Zen KÄ±ssalarÄ±",
+    "flow": "Zen ustasÄ± Hakuin haksÄ±z suÃ§lamalara da Ã¶vgÃ¼lere de sakinlikle â€œÃ–yle mi?â€ diye karÅŸÄ±lÄ±k verir. Zamanla gerÃ§eÄŸin kendiliÄŸinden ortaya Ã§Ä±ktÄ±ÄŸÄ± anlatÄ±lÄ±r.",
+    "lesson": "Ä°nsanÄ±n deÄŸeri, baÅŸkalarÄ±nÄ±n anlÄ±k yargÄ±larÄ±yla hemen deÄŸiÅŸmez."
+  },
+  {
+    "title": "Ryokan ve HÄ±rsÄ±z",
+    "category": "Merhamet ve Nezaket",
+    "group": "Zen KÄ±ssalarÄ±",
+    "flow": "HÄ±rsÄ±z Ryokanâ€™Ä±n kulÃ¼besine gelir ama Ã§alacak bir ÅŸey bulamaz. Ryokan ona giysisini verir ve ay Ä±ÅŸÄ±ÄŸÄ±nÄ± da verebilmeyi diler.",
+    "lesson": "GerÃ§ek cÃ¶mertlik, sahip olunan az ÅŸeyde bile kendini gÃ¶sterebilir."
+  },
+  {
+    "title": "Bayrak mÄ± Hareket Ediyor?",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen KÄ±ssalarÄ±",
+    "flow": "Ä°ki keÅŸiÅŸ bayraÄŸÄ±n mÄ± rÃ¼zgÃ¢rÄ±n mÄ± hareket ettiÄŸini tartÄ±ÅŸÄ±r. Usta, hareket edenin zihinleri olduÄŸunu sÃ¶yler.",
+    "lesson": "AlgÄ±mÄ±z, dÄ±ÅŸ dÃ¼nyayÄ± yorumlama biÃ§imimizi belirler."
+  },
+  {
+    "title": "Yolunu YÄ±kamak",
+    "category": "Dikkat ve Karar",
+    "group": "Zen KÄ±ssalarÄ±",
+    "flow": "Ã–ÄŸrenci yemekten sonra ne yapacaÄŸÄ±nÄ± sorar. Usta ona kÃ¢sesini yÄ±kamasÄ±nÄ± sÃ¶yler. BÃ¼yÃ¼k hakikati arayan Ã¶ÄŸrenci, gÃ¼ndelik iÅŸte dikkati Ã¶ÄŸrenir.",
+    "lesson": "Bilgelik bazen olaÄŸan iÅŸi tam farkÄ±ndalÄ±kla yapmaktÄ±r."
+  },
+  {
+    "title": "Bir Elin Sesi",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen KoanlarÄ±",
+    "flow": "Ã–ÄŸrenciye iki elin sesi bilinir, peki bir elin sesi nedir diye sorulur. Soru, mantÄ±kla hemen Ã§Ã¶zÃ¼lecek cevap deÄŸil, zihnin sÄ±nÄ±rlarÄ±nÄ± gÃ¶rme aracÄ±dÄ±r.",
+    "lesson": "BazÄ± sorular cevap vermek iÃ§in deÄŸil, dÃ¼ÅŸÃ¼nme biÃ§imini kÄ±rmak iÃ§in vardÄ±r."
+  },
+  {
+    "title": "Nan-inâ€™in Ã‡ayÄ±",
+    "category": "Kendini Bilme",
+    "group": "Zen KÄ±ssalarÄ±",
+    "flow": "ProfesÃ¶r Zen Ã¶ÄŸrenmeye gelir ama sÃ¼rekli kendi bilgilerini anlatÄ±r. Nan-in fincanÄ± taÅŸana kadar Ã§ay doldurarak dolu zihnin yeni ÅŸey alamayacaÄŸÄ±nÄ± gÃ¶sterir.",
+    "lesson": "Ã–ÄŸrenmek iÃ§in Ã¶nce bildiÄŸini sanmanÄ±n fazlalÄ±ÄŸÄ±nÄ± boÅŸaltmak gerekir."
+  },
+  {
+    "title": "Ã‡amurlu Yol",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Zen KÄ±ssalarÄ±",
+    "flow": "Ä°ki keÅŸiÅŸten biri Ã§amurlu yoldaki kadÄ±nÄ± sÄ±rtÄ±nda taÅŸÄ±r. DiÄŸeri bunu saatlerce zihninde taÅŸÄ±r; ilk keÅŸiÅŸ kadÄ±nÄ± yolda bÄ±raktÄ±ÄŸÄ±nÄ± sÃ¶yler.",
+    "lesson": "OlayÄ± geride bÄ±rakmayÄ±nca yÃ¼k zihinde sÃ¼rer."
+  },
+  {
+    "title": "BoÅŸ KayÄ±k Meseli",
+    "category": "Duygusal FarkÄ±ndalÄ±k",
+    "group": "Taoist / Zen Bilgelik",
+    "flow": "Bir kayÄ±k insana Ã§arptÄ±ÄŸÄ±nda iÃ§inde biri varsa Ã¶fkelenir, boÅŸsa Ã¶fkesi sÃ¶ner. Mesel, Ã¶fkenin olaydan Ã§ok niyet yorumuna baÄŸlandÄ±ÄŸÄ±nÄ± anlatÄ±r.",
+    "lesson": "Her Ã§arpÄ±ÅŸmanÄ±n arkasÄ±nda kasÄ±t aramak huzuru bozar."
+  },
+  {
+    "title": "Sirke TadÄ±cÄ±larÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Ã‡in Bilgelik Alegorileri",
+    "flow": "KonfÃ¼Ã§yÃ¼s, Buda ve Lao Tzuâ€™nun sirkeyi tatmasÄ± farklÄ± Ã¶ÄŸretilerin dÃ¼nyaya bakÄ±ÅŸÄ±nÄ± temsil eder. Lao Tzu sirkeyi olduÄŸu gibi kabul eder.",
+    "lesson": "AynÄ± hayat, farklÄ± zihinlerde farklÄ± tat bÄ±rakÄ±r."
+  },
+  {
+    "title": "Kelebek RÃ¼yasÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Taoist Bilgelik",
+    "flow": "Zhuangzi rÃ¼yasÄ±nda kelebek olduÄŸunu gÃ¶rÃ¼r. UyanÄ±nca kendisinin kelebek rÃ¼yasÄ± gÃ¶ren Zhuangzi mi, yoksa Zhuangzi rÃ¼yasÄ± gÃ¶ren kelebek mi olduÄŸunu sorgular.",
+    "lesson": "Benlik ve gerÃ§eklik sandÄ±ÄŸÄ±mÄ±zdan daha kaygan olabilir."
+  },
+  {
+    "title": "Theseusâ€™un Gemisi",
+    "category": "Kendini Bilme",
+    "group": "Felsefi Anekdot ve Paradokslar",
+    "flow": "Theseusâ€™un gemisinin parÃ§alarÄ± zamanla tek tek deÄŸiÅŸtirilir. Sonunda aynÄ± gemi olup olmadÄ±ÄŸÄ± sorusu doÄŸar.",
+    "lesson": "Kimlik, yalnÄ±zca parÃ§alarÄ±n toplamÄ± mÄ± yoksa sÃ¼reklilik duygusu mu sorusunu dÃ¼ÅŸÃ¼ndÃ¼rÃ¼r."
+  },
+  {
+    "title": "Akhilleus ve KaplumbaÄŸa",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Felsefi Anekdot ve Paradokslar",
+    "flow": "Zenoâ€™nun paradoksunda hÄ±zlÄ± Akhilleus, Ã¶nden baÅŸlayan kaplumbaÄŸaya teorik olarak yetiÅŸemiyor gibi gÃ¶sterilir. Hareket ve sonsuz bÃ¶lÃ¼nme Ã¼zerine dÃ¼ÅŸÃ¼ndÃ¼rÃ¼r.",
+    "lesson": "AkÄ±l yÃ¼rÃ¼tme bazen apaÃ§Ä±k gÃ¶rÃ¼nen ÅŸeyi bile sorgulatabilir."
+  },
+  {
+    "title": "Buridanâ€™Ä±n EÅŸeÄŸi",
+    "category": "Dikkat ve Karar",
+    "group": "Felsefi Anekdot ve Paradokslar",
+    "flow": "EÅŸit uzaklÄ±ktaki iki yem arasÄ±nda kalan eÅŸek karar veremediÄŸi iÃ§in aÃ§ kalÄ±r. Hikaye kararsÄ±zlÄ±ÄŸÄ±n bedelini anlatÄ±r.",
+    "lesson": "Tam eÅŸit seÃ§eneklerde bile sonsuz beklemek Ã§Ã¶zÃ¼m deÄŸildir."
+  },
+  {
+    "title": "Sokrates ve Ksantippe",
+    "category": "Duygusal FarkÄ±ndalÄ±k",
+    "group": "Felsefi Anekdotlar",
+    "flow": "Sokratesâ€™in eÅŸiyle ilgili anlatÄ±lan nÃ¼ktelerde, onun sert sÃ¶zlere sakinlikle karÅŸÄ±lÄ±k verdiÄŸi sÃ¶ylenir. Hikaye sabÄ±r ve iÃ§ dengeyi vurgular.",
+    "lesson": "DÄ±ÅŸ gÃ¼rÃ¼ltÃ¼ karÅŸÄ±sÄ±nda iÃ§ dengeyi korumak bilgelik ister."
+  },
+  {
+    "title": "Sokrates ve Zehir Kadehi",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Felsefi Anekdotlar",
+    "flow": "Sokrates, dÃ¼ÅŸÃ¼ncelerinden vazgeÃ§erek kurtulma ihtimali varken mahkemenin verdiÄŸi cezayÄ± kabul eder. Kendi ilkelerine ihanet etmemeyi seÃ§er.",
+    "lesson": "BazÄ± insanlar iÃ§in doÄŸruluk, yaÅŸam rahatlÄ±ÄŸÄ±ndan daha deÄŸerlidir."
+  },
+  {
+    "title": "Epiktetosâ€™un LambasÄ±",
+    "category": "Kendini Bilme",
+    "group": "StoacÄ± Anekdotlar",
+    "flow": "Epiktetosâ€™un deÄŸerli lambasÄ± Ã§alÄ±nÄ±nca bir daha daha ucuz lamba kullanacaÄŸÄ± anlatÄ±lÄ±r. KaybÄ±, dÄ±ÅŸ eÅŸyaya baÄŸlÄ±lÄ±ÄŸÄ± azaltan bir ders gibi gÃ¶rÃ¼r.",
+    "lesson": "DÄ±ÅŸ ÅŸeylere aÅŸÄ±rÄ± baÄŸlanmamak kaybÄ± hafifletir."
+  },
+  {
+    "title": "Marcus Aureliusâ€™un Sabah HatÄ±rlatmasÄ±",
+    "category": "Duygusal FarkÄ±ndalÄ±k",
+    "group": "StoacÄ± Anekdotlar",
+    "flow": "Marcus Aurelius, sabahlarÄ± zor insanlarla karÅŸÄ±laÅŸacaÄŸÄ±nÄ± kendine hatÄ±rlatÄ±r. BÃ¶ylece gÃ¼n iÃ§inde Ã¶fke yerine hazÄ±rlÄ±klÄ± bir zihinle davranmaya Ã§alÄ±ÅŸÄ±r.",
+    "lesson": "Ä°nsan doÄŸasÄ±nÄ± Ã¶nceden hesaba katmak, Ã¶fkeyi azaltabilir."
+  },
+  {
+    "title": "Zeno ve Gemi KazasÄ±",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "StoacÄ± Anekdotlar",
+    "flow": "Zenoâ€™nun gemi kazasÄ±ndan sonra felsefeye yÃ¶neldiÄŸi anlatÄ±lÄ±r. KaybÄ±, hayatÄ±nÄ± deÄŸiÅŸtiren bir baÅŸlangÄ±ca dÃ¶nÃ¼ÅŸÃ¼r.",
+    "lesson": "BazÄ± yÄ±kÄ±mlar, yeni bir dÃ¼ÅŸÃ¼nce yolunun kapÄ±sÄ±nÄ± aÃ§abilir."
+  },
+  {
+    "title": "Antisthenes ve YÄ±rtÄ±k Pelerin",
+    "category": "Kendini Bilme",
+    "group": "Felsefi Anekdotlar",
+    "flow": "Sokratesâ€™in, yÄ±rtÄ±k pelerinle gÃ¶steriÅŸ yapan Antisthenesâ€™e kibrini pelerinin deliklerinden gÃ¶rdÃ¼ÄŸÃ¼nÃ¼ sÃ¶ylediÄŸi aktarÄ±lÄ±r.",
+    "lesson": "Tevazu gÃ¶steriÅŸe dÃ¶nÃ¼ÅŸÃ¼rse yine kibir olur."
+  },
+  {
+    "title": "Dionysiosâ€™un KulaÄŸÄ±",
+    "category": "GÃ¼ven",
+    "group": "Tarihi Anekdotlar",
+    "flow": "Tiran Dionysiosâ€™un, insanlarÄ± gizlice dinlemek iÃ§in Ã¶zel bir yapÄ± kullandÄ±ÄŸÄ± anlatÄ±lÄ±r. Hikaye iktidar ve gÃ¼vensizlik iliÅŸkisini gÃ¶sterir.",
+    "lesson": "GÃ¼ven kuramayan gÃ¼Ã§, sÃ¼rekli korku iÃ§inde yaÅŸar."
+  },
+  {
+    "title": "Ã‡irkin Ã–rdek Yavrusu",
+    "category": "Kendini Bilme",
+    "group": "Andersen MasallarÄ±",
+    "flow": "DÄ±ÅŸlanan yavru kendini deÄŸersiz sanÄ±r. Zamanla aslÄ±nda bir kuÄŸu olduÄŸunu fark eder ve baÅŸkalarÄ±nÄ±n yargÄ±sÄ±nÄ±n gerÃ§ek kimliÄŸini belirlemediÄŸini anlar.",
+    "lesson": "Ä°nsanÄ±n deÄŸeri, erken yargÄ±larla sÄ±nÄ±rlanamaz."
+  },
+  {
+    "title": "BÃ¼lbÃ¼l",
+    "category": "Kendini Bilme",
+    "group": "Andersen MasallarÄ±",
+    "flow": "Ä°mparator gerÃ§ek bÃ¼lbÃ¼lÃ¼n sesini sever ama mekanik kuÅŸa kapÄ±lÄ±r. Yapay kuÅŸ bozulunca gerÃ§ek bÃ¼lbÃ¼lÃ¼n canlÄ± gÃ¼zelliÄŸi yeniden anlaÅŸÄ±lÄ±r.",
+    "lesson": "CanlÄ± ve samimi olan, gÃ¶steriÅŸli taklitten daha deÄŸerlidir."
+  },
+  {
+    "title": "KÃ¶knar AÄŸacÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Andersen MasallarÄ±",
+    "flow": "KÃ¼Ã§Ã¼k kÃ¶knar aÄŸacÄ± hep bÃ¼yÃ¼meyi ve baÅŸka yerde olmayÄ± ister. Kesilip sÃ¼slendikten sonra geÃ§miÅŸteki sade gÃ¼nlerinin deÄŸerini anlar.",
+    "lesson": "SÃ¼rekli geleceÄŸi bekleyen kiÅŸi bugÃ¼nÃ¼n gÃ¼zelliÄŸini kaÃ§Ä±rabilir."
+  },
+  {
+    "title": "KÄ±rmÄ±zÄ± AyakkabÄ±lar",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Andersen MasallarÄ±",
+    "flow": "KÄ±z gÃ¶steriÅŸli kÄ±rmÄ±zÄ± ayakkabÄ±lara kapÄ±lÄ±r ve onlar onu durmadan dans etmeye sÃ¼rÃ¼kler. Arzu kontrolsÃ¼z hale gelince Ã¶zgÃ¼rlÃ¼ÄŸÃ¼nÃ¼ kaybeder.",
+    "lesson": "GÃ¶steriÅŸ tutkusu insanÄ± yÃ¶neten bir baÄŸÄ±mlÄ±lÄ±ÄŸa dÃ¶nÃ¼ÅŸebilir."
+  },
+  {
+    "title": "BalÄ±kÃ§Ä± ile KarÄ±sÄ±",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "Grimm MasallarÄ±",
+    "flow": "BalÄ±kÃ§Ä± dilekleri gerÃ§ekleÅŸtiren balÄ±ÄŸÄ± serbest bÄ±rakÄ±r. KarÄ±sÄ± daha fazlasÄ±nÄ± istedikÃ§e ister; sonunda her ÅŸeylerini kaybederler.",
+    "lesson": "Doymayan arzu, eldeki mutluluÄŸu da yok eder."
+  },
+  {
+    "title": "ÃœÃ§ Ä°plikÃ§i KadÄ±n",
+    "category": "Kendini Bilme",
+    "group": "Grimm MasallarÄ±",
+    "flow": "KÄ±z iplik eÄŸirmekte zorlanÄ±r; Ã¼Ã§ tuhaf kadÄ±n ona yardÄ±m eder. Sonunda iÅŸin zorluÄŸu ve emeÄŸin bedeli gÃ¶rÃ¼nÃ¼r hale gelir.",
+    "lesson": "Ä°nsanlarÄ± yalnÄ±z sonuÃ§la deÄŸil, emeÄŸin aÄŸÄ±rlÄ±ÄŸÄ±yla da deÄŸerlendirmek gerekir."
+  },
+  {
+    "title": "AkÄ±llÄ± Gretel",
+    "category": "Dikkat ve Karar",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Gretel kendisine emanet edilen yemeÄŸi ve durumu kurnazlÄ±kla kendi lehine Ã§evirir. Hikaye mizahi biÃ§imde uyanÄ±klÄ±k ve aldanma temasÄ±nÄ± iÅŸler.",
+    "lesson": "Saf gÃ¼ven, kurnaz kiÅŸinin elinde kolayca kullanÄ±labilir."
+  },
+  {
+    "title": "YÄ±ldÄ±z Talerleri",
+    "category": "Merhamet ve Nezaket",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Yoksul kÄ±z elindeki az ÅŸeyleri bile ihtiyacÄ± olanlarla paylaÅŸÄ±r. Sonunda cÃ¶mertliÄŸi sembolik bir Ã¶dÃ¼lle karÅŸÄ±lÄ±k bulur.",
+    "lesson": "CÃ¶mertlik, yoksullukta bile insanÄ±n iÃ§ zenginliÄŸini gÃ¶sterir."
+  },
+  {
+    "title": "Mutlu Prens",
+    "category": "Merhamet ve Nezaket",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "AltÄ±n ve mÃ¼cevherlerle kaplÄ± prens heykeli, ÅŸehirdeki yoksullarÄ± gÃ¶rÃ¼r. KÄ±rlangÄ±Ã§tan Ã¼zerindeki deÄŸerli parÃ§alarÄ± ihtiyaÃ§ sahiplerine gÃ¶tÃ¼rmesini ister.",
+    "lesson": "GerÃ§ek gÃ¼zellik, baÅŸkalarÄ±nÄ±n acÄ±sÄ±nÄ± hafifletmeye yÃ¶neldiÄŸinde anlam kazanÄ±r."
+  },
+  {
+    "title": "Bencil Dev",
+    "category": "Merhamet ve Nezaket",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "Dev, bahÃ§esinde oynayan Ã§ocuklarÄ± kovar; bahÃ§eye bahar gelmez. Ã‡ocuklara izin verdiÄŸinde bahÃ§e canlanÄ±r ve dev paylaÅŸmanÄ±n deÄŸerini anlar.",
+    "lesson": "PaylaÅŸÄ±lmayan gÃ¼zellik, zamanla canlÄ±lÄ±ÄŸÄ±nÄ± kaybeder."
+  },
+  {
+    "title": "SadÄ±k Dost",
+    "category": "Dostluk",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "KÃ¼Ã§Ã¼k Hans, dostluk adÄ± altÄ±nda kendisinden sÃ¼rekli yararlanan deÄŸirmenciye inanÄ±r. Sonunda bu tek taraflÄ± dostluÄŸun bedelini aÄŸÄ±r Ã¶der.",
+    "lesson": "GerÃ§ek dostluk sÃ¶mÃ¼rÃ¼ deÄŸil karÅŸÄ±lÄ±klÄ± iyilik ister."
+  },
+  {
+    "title": "BÃ¼lbÃ¼l ile GÃ¼l",
+    "category": "Merhamet ve Nezaket",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "BÃ¼lbÃ¼l, Ã¢ÅŸÄ±k Ã¶ÄŸrencinin kÄ±rmÄ±zÄ± gÃ¼l bulabilmesi iÃ§in kendini feda eder. Fakat fedakÃ¢rlÄ±k deÄŸer bilmeyen insanlarÄ±n dÃ¼nyasÄ±nda boÅŸa gider.",
+    "lesson": "FedakÃ¢rlÄ±k yÃ¼cedir; ama herkes onun deÄŸerini anlayacak derinlikte olmayabilir."
+  },
+  {
+    "title": "OlaÄŸanÃ¼stÃ¼ Roket",
+    "category": "Kendini Bilme",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "Roket kendini Ã§ok Ã¶nemli ve duygusal sanÄ±r. BÃ¼yÃ¼k gÃ¶steri iÃ§in yaratÄ±ldÄ±ÄŸÄ±nÄ± dÃ¼ÅŸÃ¼nÃ¼r ama kibri ve kendini beÄŸenmiÅŸliÄŸi onu gÃ¼lÃ¼nÃ§ kÄ±lar.",
+    "lesson": "Kendini fazla bÃ¼yÃ¼ten kiÅŸi, gerÃ§ek deÄŸerini gÃ¶remez hale gelir."
+  },
+  {
+    "title": "GenÃ§ Kral",
+    "category": "Adalet ve Vicdan",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "GenÃ§ kral, taÃ§ ve giysilerinin yoksullarÄ±n acÄ±sÄ± Ã¼zerinden Ã¼retildiÄŸini gÃ¶rÃ¼r. GÃ¶rkem yerine vicdanÄ±n sesini dinlemeye yÃ¶nelir.",
+    "lesson": "LÃ¼ksÃ¼n arkasÄ±ndaki emeÄŸi ve acÄ±yÄ± gÃ¶rmek ahlaki sorumluluk doÄŸurur."
+  },
+  {
+    "title": "BÃ¼yÃ¼kbaba ile Torun",
+    "category": "Merhamet ve Nezaket",
+    "group": "Grimm MasallarÄ±",
+    "flow": "YaÅŸlÄ± adam sofrada hor gÃ¶rÃ¼lÃ¼r; kÃ¼Ã§Ã¼k torun ileride anne babasÄ±na da aynÄ± tasÄ± hazÄ±rlayacaÄŸÄ±nÄ± sÃ¶yleyince aile davranÄ±ÅŸÄ±nÄ± fark eder.",
+    "lesson": "YaÅŸlÄ±lara davranÄ±ÅŸÄ±mÄ±z, Ã§ocuklara insanlÄ±k dersi olur."
+  },
+  {
+    "title": "Bremen MÄ±zÄ±kacÄ±larÄ±'nÄ±n Dersi",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Grimm MasallarÄ±",
+    "flow": "YaÅŸlandÄ±klarÄ± iÃ§in dÄ±ÅŸlanan hayvanlar birlikte yola Ã§Ä±kar. Tek baÅŸlarÄ±na zayÄ±f gÃ¶rÃ¼nseler de birlikte yeni bir hayat kurarlar.",
+    "lesson": "DÄ±ÅŸlananlarÄ±n dayanÄ±ÅŸmasÄ± yeni bir gÃ¼Ã§ yaratabilir."
+  },
+  {
+    "title": "Kanun Ã–nÃ¼nde",
+    "category": "Adalet ve Vicdan",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "Bir adam kanuna girmek ister ama kapÄ±cÄ± onu bekletir. Ã–mrÃ¼ boyunca kapÄ±nÄ±n Ã¶nÃ¼nde bekler; Ã¶lÃ¼rken kapÄ±nÄ±n yalnÄ±z onun iÃ§in olduÄŸunu Ã¶ÄŸrenir.",
+    "lesson": "Ä°nsan bazen izin beklerken kendi hayatÄ±nÄ±n kapÄ±sÄ±nda tÃ¼kenir."
+  },
+  {
+    "title": "AÃ§lÄ±k SanatÃ§Ä±sÄ±",
+    "category": "Kendini Bilme",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "AÃ§ kalma sanatÄ±yla tanÄ±nan adam zamanla ilgisini kaybeden kalabalÄ±ÄŸÄ±n iÃ§inde unutulur. Sonunda aslÄ±nda sevdiÄŸi yiyeceÄŸi hiÃ§ bulamadÄ±ÄŸÄ±nÄ± sÃ¶yler.",
+    "lesson": "Toplumun alkÄ±ÅŸÄ±yla kurulan kimlik, iÃ§ boÅŸluÄŸu doldurmayabilir."
+  },
+  {
+    "title": "Ä°mparatorun MesajÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "Ä°mparatorun sana gÃ¶nderdiÄŸi mesaj, saraylarÄ±n ve kalabalÄ±klarÄ±n iÃ§inde asla ulaÅŸamayacak gibidir. Bekleyen kiÅŸi mesajÄ± hayal ederek yaÅŸar.",
+    "lesson": "BazÄ± bekleyiÅŸler, ulaÅŸmayacak bir anlamÄ±n gÃ¶lgesinde Ã¶mÃ¼r tÃ¼ketebilir."
+  },
+  {
+    "title": "Poseidon",
+    "category": "Liderlik ve Sorumluluk",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "Poseidon denizlerin tanrÄ±sÄ±dÄ±r ama masasÄ±nda evraklardan baÅŸÄ±nÄ± kaldÄ±ramaz. Denizleri gerÃ§ekten gÃ¶rmeye vakti yoktur.",
+    "lesson": "MakamÄ±n Ã¶zÃ¼, bÃ¼rokrasi iÃ§inde kaybolursa kiÅŸi yÃ¶nettiÄŸi ÅŸeyi yaÅŸayamaz."
+  },
+  {
+    "title": "KÃ¼Ã§Ã¼k Bir Fabl",
+    "category": "Dikkat ve Karar",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "Fare dÃ¼nya daralÄ±yor diye yakÄ±nÄ±r; Ã¶nce geniÅŸken ÅŸimdi duvarlar yaklaÅŸmaktadÄ±r. Kedi ona yÃ¶n deÄŸiÅŸtirmesini sÃ¶yler ve onu yer.",
+    "lesson": "Tehlikeyi geÃ§ fark eden iÃ§in basit Ã¶ÄŸÃ¼t bile artÄ±k yeterli olmayabilir."
+  },
+  {
+    "title": "Ä°ki GÃ¼vercin",
+    "category": "Dostluk",
+    "group": "La Fontaine FabllarÄ±",
+    "flow": "Bir gÃ¼vercin uzaklarÄ± gÃ¶rmek ister, diÄŸeri kalmasÄ±nÄ± Ã¶ÄŸÃ¼tler. Yolculuk tehlikelerle dolu olur ve dÃ¶nÃ¼ÅŸte dostluÄŸun deÄŸeri anlaÅŸÄ±lÄ±r.",
+    "lesson": "Merak deÄŸerlidir ama gÃ¼venli dostluÄŸun kÄ±ymeti de unutulmamalÄ±dÄ±r."
+  },
+  {
+    "title": "Veba SalgÄ±nÄ±na Yakalanan Hayvanlar",
+    "category": "Adalet ve Vicdan",
+    "group": "La Fontaine FabllarÄ±",
+    "flow": "Hayvanlar baÅŸlarÄ±na gelen felaketin suÃ§lusunu arar. GÃ¼Ã§lÃ¼lerin gÃ¼nahlarÄ± hafif geÃ§ilirken zayÄ±f eÅŸek gÃ¼nah keÃ§isi yapÄ±lÄ±r.",
+    "lesson": "Adalet gÃ¼Ã§lÃ¼nÃ¼n Ã§Ä±karÄ±na gÃ¶re iÅŸlediÄŸinde haksÄ±zlÄ±k doÄŸar."
+  },
+  {
+    "title": "MeÅŸe ve KamÄ±ÅŸ",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "La Fontaine FabllarÄ±",
+    "flow": "MeÅŸe kamÄ±ÅŸÄ± zayÄ±f bulur; fÄ±rtÄ±na gelince meÅŸe devrilir, kamÄ±ÅŸ eÄŸilip kalÄ±r. La Fontaineâ€™in en bilinen fabllarÄ±ndandÄ±r.",
+    "lesson": "Esneklik, bazen kaba kuvvetten daha dayanÄ±klÄ±dÄ±r."
+  },
+  {
+    "title": "AyÄ± ile BahÃ§Ä±van",
+    "category": "Dikkat ve Karar",
+    "group": "La Fontaine FabllarÄ±",
+    "flow": "AyÄ±, dostu bahÃ§Ä±vanÄ±n yÃ¼zÃ¼ndeki sineÄŸi Ã¶ldÃ¼rmek iÃ§in taÅŸ atar ve dostunu Ã¶ldÃ¼rÃ¼r. Ä°yi niyet bilgisizlikle birleÅŸince felakete yol aÃ§ar.",
+    "lesson": "AkÄ±lsÄ±z dost, dÃ¼ÅŸmandan daha tehlikeli olabilir."
+  },
+  {
+    "title": "Sinek ile Araba",
+    "category": "Kendini Bilme",
+    "group": "La Fontaine FabllarÄ±",
+    "flow": "Sinek, arabayÄ± hareket ettirenin kendisi olduÄŸunu sanÄ±r. Oysa yalnÄ±zca arabanÄ±n Ã¼stÃ¼nde konmuÅŸtur.",
+    "lesson": "KÃ¼Ã§Ã¼k rolÃ¼nÃ¼ bÃ¼yÃ¼k baÅŸarÄ± sanmak insanÄ± yanÄ±ltÄ±r."
+  },
+  {
+    "title": "Aslan ile Ã–kÃ¼z",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir Ã¶kÃ¼z, tesadÃ¼fen ormana dÃ¼ÅŸer ve zamanla aslanÄ±n dostluÄŸunu kazanÄ±r. Aslan onun aklÄ±na ve sakinliÄŸine deÄŸer vermeye baÅŸlar. Fakat saray Ã§evresindeki Ã§akallar, bu dostluÄŸu kendi Ã§Ä±karlarÄ± iÃ§in tehlikeli gÃ¶rÃ¼r. Biri aslana Ã¶kÃ¼zÃ¼n ihanet hazÄ±rlÄ±ÄŸÄ±nda olduÄŸunu, diÄŸeriyse Ã¶kÃ¼ze aslanÄ±n onu Ã¶ldÃ¼receÄŸini sÃ¶yler. GÃ¼venin yerine kuÅŸku geÃ§ince iki dost birbirine dÃ¼ÅŸman olur.",
+    "lesson": "KÃ¶tÃ¼ niyetli aracÄ±lar, gÃ¼veni zehirleyerek en saÄŸlam dostluÄŸu bile yÄ±kabilir."
+  },
+  {
+    "title": "Karga ile BaykuÅŸlar",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Kargalarla baykuÅŸlar uzun sÃ¼redir dÃ¼ÅŸmandÄ±r. Kargalardan biri kendini sÃ¼rgÃ¼n edilmiÅŸ gibi gÃ¶sterip baykuÅŸlarÄ±n arasÄ±na girer. BaykuÅŸlar onu kabul eder; o da zamanla onlarÄ±n maÄŸarasÄ±nÄ±, dÃ¼zenini ve zayÄ±f noktasÄ±nÄ± Ã¶ÄŸrenir. Sonunda kendi kavmine haber verir ve baykuÅŸlar hazÄ±rlÄ±ksÄ±z yakalanÄ±r.",
+    "lesson": "DÃ¼ÅŸmana karÅŸÄ± kÃ¶r gÃ¼ven, kaleyi dÄ±ÅŸarÄ±dan deÄŸil iÃ§eriden zayÄ±flatÄ±r."
+  },
+  {
+    "title": "KaplumbaÄŸa ve Ä°ki Kaz",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir gÃ¶l kuruyunca iki kaz, dostlarÄ± kaplumbaÄŸayÄ± baÅŸka bir yere taÅŸÄ±mak ister. Bir sopa getirirler; kaplumbaÄŸa ortasÄ±ndan aÄŸzÄ±yla tutacak, kazlar da iki ucundan uÃ§acaktÄ±r. Tek ÅŸart kaplumbaÄŸanÄ±n yol boyunca konuÅŸmamasÄ±dÄ±r. Ä°nsanlar aÅŸaÄŸÄ±dan alay edince kaplumbaÄŸa cevap vermek ister, aÄŸzÄ±nÄ± aÃ§ar ve dÃ¼ÅŸer.",
+    "lesson": "Gereksiz konuÅŸma, insanÄ± taÅŸÄ±yan fÄ±rsatÄ± bile kaybettirebilir."
+  },
+  {
+    "title": "Brahman ve KeÃ§i",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir brahman omzunda kurbanlÄ±k bir keÃ§i taÅŸÄ±r. ÃœÃ§ dolandÄ±rÄ±cÄ± onu kandÄ±rmak iÃ§in sÄ±rayla karÅŸÄ±sÄ±na Ã§Ä±kar ve taÅŸÄ±dÄ±ÄŸÄ± ÅŸeyin keÃ§i deÄŸil kÃ¶pek olduÄŸunu sÃ¶yler. Brahman ilk baÅŸta inanmaz; ama aynÄ± yalanÄ± birkaÃ§ kiÅŸiden duyunca kendi gÃ¶zÃ¼nden kuÅŸku duyar ve keÃ§iyi bÄ±rakÄ±r.",
+    "lesson": "Tekrarlanan yalan, dikkat edilmezse insanÄ±n kendi doÄŸru bilgisini bile sarsabilir."
+  },
+  {
+    "title": "Turna ile YengeÃ§",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "YaÅŸlanan bir turna balÄ±k avlayamaz hale gelir. GÃ¶ldeki balÄ±klara yaklaÅŸarak gÃ¶lÃ¼n kuruyacaÄŸÄ±nÄ±, onlarÄ± baÅŸka bir suya taÅŸÄ±yabileceÄŸini sÃ¶yler. Her taÅŸÄ±dÄ±ÄŸÄ±nÄ± yolda yer. Sonunda yengeÃ§ de gitmek ister; turnanÄ±n hilesini fark eder ve boynunu kÄ±skacÄ±yla sÄ±karak kurtulur.",
+    "lesson": "KurtarÄ±cÄ± gibi gÃ¶rÃ¼nen kiÅŸilerin niyeti sorgulanmazsa tuzaÄŸa dÃ¼ÅŸÃ¼lebilir."
+  },
+  {
+    "title": "DÃ¶rt Bilgin ve Aslan",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "DÃ¶rt bilgin ormanda Ã¶lÃ¼ bir aslan iskeleti bulur. ÃœÃ§Ã¼ bilgilerini gÃ¶stermek iÃ§in kemikleri birleÅŸtirir, et ve deri oluÅŸturur, sonra da can vermeye hazÄ±rlanÄ±r. DÃ¶rdÃ¼ncÃ¼ kiÅŸi tehlikeyi fark edip aÄŸaca Ã§Ä±kar. Aslan dirilince bilgiyi gÃ¶steriÅŸ iÃ§in kullananlar onun avÄ± olur.",
+    "lesson": "Bilgi, saÄŸduyu ile birleÅŸmezse insanÄ± korumak yerine tehlikeye sokabilir."
+  },
+  {
+    "title": "Fare KÄ±z",
+    "category": "Kendini Bilme",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Bir bilge, kÃ¼Ã§Ã¼k bir fareyi kÄ±za dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r ve bÃ¼yÃ¼tÃ¼nce ona en gÃ¼Ã§lÃ¼ eÅŸ adayÄ±nÄ± arar. GÃ¼neÅŸ, bulut, rÃ¼zgÃ¢r ve daÄŸ sÄ±rayla daha gÃ¼Ã§lÃ¼ gÃ¶rÃ¼nen baÅŸka birini iÅŸaret eder. Sonunda daÄŸÄ± bile delen farenin gÃ¼cÃ¼ ortaya Ã§Ä±kar. KÄ±z, kendi doÄŸasÄ±na en uygun olanÄ±n yine fare olduÄŸunu anlar.",
+    "lesson": "Ä°nsanÄ±n kendine uygun olanÄ± bulmasÄ±, dÄ±ÅŸarÄ±dan en gÃ¼Ã§lÃ¼ gÃ¶rÃ¼neni seÃ§mesinden daha Ã¶nemlidir."
+  },
+  {
+    "title": "Ã‡Ã¶mlekÃ§i ve Kral",
+    "category": "Kendini Bilme",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir Ã§Ã¶mlekÃ§i sarhoÅŸken dÃ¼ÅŸer ve alnÄ±nda bÃ¼yÃ¼k bir yara izi kalÄ±r. YÄ±llar sonra bir kral bu izi savaÅŸ yarasÄ± sanÄ±p onu kahraman asker zanneder. Ã‡Ã¶mlekÃ§i gerÃ§eÄŸi sÃ¶yleyince, gÃ¶rÃ¼nÃ¼ÅŸe dayanarak verilen deÄŸerin ne kadar kolay deÄŸiÅŸtiÄŸi ortaya Ã§Ä±kar.",
+    "lesson": "Ä°tibar, yanlÄ±ÅŸ anlaÅŸÄ±lmaya dayanÄ±yorsa en kÃ¼Ã§Ã¼k gerÃ§ek karÅŸÄ±sÄ±nda Ã§Ã¶ker."
+  },
+  {
+    "title": "Ä°ki BaÅŸlÄ± KuÅŸ",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "AynÄ± bedeni paylaÅŸan iki baÅŸlÄ± bir kuÅŸ vardÄ±r. BaÅŸlardan biri gÃ¼zel bir meyve bulur ve diÄŸerine vermeden yer. DiÄŸeri kÄ±rÄ±lÄ±r ve intikam iÃ§in zehirli meyve yer. Fakat beden ortak olduÄŸu iÃ§in ikisi de Ã¶lÃ¼r.",
+    "lesson": "AynÄ± bÃ¼tÃ¼ne ait olanlarÄ±n birbirine zarar vermesi sonunda herkese zarar verir."
+  },
+  {
+    "title": "Aslan Derisine BÃ¼rÃ¼nmÃ¼ÅŸ EÅŸek",
+    "category": "DÃ¼rÃ¼stlÃ¼k",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir eÅŸek aslan postu giyerek tarlalarda dolaÅŸÄ±r; insanlar ve hayvanlar onu aslan sanÄ±p korkar. Bir gÃ¼n kendini tutamayÄ±p anÄ±rÄ±nca gerÃ§ek kimliÄŸi ortaya Ã§Ä±kar. Sahte korku ve saygÄ± bir anda yok olur.",
+    "lesson": "Sahte gÃ¶rÃ¼nÃ¼ÅŸ bir sÃ¼re iÅŸe yarayabilir; ama kiÅŸinin gerÃ§ek doÄŸasÄ± sonunda kendini belli eder."
+  },
+  {
+    "title": "Demir Terazi ve Fareler",
+    "category": "Adalet ve Vicdan",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir tÃ¼ccar demir terazisini arkadaÅŸÄ±na emanet eder. DÃ¶ndÃ¼ÄŸÃ¼nde arkadaÅŸÄ± teraziyi farelerin yediÄŸini sÃ¶yler. TÃ¼ccar buna inanmÄ±ÅŸ gibi yapar ve arkadaÅŸÄ±nÄ±n oÄŸlunu saklayÄ±p onu bir ÅŸahinin kaptÄ±ÄŸÄ±nÄ± sÃ¶yler. Adam bunun imkÃ¢nsÄ±z olduÄŸunu sÃ¶yleyince tÃ¼ccar, farelerin demir yediÄŸi yerde ÅŸahinin de Ã§ocuk kaÃ§Ä±rabileceÄŸini anlatÄ±r.",
+    "lesson": "Akla aykÄ±rÄ± yalan sÃ¶yleyen kiÅŸi, aynÄ± Ã¶lÃ§Ã¼yle karÅŸÄ±lÄ±k gÃ¶rÃ¼nce kendi hilesini anlar."
+  },
+  {
+    "title": "Aptal Maymun ve Kral",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Bir kral, Ã§ok sevdiÄŸi maymunu yanÄ±nda tutar. Maymun sadÄ±ktÄ±r ama akÄ±lsÄ±zdÄ±r. Kral uyurken yÃ¼zÃ¼ne konan sineÄŸi kovmak ister; kÄ±lÄ±cÄ± alÄ±p sineÄŸe vurur ve kralÄ± yaralar. Ä°yi niyet, dÃ¼ÅŸÃ¼ncesizlikle birleÅŸince felakete dÃ¶nÃ¼ÅŸÃ¼r.",
+    "lesson": "AkÄ±lsÄ±z dostun zararÄ±, kimi zaman dÃ¼ÅŸmanÄ±n zararÄ±ndan daha bÃ¼yÃ¼k olabilir."
+  },
+  {
+    "title": "Kral ve PapaÄŸan",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "KralÄ±n deÄŸer verdiÄŸi bir papaÄŸanÄ± vardÄ±r. Bir yanlÄ±ÅŸ anlaÅŸÄ±lma sonucu papaÄŸanÄ±n suÃ§lu olduÄŸuna inanÄ±r ve onu cezalandÄ±rÄ±r. Sonra gerÃ§ek ortaya Ã§Ä±kar; papaÄŸan aslÄ±nda sadÄ±k ve haklÄ±dÄ±r. Kral piÅŸman olur ama yapÄ±lanÄ± geri alamaz.",
+    "lesson": "Ã–fkeyle ve eksik bilgiyle verilen karar, sonradan piÅŸmanlÄ±k getirebilir."
+  },
+  {
+    "title": "TavÅŸan ve Fil SÃ¼rÃ¼sÃ¼",
+    "category": "Dikkat ve Karar",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Fil sÃ¼rÃ¼sÃ¼ su bulmak iÃ§in tavÅŸanlarÄ±n yaÅŸadÄ±ÄŸÄ± gÃ¶le gelir ve yuvalarÄ± ezer. TavÅŸanlardan biri fillere ayÄ±n gÃ¶lde yaÅŸadÄ±ÄŸÄ±nÄ±, onu rahatsÄ±z ettiklerini sÃ¶yler. Gece gÃ¶ldeki ay yansÄ±masÄ±nÄ± gÃ¶stererek filleri korkutur ve sÃ¼rÃ¼nÃ¼n uzaklaÅŸmasÄ±nÄ± saÄŸlar.",
+    "lesson": "ZayÄ±f olan, aklÄ±nÄ± doÄŸru kullanÄ±rsa gÃ¼Ã§lÃ¼ olanÄ±n zararÄ±ndan korunabilir."
+  },
+  {
+    "title": "Kedi, Keklik ve TavÅŸan",
+    "category": "Adalet ve Vicdan",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Keklik eski yuvasÄ±na dÃ¶ndÃ¼ÄŸÃ¼nde oraya tavÅŸanÄ±n yerleÅŸtiÄŸini gÃ¶rÃ¼r. AnlaÅŸmazlÄ±ÄŸÄ± Ã§Ã¶zmek iÃ§in dindar gÃ¶rÃ¼nen bir kediye giderler. Kedi barÄ±ÅŸÃ§Ä± ve adil gÃ¶rÃ¼nÃ¼r; yaklaÅŸÄ±nca ikisini de yakalar.",
+    "lesson": "Adalet ararken hakemi seÃ§mek de adaletin parÃ§asÄ±dÄ±r."
+  },
+  {
+    "title": "Tilki, Davul ve Korku",
+    "category": "Dikkat ve Karar",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "AÃ§ bir tilki ormanda yÃ¼ksek bir ses duyar ve bÃ¼yÃ¼k bir yaratÄ±kla karÅŸÄ±laÅŸtÄ±ÄŸÄ±nÄ± sanarak korkar. Sesin kaynaÄŸÄ±nÄ± araÅŸtÄ±rÄ±nca rÃ¼zgÃ¢rla vurulan boÅŸ bir davul olduÄŸunu gÃ¶rÃ¼r. KorktuÄŸu ÅŸeyin iÃ§i boÅŸtur.",
+    "lesson": "Ä°nsan, kaynaÄŸÄ±nÄ± bilmediÄŸi sesten korkar; araÅŸtÄ±rma korkuyu kÃ¼Ã§Ã¼ltÃ¼r."
+  },
+  {
+    "title": "SerÃ§e ve Deniz",
+    "category": "SabÄ±r ve Emek",
+    "group": "Kelile ve Dimne / Panchatantra",
+    "flow": "Deniz dalgasÄ± serÃ§enin yumurtalarÄ±nÄ± alÄ±r. SerÃ§e kÃ¼Ã§Ã¼k gagasÄ±yla denizi boÅŸaltmaya Ã§alÄ±ÅŸÄ±r. DiÄŸer kuÅŸlar Ã¶nce buna gÃ¼ler; sonra dayanÄ±ÅŸma bÃ¼yÃ¼r ve gÃ¼Ã§lÃ¼ kuÅŸlarÄ±n yardÄ±mÄ±yla deniz geri adÄ±m atar.",
+    "lesson": "KÃ¼Ã§Ã¼k bir hak arayÄ±ÅŸÄ±, kararlÄ±lÄ±k ve dayanÄ±ÅŸmayla bÃ¼yÃ¼k gÃ¼ce dÃ¶nÃ¼ÅŸebilir."
+  },
+  {
+    "title": "Ã‡akal ve Deve",
+    "category": "Dikkat ve Karar",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Ã‡akal, deveyi dost gibi yanÄ±na alÄ±r ama kendi Ã§Ä±karÄ± iÃ§in onu tehlikeye sÃ¼rÃ¼kler. Deve Ã§akalÄ±n sÃ¶zlerine gÃ¼venir; sonunda Ã§akalÄ±n dostluÄŸunun yalnÄ±zca karnÄ±yla ilgili olduÄŸunu anlar.",
+    "lesson": "Ã‡Ä±kar iÃ§in yaklaÅŸan dost, zor anda gerÃ§ek niyetini gÃ¶sterir."
+  },
+  {
+    "title": "KuÅŸlar ve AltÄ±n AÄŸ",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Bir grup kuÅŸ avcÄ±nÄ±n aÄŸÄ±na yakalanÄ±r. Tek tek Ã§Ä±rpÄ±nsalar kurtulamazlar. Liderleri hep birlikte aynÄ± anda kanat Ã§Ä±rpmalarÄ±nÄ± sÃ¶yler; aÄŸla birlikte havalanÄ±p gÃ¼venli yere giderler.",
+    "lesson": "Tek baÅŸÄ±na Ã§Ã¶zÃ¼lemeyen tuzak, birlikte hareket edilirse aÅŸÄ±labilir."
+  },
+  {
+    "title": "Maymun ve Takoz",
+    "category": "Dikkat ve Karar",
+    "group": "Panchatantra ve Halk Hikayeleri",
+    "flow": "Marangozlar yarÄ±lmÄ±ÅŸ bir kÃ¼tÃ¼ÄŸÃ¼n arasÄ±na takoz koyup gider. MeraklÄ± maymun takozu Ã§ekmeye Ã§alÄ±ÅŸÄ±r; takoz Ã§Ä±kÄ±nca kÃ¼tÃ¼k kapanÄ±r ve maymun sÄ±kÄ±ÅŸÄ±r.",
+    "lesson": "AnlamadÄ±ÄŸÄ± iÅŸe karÄ±ÅŸmak, merakla baÅŸlayan zarara dÃ¶nÃ¼ÅŸebilir."
+  },
+  {
+    "title": "GÃ¶lge",
+    "category": "Kendini Bilme",
+    "group": "Andersen MasallarÄ±",
+    "flow": "Bir bilginin gÃ¶lgesi ondan ayrÄ±lÄ±r ve zamanla baÄŸÄ±msÄ±z bir varlÄ±k gibi gÃ¼Ã§ kazanÄ±r. Bilgin sessiz, dÃ¼rÃ¼st ve zayÄ±f kalÄ±rken gÃ¶lge toplum iÃ§inde yÃ¼kselir, saygÄ± gÃ¶rÃ¼r ve sonunda efendisinin yerini almaya kalkar. Hikaye, insanÄ±n karanlÄ±k tarafÄ±nÄ±n veya sahte gÃ¶rÃ¼ntÃ¼sÃ¼nÃ¼n gerÃ§eÄŸin Ã¶nÃ¼ne geÃ§mesini anlatÄ±r.",
+    "lesson": "Ä°nsanÄ±n gÃ¶lgesi, yani gÃ¶steriÅŸi ve karanlÄ±k yanÄ±, denetlenmezse gerÃ§eÄŸinin yerine geÃ§ebilir."
+  },
+  {
+    "title": "Ã‡an",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Andersen MasallarÄ±",
+    "flow": "Uzaklardan duyulan gizemli bir Ã§an sesi birÃ§ok insanÄ± peÅŸine dÃ¼ÅŸÃ¼rÃ¼r. Kimi yolda oyalanÄ±r, kimi sesi yanlÄ±ÅŸ yerde arar. GerÃ§ek arayÄ±ÅŸÄ±na sabÄ±rla devam edenler, sesin doÄŸanÄ±n ve iÃ§sel hakikatin derinliÄŸinde yankÄ±landÄ±ÄŸÄ±nÄ± anlar.",
+    "lesson": "Hakikat arayÄ±ÅŸÄ±, kalabalÄ±ÄŸÄ±n oyalanmalarÄ±ndan ayrÄ±lmayÄ± ve sabÄ±rla yÃ¼rÃ¼meyi ister."
+  },
+  {
+    "title": "Papatya",
+    "category": "Merhamet ve Nezaket",
+    "group": "Andersen MasallarÄ±",
+    "flow": "KÃ¼Ã§Ã¼k bir papatya tarlada sade ve gÃ¶steriÅŸsiz yaÅŸar. YanÄ±ndaki kuÅŸ kafese kapatÄ±lÄ±r; papatya onun acÄ±sÄ±nÄ± sessizce paylaÅŸÄ±r. Ã‡iÃ§ek de kuÅŸ da insanlarÄ±n dikkatsizliÄŸi iÃ§inde yok olur.",
+    "lesson": "KÃ¼Ã§Ã¼k ve sessiz varlÄ±klarÄ±n acÄ±sÄ± gÃ¶rÃ¼lmediÄŸinde, duyarsÄ±zlÄ±k sÄ±radanlaÅŸÄ±r."
+  },
+  {
+    "title": "KurÅŸun Asker",
+    "category": "SabÄ±r ve Emek",
+    "group": "Andersen MasallarÄ±",
+    "flow": "Tek bacaklÄ± kurÅŸun asker, oyuncak balerine sevgi duyar. BirÃ§ok tehlikeden geÃ§er, suya dÃ¼ÅŸer, balÄ±ÄŸÄ±n karnÄ±na girer ve yeniden eve dÃ¶ner. Sonunda kaderi hÃ¼zÃ¼nlÃ¼ olsa da duruÅŸunu hiÃ§ bozmaz.",
+    "lesson": "AsÄ±l gÃ¼Ã§, zorlu yolculukta karakterini kaybetmemektir."
+  },
+  {
+    "title": "KÃ¼Ã§Ã¼k Claus ve BÃ¼yÃ¼k Claus",
+    "category": "Dikkat ve Karar",
+    "group": "Andersen MasallarÄ±",
+    "flow": "BÃ¼yÃ¼k Claus gÃ¼Ã§lÃ¼ ve zalimdir; KÃ¼Ã§Ã¼k Claus ise kurnazlÄ±ÄŸÄ±yla hayatta kalÄ±r. HaksÄ±zlÄ±ÄŸa uÄŸradÄ±kÃ§a zekÃ¢sÄ±nÄ± kullanarak kendisini ezen kiÅŸiyi alt eder. Hikaye mizahi ve sert bir adalet duygusu taÅŸÄ±r.",
+    "lesson": "GÃ¼Ã§ karÅŸÄ±sÄ±nda akÄ±l, bazen zayÄ±f gÃ¶rÃ¼nen kiÅŸinin tek savunmasÄ±dÄ±r."
+  },
+  {
+    "title": "AltÄ± KuÄŸu",
+    "category": "SabÄ±r ve Emek",
+    "group": "Grimm MasallarÄ±",
+    "flow": "KardeÅŸleri kuÄŸuya dÃ¶nÃ¼ÅŸen kÄ±z, onlarÄ± kurtarmak iÃ§in yÄ±llarca susmak ve dikenli gÃ¶mlekler Ã¶rmek zorundadÄ±r. HaksÄ±z yere suÃ§lansa bile gÃ¶revini bÄ±rakmaz. Sonunda sabrÄ± ve emeÄŸi kardeÅŸlerini kurtarÄ±r.",
+    "lesson": "Sevgi bazen uzun sÃ¼reli sabÄ±r, sessizlik ve emek ister."
+  },
+  {
+    "title": "AltÄ±n KuÅŸ",
+    "category": "Dikkat ve Karar",
+    "group": "Grimm MasallarÄ±",
+    "flow": "KralÄ±n bahÃ§esinden altÄ±n elma Ã§alÄ±nÄ±r ve Ã¼Ã§ kardeÅŸ altÄ±n kuÅŸu bulmak iÃ§in yola Ã§Ä±kar. BÃ¼yÃ¼k kardeÅŸler uyarÄ±larÄ± dinlemez; en kÃ¼Ã§Ã¼k kardeÅŸ ise yardÄ±mlarÄ± ve Ã¶ÄŸÃ¼tleri dikkate alarak hedefe yaklaÅŸÄ±r.",
+    "lesson": "Yolculukta akÄ±l veren uyarÄ±larÄ± kÃ¼Ã§Ã¼msemek, insanÄ± hedefinden uzaklaÅŸtÄ±rÄ±r."
+  },
+  {
+    "title": "Demir Hans",
+    "category": "Kendini Bilme",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Bir Ã§ocuk, vahÅŸi ve gizemli Demir Hansâ€™Ä±n yardÄ±mÄ±yla bÃ¼yÃ¼r. Saraydan ormana, hizmetÃ§ilikten savaÅŸÃ§Ä±lÄ±ÄŸa uzanan yolda cesaretini, sadakatini ve kendi gÃ¼cÃ¼nÃ¼ keÅŸfeder.",
+    "lesson": "OlgunlaÅŸma, insanÄ±n iÃ§indeki vahÅŸi ve gÃ¼Ã§lÃ¼ tarafÄ± tanÄ±yÄ±p yÃ¶netmesiyle ilgilidir."
+  },
+  {
+    "title": "AyakkabÄ±cÄ± ve CÃ¼celer",
+    "category": "YardÄ±mlaÅŸma",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Yoksul ayakkabÄ±cÄ± gece bÄ±raktÄ±ÄŸÄ± derilerin sabah gÃ¼zel ayakkabÄ±lara dÃ¶nÃ¼ÅŸtÃ¼ÄŸÃ¼nÃ¼ gÃ¶rÃ¼r. Gizlice izlediÄŸinde kÃ¼Ã§Ã¼k cÃ¼celerin ona yardÄ±m ettiÄŸini anlar. EÅŸiyle birlikte onlara giysi dikerek iyiliÄŸe karÅŸÄ±lÄ±k verir.",
+    "lesson": "GÃ¶rÃ¼nmeyen yardÄ±mÄ± fark etmek ve minnetle karÅŸÄ±lÄ±k vermek erdemdir."
+  },
+  {
+    "title": "Rapunzel'in Kulesi",
+    "category": "Ã–zgÃ¼rlÃ¼k",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Rapunzel yÃ¼ksek kulede dÃ¼nyadan uzak tutulur. Onu koruduÄŸunu sÃ¶yleyen kiÅŸi aslÄ±nda hayatÄ±nÄ± kapatmÄ±ÅŸtÄ±r. Rapunzelâ€™in hikayesi, sevgi adÄ± altÄ±nda kontrol ile gerÃ§ek Ã¶zgÃ¼rlÃ¼k arasÄ±ndaki farkÄ± gÃ¶sterir.",
+    "lesson": "Koruma bahanesiyle Ã¶zgÃ¼rlÃ¼ÄŸÃ¼ yok etmek sevgi deÄŸildir."
+  },
+  {
+    "title": "Yedi Kuzgun",
+    "category": "Dostluk",
+    "group": "Grimm MasallarÄ±",
+    "flow": "KardeÅŸleri kuzguna dÃ¶nÃ¼ÅŸen kÄ±z, onlarÄ± bulmak iÃ§in zorlu bir yolculuÄŸa Ã§Ä±kar. Korkutucu yerlerden geÃ§er, kÃ¼Ã§Ã¼k iÅŸaretleri takip eder ve sonunda kardeÅŸlerine ulaÅŸÄ±r.",
+    "lesson": "Aile ve baÄŸlÄ±lÄ±k, zor yollardan geÃ§meyi gÃ¶ze alan bir sadakat ister."
+  },
+  {
+    "title": "Hans ÅanslÄ±",
+    "category": "Huzur ve Zaman",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Hans bÃ¼yÃ¼k bir altÄ±n parÃ§asÄ±yla yola Ã§Ä±kar; onu sÄ±rasÄ±yla daha az deÄŸerli ÅŸeylerle deÄŸiÅŸtirir. DÄ±ÅŸarÄ±dan sÃ¼rekli kaybediyor gibidir ama sonunda yÃ¼klerinden kurtulduÄŸu iÃ§in kendini Ã¶zgÃ¼r hisseder.",
+    "lesson": "DeÄŸer her zaman maddi Ã¶lÃ§Ã¼yle belirlenmez; bazen hafiflemek de kazanÃ§tÄ±r."
+  },
+  {
+    "title": "Yoksul ile Zengin",
+    "category": "Merhamet ve Nezaket",
+    "group": "Grimm MasallarÄ±",
+    "flow": "Yoksul adam misafire gÃ¶nÃ¼lden kapÄ±sÄ±nÄ± aÃ§ar; zengin adam ise cimrilik eder. Hikaye, insanÄ±n sahip olduÄŸu ÅŸeyin Ã§okluÄŸundan Ã§ok paylaÅŸma niyetinin deÄŸerini gÃ¶sterir.",
+    "lesson": "CÃ¶mertlik servetin deÄŸil gÃ¶nlÃ¼n bÃ¼yÃ¼klÃ¼ÄŸÃ¼ne baÄŸlÄ±dÄ±r."
+  },
+  {
+    "title": "Kral Pamuk Prensesin AynasÄ±",
+    "category": "Kendini Bilme",
+    "group": "Grimm MasallarÄ±",
+    "flow": "KraliÃ§e gÃ¼zelliÄŸini aynadan aldÄ±ÄŸÄ± onayla Ã¶lÃ§er. BaÅŸkasÄ±nÄ±n gÃ¼zelliÄŸi kendi deÄŸerini tehdit edince kÄ±skanÃ§lÄ±k onu zalimliÄŸe sÃ¼rÃ¼kler.",
+    "lesson": "Kendini yalnÄ±z karÅŸÄ±laÅŸtÄ±rmayla tanÄ±mlayan kiÅŸi huzurunu baÅŸkasÄ±nÄ±n varlÄ±ÄŸÄ±na baÄŸlar."
+  },
+  {
+    "title": "BalÄ±kÃ§Ä± ve Cini",
+    "category": "Dikkat ve Karar",
+    "group": "Binbir Gece MasallarÄ±",
+    "flow": "BalÄ±kÃ§Ä± denizden mÃ¼hÃ¼rlÃ¼ bir kap Ã§Ä±karÄ±r; iÃ§inden gÃ¼Ã§lÃ¼ bir cin Ã§Ä±kar ve onu Ã¶ldÃ¼rmek ister. BalÄ±kÃ§Ä± zekÃ¢sÄ±nÄ± kullanÄ±p cinin gerÃ§ekten kaba sÄ±ÄŸÄ±p sÄ±ÄŸmadÄ±ÄŸÄ±nÄ± sorar. Cin tekrar kaba girince balÄ±kÃ§Ä± kapaÄŸÄ± kapatÄ±r.",
+    "lesson": "Kaba gÃ¼Ã§ karÅŸÄ±sÄ±nda soÄŸukkanlÄ± akÄ±l hayat kurtarabilir."
+  },
+  {
+    "title": "Sindbad'Ä±n Ä°lk YolculuÄŸu",
+    "category": "Dikkat ve Karar",
+    "group": "Binbir Gece MasallarÄ±",
+    "flow": "Sindbad denizde gÃ¶rdÃ¼ÄŸÃ¼ adaya benzer yere Ã§Ä±kar; fakat burasÄ± aslÄ±nda dev bir balÄ±ÄŸÄ±n sÄ±rtÄ±dÄ±r. BalÄ±k hareket edince herkes paniÄŸe kapÄ±lÄ±r. Sindbad deniz yolculuÄŸunun gÃ¶rÃ¼nÃ¼ÅŸe aldanmamayÄ± Ã¶ÄŸrettiÄŸini anlar.",
+    "lesson": "GÃ¼venli gÃ¶rÃ¼nen zemin bile sorgulanmadan kabul edilmemelidir."
+  },
+  {
+    "title": "Ali Baba ve KÄ±rk Haramiler",
+    "category": "Dikkat ve Karar",
+    "group": "Binbir Gece MasallarÄ±",
+    "flow": "Ali Baba tesadÃ¼fen haramilerin gizli maÄŸarasÄ±nÄ± Ã¶ÄŸrenir. AÃ§gÃ¶zlÃ¼lÃ¼k ve dikkatsizlik yÃ¼zÃ¼nden Ã§evresindekiler tehlikeye girer. Morgianaâ€™nÄ±n zekÃ¢sÄ± ve tedbiri sayesinde hane kurtulur.",
+    "lesson": "Tehlikeli bilgi, tedbir ve sadakat olmadan felakete dÃ¶nÃ¼ÅŸebilir."
+  },
+  {
+    "title": "Åehrazad'Ä±n Hikayesi",
+    "category": "Dikkat ve Karar",
+    "group": "Binbir Gece MasallarÄ±",
+    "flow": "Åehrazad, zalim hÃ¼kÃ¼mdarÄ±n Ã¶lÃ¼m dÃ¼zenini durdurmak iÃ§in hikaye anlatmaya baÅŸlar. Her gece anlatÄ±sÄ±nÄ± yarÄ±m bÄ±rakÄ±r ve merak uyandÄ±rÄ±r. Zamanla hikayeler yalnÄ±z kendisini deÄŸil, hÃ¼kÃ¼mdarÄ±n zihnini de dÃ¶nÃ¼ÅŸtÃ¼rÃ¼r.",
+    "lesson": "SÃ¶z ve hikaye, kaba gÃ¼cÃ¼n aÃ§tÄ±ÄŸÄ± yarayÄ± zamanla deÄŸiÅŸtirebilir."
+  },
+  {
+    "title": "Beyaz Fil",
+    "category": "AÃ§gÃ¶zlÃ¼lÃ¼k",
+    "group": "DoÄŸu Halk Hikayeleri",
+    "flow": "Bir hÃ¼kÃ¼mdarÄ±n beyaz fil armaÄŸanÄ± bÃ¼yÃ¼k onur gibi gÃ¶rÃ¼nÃ¼r; fakat fili beslemek o kadar masraflÄ±dÄ±r ki alan kiÅŸi zor durumda kalÄ±r. GÃ¶rkemli hediye aslÄ±nda aÄŸÄ±r bir yÃ¼ke dÃ¶nÃ¼ÅŸÃ¼r.",
+    "lesson": "Her parlak hediye nimet deÄŸildir; bazÄ±larÄ± taÅŸÄ±masÄ± zor sorumluluk getirir."
+  },
+  {
+    "title": "BalÄ±kÃ§Ä± ve Ruhu",
+    "category": "Kendini Bilme",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "GenÃ§ balÄ±kÃ§Ä± bir denizkÄ±zÄ±na Ã¢ÅŸÄ±k olur ve onunla yaÅŸayabilmek iÃ§in ruhundan ayrÄ±lmak ister. Ruhu dÃ¼nyayÄ± dolaÅŸÄ±r, ona haz ve bilgelik vaat eder. BalÄ±kÃ§Ä± ise sevgi ile ruhsuz arzular arasÄ±ndaki gerilimde kalÄ±r.",
+    "lesson": "Ä°nsan, tutkusu uÄŸruna ruhunu kaybettiÄŸinde sevginin anlamÄ± da tehlikeye girer."
+  },
+  {
+    "title": "YÄ±ldÄ±z Ã‡ocuk",
+    "category": "Kendini Bilme",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "GÃ¼zel bir Ã§ocuk, dÄ±ÅŸ gÃ¶rÃ¼nÃ¼ÅŸÃ¼ne gÃ¼venerek yoksul ve Ã§irkin gÃ¶rdÃ¼ÄŸÃ¼ herkesi hor gÃ¶rÃ¼r. Kendi annesini bile reddeder. Sonra gÃ¼zelliÄŸini kaybedip acÄ± Ã§ekince merhameti ve alÃ§akgÃ¶nÃ¼llÃ¼lÃ¼ÄŸÃ¼ Ã¶ÄŸrenir.",
+    "lesson": "DÄ±ÅŸ gÃ¼zellik, merhametle birleÅŸmezse insanÄ± Ã§irkinleÅŸtirebilir."
+  },
+  {
+    "title": "Prensesin DoÄŸum GÃ¼nÃ¼",
+    "category": "Merhamet ve Nezaket",
+    "group": "Oscar Wilde Ã–ykÃ¼leri",
+    "flow": "Saray eÄŸlencesinde kÃ¼Ã§Ã¼k cÃ¼ce, prensesin kendisine gÃ¼ldÃ¼ÄŸÃ¼nÃ¼ anlamaz ve sevildiÄŸini sanÄ±r. GerÃ§eÄŸi fark ettiÄŸinde kalbi kÄ±rÄ±lÄ±r. SarayÄ±n eÄŸlencesi, bir insanÄ±n acÄ±sÄ±na dayanÄ±r.",
+    "lesson": "BaÅŸkalarÄ±nÄ±n kÄ±rÄ±lganlÄ±ÄŸÄ±nÄ± eÄŸlenceye Ã§evirmek merhametsizliktir."
+  },
+  {
+    "title": "Ä°lyas",
+    "category": "Huzur ve Zaman",
+    "group": "Tolstoy KÄ±sa Hikayeleri",
+    "flow": "Ä°lyas zenginken malÄ± mÃ¼lkÃ¼ Ã§oktur ama huzuru azdÄ±r. Zamanla her ÅŸeyini kaybeder ve baÅŸkalarÄ±nÄ±n yanÄ±nda sade bir hayat yaÅŸamaya baÅŸlar. YoksullaÅŸtÄ±ÄŸÄ±nda, eski kaygÄ±larÄ±ndan kurtulup daha sakin olduÄŸunu fark eder.",
+    "lesson": "Servet artarken huzur azalabilir; insan bazen kayÄ±pla sadeleÅŸir."
+  },
+  {
+    "title": "Efendi ile UÅŸak",
+    "category": "Merhamet ve Nezaket",
+    "group": "Tolstoy KÄ±sa Hikayeleri",
+    "flow": "Bir efendi ve uÅŸaÄŸÄ± fÄ±rtÄ±nada yolda kalÄ±r. BaÅŸta efendi Ã§Ä±karÄ±nÄ± dÃ¼ÅŸÃ¼nÃ¼r; fakat Ã¶lÃ¼m tehlikesi yaklaÅŸÄ±nca uÅŸaÄŸÄ±nÄ± korumak iÃ§in bedenini ona siper eder. Bu dÃ¶nÃ¼ÅŸÃ¼m, bencillikten fedakÃ¢rlÄ±ÄŸa geÃ§iÅŸi gÃ¶sterir.",
+    "lesson": "Ã–lÃ¼mle yÃ¼zleÅŸmek, insanÄ±n gerÃ§ek deÄŸerlerini aÃ§Ä±ÄŸa Ã§Ä±karabilir."
+  },
+  {
+    "title": "Ä°van Ä°lyiÃ§'in Ã–lÃ¼mÃ¼",
+    "category": "Kendini Bilme",
+    "group": "Tolstoy KÄ±sa Hikayeleri",
+    "flow": "Ä°van Ä°lyiÃ§ toplumun doÄŸru saydÄ±ÄŸÄ± ÅŸekilde yaÅŸar: makam, saygÄ±nlÄ±k ve dÃ¼zen peÅŸindedir. Ã–lÃ¼m hastalÄ±ÄŸÄ±na yakalanÄ±nca hayatÄ±nÄ±n sahiciliÄŸini sorgular. Sonunda asÄ±l eksikliÄŸin dÄ±ÅŸ baÅŸarÄ± deÄŸil iÃ§ten yaÅŸamak olduÄŸunu gÃ¶rÃ¼r.",
+    "lesson": "Toplumun onayladÄ±ÄŸÄ± hayat, insanÄ±n iÃ§ hakikatini karÅŸÄ±lamÄ±yorsa boÅŸ kalabilir."
+  },
+  {
+    "title": "Ä°ki YaÅŸlÄ± Adam",
+    "category": "Merhamet ve Nezaket",
+    "group": "Tolstoy KÄ±sa Hikayeleri",
+    "flow": "Ä°ki yaÅŸlÄ± adam kutsal bir yolculuÄŸa Ã§Ä±kmak ister. Biri yola devam ederken diÄŸeri yoksul bir aileye yardÄ±m etmek iÃ§in kalÄ±r. Hikaye, niyetin ve gerÃ§ek iyiliÄŸin yolculuÄŸun ÅŸeklinden daha Ã¶nemli olduÄŸunu anlatÄ±r.",
+    "lesson": "Bazen en doÄŸru yol, ihtiyaÃ§ sahibinin yanÄ±nda durmaktÄ±r."
+  },
+  {
+    "title": "Akbabalar",
+    "category": "Dikkat ve Karar",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "Bir adamÄ± akbabalar parÃ§alamaktadÄ±r. Bir yabancÄ± yardÄ±m etmek ister ama Ã§Ã¶zÃ¼m gecikir. Alegori, insanÄ±n Ã¼stÃ¼ne Ã§Ã¶ken gÃ¼Ã§ler karÅŸÄ±sÄ±nda Ã§aresizlik ve geÃ§ kalmÄ±ÅŸ yardÄ±mÄ± anlatÄ±r.",
+    "lesson": "BazÄ± tehlikeler ertelendikÃ§e bÃ¼yÃ¼r ve yardÄ±m niyeti tek baÅŸÄ±na yetmez."
+  },
+  {
+    "title": "KÃ¶prÃ¼",
+    "category": "Kendini Bilme",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "AnlatÄ±cÄ± kendisini bir kÃ¶prÃ¼ gibi dÃ¼ÅŸÃ¼nÃ¼r; iki kÄ±yÄ±yÄ± birleÅŸtirmek iÃ§in gerilir. Ãœzerinden geÃ§ilmesini beklerken kendi varlÄ±ÄŸÄ±nÄ±n kÄ±rÄ±lganlÄ±ÄŸÄ±nÄ± hisseder.",
+    "lesson": "SÃ¼rekli baÅŸkalarÄ±nÄ± taÅŸÄ±mak iÃ§in yaÅŸayan kiÅŸi kendi kÄ±rÄ±lganlÄ±ÄŸÄ±nÄ± unutabilir."
+  },
+  {
+    "title": "Prometheus",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Kafka KÄ±sa Alegorileri",
+    "flow": "Kafka, Prometheus efsanesine farklÄ± olasÄ±lÄ±klarla yaklaÅŸÄ±r: ceza, unutuluÅŸ, yorgunluk ve kayaya karÄ±ÅŸma. Efsane tek bir anlamla kapanmaz, zamanla baÅŸka anlamlara bÃ¶lÃ¼nÃ¼r.",
+    "lesson": "BazÄ± hikayeler tek aÃ§Ä±klamayla bitmez; zaman onlarÄ±n anlamÄ±nÄ± deÄŸiÅŸtirir."
+  },
+  {
+    "title": "Babil KitaplÄ±ÄŸÄ±",
+    "category": "Kendini Bilme",
+    "group": "Borges KÄ±sa Alegorileri",
+    "flow": "Borgesâ€™in hayali evreninde bÃ¼tÃ¼n kitaplarÄ± iÃ§eren sonsuz bir kÃ¼tÃ¼phane vardÄ±r. Ä°nsanlar anlamÄ±, doÄŸru kitabÄ± ve kendi kaderlerini bu sonsuzlukta arar. Bilginin sÄ±nÄ±rsÄ±zlÄ±ÄŸÄ±, huzurdan Ã§ok kaybolma duygusu da Ã¼retir.",
+    "lesson": "SÄ±nÄ±rsÄ±z bilgi, anlamÄ± garanti etmez; insanÄ±n aradÄ±ÄŸÄ± dÃ¼zeni bulmasÄ± ayrÄ± bir meseledir."
+  },
+  {
+    "title": "Borges ve Ben",
+    "category": "Kendini Bilme",
+    "group": "Borges KÄ±sa Alegorileri",
+    "flow": "AnlatÄ±cÄ±, kamuya ait yazar Borges ile gÃ¼ndelik benliÄŸi arasÄ±ndaki ayrÄ±mÄ± dÃ¼ÅŸÃ¼nÃ¼r. Ãœn, yazÄ± ve kimlik birbirine karÄ±ÅŸÄ±r. Kimin kimi yaÅŸattÄ±ÄŸÄ± belirsizleÅŸir.",
+    "lesson": "Ä°nsanÄ±n dÄ±ÅŸarÄ±daki imajÄ± ile iÃ§teki benliÄŸi aynÄ± ÅŸey olmayabilir."
+  },
+  {
+    "title": "Ä°ki Kral ve Ä°ki Labirent",
+    "category": "Adalet ve Vicdan",
+    "group": "Borges KÄ±sa Alegorileri",
+    "flow": "Bir kral, rakibini karmaÅŸÄ±k bir labirente sokarak kÃ¼Ã§Ã¼mser. DiÄŸer kral daha sonra onu Ã§Ã¶lde bÄ±rakÄ±r ve bunun kendi labirenti olduÄŸunu sÃ¶yler. Yapay karmaÅŸa, doÄŸal sonsuzluk karÅŸÄ±sÄ±nda kÃ¼Ã§Ã¼k kalÄ±r.",
+    "lesson": "GÃ¼Ã§ gÃ¶sterisiyle kurulan oyun, daha bÃ¼yÃ¼k bir gerÃ§eklik karÅŸÄ±sÄ±nda bozulabilir."
+  },
+  {
+    "title": "Alef",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Borges KÄ±sa Alegorileri",
+    "flow": "Alef, bÃ¼tÃ¼n evrenin aynÄ± anda gÃ¶rÃ¼lebildiÄŸi gizemli bir noktadÄ±r. Onu gÃ¶ren kiÅŸi sÄ±nÄ±rsÄ±z gÃ¶rÃ¼ntÃ¼yle karÅŸÄ±laÅŸÄ±r ama bu gÃ¶rme hali insan zihnine aÄŸÄ±r gelir.",
+    "lesson": "Her ÅŸeyi gÃ¶rmek, her ÅŸeyi anlamak anlamÄ±na gelmez."
+  },
+  {
+    "title": "AÄŸaca TÃ¼neyen Baron",
+    "category": "Ã–zgÃ¼rlÃ¼k",
+    "group": "Italo Calvino AnlatÄ±larÄ±",
+    "flow": "Cosimo, ailesine karÅŸÄ± Ã§Ä±kar ve bir aÄŸaca Ã§Ä±karak hayatÄ±nÄ± aÄŸaÃ§larda sÃ¼rdÃ¼rmeye karar verir. Toplumdan tamamen kopmaz ama ona yukarÄ±dan ve mesafeli bakar. Ã–zgÃ¼rlÃ¼ÄŸÃ¼, kaÃ§Ä±ÅŸtan Ã§ok farklÄ± bir duruÅŸ haline gelir.",
+    "lesson": "Bazen insan, dÃ¼nyaya daha doÄŸru bakmak iÃ§in ondan biraz uzaklaÅŸmak zorundadÄ±r."
+  },
+  {
+    "title": "Ä°kiye BÃ¶lÃ¼nen Vikont",
+    "category": "Kendini Bilme",
+    "group": "Italo Calvino AnlatÄ±larÄ±",
+    "flow": "Vikont savaÅŸta ikiye bÃ¶lÃ¼nÃ¼r; bir yarÄ±sÄ± tamamen kÃ¶tÃ¼, diÄŸer yarÄ±sÄ± aÅŸÄ±rÄ± iyi hale gelir. Ä°ki uÃ§ da eksiktir. Ä°nsan ancak parÃ§alarÄ± birleÅŸtiÄŸinde daha bÃ¼tÃ¼n bir varlÄ±k olur.",
+    "lesson": "Ä°yilik ve kÃ¶tÃ¼lÃ¼kten birini tamamen koparmak deÄŸil, insanÄ±n bÃ¼tÃ¼nlÃ¼ÄŸÃ¼nÃ¼ anlamak gerekir."
+  },
+  {
+    "title": "Varolmayan ÅÃ¶valye",
+    "category": "Kendini Bilme",
+    "group": "Italo Calvino AnlatÄ±larÄ±",
+    "flow": "Agilulfo kusursuz bir ÅŸÃ¶valyedir ama zÄ±rhÄ±nÄ±n iÃ§inde beden yoktur; yalnÄ±zca irade ve gÃ¶rev bilinci vardÄ±r. DÃ¼zenli, doÄŸru ve eksiksizdir ama canlÄ± insan eksikliÄŸini taÅŸÄ±r.",
+    "lesson": "YalnÄ±z gÃ¶rev ve mÃ¼kemmellik, insanÄ±n canlÄ± varlÄ±ÄŸÄ±nÄ±n yerine geÃ§emez."
+  },
+  {
+    "title": "GÃ¶rÃ¼nmez Kentler",
+    "category": "BakÄ±ÅŸ AÃ§Ä±sÄ±",
+    "group": "Italo Calvino AnlatÄ±larÄ±",
+    "flow": "Marco Polo, Kubilay Hanâ€™a birbirinden farklÄ± kentler anlatÄ±r. Her kent aslÄ±nda hafÄ±za, arzu, korku, dÃ¼zen veya kayÄ±p Ã¼zerine bir dÃ¼ÅŸÃ¼nceye dÃ¶nÃ¼ÅŸÃ¼r. Kentler dÄ±ÅŸ dÃ¼nyadan Ã§ok insan zihninin aynasÄ± gibidir.",
+    "lesson": "MekanlarÄ± anlatÄ±rken Ã§oÄŸu zaman kendi arzularÄ±mÄ±zÄ± ve korkularÄ±mÄ±zÄ± anlatÄ±rÄ±z."
+  },
+  {
+    "title": "Erdemli Prens",
+    "category": "Adalet ve Vicdan",
+    "group": "Machiavelli ve Siyaset AnekdotlarÄ±",
+    "flow": "Siyaset dÃ¼ÅŸÃ¼ncesinde hÃ¼kÃ¼mdarÄ±n iyi gÃ¶rÃ¼nmesi ile gerÃ§ekten iyi davranmasÄ± arasÄ±ndaki fark tartÄ±ÅŸÄ±lÄ±r. GÃ¼Ã§, ahlak ve sonuÃ§ arasÄ±ndaki gerilim kÄ±sa Ã¶rneklerle anlatÄ±lÄ±r.",
+    "lesson": "YÃ¶netimde yalnÄ±z iyi niyet yetmez; fakat sonuÃ§ uÄŸruna ahlakÄ± tamamen terk etmek de tehlikelidir."
+  },
+  {
+    "title": "Solon ve Kroisos",
+    "category": "Huzur ve Zaman",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Zengin kral Kroisos, Solonâ€™a dÃ¼nyanÄ±n en mutlu insanÄ±nÄ± sorar ve kendisinin sÃ¶ylenmesini bekler. Solon, insanÄ±n mutluluÄŸuna hayatÄ± bitmeden hÃ¼kÃ¼m verilemeyeceÄŸini anlatÄ±r.",
+    "lesson": "Mutluluk, yalnÄ±z servet ve anlÄ±k gÃ¼Ã§le Ã¶lÃ§Ã¼lemez; hayatÄ±n bÃ¼tÃ¼nÃ¼yle anlaÅŸÄ±lÄ±r."
+  },
+  {
+    "title": "Kral Pyrrhos'un Zaferi",
+    "category": "Dikkat ve Karar",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Kral Pyrrhos savaÅŸÄ± kazanÄ±r ama o kadar Ã§ok kayÄ±p verir ki bir zafer daha kazanÄ±rsa mahvolacaÄŸÄ±nÄ± sÃ¶yler. Zafer kelimesi, bedeli yÃ¼zÃ¼nden anlamÄ±nÄ± yitirir.",
+    "lesson": "Bedeli yÄ±kÄ±cÄ± olan baÅŸarÄ±, gerÃ§ek baÅŸarÄ± olmayabilir."
+  },
+  {
+    "title": "Aristippos ve LÃ¼ks",
+    "category": "Huzur ve Zaman",
+    "group": "Felsefi Anekdotlar",
+    "flow": "Aristipposâ€™un lÃ¼ks iÃ§inde yaÅŸayabilip aynÄ± zamanda ona baÄŸÄ±mlÄ± olmamaya Ã§alÄ±ÅŸtÄ±ÄŸÄ± anlatÄ±lÄ±r. Onun tavrÄ±, haz ile esaret arasÄ±ndaki sÄ±nÄ±rÄ± dÃ¼ÅŸÃ¼ndÃ¼rÃ¼r.",
+    "lesson": "Bir ÅŸeye sahip olmak sorun deÄŸildir; sorun onsuz yaÅŸayamamaktÄ±r."
+  },
+  {
+    "title": "Kleobis ve Biton",
+    "category": "Huzur ve Zaman",
+    "group": "Tarihi ve Felsefi Anekdotlar",
+    "flow": "Ä°ki kardeÅŸ, annelerini tapÄ±naÄŸa yetiÅŸtirmek iÃ§in Ã¶kÃ¼z yerine arabayÄ± kendileri Ã§eker. Halk onlarÄ± Ã¶ver; anneleri de onlar iÃ§in en iyi kaderi diler. Hikaye, mutluluk ve onurlu yaÅŸam Ã¼zerine eski bir dÃ¼ÅŸÃ¼nceyi taÅŸÄ±r.",
+    "lesson": "Ä°nsanÄ±n deÄŸeri bazen uzun Ã¶mÃ¼rden Ã§ok onurlu davranÄ±ÅŸla Ã¶lÃ§Ã¼lÃ¼r."
+  },
+  {
+    "title": "Cincinnatus'un TarlasÄ±",
+    "category": "Liderlik ve Sorumluluk",
+    "group": "Tarihi Anekdotlar",
+    "flow": "Romaâ€™da kriz Ã§Ä±kÄ±nca Cincinnatus tarlasÄ±ndan Ã§aÄŸrÄ±lÄ±r ve diktatÃ¶r yetkisi alÄ±r. GÃ¶revini tamamlayÄ±nca gÃ¼cÃ¼ bÄ±rakÄ±p tarlasÄ±na dÃ¶ner. Bu tutum, makam hÄ±rsÄ± yerine sorumluluk anlayÄ±ÅŸÄ±nÄ± gÃ¶sterir.",
+    "lesson": "GerÃ§ek liderlik, gerektiÄŸinde gÃ¼cÃ¼ almak kadar zamanÄ± gelince bÄ±rakmayÄ± da bilmektir."
+  },
+  {
+    "title": "Diyojen'in Feneri",
+    "category": "Kendini Bilme",
+    "group": "Felsefi Anekdotlar",
+    "flow": "Diyojen gÃ¼ndÃ¼z vakti elinde fenerle dolaÅŸÄ±p insan aradÄ±ÄŸÄ±nÄ± sÃ¶yler. KalabalÄ±ÄŸÄ±n iÃ§inde gerÃ§ek erdem ve dÃ¼rÃ¼stlÃ¼k arayÄ±ÅŸÄ±nÄ± mizahi biÃ§imde gÃ¶sterir.",
+    "lesson": "KalabalÄ±k iÃ§inde insan olmak, yalnÄ±zca var olmak deÄŸil erdem taÅŸÄ±maktÄ±r."
+  }
+];
+const storyList = document.getElementById("storyList");
+const categoryRail = document.getElementById("categoryRail");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const listMeta = document.getElementById("listMeta");
+const restoreDeleted = document.getElementById("restoreDeleted");
+const reader = document.getElementById("reader");
+const readerTitle = document.getElementById("readerTitle");
+const readerCategory = document.getElementById("readerCategory");
+const readerGroup = document.getElementById("readerGroup");
+const readerFlow = document.getElementById("readerFlow");
+const readerLesson = document.getElementById("readerLesson");
+const readerFavorite = document.getElementById("readerFavorite");
+const readerDelete = document.getElementById("readerDelete");
+const mobileClose = document.getElementById("mobileClose");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+let selectedCategory = "TÃ¼mÃ¼";
+let filteredStories = [...stories];
+let selectedOriginalIndex = 0;
+const FAVORITES_KEY = "cepHikayeleriFavoriler";
+const DELETED_KEY = "cepHikayeleriSilinenler";
+let favorites = new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"));
+let deleted = new Set(JSON.parse(localStorage.getItem(DELETED_KEY) || "[]"));
+
+function saveFavorites() { localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites])); }
+function saveDeleted() { localStorage.setItem(DELETED_KEY, JSON.stringify([...deleted])); }
+function storyKey(story) { return story.title; }
+function isFavorite(story) { return favorites.has(storyKey(story)); }
+function isDeleted(story) { return deleted.has(storyKey(story)); }
+function normalize(value) { return value.toLocaleLowerCase("tr-TR"); }
+
+function shuffleArray(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function visibleStories() {
+  return stories.filter(story => !isDeleted(story));
+}
+
+function categoryCounts() {
+  return visibleStories().reduce((acc, story) => {
+    acc[story.category] = (acc[story.category] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function renderCategories() {
+  const counts = categoryCounts();
+  const categories = ["TÃ¼mÃ¼", ...Object.keys(counts).sort((a,b) => {
+    const diff = counts[b] - counts[a];
+    return diff || a.localeCompare(b, "tr");
+  })];
+
+  categoryRail.innerHTML = "";
+  categories.forEach(category => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (category === selectedCategory ? " active" : "");
+    btn.textContent = category === "TÃ¼mÃ¼" ? `TÃ¼mÃ¼ (${visibleStories().length})` : `${category} (${counts[category]})`;
+    btn.addEventListener("click", () => {
+      selectedCategory = category;
+      render();
+    });
+    categoryRail.appendChild(btn);
+  });
+}
+
+function applyFilters() {
+  const query = normalize(searchInput.value.trim());
+  filteredStories = stories.filter(story => {
+    if (isDeleted(story)) return false;
+    const inCategory = selectedCategory === "TÃ¼mÃ¼" || story.category === selectedCategory;
+    const haystack = normalize(`${story.title} ${story.category} ${story.group} ${story.flow} ${story.lesson}`);
+    return inCategory && (!query || haystack.includes(query));
+  });
+
+  const mode = sortSelect.value;
+  if (mode === "newest") filteredStories.sort((a,b)=>stories.indexOf(b)-stories.indexOf(a));
+  else if (mode === "favorites") filteredStories.sort((a,b)=>Number(isFavorite(b))-Number(isFavorite(a)) || stories.indexOf(a)-stories.indexOf(b));
+  else if (mode === "az") filteredStories.sort((a,b)=>a.title.localeCompare(b.title,"tr"));
+  else if (mode === "za") filteredStories.sort((a,b)=>b.title.localeCompare(a.title,"tr"));
+  else if (mode === "shuffle") filteredStories = shuffleArray(filteredStories);
+}
+
+function toggleFavorite(index, event) {
+  if (event) event.stopPropagation();
+  const key = storyKey(stories[index]);
+  favorites.has(key) ? favorites.delete(key) : favorites.add(key);
+  saveFavorites();
+  render();
+  if (!isDeleted(stories[index])) selectStory(index, false);
+}
+
+function deleteStory(index, event) {
+  if (event) event.stopPropagation();
+  const story = stories[index];
+  const ok = confirm(`"${story.title}" hikayesini listeden silmek istiyor musun? Bu iÅŸlem bu tarayÄ±cÄ±da kalÄ±cÄ± olarak saklanÄ±r.`);
+  if (!ok) return;
+  deleted.add(storyKey(story));
+  favorites.delete(storyKey(story));
+  saveDeleted();
+  saveFavorites();
+  const currentFilteredIndex = filteredStories.indexOf(story);
+  render();
+  const fallback = filteredStories[Math.min(currentFilteredIndex, filteredStories.length - 1)];
+  if (fallback) selectStory(stories.indexOf(fallback), false);
+  else selectEmpty();
+}
+
+function renderList() {
+  storyList.innerHTML = "";
+  listMeta.textContent = `${filteredStories.length} / ${visibleStories().length} Ã¶ykÃ¼ gÃ¶steriliyor`;
+  restoreDeleted.style.display = deleted.size ? "inline-flex" : "none";
+
+  filteredStories.forEach(story => {
+    const originalIndex = stories.indexOf(story);
+    const button = document.createElement("button");
+    button.className = "storyItem" + (originalIndex === selectedOriginalIndex ? " active" : "");
+    button.innerHTML = `
+      <div class="itemTop">
+        <div class="num">${originalIndex + 1}</div>
+        <div style="min-width:0; flex:1;">
+          <div class="itemActions">
+            <p class="itemTitle">${story.title}</p>
+            <div class="actionBtns">
+              <button class="iconBtn favSmall ${isFavorite(story) ? "active" : ""}" type="button" title="Favori">${isFavorite(story) ? "â˜…" : "â˜†"}</button>
+              <button class="iconBtn deleteSmall" type="button" title="Sil">Ã—</button>
+            </div>
+          </div>
+          <p class="itemPreview">${story.flow}</p>
+          <div class="tagRow"><span class="tag">${story.category}</span><span class="tag groupTag">${story.group}</span></div>
+        </div>
+      </div>`;
+    button.querySelector(".favSmall").addEventListener("click", event => toggleFavorite(originalIndex, event));
+    button.querySelector(".deleteSmall").addEventListener("click", event => deleteStory(originalIndex, event));
+    button.addEventListener("click", () => selectStory(originalIndex, true));
+    storyList.appendChild(button);
+  });
+}
+
+function selectStory(index, openMobile=false) {
+  if (index < 0 || index >= stories.length || isDeleted(stories[index])) return;
+  selectedOriginalIndex = index;
+  const story = stories[index];
+  readerTitle.textContent = story.title;
+  readerCategory.textContent = story.category;
+  readerGroup.textContent = story.group;
+  readerFlow.textContent = story.flow;
+  readerLesson.textContent = story.lesson;
+  readerFavorite.textContent = isFavorite(story) ? "â˜… Favorilerde" : "â˜† Favoriye ekle";
+  readerFavorite.classList.toggle("active", isFavorite(story));
+  const currentFilteredIndex = filteredStories.indexOf(story);
+  prevBtn.disabled = currentFilteredIndex <= 0;
+  nextBtn.disabled = currentFilteredIndex === -1 || currentFilteredIndex >= filteredStories.length - 1;
+  document.querySelectorAll(".storyItem").forEach(item => item.classList.remove("active"));
+  const activeButton = [...storyList.children].find((button, i) => filteredStories[i] === story);
+  if (activeButton) activeButton.classList.add("active");
+  if (openMobile) reader.classList.add("open");
+}
+
+function selectEmpty() {
+  readerTitle.textContent = "SonuÃ§ bulunamadÄ±";
+  readerCategory.textContent = "â€”";
+  readerGroup.textContent = "â€”";
+  readerFlow.textContent = "Arama veya kategori filtresini deÄŸiÅŸtirerek tekrar dene.";
+  readerLesson.textContent = "DoÄŸru hikayeyi bulmak iÃ§in filtreleri sadeleÅŸtirmek iÅŸe yarar.";
+  prevBtn.disabled = true;
+  nextBtn.disabled = true;
+}
+
+function moveSelection(direction) {
+  const currentStory = stories[selectedOriginalIndex];
+  let currentFilteredIndex = filteredStories.indexOf(currentStory);
+  if (currentFilteredIndex === -1) currentFilteredIndex = 0;
+  const nextFilteredIndex = currentFilteredIndex + direction;
+  if (nextFilteredIndex < 0 || nextFilteredIndex >= filteredStories.length) return;
+  selectStory(stories.indexOf(filteredStories[nextFilteredIndex]), true);
+}
+
+function shuffleVisibleList() {
+  sortSelect.value = "shuffle";
+  render();
+  if (filteredStories.length) {
+    selectStory(stories.indexOf(filteredStories[0]), false);
+  }
+}
+
+function render() {
+  renderCategories();
+  applyFilters();
+  renderList();
+  if (!filteredStories.includes(stories[selectedOriginalIndex]) && filteredStories.length) {
+    selectedOriginalIndex = stories.indexOf(filteredStories[0]);
+  }
+  filteredStories.length ? selectStory(selectedOriginalIndex, false) : selectEmpty();
+}
+
+searchInput.addEventListener("input", render);
+sortSelect.addEventListener("change", render);
+shuffleBtn.addEventListener("click", shuffleVisibleList);
+readerFavorite.addEventListener("click", event => toggleFavorite(selectedOriginalIndex, event));
+readerDelete.addEventListener("click", event => deleteStory(selectedOriginalIndex, event));
+restoreDeleted.addEventListener("click", () => {
+  const ok = confirm("Bu tarayÄ±cÄ±da sildiÄŸin tÃ¼m hikayeler geri getirilsin mi?");
+  if (!ok) return;
+  deleted.clear();
+  saveDeleted();
+  render();
+});
+mobileClose.addEventListener("click", () => reader.classList.remove("open"));
+reader.addEventListener("click", event => {
+  if (event.target === reader) reader.classList.remove("open");
+});
+prevBtn.addEventListener("click", () => moveSelection(-1));
+nextBtn.addEventListener("click", () => moveSelection(1));
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") reader.classList.remove("open");
+  if (event.key === "ArrowLeft") moveSelection(-1);
+  if (event.key === "ArrowRight") moveSelection(1);
+});
+render();
+</script>
+</body>
+</html>
