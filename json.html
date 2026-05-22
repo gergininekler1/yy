@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowNote — Yaz, tıkanma, devam et.</title>
+  <style>
+    :root {
+      --bg-1: #060814;
+      --bg-2: #101329;
+      --bg-3: #261148;
+      --glass: rgba(255, 255, 255, 0.075);
+      --glass-2: rgba(255, 255, 255, 0.11);
+      --stroke: rgba(255, 255, 255, 0.13);
+      --stroke-2: rgba(255, 255, 255, 0.22);
+      --text: #f5f7ff;
+      --muted: rgba(245, 247, 255, 0.66);
+      --soft: rgba(245, 247, 255, 0.45);
+      --accent: #9b5cff;
+      --accent-2: #39d5ff;
+      --accent-3: #ff5cc8;
+      --danger: #ff5f7e;
+      --success: #58ffc2;
+      --warning: #ffd166;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100%;
+      margin: 0;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(155, 92, 255, 0.34), transparent 32%),
+        radial-gradient(circle at 85% 12%, rgba(57, 213, 255, 0.22), transparent 30%),
+        radial-gradient(circle at 70% 90%, rgba(255, 92, 200, 0.18), transparent 35%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2) 48%, var(--bg-3));
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+      z-index: 0;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 310px minmax(360px, 1fr) 360px;
+      gap: 18px;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.055));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .sidebar,
+    .editor,
+    .assistant-panel {
+      border-radius: var(--radius-xl);
+      min-height: calc(100vh - 44px);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      padding: 22px;
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.55), transparent 18%),
+        linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 38px rgba(155, 92, 255, 0.36);
+      font-size: 22px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 25px;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .tagline {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .sidebar-actions {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: var(--glass-2);
+      border-color: var(--stroke-2);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(155, 92, 255, 0.95), rgba(57, 213, 255, 0.72));
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 16px 42px rgba(155, 92, 255, 0.24);
+      font-weight: 750;
+    }
+
+    .btn.danger {
+      color: #ffeef2;
+      background: rgba(255, 95, 126, 0.13);
+      border-color: rgba(255, 95, 126, 0.28);
+    }
+
+    .btn.icon {
+      width: 42px;
+      padding: 0;
+      flex: 0 0 auto;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap span {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--soft);
+      pointer-events: none;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      outline: none;
+      padding: 12px 14px;
+      transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .search-wrap .input {
+      padding-left: 40px;
+    }
+
+    .input:focus,
+    .select:focus,
+    textarea:focus {
+      border-color: rgba(57, 213, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(57, 213, 255, 0.08);
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .notes-list {
+      padding: 12px;
+      overflow: auto;
+      flex: 1;
+    }
+
+    .note-card {
+      width: 100%;
+      text-align: left;
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid transparent;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .note-card:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.085);
+      border-color: var(--stroke);
+    }
+
+    .note-card.active {
+      background: linear-gradient(135deg, rgba(155, 92, 255, 0.22), rgba(57, 213, 255, 0.10));
+      border-color: rgba(155, 92, 255, 0.42);
+    }
+
+    .note-card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 760;
+      letter-spacing: -0.01em;
+    }
+
+    .note-card-preview {
+      margin-top: 7px;
+      color: var(--muted);
+      line-height: 1.35;
+      font-size: 12.5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .note-card-meta {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--soft);
+      font-size: 11.5px;
+    }
+
+    .empty {
+      padding: 28px 18px;
+      border: 1px dashed var(--stroke-2);
+      border-radius: 22px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .editor {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-toolbar {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .editor-toolbar .spacer {
+      flex: 1;
+    }
+
+    .status-pill {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: var(--success);
+      box-shadow: 0 0 18px rgba(88,255,194,0.8);
+    }
+
+    .editor-body {
+      padding: 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .title-input {
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 830;
+      letter-spacing: -0.065em;
+      line-height: 1.05;
+      padding: 6px 0;
+    }
+
+    .title-input::placeholder,
+    .content-input::placeholder {
+      color: rgba(245, 247, 255, 0.28);
+    }
+
+    .content-input {
+      width: 100%;
+      flex: 1;
+      min-height: 430px;
+      resize: none;
+      border: 1px solid var(--stroke);
+      outline: none;
+      border-radius: 24px;
+      padding: 22px;
+      color: rgba(245, 247, 255, 0.92);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.08)),
+        rgba(255,255,255,0.045);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .stat {
+      padding: 8px 11px;
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.055);
+    }
+
+    .assistant-panel {
+      overflow: auto;
+      padding: 16px;
+    }
+
+    .panel-section {
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid var(--stroke);
+      padding: 15px;
+      margin-bottom: 14px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.015em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mini {
+      min-height: 32px;
+      padding: 7px 10px;
+      border-radius: 11px;
+      font-size: 12px;
+    }
+
+    .suggestion-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .suggestion {
+      padding: 12px;
+      border-radius: 17px;
+      background: rgba(0, 0, 0, 0.17);
+      border: 1px solid rgba(255,255,255,0.09);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .suggestion:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.07);
+      border-color: var(--stroke-2);
+    }
+
+    .suggestion-main {
+      color: rgba(245, 247, 255, 0.92);
+      line-height: 1.42;
+      font-size: 13px;
+    }
+
+    .suggestion-meta {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: rgba(245, 247, 255, 0.7);
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(155, 92, 255, 0.14);
+      border: 1px solid rgba(155, 92, 255, 0.2);
+      white-space: nowrap;
+    }
+
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .template-btn {
+      min-height: 52px;
+      padding: 10px;
+      justify-content: flex-start;
+      text-align: left;
+      font-size: 12.5px;
+      border-radius: 15px;
+    }
+
+    .inspiration-card {
+      padding: 12px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, rgba(155,92,255,0.16), rgba(57,213,255,0.07));
+      border: 1px solid rgba(255,255,255,0.11);
+      margin-bottom: 9px;
+    }
+
+    .inspiration-card small {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--soft);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .inspiration-card div {
+      color: rgba(245,247,255,0.9);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 50;
+      transform: translateX(-50%) translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(11, 13, 26, 0.78);
+      border: 1px solid var(--stroke-2);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-size: 13px;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .focus-mode .sidebar,
+    .focus-mode .assistant-panel {
+      display: none;
+    }
+
+    .focus-mode .app {
+      grid-template-columns: minmax(0, 920px);
+      justify-content: center;
+    }
+
+    .focus-mode .editor {
+      min-height: calc(100vh - 44px);
+    }
+
+    .focus-mode .content-input {
+      min-height: 62vh;
+    }
+
+    .kbd {
+      color: var(--muted);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--stroke);
+    }
+
+    .select {
+      appearance: none;
+      color: var(--text);
+    }
+
+    .select option {
+      color: #111827;
+    }
+
+    @media (max-width: 1180px) {
+      .app {
+        grid-template-columns: 290px minmax(360px, 1fr);
+      }
+
+      .assistant-panel {
+        grid-column: 1 / -1;
+        min-height: auto;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .panel-section {
+        margin-bottom: 0;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        padding: 12px;
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar,
+      .editor,
+      .assistant-panel {
+        min-height: auto;
+        border-radius: 22px;
+      }
+
+      .assistant-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .editor-toolbar {
+        flex-wrap: wrap;
+      }
+
+      .editor-toolbar .spacer {
+        display: none;
+      }
+
+      .content-input {
+        min-height: 420px;
+      }
+
+      .template-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .focus-mode .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .brand,
+      .editor-body {
+        padding: 16px;
+      }
+
+      .title-input {
+        font-size: 32px;
+      }
+
+      .content-input {
+        padding: 16px;
+        border-radius: 19px;
+        font-size: 15px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .btn.icon {
+        width: 42px;
+      }
+
+      .editor-toolbar .btn.icon {
+        width: calc(50% - 5px);
+      }
+
+      .status-pill {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar glass">
+      <div class="brand">
+        <div class="brand-top">
+          <div class="logo">✦</div>
+          <div>
+            <h1>FlowNote</h1>
+            <p class="tagline">Yaz, tıkanma, devam et.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="btn primary" id="newNoteBtn">＋ Yeni Not</button>
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input class="input" id="searchInput" placeholder="Notlarda ara..." />
+        </div>
+      </div>
+
+      <div class="notes-list" id="notesList"></div>
+    </aside>
+
+    <section class="editor glass">
+      <div class="editor-toolbar">
+        <span class="status-pill"><span class="status-dot"></span><span id="saveStatus">Hazır</span></span>
+        <span class="status-pill">⌘/Ctrl + S <span class="kbd">kaydet</span></span>
+        <div class="spacer"></div>
+        <button class="btn icon" id="favoriteBtn" title="Favori">☆</button>
+        <button class="btn icon" id="focusBtn" title="Odak modu">◐</button>
+        <button class="btn danger" id="deleteBtn">Sil</button>
+        <button class="btn primary" id="saveBtn">Kaydet</button>
+      </div>
+
+      <div class="editor-body">
+        <input id="titleInput" class="title-input" placeholder="Başlıksız fikir..." />
+        <textarea id="contentInput" class="content-input" placeholder="Bir cümle yaz. Gerisi akar..."></textarea>
+
+        <div class="stats">
+          <span class="stat" id="wordCount">0 kelime</span>
+          <span class="stat" id="charCount">0 karakter</span>
+          <span class="stat" id="readTime">0 dk okuma</span>
+          <span class="stat" id="updatedAt">Henüz kaydedilmedi</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="assistant-panel glass">
+      <section class="panel-section">
+        <div class="section-head">
+          <h2 class="section-title">🧭 Konu Önerileri</h2>
+          <button class="btn mini" id="topicRefreshBtn">Yenile</button>
+        </div>
+        <select class="select" id="topicCategory">
+          <option value="all">Tüm kategoriler</option>
+          <option value="Kişisel gelişim">Kişisel gelişim</option>
+          <option value="Teknoloji">Teknoloji</option>
+          <option value="Psikoloji">Psikoloji</option>
+          <option value="Günlük yaşam">Günlük yaşam</option>
+          <option value="Deneme">Deneme</option>
+          <option value="Hikâye">Hikâye</option>
+          <option value="Araştırma">Araştırma</option>
+          <option value="Sosyal medya">Sosyal medya</option>
+        </select>
+        <div style="height: 10px;"></div>
+        <div class="suggestion-list" id="topicList"></div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-head">
+          <h2 class="section-title">⚡ Tıkanıklık Giderici</h2>
+          <button class="btn mini" id="boostBtn">İtici güç</button>
+        </div>
+        <div class="suggestion-list" id="boostList"></div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-head">
+          <h2 class="section-title">🧩 Yazma Şablonları</h2>
+        </div>
+        <div class="template-grid" id="templateGrid"></div>
+      </section>
+
+      <section class="panel-section">
+        <div class="section-head">
+          <h2 class="section-title">✨ İlham Paneli</h2>
+          <button class="btn mini" id="inspireRefreshBtn">Karıştır</button>
+        </div>
+        <div id="inspirationPanel"></div>
+      </section>
+    </aside>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "flownote.notes.v1";
+
+    const $ = (selector) => document.querySelector(selector);
+
+    const els = {
+      notesList: $("#notesList"),
+      searchInput: $("#searchInput"),
+      newNoteBtn: $("#newNoteBtn"),
+      saveBtn: $("#saveBtn"),
+      deleteBtn: $("#deleteBtn"),
+      favoriteBtn: $("#favoriteBtn"),
+      focusBtn: $("#focusBtn"),
+      titleInput: $("#titleInput"),
+      contentInput: $("#contentInput"),
+      wordCount: $("#wordCount"),
+      charCount: $("#charCount"),
+      readTime: $("#readTime"),
+      updatedAt: $("#updatedAt"),
+      saveStatus: $("#saveStatus"),
+      topicCategory: $("#topicCategory"),
+      topicRefreshBtn: $("#topicRefreshBtn"),
+      topicList: $("#topicList"),
+      boostBtn: $("#boostBtn"),
+      boostList: $("#boostList"),
+      templateGrid: $("#templateGrid"),
+      inspireRefreshBtn: $("#inspireRefreshBtn"),
+      inspirationPanel: $("#inspirationPanel"),
+      toast: $("#toast")
+    };
+
+    const topics = [
+      { category: "Kişisel gelişim", source: "Kitaplardan", text: "Disiplin ile motivasyon arasındaki sessiz savaş: Hangisi gerçekten sürdürülebilir?" },
+      { category: "Kişisel gelişim", source: "Kişisel", text: "Küçük alışkanlıkların bir insanın kimliğini yavaşça yeniden yazması." },
+      { category: "Teknoloji", source: "Trendlerden", text: "Yapay zekâ çağında insan emeğinin yeni anlamı ne olacak?" },
+      { category: "Teknoloji", source: "Akademik", text: "Dijital dikkat dağınıklığı: Modern zihnin görünmeyen maliyeti." },
+      { category: "Psikoloji", source: "Akademik", text: "Ertelemenin tembellikten çok duygu yönetimiyle ilişkisi." },
+      { category: "Psikoloji", source: "Felsefi", text: "İnsan neden bildiği doğruları uygulamakta zorlanır?" },
+      { category: "Günlük yaşam", source: "Kişisel", text: "Sıradan bir günün içinde fark edilmeyen küçük dönüm noktaları." },
+      { category: "Günlük yaşam", source: "Sosyal gözlem", text: "Kalabalık şehirlerde yalnızlığın yeni biçimleri." },
+      { category: "Deneme", source: "Felsefi", text: "Başarı dediğimiz şey gerçekten bizim isteğimiz mi, yoksa bize öğretilen bir hedef mi?" },
+      { category: "Deneme", source: "Kitaplardan", text: "İnsanın kendini anlatma ihtiyacı: Yazmak neden bir var olma biçimi?" },
+      { category: "Hikâye", source: "Yaratıcı", text: "Her gün aynı saatte kapısının önünde isimsiz bir not bulan bir karakter." },
+      { category: "Hikâye", source: "Felsefi", text: "Anıları silinebilen bir dünyada, geçmişini saklamak isteyen biri." },
+      { category: "Araştırma", source: "Akademik", text: "Sosyal medya kullanımının üretkenlik algısı üzerindeki etkileri." },
+      { category: "Araştırma", source: "Akademik", text: "Uzaktan çalışmanın yaratıcılık, odak ve ekip kültürü üzerindeki sonuçları." },
+      { category: "Sosyal medya", source: "Trendlerden", text: "İnsanların kaydetmek isteyeceği 7 kısa ama güçlü yazma ipucu." },
+      { category: "Sosyal medya", source: "Güncel kültür", text: "Bir fikri 10 saniyede merak uyandırıcı hale getirme yolları." }
+    ];
+
+    const boosters = [
+      { tag: "Başlangıç", text: "İlk bakışta basit görünen bu konu, aslında daha derin bir soruyu saklıyor:" },
+      { tag: "Başlangıç", text: "Bazen bir fikri anlamak için onun tam tersinden başlamak gerekir." },
+      { tag: "Geçiş", text: "Burada asıl mesele, görünen nedenlerden çok görünmeyen alışkanlıklardır." },
+      { tag: "Geçiş", text: "Bu noktada sorulması gereken daha önemli bir soru var:" },
+      { tag: "Duygu", text: "belirsizlik, merak, huzursuzluk, umut, direnç, kırılganlık, hayret" },
+      { tag: "Güçlü fiiller", text: "dönüştürür, tetikler, görünür kılar, aşındırır, besler, hızlandırır, sorgulatır" },
+      { tag: "Soru", text: "Bu fikrin kimleri etkilediğini ve kimlerin görmezden geldiğini düşün." },
+      { tag: "Soru", text: "Bu konunun en rahatsız edici ama en dürüst tarafı ne?" },
+      { tag: "Sonuç", text: "Sonuç olarak, mesele yalnızca ne yaptığımız değil; bunu neden sürdürdüğümüzdür." },
+      { tag: "Sonuç", text: "Belki de cevap, büyük değişimlerde değil, tekrar eden küçük seçimlerde saklıdır." }
+    ];
+
+    const templates = [
+      {
+        name: "Blog yazısı",
+        icon: "📰",
+        text:
+`## Giriş
+Okuyucunun ilgisini çeken kısa bir problem veya gözlem yaz.
+
+## Ana fikir
+Bu yazıda savunacağın temel düşünce:
+
+## 1. Nokta
+Açıklama, örnek veya kısa hikâye.
+
+## 2. Nokta
+Karşılaştırma, veri, gözlem veya kişisel yorum.
+
+## 3. Nokta
+Okuyucunun uygulayabileceği pratik çıkarım.
+
+## Sonuç
+Akılda kalıcı bir kapanış cümlesi ve küçük bir çağrı.`
+      },
+      {
+        name: "Deneme",
+        icon: "✒️",
+        text:
+`## Soru
+Bu yazının merkezindeki soru ne?
+
+## Gözlem
+Günlük hayattan küçük ama anlamlı bir sahne.
+
+## Düşünce
+Bu sahnenin sende uyandırdığı fikir.
+
+## Derinleşme
+Konunun görünmeyen tarafı, çelişkisi veya ironisi.
+
+## Kapanış
+Kesin cevap vermeden, okuru düşündüren bir son.`
+      },
+      {
+        name: "Hikâye",
+        icon: "🌙",
+        text:
+`## Karakter
+Kim? Ne istiyor? Neden şimdi?
+
+## Mekân
+Hikâyenin atmosferi ve duyusal detaylar.
+
+## Kıvılcım
+Her şeyi değiştiren olay.
+
+## Çatışma
+Karakterin önündeki engel.
+
+## Dönüm noktası
+Karakterin seçim yapmak zorunda kaldığı an.
+
+## Son
+Değişen ne oldu? Bedeli neydi?`
+      },
+      {
+        name: "Günlük",
+        icon: "🌿",
+        text:
+`Bugün aklımda kalan şey:
+
+Beni yoran şey:
+
+Bana iyi gelen küçük detay:
+
+Bugünden öğrendiğim:
+
+Yarın kendime hatırlatmak istediğim cümle:`
+      },
+      {
+        name: "Araştırma notu",
+        icon: "🔎",
+        text:
+`## Konu
+Araştırılan başlık:
+
+## Temel soru
+Bu araştırma neyi anlamaya çalışıyor?
+
+## Bulgular
+- 
+- 
+- 
+
+## Kaynak fikirleri
+- Kitap:
+- Makale:
+- Gözlem:
+- Örnek olay:
+
+## Kendi yorumum
+Bu bilgiler ne anlama geliyor?
+
+## Sonraki adım
+Daha neyi araştırmalıyım?`
+      },
+      {
+        name: "Sosyal medya",
+        icon: "📱",
+        text:
+`Kanca:
+İlk cümlede merak uyandır.
+
+Ana fikir:
+Tek ve net bir mesaj ver.
+
+3 kısa nokta:
+1.
+2.
+3.
+
+Kapanış:
+Okuyucuya yorum yaptıracak veya kaydettirecek cümle.`
+      },
+      {
+        name: "Video metni",
+        icon: "🎬",
+        text:
+`## İlk 3 saniye
+Dikkat çeken cümle:
+
+## Problem
+İzleyicinin yaşadığı durum:
+
+## Çözüm / Fikir
+Net anlatım:
+
+## Örnek
+Günlük hayattan kısa örnek:
+
+## Kapanış
+Akılda kalan son cümle:`
+      }
+    ];
+
+    const inspirations = {
+      questions: [
+        "Bugün yazdığın fikrin altında hangi korku veya istek var?",
+        "Bu konuyu tamamen zıt düşünen biri ne söylerdi?",
+        "Okuyucu bu yazıdan sonra neyi farklı görmeli?",
+        "Bu fikri tek bir sahneyle anlatsan, sahnede ne olurdu?",
+        "Bu konunun en basit ama en ihmal edilen tarafı ne?"
+      ],
+      constraints: [
+        "Sadece 7 cümleyle anlat.",
+        "Bir metafor kullan ama adını açıklama.",
+        "İlk paragrafta soru sorma.",
+        "Bir karakterin gözünden yaz.",
+        "Son cümleyi tek kelimeyle bitir."
+      ],
+      motivation: [
+        "Kötü taslak, boş sayfadan daha değerlidir.",
+        "Bugün sadece akışı başlatman yeterli.",
+        "Mükemmel cümle sonra gelir; önce ham düşünceyi yakala.",
+        "Yazmak, zihindeki sisin şeklini görmektir.",
+        "Bir paragraf bile ilerlemedir."
+      ],
+      titles: [
+        "Görünmeyen Eşik",
+        "Küçük Şeylerin Gürültüsü",
+        "Başlamanın Sessiz Gücü",
+        "Zihnin Arka Odası",
+        "Yavaşça Değişen İnsan"
+      ]
+    };
+
+    let notes = loadNotes();
+    let activeId = notes[0]?.id || null;
+    let saveTimer = null;
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    function nowISO() {
+      return new Date().toISOString();
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "Henüz yok";
+      const date = new Date(iso);
+      return new Intl.DateTimeFormat("tr-TR", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function loadNotes() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+      } catch {}
+
+      const starter = {
+        id: uid(),
+        title: "FlowNote'a hoş geldin",
+        content: "Buraya ilk fikrini yaz. Sağdaki önerileri tek tıkla metnine ekleyebilir, şablonlarla hızlıca başlayabilir ve odak modunda sadece yazıya dönebilirsin.",
+        favorite: true,
+        createdAt: nowISO(),
+        updatedAt: nowISO()
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([starter]));
+      return [starter];
+    }
+
+    function persist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    }
+
+    function getActiveNote() {
+      return notes.find(note => note.id === activeId) || null;
+    }
+
+    function sortNotes(list) {
+      return [...list].sort((a, b) => {
+        if (a.favorite !== b.favorite) return b.favorite - a.favorite;
+        return new Date(b.updatedAt) - new Date(a.updatedAt);
+      });
+    }
+
+    function renderNotes() {
+      const q = els.searchInput.value.trim().toLowerCase();
+      const filtered = sortNotes(notes).filter(note => {
+        const haystack = `${note.title} ${note.content}`.toLowerCase();
+        return haystack.includes(q);
+      });
+
+      if (!filtered.length) {
+        els.notesList.innerHTML = `<div class="empty">Not bulunamadı.<br>Yeni bir fikir başlatmak için “Yeni Not”a bas.</div>`;
+        return;
+      }
+
+      els.notesList.innerHTML = filtered.map(note => {
+        const title = escapeHTML(note.title || "Başlıksız not");
+        const preview = escapeHTML(note.content || "Henüz içerik yok.");
+        const active = note.id === activeId ? "active" : "";
+        const fav = note.favorite ? "★" : "";
+        return `
+          <button class="note-card ${active}" data-note-id="${note.id}">
+            <div class="note-card-title">
+              <span>${title}</span>
+              <span>${fav}</span>
+            </div>
+            <div class="note-card-preview">${preview}</div>
+            <div class="note-card-meta">
+              <span>${countWords(note.content)} kelime</span>
+              <span>${formatDate(note.updatedAt)}</span>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-note-id]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          saveCurrentNote(false);
+          activeId = btn.dataset.noteId;
+          renderEditor();
+          renderNotes();
+        });
+      });
+    }
+
+    function renderEditor() {
+      const note = getActiveNote();
+      if (!note) {
+        createNote();
+        return;
+      }
+
+      els.titleInput.value = note.title || "";
+      els.contentInput.value = note.content || "";
+      els.favoriteBtn.textContent = note.favorite ? "★" : "☆";
+      els.updatedAt.textContent = `Son kayıt: ${formatDate(note.updatedAt)}`;
+      updateStats();
+      setStatus("Hazır");
+    }
+
+    function createNote() {
+      const note = {
+        id: uid(),
+        title: "",
+        content: "",
+        favorite: false,
+        createdAt: nowISO(),
+        updatedAt: nowISO()
+      };
+
+      notes.unshift(note);
+      activeId = note.id;
+      persist();
+      renderEditor();
+      renderNotes();
+      els.titleInput.focus();
+      toast("Yeni not açıldı");
+    }
+
+    function saveCurrentNote(showToast = true) {
+      const note = getActiveNote();
+      if (!note) return;
+
+      note.title = els.titleInput.value.trim();
+      note.content = els.contentInput.value;
+      note.updatedAt = nowISO();
+
+      persist();
+      renderNotes();
+      updateStats();
+      setStatus("Kaydedildi");
+      if (showToast) toast("Not kaydedildi");
+    }
+
+    function deleteCurrentNote() {
+      const note = getActiveNote();
+      if (!note) return;
+
+      const title = note.title || "Başlıksız not";
+      const ok = confirm(`“${title}” silinsin mi?`);
+      if (!ok) return;
+
+      notes = notes.filter(n => n.id !== activeId);
+      activeId = notes[0]?.id || null;
+
+      if (!notes.length) {
+        createNote();
+      } else {
+        persist();
+        renderEditor();
+        renderNotes();
+      }
+
+      toast("Not silindi");
+    }
+
+    function toggleFavorite() {
+      const note = getActiveNote();
+      if (!note) return;
+      note.favorite = !note.favorite;
+      note.updatedAt = nowISO();
+      persist();
+      renderEditor();
+      renderNotes();
+      toast(note.favorite ? "Favorilere eklendi" : "Favorilerden çıkarıldı");
+    }
+
+    function updateStats() {
+      const content = els.contentInput.value;
+      const words = countWords(content);
+      const chars = content.length;
+      const minutes = Math.max(0, Math.ceil(words / 200));
+
+      els.wordCount.textContent = `${words} kelime`;
+      els.charCount.textContent = `${chars} karakter`;
+      els.readTime.textContent = `${minutes} dk okuma`;
+    }
+
+    function countWords(text) {
+      return (text || "").trim().split(/\s+/).filter(Boolean).length;
+    }
+
+    function setStatus(text) {
+      els.saveStatus.textContent = text;
+    }
+
+    function scheduleAutosave() {
+      setStatus("Yazılıyor...");
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveCurrentNote(false), 700);
+    }
+
+    function addToEditor(text) {
+      const textarea = els.contentInput;
+      const before = textarea.value.slice(0, textarea.selectionStart);
+      const after = textarea.value.slice(textarea.selectionEnd);
+      const spacer = before && !before.endsWith("\n") ? "\n\n" : "";
+      const insert = `${spacer}${text}`;
+      const cursor = before.length + insert.length;
+
+      textarea.value = before + insert + after;
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = cursor;
+
+      updateStats();
+      scheduleAutosave();
+      toast("Editöre eklendi");
+    }
+
+    function pickRandom(arr, count = 1) {
+      return [...arr].sort(() => Math.random() - 0.5).slice(0, count);
+    }
+
+    function renderTopics() {
+      const category = els.topicCategory.value;
+      const pool = category === "all" ? topics : topics.filter(item => item.category === category);
+      const selected = pickRandom(pool, Math.min(3, pool.length));
+
+      els.topicList.innerHTML = selected.map(item => `
+        <div class="suggestion">
+          <div class="suggestion-main">${escapeHTML(item.text)}</div>
+          <div class="suggestion-meta">
+            <span class="tag"># ${escapeHTML(item.source)}</span>
+            <button class="btn mini" data-add="${escapeAttr(item.text)}">Ekle</button>
+          </div>
+        </div>
+      `).join("");
+
+      bindAddButtons();
+    }
+
+    function renderBoosters() {
+      const selected = pickRandom(boosters, 3);
+
+      els.boostList.innerHTML = selected.map(item => `
+        <div class="suggestion">
+          <div class="suggestion-main">${escapeHTML(item.text)}</div>
+          <div class="suggestion-meta">
+            <span class="tag">${escapeHTML(item.tag)}</span>
+            <button class="btn mini" data-add="${escapeAttr(item.text)}">Ekle</button>
+          </div>
+        </div>
+      `).join("");
+
+      bindAddButtons();
+    }
+
+    function renderTemplates() {
+      els.templateGrid.innerHTML = templates.map((item, index) => `
+        <button class="btn template-btn" data-template-index="${index}">
+          <span>${item.icon}</span>
+          <span>${escapeHTML(item.name)}</span>
+        </button>
+      `).join("");
+
+      document.querySelectorAll("[data-template-index]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const template = templates[Number(btn.dataset.templateIndex)];
+          addToEditor(template.text);
+        });
+      });
+    }
+
+    function renderInspiration() {
+      const question = pickRandom(inspirations.questions)[0];
+      const constraint = pickRandom(inspirations.constraints)[0];
+      const motivation = pickRandom(inspirations.motivation)[0];
+      const title = pickRandom(inspirations.titles)[0];
+
+      els.inspirationPanel.innerHTML = `
+        <div class="inspiration-card">
+          <small>Günün yazma sorusu</small>
+          <div>${escapeHTML(question)}</div>
+        </div>
+        <div class="inspiration-card">
+          <small>Yaratıcı kısıtlama</small>
+          <div>${escapeHTML(constraint)}</div>
+        </div>
+        <div class="inspiration-card">
+          <small>Motivasyon</small>
+          <div>${escapeHTML(motivation)}</div>
+        </div>
+        <div class="inspiration-card">
+          <small>Alternatif başlık</small>
+          <div>${escapeHTML(title)}</div>
+        </div>
+      `;
+    }
+
+    function bindAddButtons() {
+      document.querySelectorAll("[data-add]").forEach(btn => {
+        btn.addEventListener("click", () => addToEditor(btn.dataset.add));
+      });
+    }
+
+    function toast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => els.toast.classList.remove("show"), 1700);
+    }
+
+    function escapeHTML(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHTML(value).replaceAll("\n", "&#10;");
+    }
+
+    els.newNoteBtn.addEventListener("click", () => {
+      saveCurrentNote(false);
+      createNote();
+    });
+
+    els.saveBtn.addEventListener("click", () => saveCurrentNote(true));
+    els.deleteBtn.addEventListener("click", deleteCurrentNote);
+    els.favoriteBtn.addEventListener("click", toggleFavorite);
+
+    els.focusBtn.addEventListener("click", () => {
+      document.body.classList.toggle("focus-mode");
+      els.focusBtn.textContent = document.body.classList.contains("focus-mode") ? "◑" : "◐";
+      toast(document.body.classList.contains("focus-mode") ? "Odak modu açık" : "Odak modu kapalı");
+    });
+
+    els.searchInput.addEventListener("input", renderNotes);
+
+    els.titleInput.addEventListener("input", () => {
+      scheduleAutosave();
+      renderNotes();
+    });
+
+    els.contentInput.addEventListener("input", () => {
+      updateStats();
+      scheduleAutosave();
+    });
+
+    els.topicRefreshBtn.addEventListener("click", renderTopics);
+    els.topicCategory.addEventListener("change", renderTopics);
+    els.boostBtn.addEventListener("click", renderBoosters);
+    els.inspireRefreshBtn.addEventListener("click", renderInspiration);
+
+    document.addEventListener("keydown", (event) => {
+      const isSave = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s";
+      if (isSave) {
+        event.preventDefault();
+        saveCurrentNote(true);
+      }
+
+      if (event.key === "Escape" && document.body.classList.contains("focus-mode")) {
+        document.body.classList.remove("focus-mode");
+        els.focusBtn.textContent = "◐";
+        toast("Odak modu kapalı");
+      }
+    });
+
+    renderEditor();
+    renderNotes();
+    renderTopics();
+    renderBoosters();
+    renderTemplates();
+    renderInspiration();
+  </script>
+</body>
+</html>
