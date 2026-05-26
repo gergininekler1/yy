@@ -3,1398 +3,1321 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FlowNote — Yaz, tıkanma, devam et.</title>
+  <title>Kasa — Notlar & Flashkartlar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+
   <style>
+    /* ==============================================
+       TOKENS & RESET
+    =============================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg-1: #060814;
-      --bg-2: #101329;
-      --bg-3: #261148;
-      --glass: rgba(255, 255, 255, 0.075);
-      --glass-2: rgba(255, 255, 255, 0.11);
-      --stroke: rgba(255, 255, 255, 0.13);
-      --stroke-2: rgba(255, 255, 255, 0.22);
-      --text: #f5f7ff;
-      --muted: rgba(245, 247, 255, 0.66);
-      --soft: rgba(245, 247, 255, 0.45);
-      --accent: #9b5cff;
-      --accent-2: #39d5ff;
-      --accent-3: #ff5cc8;
-      --danger: #ff5f7e;
-      --success: #58ffc2;
-      --warning: #ffd166;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg:           #f5f3ee;
+      --surface:      #ffffff;
+      --surface-2:    #f9f8f5;
+      --border:       #e4e0d8;
+      --border-dark:  #ccc8be;
+      --text:         #1c1a17;
+      --text-2:       #6b6860;
+      --text-3:       #a9a69f;
+      --accent:       #3d6b52;
+      --accent-light: #ebf4ef;
+      --accent-mid:   #c3dece;
+      --warn:         #b94040;
+      --warn-light:   #fbeeee;
+      --ok:           #2e7d5a;
+      --ok-light:     #e8f5ee;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.05);
+      --shadow:       0 2px 8px rgba(0,0,0,.07);
+      --shadow-md:    0 6px 20px rgba(0,0,0,.09);
+      --r:            10px;
+      --r-lg:         14px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      height: 100%;
-      scroll-behavior: smooth;
-    }
-
+    html { font-size: 15px; }
     body {
-      min-height: 100%;
-      margin: 0;
-      font-family: var(--font);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
       color: var(--text);
-      background:
-        radial-gradient(circle at 15% 10%, rgba(155, 92, 255, 0.34), transparent 32%),
-        radial-gradient(circle at 85% 12%, rgba(57, 213, 255, 0.22), transparent 30%),
-        radial-gradient(circle at 70% 90%, rgba(255, 92, 200, 0.18), transparent 35%),
-        linear-gradient(135deg, var(--bg-1), var(--bg-2) 48%, var(--bg-3));
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: radial-gradient(circle at center, black, transparent 78%);
-      z-index: 0;
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    .app {
-      position: relative;
-      z-index: 1;
       min-height: 100vh;
-      padding: 22px;
-      display: grid;
-      grid-template-columns: 310px minmax(360px, 1fr) 360px;
-      gap: 18px;
     }
 
-    .glass {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.055));
-      border: 1px solid var(--stroke);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+    /* ==============================================
+       SAYFA GEÇIŞ SİSTEMİ
+    =============================================== */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ==============================================
+       ORTAK LAYOUT
+    =============================================== */
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
     }
 
-    .sidebar,
-    .editor,
-    .assistant-panel {
-      border-radius: var(--radius-xl);
-      min-height: calc(100vh - 44px);
-      overflow: hidden;
-    }
-
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .brand {
-      padding: 22px;
-      border-bottom: 1px solid var(--stroke);
-    }
-
-    .brand-top {
+    /* Geri / başlık satırı */
+    .top-bar {
       display: flex;
       align-items: center;
       gap: 12px;
+      margin-bottom: 26px;
     }
 
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.55), transparent 18%),
-        linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 12px 38px rgba(155, 92, 255, 0.36);
-      font-size: 22px;
+    .back-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      flex-shrink: 0;
     }
+    .back-btn:hover { background: var(--surface); border-color: var(--border-dark); color: var(--text); }
 
-    h1,
-    h2,
-    h3,
-    p {
-      margin: 0;
-    }
-
-    h1 {
-      font-size: 25px;
-      letter-spacing: -0.04em;
-      line-height: 1;
-    }
-
-    .tagline {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .sidebar-actions {
-      padding: 16px;
-      display: grid;
-      gap: 10px;
-      border-bottom: 1px solid var(--stroke);
-    }
-
-    .btn {
-      min-height: 42px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: var(--glass);
-      border: 1px solid var(--stroke);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
-      user-select: none;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      background: var(--glass-2);
-      border-color: var(--stroke-2);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
-    }
-
-    .btn:active {
-      transform: translateY(0) scale(0.99);
-    }
-
-    .btn.primary {
-      background: linear-gradient(135deg, rgba(155, 92, 255, 0.95), rgba(57, 213, 255, 0.72));
-      border-color: rgba(255,255,255,0.24);
-      box-shadow: 0 16px 42px rgba(155, 92, 255, 0.24);
-      font-weight: 750;
-    }
-
-    .btn.danger {
-      color: #ffeef2;
-      background: rgba(255, 95, 126, 0.13);
-      border-color: rgba(255, 95, 126, 0.28);
-    }
-
-    .btn.icon {
-      width: 42px;
-      padding: 0;
-      flex: 0 0 auto;
-    }
-
-    .search-wrap {
-      position: relative;
-    }
-
-    .search-wrap span {
-      position: absolute;
-      left: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--soft);
-      pointer-events: none;
-    }
-
-    .input,
-    .select {
-      width: 100%;
-      color: var(--text);
-      background: rgba(0, 0, 0, 0.18);
-      border: 1px solid var(--stroke);
-      border-radius: 14px;
-      outline: none;
-      padding: 12px 14px;
-      transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
-    }
-
-    .search-wrap .input {
-      padding-left: 40px;
-    }
-
-    .input:focus,
-    .select:focus,
-    textarea:focus {
-      border-color: rgba(57, 213, 255, 0.5);
-      box-shadow: 0 0 0 4px rgba(57, 213, 255, 0.08);
-      background: rgba(0, 0, 0, 0.25);
-    }
-
-    .notes-list {
-      padding: 12px;
-      overflow: auto;
+    .page-title {
+      font-family: 'Lora', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -.2px;
       flex: 1;
-    }
-
-    .note-card {
-      width: 100%;
-      text-align: left;
-      padding: 14px;
-      border-radius: 18px;
-      margin-bottom: 10px;
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.055);
-      border: 1px solid transparent;
-      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-    }
-
-    .note-card:hover {
-      transform: translateY(-1px);
-      background: rgba(255, 255, 255, 0.085);
-      border-color: var(--stroke);
-    }
-
-    .note-card.active {
-      background: linear-gradient(135deg, rgba(155, 92, 255, 0.22), rgba(57, 213, 255, 0.10));
-      border-color: rgba(155, 92, 255, 0.42);
-    }
-
-    .note-card-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 14px;
-      font-weight: 760;
-      letter-spacing: -0.01em;
-    }
-
-    .note-card-preview {
-      margin-top: 7px;
-      color: var(--muted);
-      line-height: 1.35;
-      font-size: 12.5px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .note-card-meta {
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      color: var(--soft);
-      font-size: 11.5px;
-    }
-
-    .empty {
-      padding: 28px 18px;
-      border: 1px dashed var(--stroke-2);
-      border-radius: 22px;
-      text-align: center;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .editor {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .editor-toolbar {
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid var(--stroke);
-    }
-
-    .editor-toolbar .spacer {
-      flex: 1;
-    }
-
-    .status-pill {
-      min-height: 36px;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid var(--stroke);
-      color: var(--muted);
-      font-size: 12px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 99px;
-      background: var(--success);
-      box-shadow: 0 0 18px rgba(88,255,194,0.8);
-    }
-
-    .editor-body {
-      padding: 22px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      min-height: 0;
-    }
-
-    .title-input {
-      width: 100%;
-      border: 0;
-      outline: none;
-      background: transparent;
-      color: var(--text);
-      font-size: clamp(28px, 4vw, 52px);
-      font-weight: 830;
-      letter-spacing: -0.065em;
-      line-height: 1.05;
-      padding: 6px 0;
-    }
-
-    .title-input::placeholder,
-    .content-input::placeholder {
-      color: rgba(245, 247, 255, 0.28);
-    }
-
-    .content-input {
-      width: 100%;
-      flex: 1;
-      min-height: 430px;
-      resize: none;
-      border: 1px solid var(--stroke);
-      outline: none;
-      border-radius: 24px;
-      padding: 22px;
-      color: rgba(245, 247, 255, 0.92);
-      background:
-        linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.08)),
-        rgba(255,255,255,0.045);
-      line-height: 1.75;
-      font-size: 16px;
-    }
-
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 9px;
-      color: var(--muted);
-      font-size: 12.5px;
-    }
-
-    .stat {
-      padding: 8px 11px;
-      border: 1px solid var(--stroke);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.055);
-    }
-
-    .assistant-panel {
-      overflow: auto;
-      padding: 16px;
-    }
-
-    .panel-section {
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.055);
-      border: 1px solid var(--stroke);
-      padding: 15px;
-      margin-bottom: 14px;
-    }
-
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: -0.015em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .mini {
-      min-height: 32px;
-      padding: 7px 10px;
-      border-radius: 11px;
-      font-size: 12px;
-    }
-
-    .suggestion-list {
-      display: grid;
-      gap: 9px;
-    }
-
-    .suggestion {
-      padding: 12px;
-      border-radius: 17px;
-      background: rgba(0, 0, 0, 0.17);
-      border: 1px solid rgba(255,255,255,0.09);
-      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-    }
-
-    .suggestion:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,0.07);
-      border-color: var(--stroke-2);
-    }
-
-    .suggestion-main {
-      color: rgba(245, 247, 255, 0.92);
-      line-height: 1.42;
-      font-size: 13px;
-    }
-
-    .suggestion-meta {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .tag {
+    /* ==============================================
+       BUTONLAR
+    =============================================== */
+    .btn {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      color: rgba(245, 247, 255, 0.7);
-      font-size: 11px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: rgba(155, 92, 255, 0.14);
-      border: 1px solid rgba(155, 92, 255, 0.2);
+      padding: 7px 15px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, opacity .15s;
       white-space: nowrap;
     }
+    .btn:disabled { opacity: .4; pointer-events: none; }
 
-    .template-grid {
+    .btn-primary  { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: #315843; border-color: #315843; }
+
+    .btn-ghost    { background: transparent; color: var(--text-2); border-color: var(--border); }
+    .btn-ghost:hover { background: var(--surface); color: var(--text); border-color: var(--border-dark); }
+
+    .btn-danger   { background: transparent; color: var(--warn); border-color: var(--border); }
+    .btn-danger:hover { background: var(--warn-light); border-color: var(--warn); }
+
+    .btn-ok       { background: var(--ok-light); color: var(--ok); border-color: #a9d9be; }
+    .btn-ok:hover { background: #d5eedd; }
+
+    .btn-fail     { background: var(--warn-light); color: var(--warn); border-color: #e8b0b0; }
+    .btn-fail:hover { background: #f5dada; }
+
+    /* ==============================================
+       ======= SAYFA 1: KASA (ANA SAYFA) =======
+    =============================================== */
+    #page-vault .vault-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #page-vault .vault-title {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -.4px;
+      line-height: 1.2;
+    }
+
+    #page-vault .vault-subtitle {
+      font-size: .78rem;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    /* Arama */
+    .search-bar {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .search-bar input {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 9px 14px 9px 36px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--text-3); }
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: .9rem;
+      pointer-events: none;
+    }
+
+    /* Seçim araç çubuğu */
+    .select-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .select-info {
+      font-size: .78rem;
+      color: var(--text-2);
+      margin-right: auto;
+    }
+    .select-info strong { color: var(--accent); }
+
+    /* Not listesi */
+    .note-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    /* Tek not satırı */
+    .note-row {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .note-row:hover { border-color: var(--border-dark); box-shadow: var(--shadow); }
+    .note-row.selected { border-color: var(--accent); background: var(--accent-light); }
+
+    /* Checkbox */
+    .note-check {
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid var(--border-dark);
+      border-radius: 5px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      transition: background .12s, border-color .12s;
+      background: var(--bg);
+    }
+    .note-row.selected .note-check {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .note-info { flex: 1; min-width: 0; }
+
+    .note-title {
+      font-size: .9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+
+    .note-meta {
+      display: flex;
+      gap: 10px;
+      margin-top: 3px;
+      flex-wrap: wrap;
+    }
+    .note-meta span {
+      font-size: .72rem;
+      color: var(--text-3);
+    }
+    .note-meta .chip {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: 1px 7px;
+      font-weight: 500;
+    }
+    .note-meta .chip-zero {
+      background: var(--surface-2);
+      color: var(--text-3);
+    }
+
+    .note-arrow {
+      color: var(--text-3);
+      font-size: .85rem;
+      flex-shrink: 0;
+    }
+
+    /* Boş kasa */
+    .vault-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-3);
+      border: 1.5px dashed var(--border);
+      border-radius: var(--r-lg);
+      background: var(--surface);
+    }
+    .vault-empty .big-icon { font-size: 2.4rem; margin-bottom: 12px; display: block; }
+    .vault-empty p { font-size: .85rem; line-height: 1.6; }
+
+    /* ==============================================
+       ======= SAYFA 2: NOT EDİTÖRÜ =======
+    =============================================== */
+    #page-editor .editor-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Başlık input */
+    #noteTitleInput {
+      font-family: 'Lora', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      outline: none;
+      width: 100%;
+      padding: 6px 2px;
+      margin-bottom: 16px;
+      transition: border-color .15s;
+    }
+    #noteTitleInput:focus { border-bottom-color: var(--accent); }
+    #noteTitleInput::placeholder { color: var(--text-3); font-style: italic; }
+
+    .hint-box {
+      background: var(--accent-light);
+      border: 1px solid var(--accent-mid);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: .77rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .hint-box code {
+      font-family: 'DM Mono', monospace;
+      font-size: .75rem;
+      background: rgba(61,107,82,.12);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    #noteBodyInput {
+      width: 100%;
+      min-height: 280px;
+      resize: vertical;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      outline: none;
+      box-shadow: var(--shadow-sm);
+      transition: border-color .15s;
+    }
+    #noteBodyInput:focus { border-color: var(--accent); }
+    #noteBodyInput::placeholder { color: var(--text-3); }
+
+    .editor-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .save-status {
+      font-size: .75rem;
+      color: var(--text-3);
+    }
+    .save-status.saving { color: var(--text-2); }
+    .save-status.saved  { color: var(--accent); }
+
+    /* Kart önizleme (editör içi) */
+    .preview-section {
+      margin-top: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .preview-label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+    .preview-count {
+      font-size: .75rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .preview-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr 16px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: .82rem;
+    }
+    .preview-q { font-weight: 500; color: var(--text); }
+    .preview-sep { color: var(--text-3); text-align: center; font-size: .7rem; }
+    .preview-a { color: var(--text-2); }
+
+    .preview-empty {
+      font-size: .8rem;
+      color: var(--text-3);
+      font-style: italic;
+      padding: 8px 0;
+    }
+
+    /* ==============================================
+       ======= SAYFA 3: ÇALIŞMA MODU =======
+    =============================================== */
+    .study-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
-    .template-btn {
-      min-height: 52px;
-      padding: 10px;
-      justify-content: flex-start;
-      text-align: left;
-      font-size: 12.5px;
-      border-radius: 15px;
+    .study-source {
+      font-size: .75rem;
+      color: var(--text-3);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .inspiration-card {
-      padding: 12px;
-      border-radius: 17px;
-      background: linear-gradient(135deg, rgba(155,92,255,0.16), rgba(57,213,255,0.07));
-      border: 1px solid rgba(255,255,255,0.11);
-      margin-bottom: 9px;
+    .study-counter {
+      font-size: .82rem;
+      color: var(--text-2);
     }
+    .study-counter strong { color: var(--text); }
 
-    .inspiration-card small {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--soft);
-      font-size: 11px;
+    /* İstatistik çubuğu */
+    .stats-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      font-size: .75rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-2);
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .dot-ok     { background: var(--ok); }
+    .dot-fail   { background: var(--warn); }
+    .dot-unseen { background: var(--border-dark); }
+
+    /* Flashkart */
+    .fc-wrap { margin-bottom: 16px; }
+
+    .flashcard {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 44px 28px 36px;
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: box-shadow .15s, border-color .2s;
+      user-select: none;
+      position: relative;
+    }
+    .flashcard:hover { box-shadow: 0 8px 24px rgba(0,0,0,.11); }
+    .flashcard.correct { border-color: #a9d9be; }
+    .flashcard.wrong   { border-color: #e8b0b0; }
+
+    .fc-tag {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      font-size: .68rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: .9px;
+      color: var(--text-3);
+    }
+    .fc-source-tag {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-size: .68rem;
+      color: var(--text-3);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 20px;
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fc-tap {
+      position: absolute;
+      bottom: 12px;
+      right: 16px;
+      font-size: .68rem;
+      color: var(--border-dark);
     }
 
-    .inspiration-card div {
-      color: rgba(245,247,255,0.9);
-      font-size: 13px;
-      line-height: 1.45;
+    .fc-question {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .fc-answer {
+      font-size: .9rem;
+      color: var(--text-2);
+      line-height: 1.65;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      width: 100%;
+    }
+    .fc-answer.hidden { display: none; }
+
+    /* Kart butonları */
+    .card-btns {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
     }
 
-    .toast {
+    /* Sonuç */
+    .result-box {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 36px 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .result-pct {
+      font-family: 'Lora', serif;
+      font-size: 3rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 10px 0 6px;
+    }
+    .result-detail {
+      font-size: .82rem;
+      color: var(--text-2);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .result-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+    /* ==============================================
+       MODAL
+    =============================================== */
+    .modal-bg {
+      display: none;
       position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.22);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: var(--shadow-md);
+    }
+    .modal h3 { font-size: .95rem; font-weight: 600; margin-bottom: 10px; }
+    .modal p  { font-size: .83rem; color: var(--text-2); margin-bottom: 20px; line-height: 1.5; }
+    .modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* ==============================================
+       TOAST
+    =============================================== */
+    #toast {
+      position: fixed;
+      bottom: 22px;
       left: 50%;
-      bottom: 24px;
-      z-index: 50;
-      transform: translateX(-50%) translateY(18px);
+      transform: translateX(-50%) translateY(16px);
+      background: var(--text);
+      color: #fff;
+      font-size: .78rem;
+      padding: 8px 18px;
+      border-radius: 20px;
       opacity: 0;
       pointer-events: none;
-      padding: 12px 16px;
-      border-radius: 999px;
-      background: rgba(11, 13, 26, 0.78);
-      border: 1px solid var(--stroke-2);
-      backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-      color: var(--text);
-      font-size: 13px;
-      transition: opacity 0.22s ease, transform 0.22s ease;
+      z-index: 300;
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap;
     }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    .focus-mode .sidebar,
-    .focus-mode .assistant-panel {
-      display: none;
-    }
-
-    .focus-mode .app {
-      grid-template-columns: minmax(0, 920px);
-      justify-content: center;
-    }
-
-    .focus-mode .editor {
-      min-height: calc(100vh - 44px);
-    }
-
-    .focus-mode .content-input {
-      min-height: 62vh;
-    }
-
-    .kbd {
-      color: var(--muted);
-      font-size: 11px;
-      padding: 3px 7px;
-      border-radius: 7px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid var(--stroke);
-    }
-
-    .select {
-      appearance: none;
-      color: var(--text);
-    }
-
-    .select option {
-      color: #111827;
-    }
-
-    @media (max-width: 1180px) {
-      .app {
-        grid-template-columns: 290px minmax(360px, 1fr);
-      }
-
-      .assistant-panel {
-        grid-column: 1 / -1;
-        min-height: auto;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-      }
-
-      .panel-section {
-        margin-bottom: 0;
-      }
-    }
-
-    @media (max-width: 820px) {
-      .app {
-        padding: 12px;
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar,
-      .editor,
-      .assistant-panel {
-        min-height: auto;
-        border-radius: 22px;
-      }
-
-      .assistant-panel {
-        grid-template-columns: 1fr;
-      }
-
-      .editor-toolbar {
-        flex-wrap: wrap;
-      }
-
-      .editor-toolbar .spacer {
-        display: none;
-      }
-
-      .content-input {
-        min-height: 420px;
-      }
-
-      .template-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .focus-mode .app {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .brand,
-      .editor-body {
-        padding: 16px;
-      }
-
-      .title-input {
-        font-size: 32px;
-      }
-
-      .content-input {
-        padding: 16px;
-        border-radius: 19px;
-        font-size: 15px;
-      }
-
-      .btn {
-        width: 100%;
-      }
-
-      .btn.icon {
-        width: 42px;
-      }
-
-      .editor-toolbar .btn.icon {
-        width: calc(50% - 5px);
-      }
-
-      .status-pill {
-        width: 100%;
-        justify-content: center;
-      }
+    /* ==============================================
+       MOBİL
+    =============================================== */
+    @media (max-width: 500px) {
+      .preview-card { grid-template-columns: 1fr; }
+      .preview-sep  { display: none; }
+      .preview-a::before { content: "→ "; color: var(--text-3); }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <aside class="sidebar glass">
-      <div class="brand">
-        <div class="brand-top">
-          <div class="logo">✦</div>
-          <div>
-            <h1>FlowNote</h1>
-            <p class="tagline">Yaz, tıkanma, devam et.</p>
+
+<!-- ================================================
+     SAYFA 1: KASA
+================================================= -->
+<div class="page active" id="page-vault">
+  <div class="wrap">
+
+    <div class="vault-header">
+      <div>
+        <div class="vault-title">📦 Kasa</div>
+        <div class="vault-subtitle">Tüm notların burada.</div>
+      </div>
+      <button class="btn btn-primary" onclick="openNewNote()">+ Yeni Not</button>
+    </div>
+
+    <!-- Arama -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Notlarda ara..." oninput="renderVault()" />
+    </div>
+
+    <!-- Seçim araç çubuğu -->
+    <div class="select-toolbar" id="selectToolbar" style="display:none;">
+      <div class="select-info" id="selectInfo"></div>
+      <button class="btn btn-ghost"   onclick="selectAll()">Tümünü Seç</button>
+      <button class="btn btn-ghost"   onclick="clearSelection()">Seçimi Kaldır</button>
+      <button class="btn btn-primary" onclick="startStudyFromSelection()" id="studySelBtn">▶ Çalış</button>
+    </div>
+
+    <!-- Not listesi -->
+    <div class="note-list" id="noteList"></div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     SAYFA 2: NOT EDİTÖRÜ
+================================================= -->
+<div class="page" id="page-editor">
+  <div class="wrap">
+
+    <div class="top-bar">
+      <button class="back-btn" onclick="goVault()">← Kasa</button>
+      <div class="page-title" id="editorPageTitle">Yeni Not</div>
+      <button class="btn btn-danger" id="deleteNoteBtn" onclick="confirmDeleteNote()" style="display:none;">Sil</button>
+    </div>
+
+    <!-- Başlık -->
+    <input type="text" id="noteTitleInput" placeholder="Not başlığı..." maxlength="80" oninput="autoSave()" />
+
+    <!-- Hint -->
+    <div class="hint-box">
+      💡 <code>Soru: Cevap</code> formatındaki satırlar otomatik flashkarta dönüşür. Diğer satırlar serbest not olarak kaydedilir.
+    </div>
+
+    <!-- İçerik -->
+    <textarea id="noteBodyInput"
+      placeholder="Notlarını buraya yaz...
+
+Örnek flashkart satırları:
+Mitoz nedir?: Hücrenin ikiye bölünme sürecidir.
+DNA'nın yapı taşları nelerdir?: Nükleotitlerdir."
+      oninput="autoSave(); renderPreview()"></textarea>
+
+    <div class="editor-footer">
+      <div class="save-status" id="saveStatus">—</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost"   onclick="goVault()">← Kasaya Dön</button>
+        <button class="btn btn-primary" onclick="startStudyFromEditor()" id="editorStudyBtn">▶ Çalış</button>
+      </div>
+    </div>
+
+    <!-- Flashkart önizleme -->
+    <div class="preview-section">
+      <div class="preview-header">
+        <div class="preview-label">Flashkartlar</div>
+        <div class="preview-count" id="previewCount">0 kart</div>
+      </div>
+      <div id="previewList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     SAYFA 3: ÇALIŞMA MODU
+================================================= -->
+<div class="page" id="page-study">
+  <div class="wrap">
+
+    <div class="top-bar">
+      <button class="back-btn" onclick="exitStudy()">← Geri</button>
+      <div class="page-title">Çalışma Modu</div>
+      <button class="btn btn-ghost" onclick="restartStudy()">↺</button>
+    </div>
+
+    <!-- Kaynak & sayaç -->
+    <div class="study-top">
+      <div class="study-source" id="studySource"></div>
+      <div class="study-counter" id="studyCounter"></div>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="stats-row">
+      <div class="stat"><span class="dot dot-ok"></span><span id="statOk">Bildim: 0</span></div>
+      <div class="stat"><span class="dot dot-fail"></span><span id="statFail">Bilmedim: 0</span></div>
+      <div class="stat"><span class="dot dot-unseen"></span><span id="statLeft">Kalan: 0</span></div>
+    </div>
+
+    <!-- Kart -->
+    <div class="fc-wrap">
+      <div class="flashcard" id="flashcard" onclick="revealAnswer()">
+        <div class="fc-tag" id="fcTag">Soru</div>
+        <div class="fc-source-tag" id="fcSourceTag"></div>
+        <div class="fc-question" id="fcQuestion">…</div>
+        <div class="fc-answer hidden" id="fcAnswer"></div>
+        <div class="fc-tap" id="fcTap">Cevabı görmek için tıkla</div>
+      </div>
+    </div>
+
+    <!-- Butonlar -->
+    <div class="card-btns" id="cardBtns">
+      <button class="btn btn-ghost"   id="btnPrev"    onclick="prevCard()">← Önceki</button>
+      <button class="btn btn-ghost"   id="btnReveal"  onclick="revealAnswer()">Cevabı Göster</button>
+      <button class="btn btn-ok"      id="btnOk"      onclick="markCard(true)"  style="display:none">✓ Bildim</button>
+      <button class="btn btn-fail"    id="btnFail"    onclick="markCard(false)" style="display:none">✗ Bilmedim</button>
+      <button class="btn btn-ghost"   id="btnNext"    onclick="nextCard()">Sonraki →</button>
+    </div>
+
+    <!-- Sonuç (gizli) -->
+    <div class="result-box" id="resultBox" style="display:none">
+      <div>🎉 Tur tamamlandı!</div>
+      <div class="result-pct"  id="resultPct"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="result-btns">
+        <button class="btn btn-primary" onclick="restartStudy()">↺ Tekrar Çalış</button>
+        <button class="btn btn-ghost"   onclick="exitStudy()">← Geri Dön</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================
+     ONAY MODALLERİ
+================================================= -->
+<!-- Not silme -->
+<div class="modal-bg" id="modalDeleteNote">
+  <div class="modal">
+    <h3>Notu sil</h3>
+    <p>Bu notu ve içindeki tüm flashkartları kalıcı olarak silmek istediğinden emin misin?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost"  onclick="closeModal('modalDeleteNote')">İptal</button>
+      <button class="btn btn-danger" onclick="deleteCurrentNote()">Evet, Sil</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ================================================
+     JAVASCRIPT
+================================================= -->
+<script>
+/* ================================================
+   VERİ MODELİ
+   localStorage key: "kasa_notes"
+   Format: [ { id, title, body, createdAt, updatedAt }, … ]
+================================================= */
+
+const STORAGE_KEY = 'kasa_notes';
+
+// Tüm notları oku
+function getAllNotes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch { return []; }
+}
+
+// Notları kaydet
+function saveAllNotes(notes) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+}
+
+// Tek notu ID ile bul
+function getNoteById(id) {
+  return getAllNotes().find(n => n.id === id) || null;
+}
+
+// Not oluştur veya güncelle
+function upsertNote(note) {
+  const notes = getAllNotes();
+  const idx = notes.findIndex(n => n.id === note.id);
+  if (idx >= 0) notes[idx] = note;
+  else notes.unshift(note); // en başa ekle
+  saveAllNotes(notes);
+}
+
+// Not sil
+function deleteNoteById(id) {
+  const notes = getAllNotes().filter(n => n.id !== id);
+  saveAllNotes(notes);
+}
+
+// Benzersiz ID üret
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+/* ================================================
+   FLASHKART AYRIŞTIRICI
+================================================= */
+function parseCards(text) {
+  const cards = [];
+  for (const raw of (text || '').split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    const idx = line.indexOf(':');
+    if (idx < 1) continue;
+    const q = line.slice(0, idx).trim();
+    const a = line.slice(idx + 1).trim();
+    if (q && a) cards.push({ q, a });
+  }
+  return cards;
+}
+
+/* ================================================
+   YARDIMCILAR
+================================================= */
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const min  = Math.floor(diff / 60000);
+  const hr   = Math.floor(diff / 3600000);
+  const day  = Math.floor(diff / 86400000);
+  if (min < 2)   return 'Az önce';
+  if (min < 60)  return `${min} dk önce`;
+  if (hr  < 24)  return `${hr} saat önce`;
+  if (day < 30)  return `${day} gün önce`;
+  return new Date(ts).toLocaleDateString('tr-TR');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ================================================
+   SAYFA GEÇİŞLERİ
+================================================= */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ================================================
+   KASA (SAYFA 1)
+================================================= */
+let selectedIds = new Set(); // seçili not ID'leri
+
+function renderVault() {
+  const query = (document.getElementById('searchInput').value || '').toLowerCase();
+  let notes   = getAllNotes();
+
+  // Arama filtresi
+  if (query) {
+    notes = notes.filter(n =>
+      n.title.toLowerCase().includes(query) ||
+      n.body.toLowerCase().includes(query)
+    );
+  }
+
+  const list = document.getElementById('noteList');
+
+  if (notes.length === 0) {
+    list.innerHTML = `
+      <div class="vault-empty">
+        <span class="big-icon">${query ? '🔎' : '📭'}</span>
+        <p>${query
+          ? 'Aramanızla eşleşen not bulunamadı.'
+          : '<strong>Kasan boş.</strong><br>Sağ üstteki <strong>+ Yeni Not</strong> butonuyla başla.'
+        }</p>
+      </div>`;
+    renderSelectToolbar();
+    return;
+  }
+
+  list.innerHTML = notes.map(n => {
+    const cards   = parseCards(n.body);
+    const chipCls = cards.length > 0 ? 'chip' : 'chip chip-zero';
+    const chipTxt = cards.length > 0 ? `${cards.length} kart` : 'kart yok';
+    const sel     = selectedIds.has(n.id);
+    return `
+      <div class="note-row ${sel ? 'selected' : ''}"
+           id="row-${n.id}"
+           onclick="handleRowClick(event, '${n.id}')">
+        <div class="note-check">${sel ? '✓' : ''}</div>
+        <div class="note-info">
+          <div class="note-title">${escHtml(n.title) || '<em style="color:var(--text-3)">Başlıksız not</em>'}</div>
+          <div class="note-meta">
+            <span class="${chipCls}">${chipTxt}</span>
+            <span>${timeAgo(n.updatedAt)}</span>
           </div>
         </div>
-      </div>
+        <div class="note-arrow">›</div>
+      </div>`;
+  }).join('');
 
-      <div class="sidebar-actions">
-        <button class="btn primary" id="newNoteBtn">＋ Yeni Not</button>
-        <div class="search-wrap">
-          <span>⌕</span>
-          <input class="input" id="searchInput" placeholder="Notlarda ara..." />
-        </div>
-      </div>
+  renderSelectToolbar();
+}
 
-      <div class="notes-list" id="notesList"></div>
-    </aside>
+// Satıra tıklama: checkbox alanı → seç/kaldır, geri kalanı → editör
+function handleRowClick(e, id) {
+  // Checkbox'a veya check alanına tıklama — toggle
+  const checkEl = document.getElementById('row-' + id).querySelector('.note-check');
+  const rect = checkEl.getBoundingClientRect();
+  const inCheck = (
+    e.clientX >= rect.left - 10 && e.clientX <= rect.right + 10 &&
+    e.clientY >= rect.top  - 10 && e.clientY <= rect.bottom + 10
+  );
 
-    <section class="editor glass">
-      <div class="editor-toolbar">
-        <span class="status-pill"><span class="status-dot"></span><span id="saveStatus">Hazır</span></span>
-        <span class="status-pill">⌘/Ctrl + S <span class="kbd">kaydet</span></span>
-        <div class="spacer"></div>
-        <button class="btn icon" id="favoriteBtn" title="Favori">☆</button>
-        <button class="btn icon" id="focusBtn" title="Odak modu">◐</button>
-        <button class="btn danger" id="deleteBtn">Sil</button>
-        <button class="btn primary" id="saveBtn">Kaydet</button>
-      </div>
+  if (inCheck || selectedIds.size > 0) {
+    // Seçim modundayken her tıklama toggle
+    toggleSelect(id);
+  } else {
+    openNote(id);
+  }
+}
 
-      <div class="editor-body">
-        <input id="titleInput" class="title-input" placeholder="Başlıksız fikir..." />
-        <textarea id="contentInput" class="content-input" placeholder="Bir cümle yaz. Gerisi akar..."></textarea>
+function toggleSelect(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  renderVault();
+}
 
-        <div class="stats">
-          <span class="stat" id="wordCount">0 kelime</span>
-          <span class="stat" id="charCount">0 karakter</span>
-          <span class="stat" id="readTime">0 dk okuma</span>
-          <span class="stat" id="updatedAt">Henüz kaydedilmedi</span>
-        </div>
-      </div>
-    </section>
+function selectAll() {
+  getAllNotes().forEach(n => selectedIds.add(n.id));
+  renderVault();
+}
 
-    <aside class="assistant-panel glass">
-      <section class="panel-section">
-        <div class="section-head">
-          <h2 class="section-title">🧭 Konu Önerileri</h2>
-          <button class="btn mini" id="topicRefreshBtn">Yenile</button>
-        </div>
-        <select class="select" id="topicCategory">
-          <option value="all">Tüm kategoriler</option>
-          <option value="Kişisel gelişim">Kişisel gelişim</option>
-          <option value="Teknoloji">Teknoloji</option>
-          <option value="Psikoloji">Psikoloji</option>
-          <option value="Günlük yaşam">Günlük yaşam</option>
-          <option value="Deneme">Deneme</option>
-          <option value="Hikâye">Hikâye</option>
-          <option value="Araştırma">Araştırma</option>
-          <option value="Sosyal medya">Sosyal medya</option>
-        </select>
-        <div style="height: 10px;"></div>
-        <div class="suggestion-list" id="topicList"></div>
-      </section>
+function clearSelection() {
+  selectedIds.clear();
+  renderVault();
+}
 
-      <section class="panel-section">
-        <div class="section-head">
-          <h2 class="section-title">⚡ Tıkanıklık Giderici</h2>
-          <button class="btn mini" id="boostBtn">İtici güç</button>
-        </div>
-        <div class="suggestion-list" id="boostList"></div>
-      </section>
+function renderSelectToolbar() {
+  const tb  = document.getElementById('selectToolbar');
+  const inf = document.getElementById('selectInfo');
+  const btn = document.getElementById('studySelBtn');
 
-      <section class="panel-section">
-        <div class="section-head">
-          <h2 class="section-title">🧩 Yazma Şablonları</h2>
-        </div>
-        <div class="template-grid" id="templateGrid"></div>
-      </section>
+  if (selectedIds.size === 0) {
+    tb.style.display = 'none';
+    return;
+  }
 
-      <section class="panel-section">
-        <div class="section-head">
-          <h2 class="section-title">✨ İlham Paneli</h2>
-          <button class="btn mini" id="inspireRefreshBtn">Karıştır</button>
-        </div>
-        <div id="inspirationPanel"></div>
-      </section>
-    </aside>
-  </main>
+  tb.style.display = 'flex';
 
-  <div class="toast" id="toast"></div>
+  // Seçili notlardaki toplam kart sayısı
+  const total = [...selectedIds].reduce((acc, id) => {
+    const n = getNoteById(id);
+    return acc + (n ? parseCards(n.body).length : 0);
+  }, 0);
 
-  <script>
-    const STORAGE_KEY = "flownote.notes.v1";
+  inf.innerHTML = `<strong>${selectedIds.size}</strong> not seçildi &nbsp;·&nbsp; <strong>${total}</strong> kart`;
+  btn.disabled  = total === 0;
+}
 
-    const $ = (selector) => document.querySelector(selector);
+/* ================================================
+   NOT EDİTÖRÜ (SAYFA 2)
+================================================= */
+let currentNoteId  = null; // düzenlenen notun ID'si (null = yeni)
+let saveTimer      = null;
 
-    const els = {
-      notesList: $("#notesList"),
-      searchInput: $("#searchInput"),
-      newNoteBtn: $("#newNoteBtn"),
-      saveBtn: $("#saveBtn"),
-      deleteBtn: $("#deleteBtn"),
-      favoriteBtn: $("#favoriteBtn"),
-      focusBtn: $("#focusBtn"),
-      titleInput: $("#titleInput"),
-      contentInput: $("#contentInput"),
-      wordCount: $("#wordCount"),
-      charCount: $("#charCount"),
-      readTime: $("#readTime"),
-      updatedAt: $("#updatedAt"),
-      saveStatus: $("#saveStatus"),
-      topicCategory: $("#topicCategory"),
-      topicRefreshBtn: $("#topicRefreshBtn"),
-      topicList: $("#topicList"),
-      boostBtn: $("#boostBtn"),
-      boostList: $("#boostList"),
-      templateGrid: $("#templateGrid"),
-      inspireRefreshBtn: $("#inspireRefreshBtn"),
-      inspirationPanel: $("#inspirationPanel"),
-      toast: $("#toast")
-    };
+function openNewNote() {
+  currentNoteId = null;
+  document.getElementById('noteTitleInput').value = '';
+  document.getElementById('noteBodyInput').value  = '';
+  document.getElementById('editorPageTitle').textContent = 'Yeni Not';
+  document.getElementById('saveStatus').textContent = '—';
+  document.getElementById('saveStatus').className  = 'save-status';
+  document.getElementById('deleteNoteBtn').style.display = 'none';
+  renderPreview();
+  showPage('page-editor');
+  setTimeout(() => document.getElementById('noteTitleInput').focus(), 100);
+}
 
-    const topics = [
-      { category: "Kişisel gelişim", source: "Kitaplardan", text: "Disiplin ile motivasyon arasındaki sessiz savaş: Hangisi gerçekten sürdürülebilir?" },
-      { category: "Kişisel gelişim", source: "Kişisel", text: "Küçük alışkanlıkların bir insanın kimliğini yavaşça yeniden yazması." },
-      { category: "Teknoloji", source: "Trendlerden", text: "Yapay zekâ çağında insan emeğinin yeni anlamı ne olacak?" },
-      { category: "Teknoloji", source: "Akademik", text: "Dijital dikkat dağınıklığı: Modern zihnin görünmeyen maliyeti." },
-      { category: "Psikoloji", source: "Akademik", text: "Ertelemenin tembellikten çok duygu yönetimiyle ilişkisi." },
-      { category: "Psikoloji", source: "Felsefi", text: "İnsan neden bildiği doğruları uygulamakta zorlanır?" },
-      { category: "Günlük yaşam", source: "Kişisel", text: "Sıradan bir günün içinde fark edilmeyen küçük dönüm noktaları." },
-      { category: "Günlük yaşam", source: "Sosyal gözlem", text: "Kalabalık şehirlerde yalnızlığın yeni biçimleri." },
-      { category: "Deneme", source: "Felsefi", text: "Başarı dediğimiz şey gerçekten bizim isteğimiz mi, yoksa bize öğretilen bir hedef mi?" },
-      { category: "Deneme", source: "Kitaplardan", text: "İnsanın kendini anlatma ihtiyacı: Yazmak neden bir var olma biçimi?" },
-      { category: "Hikâye", source: "Yaratıcı", text: "Her gün aynı saatte kapısının önünde isimsiz bir not bulan bir karakter." },
-      { category: "Hikâye", source: "Felsefi", text: "Anıları silinebilen bir dünyada, geçmişini saklamak isteyen biri." },
-      { category: "Araştırma", source: "Akademik", text: "Sosyal medya kullanımının üretkenlik algısı üzerindeki etkileri." },
-      { category: "Araştırma", source: "Akademik", text: "Uzaktan çalışmanın yaratıcılık, odak ve ekip kültürü üzerindeki sonuçları." },
-      { category: "Sosyal medya", source: "Trendlerden", text: "İnsanların kaydetmek isteyeceği 7 kısa ama güçlü yazma ipucu." },
-      { category: "Sosyal medya", source: "Güncel kültür", text: "Bir fikri 10 saniyede merak uyandırıcı hale getirme yolları." }
-    ];
+function openNote(id) {
+  const note = getNoteById(id);
+  if (!note) return;
+  currentNoteId = id;
+  document.getElementById('noteTitleInput').value = note.title;
+  document.getElementById('noteBodyInput').value  = note.body;
+  document.getElementById('editorPageTitle').textContent = note.title || 'Başlıksız Not';
+  document.getElementById('saveStatus').innerHTML  = `<span class="save-status saved">Kaydedildi</span>`;
+  document.getElementById('deleteNoteBtn').style.display = '';
+  renderPreview();
+  showPage('page-editor');
+}
 
-    const boosters = [
-      { tag: "Başlangıç", text: "İlk bakışta basit görünen bu konu, aslında daha derin bir soruyu saklıyor:" },
-      { tag: "Başlangıç", text: "Bazen bir fikri anlamak için onun tam tersinden başlamak gerekir." },
-      { tag: "Geçiş", text: "Burada asıl mesele, görünen nedenlerden çok görünmeyen alışkanlıklardır." },
-      { tag: "Geçiş", text: "Bu noktada sorulması gereken daha önemli bir soru var:" },
-      { tag: "Duygu", text: "belirsizlik, merak, huzursuzluk, umut, direnç, kırılganlık, hayret" },
-      { tag: "Güçlü fiiller", text: "dönüştürür, tetikler, görünür kılar, aşındırır, besler, hızlandırır, sorgulatır" },
-      { tag: "Soru", text: "Bu fikrin kimleri etkilediğini ve kimlerin görmezden geldiğini düşün." },
-      { tag: "Soru", text: "Bu konunun en rahatsız edici ama en dürüst tarafı ne?" },
-      { tag: "Sonuç", text: "Sonuç olarak, mesele yalnızca ne yaptığımız değil; bunu neden sürdürdüğümüzdür." },
-      { tag: "Sonuç", text: "Belki de cevap, büyük değişimlerde değil, tekrar eden küçük seçimlerde saklıdır." }
-    ];
+// Otomatik kayıt (600ms debounce)
+function autoSave() {
+  const title = document.getElementById('noteTitleInput').value.trim();
+  const body  = document.getElementById('noteBodyInput').value;
 
-    const templates = [
-      {
-        name: "Blog yazısı",
-        icon: "📰",
-        text:
-`## Giriş
-Okuyucunun ilgisini çeken kısa bir problem veya gözlem yaz.
+  document.getElementById('saveStatus').textContent = 'Kaydediliyor…';
+  document.getElementById('saveStatus').className   = 'save-status saving';
+  document.getElementById('editorPageTitle').textContent = title || 'Yeni Not';
 
-## Ana fikir
-Bu yazıda savunacağın temel düşünce:
-
-## 1. Nokta
-Açıklama, örnek veya kısa hikâye.
-
-## 2. Nokta
-Karşılaştırma, veri, gözlem veya kişisel yorum.
-
-## 3. Nokta
-Okuyucunun uygulayabileceği pratik çıkarım.
-
-## Sonuç
-Akılda kalıcı bir kapanış cümlesi ve küçük bir çağrı.`
-      },
-      {
-        name: "Deneme",
-        icon: "✒️",
-        text:
-`## Soru
-Bu yazının merkezindeki soru ne?
-
-## Gözlem
-Günlük hayattan küçük ama anlamlı bir sahne.
-
-## Düşünce
-Bu sahnenin sende uyandırdığı fikir.
-
-## Derinleşme
-Konunun görünmeyen tarafı, çelişkisi veya ironisi.
-
-## Kapanış
-Kesin cevap vermeden, okuru düşündüren bir son.`
-      },
-      {
-        name: "Hikâye",
-        icon: "🌙",
-        text:
-`## Karakter
-Kim? Ne istiyor? Neden şimdi?
-
-## Mekân
-Hikâyenin atmosferi ve duyusal detaylar.
-
-## Kıvılcım
-Her şeyi değiştiren olay.
-
-## Çatışma
-Karakterin önündeki engel.
-
-## Dönüm noktası
-Karakterin seçim yapmak zorunda kaldığı an.
-
-## Son
-Değişen ne oldu? Bedeli neydi?`
-      },
-      {
-        name: "Günlük",
-        icon: "🌿",
-        text:
-`Bugün aklımda kalan şey:
-
-Beni yoran şey:
-
-Bana iyi gelen küçük detay:
-
-Bugünden öğrendiğim:
-
-Yarın kendime hatırlatmak istediğim cümle:`
-      },
-      {
-        name: "Araştırma notu",
-        icon: "🔎",
-        text:
-`## Konu
-Araştırılan başlık:
-
-## Temel soru
-Bu araştırma neyi anlamaya çalışıyor?
-
-## Bulgular
-- 
-- 
-- 
-
-## Kaynak fikirleri
-- Kitap:
-- Makale:
-- Gözlem:
-- Örnek olay:
-
-## Kendi yorumum
-Bu bilgiler ne anlama geliyor?
-
-## Sonraki adım
-Daha neyi araştırmalıyım?`
-      },
-      {
-        name: "Sosyal medya",
-        icon: "📱",
-        text:
-`Kanca:
-İlk cümlede merak uyandır.
-
-Ana fikir:
-Tek ve net bir mesaj ver.
-
-3 kısa nokta:
-1.
-2.
-3.
-
-Kapanış:
-Okuyucuya yorum yaptıracak veya kaydettirecek cümle.`
-      },
-      {
-        name: "Video metni",
-        icon: "🎬",
-        text:
-`## İlk 3 saniye
-Dikkat çeken cümle:
-
-## Problem
-İzleyicinin yaşadığı durum:
-
-## Çözüm / Fikir
-Net anlatım:
-
-## Örnek
-Günlük hayattan kısa örnek:
-
-## Kapanış
-Akılda kalan son cümle:`
-      }
-    ];
-
-    const inspirations = {
-      questions: [
-        "Bugün yazdığın fikrin altında hangi korku veya istek var?",
-        "Bu konuyu tamamen zıt düşünen biri ne söylerdi?",
-        "Okuyucu bu yazıdan sonra neyi farklı görmeli?",
-        "Bu fikri tek bir sahneyle anlatsan, sahnede ne olurdu?",
-        "Bu konunun en basit ama en ihmal edilen tarafı ne?"
-      ],
-      constraints: [
-        "Sadece 7 cümleyle anlat.",
-        "Bir metafor kullan ama adını açıklama.",
-        "İlk paragrafta soru sorma.",
-        "Bir karakterin gözünden yaz.",
-        "Son cümleyi tek kelimeyle bitir."
-      ],
-      motivation: [
-        "Kötü taslak, boş sayfadan daha değerlidir.",
-        "Bugün sadece akışı başlatman yeterli.",
-        "Mükemmel cümle sonra gelir; önce ham düşünceyi yakala.",
-        "Yazmak, zihindeki sisin şeklini görmektir.",
-        "Bir paragraf bile ilerlemedir."
-      ],
-      titles: [
-        "Görünmeyen Eşik",
-        "Küçük Şeylerin Gürültüsü",
-        "Başlamanın Sessiz Gücü",
-        "Zihnin Arka Odası",
-        "Yavaşça Değişen İnsan"
-      ]
-    };
-
-    let notes = loadNotes();
-    let activeId = notes[0]?.id || null;
-    let saveTimer = null;
-
-    function uid() {
-      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    // Başlık ve içerik tamamen boşsa kaydetme
+    if (!title && !body.trim()) {
+      document.getElementById('saveStatus').textContent = '—';
+      document.getElementById('saveStatus').className   = 'save-status';
+      return;
     }
 
-    function nowISO() {
-      return new Date().toISOString();
+    const now = Date.now();
+    if (!currentNoteId) {
+      // Yeni not oluştur
+      currentNoteId = uid();
+      document.getElementById('deleteNoteBtn').style.display = '';
     }
 
-    function formatDate(iso) {
-      if (!iso) return "Henüz yok";
-      const date = new Date(iso);
-      return new Intl.DateTimeFormat("tr-TR", {
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit"
-      }).format(date);
-    }
-
-    function loadNotes() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-      } catch {}
-
-      const starter = {
-        id: uid(),
-        title: "FlowNote'a hoş geldin",
-        content: "Buraya ilk fikrini yaz. Sağdaki önerileri tek tıkla metnine ekleyebilir, şablonlarla hızlıca başlayabilir ve odak modunda sadece yazıya dönebilirsin.",
-        favorite: true,
-        createdAt: nowISO(),
-        updatedAt: nowISO()
-      };
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([starter]));
-      return [starter];
-    }
-
-    function persist() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-    }
-
-    function getActiveNote() {
-      return notes.find(note => note.id === activeId) || null;
-    }
-
-    function sortNotes(list) {
-      return [...list].sort((a, b) => {
-        if (a.favorite !== b.favorite) return b.favorite - a.favorite;
-        return new Date(b.updatedAt) - new Date(a.updatedAt);
-      });
-    }
-
-    function renderNotes() {
-      const q = els.searchInput.value.trim().toLowerCase();
-      const filtered = sortNotes(notes).filter(note => {
-        const haystack = `${note.title} ${note.content}`.toLowerCase();
-        return haystack.includes(q);
-      });
-
-      if (!filtered.length) {
-        els.notesList.innerHTML = `<div class="empty">Not bulunamadı.<br>Yeni bir fikir başlatmak için “Yeni Not”a bas.</div>`;
-        return;
-      }
-
-      els.notesList.innerHTML = filtered.map(note => {
-        const title = escapeHTML(note.title || "Başlıksız not");
-        const preview = escapeHTML(note.content || "Henüz içerik yok.");
-        const active = note.id === activeId ? "active" : "";
-        const fav = note.favorite ? "★" : "";
-        return `
-          <button class="note-card ${active}" data-note-id="${note.id}">
-            <div class="note-card-title">
-              <span>${title}</span>
-              <span>${fav}</span>
-            </div>
-            <div class="note-card-preview">${preview}</div>
-            <div class="note-card-meta">
-              <span>${countWords(note.content)} kelime</span>
-              <span>${formatDate(note.updatedAt)}</span>
-            </div>
-          </button>
-        `;
-      }).join("");
-
-      document.querySelectorAll("[data-note-id]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          saveCurrentNote(false);
-          activeId = btn.dataset.noteId;
-          renderEditor();
-          renderNotes();
-        });
-      });
-    }
-
-    function renderEditor() {
-      const note = getActiveNote();
-      if (!note) {
-        createNote();
-        return;
-      }
-
-      els.titleInput.value = note.title || "";
-      els.contentInput.value = note.content || "";
-      els.favoriteBtn.textContent = note.favorite ? "★" : "☆";
-      els.updatedAt.textContent = `Son kayıt: ${formatDate(note.updatedAt)}`;
-      updateStats();
-      setStatus("Hazır");
-    }
-
-    function createNote() {
-      const note = {
-        id: uid(),
-        title: "",
-        content: "",
-        favorite: false,
-        createdAt: nowISO(),
-        updatedAt: nowISO()
-      };
-
-      notes.unshift(note);
-      activeId = note.id;
-      persist();
-      renderEditor();
-      renderNotes();
-      els.titleInput.focus();
-      toast("Yeni not açıldı");
-    }
-
-    function saveCurrentNote(showToast = true) {
-      const note = getActiveNote();
-      if (!note) return;
-
-      note.title = els.titleInput.value.trim();
-      note.content = els.contentInput.value;
-      note.updatedAt = nowISO();
-
-      persist();
-      renderNotes();
-      updateStats();
-      setStatus("Kaydedildi");
-      if (showToast) toast("Not kaydedildi");
-    }
-
-    function deleteCurrentNote() {
-      const note = getActiveNote();
-      if (!note) return;
-
-      const title = note.title || "Başlıksız not";
-      const ok = confirm(`“${title}” silinsin mi?`);
-      if (!ok) return;
-
-      notes = notes.filter(n => n.id !== activeId);
-      activeId = notes[0]?.id || null;
-
-      if (!notes.length) {
-        createNote();
-      } else {
-        persist();
-        renderEditor();
-        renderNotes();
-      }
-
-      toast("Not silindi");
-    }
-
-    function toggleFavorite() {
-      const note = getActiveNote();
-      if (!note) return;
-      note.favorite = !note.favorite;
-      note.updatedAt = nowISO();
-      persist();
-      renderEditor();
-      renderNotes();
-      toast(note.favorite ? "Favorilere eklendi" : "Favorilerden çıkarıldı");
-    }
-
-    function updateStats() {
-      const content = els.contentInput.value;
-      const words = countWords(content);
-      const chars = content.length;
-      const minutes = Math.max(0, Math.ceil(words / 200));
-
-      els.wordCount.textContent = `${words} kelime`;
-      els.charCount.textContent = `${chars} karakter`;
-      els.readTime.textContent = `${minutes} dk okuma`;
-    }
-
-    function countWords(text) {
-      return (text || "").trim().split(/\s+/).filter(Boolean).length;
-    }
-
-    function setStatus(text) {
-      els.saveStatus.textContent = text;
-    }
-
-    function scheduleAutosave() {
-      setStatus("Yazılıyor...");
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => saveCurrentNote(false), 700);
-    }
-
-    function addToEditor(text) {
-      const textarea = els.contentInput;
-      const before = textarea.value.slice(0, textarea.selectionStart);
-      const after = textarea.value.slice(textarea.selectionEnd);
-      const spacer = before && !before.endsWith("\n") ? "\n\n" : "";
-      const insert = `${spacer}${text}`;
-      const cursor = before.length + insert.length;
-
-      textarea.value = before + insert + after;
-      textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = cursor;
-
-      updateStats();
-      scheduleAutosave();
-      toast("Editöre eklendi");
-    }
-
-    function pickRandom(arr, count = 1) {
-      return [...arr].sort(() => Math.random() - 0.5).slice(0, count);
-    }
-
-    function renderTopics() {
-      const category = els.topicCategory.value;
-      const pool = category === "all" ? topics : topics.filter(item => item.category === category);
-      const selected = pickRandom(pool, Math.min(3, pool.length));
-
-      els.topicList.innerHTML = selected.map(item => `
-        <div class="suggestion">
-          <div class="suggestion-main">${escapeHTML(item.text)}</div>
-          <div class="suggestion-meta">
-            <span class="tag"># ${escapeHTML(item.source)}</span>
-            <button class="btn mini" data-add="${escapeAttr(item.text)}">Ekle</button>
-          </div>
-        </div>
-      `).join("");
-
-      bindAddButtons();
-    }
-
-    function renderBoosters() {
-      const selected = pickRandom(boosters, 3);
-
-      els.boostList.innerHTML = selected.map(item => `
-        <div class="suggestion">
-          <div class="suggestion-main">${escapeHTML(item.text)}</div>
-          <div class="suggestion-meta">
-            <span class="tag">${escapeHTML(item.tag)}</span>
-            <button class="btn mini" data-add="${escapeAttr(item.text)}">Ekle</button>
-          </div>
-        </div>
-      `).join("");
-
-      bindAddButtons();
-    }
-
-    function renderTemplates() {
-      els.templateGrid.innerHTML = templates.map((item, index) => `
-        <button class="btn template-btn" data-template-index="${index}">
-          <span>${item.icon}</span>
-          <span>${escapeHTML(item.name)}</span>
-        </button>
-      `).join("");
-
-      document.querySelectorAll("[data-template-index]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const template = templates[Number(btn.dataset.templateIndex)];
-          addToEditor(template.text);
-        });
-      });
-    }
-
-    function renderInspiration() {
-      const question = pickRandom(inspirations.questions)[0];
-      const constraint = pickRandom(inspirations.constraints)[0];
-      const motivation = pickRandom(inspirations.motivation)[0];
-      const title = pickRandom(inspirations.titles)[0];
-
-      els.inspirationPanel.innerHTML = `
-        <div class="inspiration-card">
-          <small>Günün yazma sorusu</small>
-          <div>${escapeHTML(question)}</div>
-        </div>
-        <div class="inspiration-card">
-          <small>Yaratıcı kısıtlama</small>
-          <div>${escapeHTML(constraint)}</div>
-        </div>
-        <div class="inspiration-card">
-          <small>Motivasyon</small>
-          <div>${escapeHTML(motivation)}</div>
-        </div>
-        <div class="inspiration-card">
-          <small>Alternatif başlık</small>
-          <div>${escapeHTML(title)}</div>
-        </div>
-      `;
-    }
-
-    function bindAddButtons() {
-      document.querySelectorAll("[data-add]").forEach(btn => {
-        btn.addEventListener("click", () => addToEditor(btn.dataset.add));
-      });
-    }
-
-    function toast(message) {
-      els.toast.textContent = message;
-      els.toast.classList.add("show");
-      clearTimeout(toast.timer);
-      toast.timer = setTimeout(() => els.toast.classList.remove("show"), 1700);
-    }
-
-    function escapeHTML(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function escapeAttr(value) {
-      return escapeHTML(value).replaceAll("\n", "&#10;");
-    }
-
-    els.newNoteBtn.addEventListener("click", () => {
-      saveCurrentNote(false);
-      createNote();
+    upsertNote({
+      id:        currentNoteId,
+      title:     title || 'Başlıksız Not',
+      body:      body,
+      createdAt: getNoteById(currentNoteId)?.createdAt || now,
+      updatedAt: now,
     });
 
-    els.saveBtn.addEventListener("click", () => saveCurrentNote(true));
-    els.deleteBtn.addEventListener("click", deleteCurrentNote);
-    els.favoriteBtn.addEventListener("click", toggleFavorite);
+    document.getElementById('saveStatus').textContent = 'Kaydedildi ✓';
+    document.getElementById('saveStatus').className   = 'save-status saved';
+  }, 600);
+}
 
-    els.focusBtn.addEventListener("click", () => {
-      document.body.classList.toggle("focus-mode");
-      els.focusBtn.textContent = document.body.classList.contains("focus-mode") ? "◑" : "◐";
-      toast(document.body.classList.contains("focus-mode") ? "Odak modu açık" : "Odak modu kapalı");
-    });
+// Flashkart önizleme
+function renderPreview() {
+  const cards = parseCards(document.getElementById('noteBodyInput').value);
+  const list  = document.getElementById('previewList');
+  const cnt   = document.getElementById('previewCount');
 
-    els.searchInput.addEventListener("input", renderNotes);
+  cnt.textContent = `${cards.length} kart`;
 
-    els.titleInput.addEventListener("input", () => {
-      scheduleAutosave();
-      renderNotes();
-    });
+  if (cards.length === 0) {
+    list.innerHTML = `<div class="preview-empty">Henüz flashkart yok. <code style="font-family:monospace">Soru: Cevap</code> formatında satır ekle.</div>`;
+    return;
+  }
 
-    els.contentInput.addEventListener("input", () => {
-      updateStats();
-      scheduleAutosave();
-    });
+  list.innerHTML = cards.map(c => `
+    <div class="preview-card">
+      <div class="preview-q">${escHtml(c.q)}</div>
+      <div class="preview-sep">→</div>
+      <div class="preview-a">${escHtml(c.a)}</div>
+    </div>`).join('');
+}
 
-    els.topicRefreshBtn.addEventListener("click", renderTopics);
-    els.topicCategory.addEventListener("change", renderTopics);
-    els.boostBtn.addEventListener("click", renderBoosters);
-    els.inspireRefreshBtn.addEventListener("click", renderInspiration);
+function goVault() {
+  clearTimeout(saveTimer);
+  showPage('page-vault');
+  renderVault();
+}
 
-    document.addEventListener("keydown", (event) => {
-      const isSave = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s";
-      if (isSave) {
-        event.preventDefault();
-        saveCurrentNote(true);
-      }
+/* ================================================
+   NOT SİLME
+================================================= */
+function confirmDeleteNote() {
+  openModal('modalDeleteNote');
+}
 
-      if (event.key === "Escape" && document.body.classList.contains("focus-mode")) {
-        document.body.classList.remove("focus-mode");
-        els.focusBtn.textContent = "◐";
-        toast("Odak modu kapalı");
-      }
-    });
+function deleteCurrentNote() {
+  if (!currentNoteId) return;
+  deleteNoteById(currentNoteId);
+  selectedIds.delete(currentNoteId);
+  closeModal('modalDeleteNote');
+  showToast('Not silindi.');
+  goVault();
+}
 
-    renderEditor();
-    renderNotes();
-    renderTopics();
-    renderBoosters();
-    renderTemplates();
-    renderInspiration();
-  </script>
+/* ================================================
+   ÇALIŞMA MODU (SAYFA 3)
+================================================= */
+let studyDeck   = [];   // { q, a, source } listesi
+let studyIdx    = 0;
+let studyMarked = [];   // true | false | null
+let answerShown = false;
+let studyReturnPage = 'page-vault'; // geri dönülecek sayfa
+
+// Editörden tek not çalışması
+function startStudyFromEditor() {
+  const body  = document.getElementById('noteBodyInput').value;
+  const title = document.getElementById('noteTitleInput').value.trim() || 'Başlıksız Not';
+  const cards = parseCards(body);
+  if (cards.length === 0) {
+    showToast('Bu notta flashkart yok. Soru: Cevap formatı ekle.');
+    return;
+  }
+  studyReturnPage = 'page-editor';
+  launchStudy(cards.map(c => ({ ...c, source: title })), title);
+}
+
+// Kasadan seçili notları çalış
+function startStudyFromSelection() {
+  const allCards = [];
+  for (const id of selectedIds) {
+    const note = getNoteById(id);
+    if (!note) continue;
+    parseCards(note.body).forEach(c => allCards.push({ ...c, source: note.title || 'Başlıksız Not' }));
+  }
+  if (allCards.length === 0) {
+    showToast('Seçili notlarda hiç flashkart yok.');
+    return;
+  }
+  studyReturnPage = 'page-vault';
+  const label = selectedIds.size === 1
+    ? (getNoteById([...selectedIds][0])?.title || 'Not')
+    : `${selectedIds.size} not`;
+  // Karıştır
+  launchStudy(shuffle([...allCards]), label);
+}
+
+function launchStudy(deck, label) {
+  studyDeck   = deck;
+  studyIdx    = 0;
+  studyMarked = new Array(deck.length).fill(null);
+  answerShown = false;
+
+  document.getElementById('studySource').textContent = label;
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('flashcard').style.display = '';
+  document.getElementById('cardBtns').style.display  = '';
+
+  showPage('page-study');
+  renderStudyCard();
+  renderStats();
+}
+
+function renderStudyCard() {
+  if (studyIdx >= studyDeck.length) { showResult(); return; }
+
+  const card  = studyDeck[studyIdx];
+  answerShown = false;
+
+  document.getElementById('fcTag').textContent      = 'Soru';
+  document.getElementById('fcQuestion').textContent = card.q;
+  document.getElementById('fcAnswer').textContent   = card.a;
+  document.getElementById('fcAnswer').classList.add('hidden');
+  document.getElementById('fcTap').style.display    = '';
+  document.getElementById('fcSourceTag').textContent = card.source || '';
+
+  // İşaretlenmiş kartların rengi
+  const fc = document.getElementById('flashcard');
+  fc.className = 'flashcard';
+  if (studyMarked[studyIdx] === true)  fc.classList.add('correct');
+  if (studyMarked[studyIdx] === false) fc.classList.add('wrong');
+
+  document.getElementById('studyCounter').innerHTML =
+    `<strong>${studyIdx + 1}</strong> / ${studyDeck.length}`;
+
+  // Buton durumları
+  document.getElementById('btnReveal').style.display = '';
+  document.getElementById('btnOk').style.display     = studyMarked[studyIdx] !== null ? '' : 'none';
+  document.getElementById('btnFail').style.display   = studyMarked[studyIdx] !== null ? '' : 'none';
+  document.getElementById('btnPrev').disabled        = studyIdx === 0;
+  document.getElementById('btnNext').disabled        = false;
+}
+
+function revealAnswer() {
+  if (answerShown) return;
+  answerShown = true;
+  document.getElementById('fcAnswer').classList.remove('hidden');
+  document.getElementById('fcTag').textContent       = 'Cevap ↓';
+  document.getElementById('fcTap').style.display     = 'none';
+  document.getElementById('btnReveal').style.display = 'none';
+  document.getElementById('btnOk').style.display     = '';
+  document.getElementById('btnFail').style.display   = '';
+}
+
+function markCard(known) {
+  studyMarked[studyIdx] = known;
+  renderStats();
+  nextCard();
+}
+
+function nextCard() {
+  if (studyIdx < studyDeck.length - 1) { studyIdx++; renderStudyCard(); }
+  else showResult();
+}
+
+function prevCard() {
+  if (studyIdx > 0) { studyIdx--; renderStudyCard(); }
+}
+
+function renderStats() {
+  const ok   = studyMarked.filter(v => v === true).length;
+  const fail = studyMarked.filter(v => v === false).length;
+  const left = studyMarked.filter(v => v === null).length;
+  document.getElementById('statOk').textContent   = `Bildim: ${ok}`;
+  document.getElementById('statFail').textContent = `Bilmedim: ${fail}`;
+  document.getElementById('statLeft').textContent = `Kalan: ${left}`;
+}
+
+function showResult() {
+  const total = studyDeck.length;
+  const ok    = studyMarked.filter(v => v === true).length;
+  const fail  = studyMarked.filter(v => v === false).length;
+  const pct   = total > 0 ? Math.round((ok / total) * 100) : 0;
+
+  document.getElementById('flashcard').style.display = 'none';
+  document.getElementById('cardBtns').style.display  = 'none';
+  document.getElementById('resultBox').style.display = 'block';
+  document.getElementById('resultPct').textContent   = `%${pct}`;
+  document.getElementById('resultDetail').innerHTML  =
+    `${total} karttan <strong>${ok}</strong> tanesini bildin, <strong>${fail}</strong> tanesini bilemedin.`;
+}
+
+function restartStudy() {
+  studyDeck   = shuffle([...studyDeck]);
+  studyIdx    = 0;
+  studyMarked = new Array(studyDeck.length).fill(null);
+  answerShown = false;
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('flashcard').style.display = '';
+  document.getElementById('cardBtns').style.display  = '';
+  renderStudyCard();
+  renderStats();
+}
+
+function exitStudy() {
+  if (studyReturnPage === 'page-editor') {
+    showPage('page-editor');
+  } else {
+    goVault();
+  }
+}
+
+/* ================================================
+   YARDIMCILAR
+================================================= */
+// Fisher-Yates karıştırma
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* ================================================
+   MODAL
+================================================= */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Arka plana tıklayınca kapat
+document.querySelectorAll('.modal-bg').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+/* ================================================
+   BAŞLANGIÇ
+================================================= */
+renderVault();
+</script>
 </body>
 </html>
