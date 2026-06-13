@@ -526,6 +526,40 @@ body{font-family:'Nunito',sans-serif;color:var(--ink);display:flex;flex-directio
   font-family:'Nunito',sans-serif;opacity:.8;
 }
 
+/* ═══ TEMPLATES ═══ */
+.tpl-card{
+  background:var(--paper);border:1.5px solid var(--line);
+  border-radius:12px;overflow:hidden;margin-bottom:10px;
+  box-shadow:var(--shadow);
+}
+.tpl-card-head{
+  padding:9px 14px;display:flex;align-items:center;gap:8px;
+  background:var(--paper2);border-bottom:1px solid var(--line);
+}
+.tpl-icon{font-size:1.1rem;}
+.tpl-name{font-family:'Lora',serif;font-size:.92rem;font-weight:600;flex:1;color:var(--ink);}
+.tpl-card-body{padding:8px 14px 10px;}
+.tpl-preview{font-size:.76rem;color:var(--ink-light);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.tpl-card-foot{padding:6px 14px 10px;display:flex;gap:7px;align-items:center;}
+.tpl-use-btn{flex:1;padding:7px;border-radius:9px;background:var(--amber);color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;}
+.tpl-use-btn:active{background:var(--amber-d);}
+.tpl-edit-btn{padding:7px 11px;border-radius:9px;border:1.5px solid var(--line);background:var(--paper2);font-size:.78rem;color:var(--ink-light);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;}
+.tpl-del-btn{padding:7px 11px;border-radius:9px;border:1.5px solid var(--rose-light);background:none;font-size:.78rem;color:var(--rose);cursor:pointer;}
+.tpl-tag-preview{font-size:.67rem;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--amber-faint);color:#92600a;border:1px solid var(--amber-light);}
+
+/* Template pick in editor */
+.tpl-pick-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;
+  transition:background .1s;
+}
+.tpl-pick-item:active{background:var(--paper);}
+.tpl-pick-icon{font-size:1.3rem;flex-shrink:0;}
+.tpl-pick-info{flex:1;min-width:0;}
+.tpl-pick-name{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.tpl-pick-preview{font-size:.74rem;color:var(--ink-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tpl-apply-btn{padding:5px 13px;border-radius:20px;background:var(--amber);color:#fff;border:none;font-size:.75rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;flex-shrink:0;}
+
 /* ═══ SYNC BUTTONS ═══ */
 .sync-btn{
   height:40px;padding:0 14px;border-radius:12px;cursor:pointer;
@@ -797,6 +831,109 @@ body{font-family:'Nunito',sans-serif;color:var(--ink);display:flex;flex-directio
   display:flex;gap:7px;overflow-x:auto;flex-shrink:0;background:var(--cream);
 }
 .map-filter-row::-webkit-scrollbar{display:none;}
+/* ═══ DARK MODE ═══ */
+body.dark-mode {
+  --cream: #1a1610;
+  --paper: #231f17;
+  --paper2: #2c2820;
+  --ink: #f0ead8;
+  --ink-mid: #d4c9b0;
+  --ink-light: #a89878;
+  --ink-faint: #6b5f4a;
+  --line: #3a3428;
+  --amber: #d4921e;
+  --amber-d: #b87818;
+  --amber-light: #f0c060;
+  --amber-faint: #2a2010;
+  --teal-light: #0e2a26;
+  --rose-light: #2a1010;
+  --shadow: 0 2px 16px rgba(0,0,0,.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,.5);
+}
+body.dark-mode .lined-paper,
+body.dark-mode #focus-paper,
+body.dark-mode .viewer-lined {
+  background-color: #1e1a12;
+}
+body.dark-mode #bottom-nav {
+  border-top-color: #3a3428;
+}
+body.dark-mode .sheet {
+  background: #1e1a12;
+}
+body.dark-mode .form-input,
+body.dark-mode .tasks-add-input,
+body.dark-mode #search-input-inner {
+  background: #2c2820;
+  color: var(--ink);
+  border-color: var(--line);
+}
+#dark-toggle {
+  width:40px;height:40px;border-radius:12px;
+  background:var(--paper);border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;cursor:pointer;flex-shrink:0;
+  transition:background .12s;
+}
+#dark-toggle:active{background:var(--paper2);}
+
+/* ═══ FOCUS TIMER ═══ */
+#timer-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(26,22,16,.96);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+#timer-overlay.open{opacity:1;pointer-events:all;}
+.timer-circle{
+  width:220px;height:220px;position:relative;margin-bottom:28px;
+}
+.timer-circle svg{width:220px;height:220px;transform:rotate(-90deg);}
+.timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:10;}
+.timer-fill{fill:none;stroke:var(--amber);stroke-width:10;stroke-linecap:round;
+  stroke-dasharray:628;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
+.timer-text{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.timer-minutes{font-family:'JetBrains Mono',monospace;font-size:3rem;font-weight:700;color:#fff;line-height:1;}
+.timer-label{font-size:.75rem;color:rgba(255,255,255,.45);margin-top:6px;letter-spacing:.08em;text-transform:uppercase;}
+.timer-phase{font-size:.85rem;font-weight:700;color:var(--amber);margin-bottom:24px;letter-spacing:.05em;}
+.timer-btns{display:flex;gap:12px;margin-bottom:32px;}
+.timer-btn{
+  padding:12px 28px;border-radius:14px;border:none;
+  font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;
+  transition:transform .12s;
+}
+.timer-btn:active{transform:scale(.95);}
+.timer-start{background:var(--amber);color:#fff;}
+.timer-reset{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+.timer-close-btn{background:none;border:none;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;font-family:'Nunito',sans-serif;padding:8px;}
+.timer-settings{display:flex;gap:8px;margin-bottom:20px;}
+.timer-preset{
+  padding:6px 16px;border-radius:20px;
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);
+  border:1.5px solid rgba(255,255,255,.12);
+  font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;
+  transition:all .12s;
+}
+.timer-preset.active{background:var(--amber);color:#fff;border-color:var(--amber);}
+.timer-note-label{font-size:.75rem;color:rgba(255,255,255,.3);text-align:center;max-width:240px;line-height:1.5;}
+/* Timer FAB */
+#timer-fab{
+  position:fixed;left:18px;bottom:calc(var(--nav-h) + var(--safe-bottom) + 14px);
+  width:42px;height:42px;border-radius:50%;
+  background:var(--paper);border:1.5px solid var(--line);color:var(--ink-light);
+  font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);
+  z-index:60;transition:transform .15s,background .12s;
+}
+#timer-fab:active{transform:scale(.93);}
+#timer-fab.running{background:var(--amber);color:#fff;border-color:var(--amber);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,130,26,.5);}50%{box-shadow:0 0 0 8px rgba(200,130,26,0);}}
+.timer-fab-badge{position:absolute;top:-4px;right:-4px;background:var(--teal);color:#fff;font-size:.55rem;font-weight:800;font-family:'JetBrains Mono',monospace;padding:1px 4px;border-radius:10px;display:none;}
+#timer-fab.running .timer-fab-badge{display:block;}
 
 </style>
 </head>
@@ -810,6 +947,7 @@ body{font-family:'Nunito',sans-serif;color:var(--ink);display:flex;flex-directio
       <div class="topbar-sub" id="home-sub">0 kutu • 0 not</div>
     </div>
     <button class="icon-btn" title="Rastgele Not" onclick="showRandom()">🎲</button>
+    <button id="dark-toggle" title="Karanlık Mod" onclick="toggleDark()">🌙</button>
     <button class="icon-btn sync-icon-btn" id="btn-load" onclick="fbLoad()" title="Firebase'den yükle">⬇️</button>
     <button class="icon-btn sync-icon-btn sync-icon-upload" id="btn-save" onclick="fbSave()" title="Firebase'e kaydet">☁️</button>
   </div>
@@ -931,6 +1069,10 @@ body{font-family:'Nunito',sans-serif;color:var(--ink);display:flex;flex-directio
     <div class="nav-item-icon">🏷️</div>
     <div class="nav-item-label">Etiketler</div>
   </div>
+  <div class="nav-item" id="nav-templates" onclick="switchScreen('templates')">
+    <div class="nav-item-icon">📋</div>
+    <div class="nav-item-label">Şablonlar</div>
+  </div>
 </div>
 
 <!-- ══════════════ QUICK NOTE BUTTON ══════════════ -->
@@ -1007,6 +1149,11 @@ body{font-family:'Nunito',sans-serif;color:var(--ink);display:flex;flex-directio
     <span class="meta-label">Etiket</span>
     <div class="tag-chips-row" id="editor-tag-chips"></div>
     <button class="add-tag-pill" onclick="openTagPickSheet()">+ Ekle</button>
+  </div>
+  <!-- template apply row -->
+  <div class="editor-meta-row" id="editor-tpl-row" style="background:var(--amber-faint);border-top:1px solid var(--amber-light);">
+    <span style="font-size:.75rem;font-weight:700;color:#92600a;">📋 Şablon</span>
+    <button class="add-tag-pill" onclick="openTplPickSheet()" style="border-color:var(--amber-light);color:var(--amber);font-weight:700;">Şablon Uygula</button>
   </div>
   <div class="sheet-body" id="editor-sheet-body">
     <!-- LINED PAPER (all categories) -->
@@ -1180,8 +1327,101 @@ body{font-family:'Nunito',sans-serif;color:var(--ink);display:flex;flex-directio
   </div>
 </div>
 
+<!-- ══════════════ SCREEN: TEMPLATES ══════════════ -->
+<div class="screen" id="screen-templates">
+  <div class="topbar">
+    <div style="flex:1;min-width:0;">
+      <div class="topbar-title">📋 <span>Şablonlar</span></div>
+      <div class="topbar-sub" id="tpl-sub">0 şablon</div>
+    </div>
+    <button class="amber-btn" onclick="openTplEditor(null)">+ Şablon</button>
+  </div>
+  <div class="scroll" id="templates-scroll"></div>
+</div>
+
+<!-- ══════════════ TEMPLATE EDITOR SHEET ══════════════ -->
+<div class="sheet-overlay" id="tpl-editor-overlay" onclick="closeTplEditor()"></div>
+<div class="sheet" id="tpl-editor-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title" id="tpl-editor-title-label">Yeni Şablon</span>
+    <button class="sheet-close" onclick="closeTplEditor()">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="form-field">
+      <label class="form-label">İkon (emoji)</label>
+      <input type="text" class="form-input" id="tpl-icon-input" placeholder="📝" maxlength="4" style="font-size:1.3rem;text-align:center;width:80px;">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Şablon Adı</label>
+      <input type="text" class="form-input" id="tpl-name-input" placeholder="Örn: Haftalık Özet">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Varsayılan Başlık <span style="font-weight:400;opacity:.65;">(isteğe bağlı)</span></label>
+      <input type="text" class="form-input" id="tpl-default-title" placeholder="Örn: Haftalık Özet – Tarih">
+    </div>
+    <div class="form-field">
+      <label class="form-label">İçerik Şablonu</label>
+      <textarea class="form-input" id="tpl-content-input" placeholder="Şablon içeriğini buraya yaz…&#10;Başlıklar, sorular, boşluklar…" rows="8" style="resize:none;line-height:1.6;font-family:'Lora',serif;font-size:.88rem;"></textarea>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Varsayılan Etiketler <span style="font-weight:400;opacity:.65;">(virgülle ayır)</span></label>
+      <input type="text" class="form-input" id="tpl-tags-input" placeholder="Örn: Haftalık, Özet">
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <button class="sheet-cancel" onclick="closeTplEditor()">İptal</button>
+    <button class="sheet-save" onclick="saveTpl()">Kaydet</button>
+  </div>
+</div>
+
+<!-- ══════════════ TEMPLATE PICK SHEET (in editor) ══════════════ -->
+<div class="sheet-overlay" id="tpl-pick-overlay" onclick="closeTplPickSheet()"></div>
+<div class="sheet" id="tpl-pick-sheet" style="max-height:70vh;">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title">📋 Şablon Seç</span>
+    <button class="sheet-close" onclick="closeTplPickSheet()">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div id="tpl-pick-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════ FOCUS TIMER OVERLAY ══════════════ -->
+<div id="timer-overlay">
+  <div class="timer-phase" id="timer-phase">🍅 Odak Zamanı</div>
+  <div class="timer-settings">
+    <button class="timer-preset active" data-min="25" onclick="setTimerPreset(25,this)">25 dk</button>
+    <button class="timer-preset" data-min="50" onclick="setTimerPreset(50,this)">50 dk</button>
+    <button class="timer-preset" data-min="5" onclick="setTimerPreset(5,this)">5 dk mola</button>
+    <button class="timer-preset" data-min="15" onclick="setTimerPreset(15,this)">15 dk mola</button>
+  </div>
+  <div class="timer-circle">
+    <svg viewBox="0 0 220 220">
+      <circle class="timer-track" cx="110" cy="110" r="100"/>
+      <circle class="timer-fill" id="timer-fill-circle" cx="110" cy="110" r="100"/>
+    </svg>
+    <div class="timer-text">
+      <div class="timer-minutes" id="timer-display">25:00</div>
+      <div class="timer-label" id="timer-sublabel">hazır</div>
+    </div>
+  </div>
+  <div class="timer-btns">
+    <button class="timer-btn timer-start" id="timer-main-btn" onclick="timerToggle()">▶ Başlat</button>
+    <button class="timer-btn timer-reset" onclick="timerReset()">↺ Sıfırla</button>
+  </div>
+  <div class="timer-note-label" id="timer-note-label">Not bağlı değil</div>
+  <button class="timer-close-btn" onclick="closeTimer()">✕ Kapat</button>
+</div>
+
+<!-- ══════════════ TIMER FAB ══════════════ -->
+<button id="timer-fab" onclick="openTimer()" title="Odak Zamanlayıcı">
+  <span class="timer-fab-badge" id="timer-fab-badge">●</span>
+  ⏱️
+</button>
+
 <script>
-/* ═══════════════════════ FIREBASE ═══════════════════════ */
 const firebaseConfig = {
   apiKey: "AIzaSyASuLrqS3DzgMcwxTgFiKBHSTsl4fr3LXA",
   authDomain: "ulan-2f6fe.firebaseapp.com",
@@ -1250,7 +1490,7 @@ async function fbLoad(){
 /* ═══════════════════════ STATE ═══════════════════════ */
 let S = JSON.parse(localStorage.getItem('notlar_v2') || 'null') || {
   boxes:[], notes:[], tags:['Fikir','Araştırma','Kişisel','Görev','Referans'],
-  tasks:[], nextBoxId:1, nextNoteSeq:1, nextBoxSeq:1
+  tasks:[], templates:[], nextBoxId:1, nextNoteSeq:1, nextBoxSeq:1
 };
 // migrate old boxes
 if(S.boxes) S.boxes.forEach((b,i)=>{
@@ -1261,6 +1501,7 @@ if(S.boxes) S.boxes.forEach((b,i)=>{
 });
 if(!S.nextBoxSeq) S.nextBoxSeq=(S.boxes.length||0)+1;
 if(!S.tasks) S.tasks=[];
+if(!S.templates) S.templates=[];
 function save(){ localStorage.setItem('notlar_v2', JSON.stringify(S)); }
 
 // editor state
@@ -1314,6 +1555,7 @@ function switchScreen(name){
   if(name==='tags') renderTags();
   if(name==='map') setTimeout(renderMap,50);
   if(name==='tasks') renderTasks();
+  if(name==='templates') renderTemplates();
 }
 
 function goHome(){ switchScreen('home'); }
@@ -2649,6 +2891,337 @@ function initTaskDrag(){
       save();renderTasks();
     },{passive:true});
   });
+}
+
+/* ═══════════════════════ TEMPLATES ═══════════════════════ */
+
+let editTplId = null;
+
+function renderTemplates(){
+  const sc = document.getElementById('templates-scroll');
+  sc.innerHTML = '';
+  const sub = document.getElementById('tpl-sub');
+  sub.textContent = S.templates.length + ' şablon';
+
+  if(S.templates.length === 0){
+    sc.innerHTML = `<div class="empty">
+      <div class="empty-icon">📋</div>
+      <div class="empty-txt">Henüz şablon yok</div>
+      <div class="empty-sub">Sağ üstten yeni şablon oluştur</div>
+    </div>`;
+
+    // Built-in starter templates suggestion
+    const suggestDiv = document.createElement('div');
+    suggestDiv.style.cssText = 'padding:16px;';
+    suggestDiv.innerHTML = `
+      <div style="font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;">🌟 Hazır Şablonlar</div>
+    `;
+    const starters = [
+      {icon:'📅', name:'Günlük Planlama', defaultTitle:'Günlük Plan – ' + new Date().toLocaleDateString('tr-TR'), content:'🌅 Bugünün hedefi:\n\n📋 Yapılacaklar:\n- \n- \n- \n\n💡 Notlar & Fikirler:\n\n🌙 Günün özeti:', tags:'Günlük,Plan'},
+      {icon:'📊', name:'Haftalık Özet', defaultTitle:'Haftalık Özet', content:'✅ Bu hafta yapılanlar:\n\n❌ Yapılamayanlar:\n\n💡 Öğrenilenler:\n\n🎯 Gelecek hafta hedefleri:', tags:'Haftalık,Özet'},
+      {icon:'💡', name:'Fikir Notu', defaultTitle:'Yeni Fikir', content:'💡 Fikir:\n\n🤔 Neden önemli?\n\n🚀 Nasıl hayata geçirilir?\n\n📚 İlgili kaynaklar:', tags:'Fikir'},
+      {icon:'📖', name:'Kitap Notu', defaultTitle:'Kitap Notu', content:'📖 Kitap adı:\n✍️ Yazar:\n\n📌 Ana fikirler:\n\n🔑 Anahtar alıntılar:\n\n💬 Kişisel yorum:', tags:'Kitap,Araştırma'},
+      {icon:'🤝', name:'Toplantı Notu', defaultTitle:'Toplantı – ' + new Date().toLocaleDateString('tr-TR'), content:'👥 Katılımcılar:\n📅 Tarih:\n\n📋 Gündem:\n\n✅ Kararlar:\n\n➡️ Aksiyon maddeleri:\n- ', tags:'Toplantı'},
+    ];
+    starters.forEach(s => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;margin-bottom:8px;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;cursor:pointer;text-align:left;';
+      btn.innerHTML = `<span style="font-size:1.3rem;">${s.icon}</span><div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:700;color:var(--ink);">${s.name}</div><div style="font-size:.73rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.content.slice(0,50)}…</div></div><span style="font-size:.75rem;color:var(--amber);font-weight:700;">+ Ekle</span>`;
+      btn.addEventListener('click', () => {
+        S.templates.push({
+          id: 'tpl_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+          icon: s.icon, name: s.name, defaultTitle: s.defaultTitle,
+          content: s.content, tags: s.tags ? s.tags.split(',').map(t=>t.trim()).filter(Boolean) : [],
+          createdAt: Date.now()
+        });
+        save(); renderTemplates(); toast('📋 "' + s.name + '" eklendi');
+      });
+      suggestDiv.appendChild(btn);
+    });
+    sc.appendChild(suggestDiv);
+    return;
+  }
+
+  S.templates.forEach((tpl, i) => {
+    const card = document.createElement('div');
+    card.className = 'tpl-card anim';
+    card.style.animationDelay = (i * 0.05) + 's';
+    const tagsHtml = (tpl.tags||[]).map(t=>`<span class="tpl-tag-preview">${esc(t)}</span>`).join('');
+    card.innerHTML = `
+      <div class="tpl-card-head">
+        <span class="tpl-icon">${tpl.icon||'📝'}</span>
+        <span class="tpl-name">${esc(tpl.name)}</span>
+      </div>
+      <div class="tpl-card-body">
+        <div class="tpl-preview">${esc(tpl.content||'İçerik yok')}</div>
+        ${tagsHtml ? '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">'+tagsHtml+'</div>' : ''}
+      </div>
+      <div class="tpl-card-foot">
+        <button class="tpl-use-btn" onclick="useTplFromScreen('${tpl.id}')">✏️ Not Oluştur</button>
+        <button class="tpl-edit-btn" onclick="openTplEditor('${tpl.id}')">Düzenle</button>
+        <button class="tpl-del-btn" onclick="deleteTpl('${tpl.id}')">🗑️</button>
+      </div>`;
+    sc.appendChild(card);
+  });
+
+  // "New template" tile at end
+  const addTile = document.createElement('div');
+  addTile.style.cssText = 'margin:4px 0 16px;border:2px dashed var(--line);border-radius:14px;padding:20px;text-align:center;color:var(--ink-faint);cursor:pointer;';
+  addTile.innerHTML = '<div style="font-size:1.6rem;margin-bottom:6px;">➕</div><div style="font-size:.8rem;font-weight:700;">Yeni Şablon</div>';
+  addTile.addEventListener('click', () => openTplEditor(null));
+  sc.appendChild(addTile);
+}
+
+function openTplEditor(tplId){
+  editTplId = tplId;
+  const isEdit = !!tplId;
+  document.getElementById('tpl-editor-title-label').textContent = isEdit ? 'Şablonu Düzenle' : 'Yeni Şablon';
+  if(isEdit){
+    const t = S.templates.find(x => x.id === tplId);
+    if(!t) return;
+    document.getElementById('tpl-icon-input').value = t.icon || '📝';
+    document.getElementById('tpl-name-input').value = t.name;
+    document.getElementById('tpl-default-title').value = t.defaultTitle || '';
+    document.getElementById('tpl-content-input').value = t.content || '';
+    document.getElementById('tpl-tags-input').value = (t.tags||[]).join(', ');
+  } else {
+    document.getElementById('tpl-icon-input').value = '📝';
+    document.getElementById('tpl-name-input').value = '';
+    document.getElementById('tpl-default-title').value = '';
+    document.getElementById('tpl-content-input').value = '';
+    document.getElementById('tpl-tags-input').value = '';
+  }
+  document.getElementById('tpl-editor-overlay').classList.add('open');
+  document.getElementById('tpl-editor-sheet').classList.add('open');
+  setTimeout(() => document.getElementById('tpl-name-input').focus(), 350);
+}
+
+function closeTplEditor(){
+  document.getElementById('tpl-editor-overlay').classList.remove('open');
+  document.getElementById('tpl-editor-sheet').classList.remove('open');
+}
+
+function saveTpl(){
+  const icon = document.getElementById('tpl-icon-input').value.trim() || '📝';
+  const name = document.getElementById('tpl-name-input').value.trim();
+  const defaultTitle = document.getElementById('tpl-default-title').value.trim();
+  const content = document.getElementById('tpl-content-input').value;
+  const tagsRaw = document.getElementById('tpl-tags-input').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+
+  if(!name){ toast('❗ Şablon adı gerekli'); return; }
+
+  if(editTplId){
+    const t = S.templates.find(x => x.id === editTplId);
+    if(t){ t.icon=icon; t.name=name; t.defaultTitle=defaultTitle; t.content=content; t.tags=tags; t.updatedAt=Date.now(); }
+  } else {
+    S.templates.push({
+      id: 'tpl_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+      icon, name, defaultTitle, content, tags, createdAt: Date.now()
+    });
+  }
+  save();
+  closeTplEditor();
+  renderTemplates();
+  toast('📋 Şablon kaydedildi');
+}
+
+function deleteTpl(tplId){
+  const t = S.templates.find(x => x.id === tplId);
+  if(!t) return;
+  openConfirmDel('📋', `"${t.name}" şablonunu sil?`, 'Bu işlem geri alınamaz.', () => {
+    S.templates = S.templates.filter(x => x.id !== tplId);
+    save(); renderTemplates(); toast('🗑️ Şablon silindi');
+  });
+}
+
+// Use template from Templates screen — first pick a box then open editor
+function useTplFromScreen(tplId){
+  const tpl = S.templates.find(x => x.id === tplId);
+  if(!tpl) return;
+  // If currently inside a box, open editor directly
+  if(curBoxId){
+    applyTplToEditor(tplId);
+    openEditorSheet(null);
+    setTimeout(() => applyTplToEditor(tplId), 100);
+  } else {
+    openBoxPickSheet('📦 Hangi Kutuda Oluşturulsun?', null, (boxId) => {
+      const boxNotes = getBoxNotes(boxId);
+      if(boxNotes.length >= 10){ toast('❗ Kutu dolu (max 10)'); return; }
+      curBoxId = boxId;
+      openEditorSheet(null);
+      setTimeout(() => applyTplToEditor(tplId), 150);
+    });
+  }
+}
+
+// Template pick sheet (inside editor)
+function openTplPickSheet(){
+  const list = document.getElementById('tpl-pick-list');
+  list.innerHTML = '';
+  if(S.templates.length === 0){
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-txt">Şablon yok</div><div class="empty-sub">Şablonlar sekmesinden şablon ekle</div></div>';
+  } else {
+    S.templates.forEach(tpl => {
+      const row = document.createElement('div');
+      row.className = 'tpl-pick-item';
+      row.innerHTML = `
+        <span class="tpl-pick-icon">${tpl.icon||'📝'}</span>
+        <div class="tpl-pick-info">
+          <div class="tpl-pick-name">${esc(tpl.name)}</div>
+          <div class="tpl-pick-preview">${esc(tpl.content ? tpl.content.slice(0,60) : 'İçerik yok')}</div>
+        </div>
+        <button class="tpl-apply-btn" onclick="applyTplToEditor('${tpl.id}')">Uygula</button>`;
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('tpl-pick-overlay').classList.add('open');
+  document.getElementById('tpl-pick-sheet').classList.add('open');
+}
+
+function closeTplPickSheet(){
+  document.getElementById('tpl-pick-overlay').classList.remove('open');
+  document.getElementById('tpl-pick-sheet').classList.remove('open');
+}
+
+function applyTplToEditor(tplId){
+  closeTplPickSheet();
+  const tpl = S.templates.find(x => x.id === tplId);
+  if(!tpl) return;
+
+  // Apply title if field is empty or user confirms
+  const titleInput = document.getElementById('editor-title');
+  if(tpl.defaultTitle && !titleInput.value.trim()){
+    titleInput.value = tpl.defaultTitle;
+  }
+
+  // Apply content — if textarea already has content, ask
+  const ta = document.getElementById('note-textarea');
+  if(ta.value.trim()){
+    // Append with separator
+    ta.value = ta.value + '\n\n── Şablon ──\n' + tpl.content;
+  } else {
+    ta.value = tpl.content;
+  }
+
+  // Apply tags (merge)
+  if(tpl.tags && tpl.tags.length){
+    tpl.tags.forEach(t => { if(!eTags.includes(t)) eTags.push(t); });
+    // Also ensure tags exist in global list
+    tpl.tags.forEach(t => { if(!S.tags.includes(t)) S.tags.push(t); });
+    save();
+    renderEditorTagChips();
+  }
+
+  onContentInput(ta.value);
+  toast('📋 "' + tpl.name + '" şablonu uygulandı');
+}
+
+/* ═══════════════════════ DARK MODE ═══════════════════════ */
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark-mode');
+  document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('notlar_dark', isDark ? '1' : '0');
+}
+(function initDark(){
+  if(localStorage.getItem('notlar_dark')==='1'){
+    document.body.classList.add('dark-mode');
+    document.getElementById('dark-toggle').textContent='☀️';
+  }
+})();
+
+/* ═══════════════════════ FOCUS TIMER ═══════════════════════ */
+let timerDuration = 25 * 60; // seconds
+let timerRemaining = 25 * 60;
+let timerInterval = null;
+let timerRunning = false;
+let timerLinkedNoteId = null;
+
+const CIRCUMFERENCE = 2 * Math.PI * 100; // r=100
+
+function openTimer(){
+  document.getElementById('timer-overlay').classList.add('open');
+  updateTimerDisplay();
+}
+function closeTimer(){
+  document.getElementById('timer-overlay').classList.remove('open');
+}
+
+function setTimerPreset(minutes, btn){
+  if(timerRunning) return;
+  document.querySelectorAll('.timer-preset').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  timerDuration = minutes * 60;
+  timerRemaining = timerDuration;
+  const phase = minutes <= 15 ? '☕ Mola Zamanı' : '🍅 Odak Zamanı';
+  document.getElementById('timer-phase').textContent = phase;
+  updateTimerDisplay();
+}
+
+function timerToggle(){
+  if(timerRunning){
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timer-main-btn').textContent = '▶ Devam';
+    document.getElementById('timer-sublabel').textContent = 'duraklatıldı';
+    document.getElementById('timer-fab').classList.remove('running');
+  } else {
+    if(timerRemaining <= 0){ timerReset(); return; }
+    timerRunning = true;
+    document.getElementById('timer-main-btn').textContent = '⏸ Duraklat';
+    document.getElementById('timer-sublabel').textContent = 'devam ediyor';
+    document.getElementById('timer-fab').classList.add('running');
+    timerInterval = setInterval(()=>{
+      timerRemaining--;
+      updateTimerDisplay();
+      if(timerRemaining <= 0){
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerDone();
+      }
+    }, 1000);
+  }
+}
+
+function timerReset(){
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerRemaining = timerDuration;
+  document.getElementById('timer-main-btn').textContent = '▶ Başlat';
+  document.getElementById('timer-sublabel').textContent = 'hazır';
+  document.getElementById('timer-fab').classList.remove('running');
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+  const m = Math.floor(timerRemaining / 60);
+  const s = timerRemaining % 60;
+  document.getElementById('timer-display').textContent =
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  // Progress circle
+  const progress = timerDuration > 0 ? timerRemaining / timerDuration : 1;
+  const offset = CIRCUMFERENCE * (1 - progress);
+  document.getElementById('timer-fill-circle').style.strokeDashoffset = offset;
+  document.getElementById('timer-fill-circle').style.strokeDasharray = CIRCUMFERENCE;
+  // FAB badge shows remaining
+  document.getElementById('timer-fab-badge').textContent = m + 'm';
+}
+
+function timerDone(){
+  document.getElementById('timer-main-btn').textContent = '▶ Başlat';
+  document.getElementById('timer-sublabel').textContent = 'tamamlandı! 🎉';
+  document.getElementById('timer-fab').classList.remove('running');
+  // Try native notification
+  if('Notification' in window && Notification.permission === 'granted'){
+    new Notification('⏱️ Süre doldu!', {body: 'Odak seansın tamamlandı. Mola ver!'});
+  } else if('Notification' in window && Notification.permission !== 'denied'){
+    Notification.requestPermission().then(p=>{
+      if(p==='granted') new Notification('⏱️ Süre doldu!', {body:'Odak seansın tamamlandı!'});
+    });
+  }
+  toast('⏱️ Süre doldu! Tebrikler 🎉');
+  timerRemaining = 0;
+  updateTimerDisplay();
 }
 
 /* ═══════════════════════ INIT ═══════════════════════ */
