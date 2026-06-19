@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defter — Not Uygulaması</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F3ECE1;
+    --bg-deep: #EAE0CF;
+    --paper: #FBF8F1;
+    --paper-soft: #F7F1E6;
+    --ink: #3C342A;
+    --ink-soft: #80735F;
+    --ink-faint: #AFA08A;
+    --border: #E2D5BC;
+    --terracotta: #C1704A;
+    --terracotta-soft: #E9C3AE;
+    --sage: #7C8A68;
+    --sage-soft: #DCE3CF;
+    --rose: #C68A82;
+    --rose-soft: #F0D9D2;
+    --shadow: 0 8px 24px -12px rgba(60, 52, 40, 0.25);
+    --radius-lg: 28px;
+    --radius-pill: 999px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    font-family: 'Karla', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 8% 12%, var(--rose-soft) 0%, transparent 38%),
+      radial-gradient(circle at 95% 5%, var(--sage-soft) 0%, transparent 35%),
+      radial-gradient(circle at 90% 92%, var(--terracotta-soft) 0%, transparent 32%);
+    min-height: 100vh;
+  }
+
+  h1,h2,h3, .display{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  ::selection{ background: var(--terracotta-soft); }
+
+  button{ font-family: inherit; cursor: pointer; }
+  input, textarea, select{ font-family: inherit; }
+
+  .app{
+    display: flex;
+    min-height: 100vh;
+    max-width: 1180px;
+    margin: 0 auto;
+    gap: 22px;
+    padding: 26px 22px;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width: 210px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px;
+  }
+
+  .brand-mark{
+    width: 38px; height: 38px;
+    border-radius: 60% 40% 55% 45% / 50% 55% 45% 50%;
+    background: linear-gradient(145deg, var(--terracotta), var(--rose));
+    display:flex; align-items:center; justify-content:center;
+    color: var(--paper);
+    font-family:'Fraunces',serif;
+    font-style: italic;
+    font-weight:600;
+    font-size: 17px;
+    flex-shrink:0;
+    box-shadow: var(--shadow);
+  }
+
+  .brand-text .t{ font-size: 16.5px; line-height:1.1; }
+  .brand-text .s{ font-size: 10.5px; color: var(--ink-soft); letter-spacing: .03em; }
+
+  nav.nav-pills{
+    display:flex; flex-direction:column; gap:7px;
+  }
+
+  .nav-pill{
+    display:flex; align-items:center; gap:9px;
+    padding: 9px 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    transition: all .18s ease;
+  }
+  .nav-pill .ic{ font-size: 14px; width:16px; text-align:center; }
+  .nav-pill:hover{ background: var(--paper-soft); color: var(--ink); }
+  .nav-pill.active{
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: var(--shadow);
+  }
+
+  .sidebar-foot{
+    margin-top:auto;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    padding: 0 8px 4px;
+    line-height:1.5;
+  }
+
+  .count-chip{
+    display:inline-flex;
+    margin-top:6px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--sage-soft);
+    color: #4C5840;
+    font-weight:700;
+    font-size: 10.5px;
+  }
+
+  /* ---------- MAIN ---------- */
+  main{
+    flex: 1;
+    min-width: 0;
+    background: var(--paper);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 28px 32px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  main::before{
+    content:'';
+    position:absolute; top:-60px; right:-60px;
+    width:200px; height:200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--terracotta-soft) 0%, transparent 70%);
+    opacity:.5;
+    pointer-events:none;
+  }
+
+  .view{ display:none; position:relative; }
+  .view.active{ display:block; }
+
+  .view-head{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    margin-bottom: 22px;
+    gap: 14px;
+  }
+  .view-head h1{ font-size: 21px; margin:0 0 4px; }
+  .view-head p{ margin:0; font-size: 12px; color: var(--ink-soft); max-width: 480px; line-height:1.5;}
+
+  /* buttons */
+  .btn{
+    border-radius: var(--radius-pill);
+    border: none;
+    padding: 9px 18px;
+    font-size: 12.5px;
+    font-weight: 700;
+    display:inline-flex; align-items:center; gap:7px;
+    transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  .btn:active{ transform: scale(.96); }
+  .btn-primary{ background: var(--ink); color: var(--paper); }
+  .btn-primary:hover{ box-shadow: var(--shadow); }
+  .btn-accent{ background: var(--terracotta); color: #fff; }
+  .btn-accent:hover{ box-shadow: 0 8px 20px -8px rgba(193,112,74,.55); }
+  .btn-ghost{ background: var(--paper-soft); color: var(--ink); border:1px solid var(--border); }
+  .btn-ghost:hover{ background: var(--bg-deep); }
+  .btn-soft{ background: var(--sage-soft); color:#46523A; }
+  .btn-danger{ background: transparent; color: var(--rose); border: 1px solid var(--rose-soft); }
+  .btn-danger:hover{ background: var(--rose-soft); }
+  .btn-sm{ padding: 6px 13px; font-size: 11px; }
+  .btn[disabled]{ opacity:.4; cursor:not-allowed; }
+
+  /* pill tags / selector chips */
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    background: var(--paper-soft);
+    padding: 7px 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    transition: all .15s ease;
+  }
+  .chip:hover{ border-color: var(--terracotta); color: var(--ink); }
+  .chip.selected{
+    background: var(--terracotta);
+    border-color: var(--terracotta);
+    color: #fff;
+  }
+
+  /* inputs */
+  label.field-label{
+    display:block; font-size: 11px; font-weight:700; letter-spacing:.03em;
+    color: var(--ink-soft); text-transform: uppercase; margin: 18px 0 8px;
+  }
+  label.field-label:first-child{ margin-top:0; }
+
+  input[type=text], textarea{
+    width:100%;
+    border: 1px solid var(--border);
+    background: var(--paper-soft);
+    color: var(--ink);
+    border-radius: 18px;
+    padding: 11px 16px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    resize: vertical;
+  }
+  input[type=text]:focus, textarea:focus{
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 3px var(--terracotta-soft);
+  }
+  .title-input{
+    font-family:'Fraunces',serif;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+    padding: 10px 20px;
+  }
+  textarea.note-body{ min-height: 220px; line-height:1.6; border-radius: 20px; }
+  textarea.template-body{ min-height: 140px; line-height:1.6; border-radius: 20px; }
+
+  /* reference note block */
+  .ref-block{
+    border: 1px dashed var(--ink-faint);
+    border-radius: 20px;
+    padding: 14px 18px;
+    background: var(--bg-deep);
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .ref-block .ref-tag{
+    position:absolute; top:-11px; left:14px;
+    background: var(--sage);
+    color: #fff;
+    font-size: 9.5px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding: 3px 11px;
+    border-radius: var(--radius-pill);
+  }
+  .ref-block .ref-title{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin: 4px 0 5px; }
+  .ref-block .ref-text{ font-size: 12px; color: var(--ink-soft); line-height:1.55; white-space:pre-wrap; max-height: 110px; overflow:auto; }
+
+  .stitch-divider{
+    border:none;
+    border-top: 1px dotted var(--ink-faint);
+    margin: 16px 0;
+  }
+
+  /* empty state */
+  .empty{
+    text-align:center;
+    padding: 50px 20px;
+    color: var(--ink-soft);
+  }
+  .empty .blob{
+    width:74px; height:74px; margin:0 auto 14px;
+    border-radius: 58% 42% 50% 50% / 50% 60% 40% 50%;
+    background: linear-gradient(135deg, var(--sage-soft), var(--rose-soft));
+    display:flex; align-items:center; justify-content:center;
+    font-size: 26px;
+  }
+  .empty h3{ font-size:14.5px; margin: 0 0 4px; }
+  .empty p{ font-size:12px; margin:0; }
+
+  /* template cards */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .tpl-card, .note-card{
+    border: 1px solid var(--border);
+    background: var(--paper-soft);
+    border-radius: 22px;
+    padding: 16px 18px;
+    display:flex; flex-direction:column; gap:8px;
+    transition: box-shadow .15s ease, border-color .15s ease;
+  }
+  .tpl-card:hover, .note-card:hover{ box-shadow: var(--shadow); border-color: var(--terracotta-soft); }
+  .tpl-card h3, .note-card h3{ font-size: 14.5px; margin:0; }
+  .tpl-card .preview, .note-card .preview{
+    font-size: 11.5px; color: var(--ink-soft); line-height:1.5;
+    overflow:hidden; text-overflow:ellipsis;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+    min-height: 30px;
+  }
+  .card-meta{ font-size: 10px; color: var(--ink-faint); display:flex; align-items:center; gap:6px; }
+  .card-meta .dot{ width:4px; height:4px; border-radius:50%; background: var(--ink-faint); }
+  .card-actions{ display:flex; gap:7px; margin-top:4px; }
+
+  .tag-pill{
+    display:inline-flex; align-items:center; gap:4px;
+    font-size: 9.5px; font-weight:700; letter-spacing:.02em;
+    padding: 3px 10px; border-radius: var(--radius-pill);
+    background: var(--terracotta-soft); color: #7A3D21;
+    width: fit-content;
+  }
+  .tag-pill.ref{ background: var(--sage-soft); color:#46523A; }
+
+  /* search bar */
+  .search-wrap{ position:relative; max-width: 320px; }
+  .search-wrap input{ padding-left: 38px; border-radius: var(--radius-pill); }
+  .search-wrap .ic{ position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--ink-faint); font-size:13px; }
+
+  .archive-list{ display:flex; flex-direction:column; gap:10px; margin-top:18px; }
+  .archive-subhead{
+    font-size: 14px; display:flex; align-items:center; gap:9px; margin: 0;
+  }
+  .archive-subnote{ font-size: 11px; color: var(--ink-soft); margin: 4px 0 0; }
+  .count-chip.ref-chip{ background: var(--rose-soft); color: #7A3D34; }
+  .archive-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 14px;
+    border: 1px solid var(--border);
+    background: var(--paper-soft);
+    border-radius: var(--radius-pill);
+    padding: 11px 10px 11px 20px;
+    transition: box-shadow .15s ease, border-color .15s ease;
+  }
+  .archive-row:hover{ border-color: var(--terracotta-soft); box-shadow: var(--shadow); }
+  .archive-row .info{ min-width:0; flex:1; }
+  .archive-row .info h3{ font-size: 13.5px; margin:0 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .archive-row .info .snip{ font-size: 11px; color: var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .archive-row .meta-col{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+  .archive-row .actions{ display:flex; gap:6px; flex-shrink:0; }
+  .icon-btn{
+    width:30px; height:30px; border-radius:50%;
+    border:1px solid var(--border); background:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .icon-btn:hover{ background: var(--bg-deep); color: var(--ink); }
+
+  .footer-row{ display:flex; justify-content:flex-end; gap:10px; margin-top: 24px; }
+
+  .toast{
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--paper);
+    padding: 10px 22px; border-radius: var(--radius-pill);
+    font-size: 12px; font-weight:600;
+    box-shadow: var(--shadow);
+    opacity: 0; pointer-events:none;
+    transition: all .25s ease;
+    z-index: 50;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 760px){
+    .app{ flex-direction:column; padding:16px; }
+    .sidebar{ width:auto; flex-direction:row; align-items:center; }
+    nav.nav-pills{ flex-direction:row; flex-wrap:wrap; }
+    .sidebar-foot{ display:none; }
+    main{ padding: 20px; }
+  }
+
+  :focus-visible{ outline: 2px solid var(--terracotta); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">d</div>
+      <div class="brand-text">
+        <div class="t display">Defter</div>
+        <div class="s">küçük notlar, sıcak köşe</div>
+      </div>
+    </div>
+
+    <nav class="nav-pills">
+      <button class="nav-pill active" data-view="editor"><span class="ic">✎</span> Yeni Not</button>
+      <button class="nav-pill" data-view="templates"><span class="ic">⌗</span> Şablonlar</button>
+      <button class="nav-pill" data-view="archive"><span class="ic">⌕</span> Arşiv</button>
+    </nav>
+
+    <div class="sidebar-foot">
+      Notların bu tarayıcıda saklanır.
+      <div><span class="count-chip" id="noteCountChip">0 not</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- ===================== EDITOR VIEW ===================== -->
+    <section class="view active" id="view-editor">
+      <div class="view-head">
+        <div>
+          <h1 id="editorHeading">Yeni not</h1>
+          <p>İstersen bir şablonla başla, istersen başka bir nottan referans ekle. Hepsi düzenlenebilir.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="resetEditorBtn">↺ Sıfırla</button>
+      </div>
+
+      <label class="field-label">Not türü</label>
+      <div class="chip-row" id="noteTypeRow">
+        <button class="chip selected" data-type="note">📝 Normal not</button>
+        <button class="chip" data-type="reference">📌 Referans notu</button>
+      </div>
+
+      <label class="field-label">Şablon seç (opsiyonel)</label>
+      <div class="chip-row" id="templateChipRow">
+        <button class="chip selected" data-tpl="">Boş not</button>
+      </div>
+
+      <label class="field-label">Referans not ekle (opsiyonel)</label>
+      <div class="chip-row" id="refChipRow">
+        <button class="chip selected" data-ref="">Yok</button>
+      </div>
+
+      <div id="refPreviewSlot"></div>
+
+      <label class="field-label">Başlık</label>
+      <input type="text" class="title-input" id="noteTitle" placeholder="Notuna bir ad ver…">
+
+      <label class="field-label">Not metni</label>
+      <textarea class="note-body" id="noteBody" placeholder="Buraya yaz…"></textarea>
+
+      <div class="footer-row">
+        <span id="editingBadge" style="display:none; align-self:center; font-size:11px; color: var(--ink-soft);">bir arşiv notu düzenleniyor</span>
+        <button class="btn btn-accent" id="saveNoteBtn">✓ Kaydet</button>
+      </div>
+    </section>
+
+    <!-- ===================== TEMPLATES VIEW ===================== -->
+    <section class="view" id="view-templates">
+      <div class="view-head">
+        <div>
+          <h1>Şablonlar</h1>
+          <p>Sık kullandığın yapıları şablon olarak kaydet; not yazarken tek tıkla başlat.</p>
+        </div>
+        <button class="btn btn-primary" id="newTplBtn">+ Şablon oluştur</button>
+      </div>
+
+      <div id="tplFormWrap" style="display:none; margin-bottom:22px;">
+        <label class="field-label">Şablon adı</label>
+        <input type="text" id="tplName" placeholder="Örn. Toplantı notu">
+        <label class="field-label">Şablon içeriği</label>
+        <textarea class="template-body" id="tplBody" placeholder="Not yazmaya başladığında otomatik dolacak metin…"></textarea>
+        <div class="footer-row">
+          <button class="btn btn-ghost btn-sm" id="cancelTplBtn">Vazgeç</button>
+          <button class="btn btn-accent" id="saveTplBtn">✓ Şablonu kaydet</button>
+        </div>
+      </div>
+
+      <div class="grid" id="tplGrid"></div>
+      <div class="empty" id="tplEmpty" style="display:none;">
+        <div class="blob">⌗</div>
+        <h3>Henüz şablon yok</h3>
+        <p>"Şablon oluştur" ile ilk şablonunu ekle.</p>
+      </div>
+    </section>
+
+    <!-- ===================== ARCHIVE VIEW ===================== -->
+    <section class="view" id="view-archive">
+      <div class="view-head">
+        <div>
+          <h1>Arşiv</h1>
+          <p>Kaydettiğin tüm notlar burada. Ara, aç, düzenle.</p>
+        </div>
+        <div class="search-wrap">
+          <span class="ic">⌕</span>
+          <input type="text" id="archiveSearch" placeholder="Notlarda ara…">
+        </div>
+      </div>
+
+      <h2 class="archive-subhead">Notlar <span class="count-chip" id="notesSubCount">0</span></h2>
+      <div class="archive-list" id="archiveList"></div>
+      <div class="empty" id="archiveEmpty" style="display:none;">
+        <div class="blob">📜</div>
+        <h3>Arşiv boş</h3>
+        <p>Kaydettiğin notlar burada görünecek.</p>
+      </div>
+
+      <hr class="stitch-divider" style="margin:28px 0;">
+
+      <h2 class="archive-subhead">📌 Referans Notlar <span class="count-chip ref-chip" id="refSubCount">0</span></h2>
+      <p class="archive-subnote">Bu notlar ayrı tutulur ve yeni not yazarken "referans ekle" listesinde sadece bunlar görünür.</p>
+      <div class="archive-list" id="archiveRefList"></div>
+      <div class="empty" id="archiveRefEmpty" style="display:none;">
+        <div class="blob">📌</div>
+        <h3>Henüz referans notu yok</h3>
+        <p>Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORE_KEY = "defter_data_v1";
+  let state = { notes: [], templates: [] };
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(raw) state = JSON.parse(raw);
+    }catch(e){ console.warn("Kayıtlı veri okunamadı", e); }
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+    catch(e){ console.warn("Kaydedilemedi", e); }
+  }
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function escapeHtml(s){
+    return (s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+  }
+  function fmtDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString('tr-TR', {day:'2-digit', month:'short'}) + " · " +
+           d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  let toastTimer;
+  function toast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> el.classList.remove('show'), 1800);
+  }
+
+  /* ---------------- VIEW SWITCHING ---------------- */
+  const views = document.querySelectorAll('.view');
+  const pills = document.querySelectorAll('.nav-pill');
+  function showView(name){
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    pills.forEach(p => p.classList.toggle('active', p.dataset.view === name));
+    if(name === 'templates') renderTemplates();
+    if(name === 'archive') renderArchive();
+  }
+  pills.forEach(p => p.addEventListener('click', () => showView(p.dataset.view)));
+
+  /* ---------------- EDITOR STATE ---------------- */
+  let editingNoteId = null;     // null => new note
+  let selectedTplId = "";
+  let selectedRefId = "";
+  let selectedNoteType = "note"; // "note" | "reference"
+
+  const noteTypeRow = document.getElementById('noteTypeRow');
+  noteTypeRow.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      selectedNoteType = chip.dataset.type;
+      noteTypeRow.querySelectorAll('.chip').forEach(c => c.classList.toggle('selected', c === chip));
+    });
+  });
+  function setNoteTypeUI(type){
+    selectedNoteType = type;
+    noteTypeRow.querySelectorAll('.chip').forEach(c => c.classList.toggle('selected', c.dataset.type === type));
+  }
+
+  const noteTitleEl = document.getElementById('noteTitle');
+  const noteBodyEl  = document.getElementById('noteBody');
+  const editorHeading = document.getElementById('editorHeading');
+  const editingBadge = document.getElementById('editingBadge');
+  const refPreviewSlot = document.getElementById('refPreviewSlot');
+
+  function resetEditor(){
+    editingNoteId = null;
+    selectedTplId = "";
+    selectedRefId = "";
+    setNoteTypeUI("note");
+    noteTitleEl.value = "";
+    noteBodyEl.value = "";
+    editorHeading.textContent = "Yeni not";
+    editingBadge.style.display = "none";
+    renderTemplateChips();
+    renderRefChips();
+    renderRefPreview();
+  }
+  document.getElementById('resetEditorBtn').addEventListener('click', resetEditor);
+
+  function renderTemplateChips(){
+    const row = document.getElementById('templateChipRow');
+    row.innerHTML = "";
+    const blank = document.createElement('button');
+    blank.className = 'chip' + (selectedTplId === "" ? ' selected' : '');
+    blank.textContent = 'Boş not';
+    blank.addEventListener('click', () => applyTemplate(""));
+    row.appendChild(blank);
+
+    state.templates.forEach(t => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (selectedTplId === t.id ? ' selected' : '');
+      c.textContent = t.name;
+      c.addEventListener('click', () => applyTemplate(t.id));
+      row.appendChild(c);
+    });
+  }
+
+  function applyTemplate(tplId){
+    selectedTplId = tplId;
+    renderTemplateChips();
+    if(!tplId){ return; }
+    const tpl = state.templates.find(t => t.id === tplId);
+    if(!tpl) return;
+    // only overwrite body if empty or user agrees implicitly by switching template while creating
+    if(!noteBodyEl.value.trim() || editingNoteId === null){
+      noteBodyEl.value = tpl.body;
+    }
+    if(!noteTitleEl.value.trim()){
+      noteTitleEl.value = tpl.name;
+    }
+    toast("“" + tpl.name + "” şablonu uygulandı");
+  }
+
+  function renderRefChips(){
+    const row = document.getElementById('refChipRow');
+    row.innerHTML = "";
+    const none = document.createElement('button');
+    none.className = 'chip' + (selectedRefId === "" ? ' selected' : '');
+    none.textContent = 'Yok';
+    none.addEventListener('click', () => { selectedRefId = ""; renderRefChips(); renderRefPreview(); });
+    row.appendChild(none);
+
+    state.notes
+      .filter(n => n.id !== editingNoteId && n.type === 'reference')
+      .slice()
+      .sort((a,b) => b.updatedAt - a.updatedAt)
+      .forEach(n => {
+        const c = document.createElement('button');
+        c.className = 'chip' + (selectedRefId === n.id ? ' selected' : '');
+        c.textContent = '📌 ' + (n.title || "(başlıksız)");
+        c.addEventListener('click', () => { selectedRefId = n.id; renderRefChips(); renderRefPreview(); });
+        row.appendChild(c);
+      });
+
+    if(state.notes.filter(n => n.type === 'reference').length === 0){
+      const hint = document.createElement('span');
+      hint.style.fontSize = '11px';
+      hint.style.color = 'var(--ink-faint)';
+      hint.style.alignSelf = 'center';
+      hint.textContent = 'Henüz referans notu yok — Arşiv\'de "Referans notu" türünde bir not kaydet.';
+      row.appendChild(hint);
+    }
+  }
+
+  function renderRefPreview(){
+    refPreviewSlot.innerHTML = "";
+    if(!selectedRefId) return;
+    const ref = state.notes.find(n => n.id === selectedRefId);
+    if(!ref) return;
+    const block = document.createElement('div');
+    block.className = 'ref-block';
+    block.innerHTML =
+      '<span class="ref-tag">Referans not</span>' +
+      '<div class="ref-title">' + escapeHtml(ref.title || "(başlıksız)") + '</div>' +
+      '<div class="ref-text">' + escapeHtml(ref.body) + '</div>';
+    refPreviewSlot.appendChild(block);
+    const hr = document.createElement('hr');
+    hr.className = 'stitch-divider';
+    refPreviewSlot.appendChild(hr);
+  }
+
+  document.getElementById('saveNoteBtn').addEventListener('click', () => {
+    const title = noteTitleEl.value.trim();
+    const body = noteBodyEl.value.trim();
+    if(!title && !body){
+      toast("Önce bir şeyler yaz");
+      return;
+    }
+    const now = Date.now();
+    if(editingNoteId){
+      const n = state.notes.find(x => x.id === editingNoteId);
+      if(n){
+        n.title = title || "(başlıksız)";
+        n.body = body;
+        n.templateId = selectedTplId || null;
+        n.referenceId = selectedRefId || null;
+        n.type = selectedNoteType;
+        n.updatedAt = now;
+      }
+      toast("Not güncellendi");
+    } else {
+      state.notes.push({
+        id: uid(),
+        title: title || "(başlıksız)",
+        body: body,
+        templateId: selectedTplId || null,
+        referenceId: selectedRefId || null,
+        type: selectedNoteType,
+        createdAt: now,
+        updatedAt: now
+      });
+      toast(selectedNoteType === 'reference' ? "Referans notu kaydedildi" : "Not kaydedildi");
+    }
+    saveState();
+    updateNoteCount();
+    resetEditor();
+    showView('archive');
+  });
+
+  /* ---------------- TEMPLATES VIEW ---------------- */
+  const tplFormWrap = document.getElementById('tplFormWrap');
+  const tplNameEl = document.getElementById('tplName');
+  const tplBodyEl = document.getElementById('tplBody');
+  let editingTplId = null;
+
+  document.getElementById('newTplBtn').addEventListener('click', () => {
+    editingTplId = null;
+    tplNameEl.value = "";
+    tplBodyEl.value = "";
+    tplFormWrap.style.display = "block";
+    tplNameEl.focus();
+  });
+  document.getElementById('cancelTplBtn').addEventListener('click', () => {
+    tplFormWrap.style.display = "none";
+  });
+  document.getElementById('saveTplBtn').addEventListener('click', () => {
+    const name = tplNameEl.value.trim();
+    const body = tplBodyEl.value;
+    if(!name){ toast("Şablona bir ad ver"); return; }
+    if(editingTplId){
+      const t = state.templates.find(x => x.id === editingTplId);
+      if(t){ t.name = name; t.body = body; }
+      toast("Şablon güncellendi");
+    } else {
+      state.templates.push({ id: uid(), name, body, createdAt: Date.now() });
+      toast("Şablon oluşturuldu");
+    }
+    saveState();
+    tplFormWrap.style.display = "none";
+    renderTemplates();
+    renderTemplateChips();
+  });
+
+  function renderTemplates(){
+    const grid = document.getElementById('tplGrid');
+    const empty = document.getElementById('tplEmpty');
+    grid.innerHTML = "";
+    if(state.templates.length === 0){
+      empty.style.display = "block";
+      return;
+    }
+    empty.style.display = "none";
+    state.templates
+      .slice()
+      .sort((a,b) => b.createdAt - a.createdAt)
+      .forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'tpl-card';
+        card.innerHTML =
+          '<h3>' + escapeHtml(t.name) + '</h3>' +
+          '<div class="preview">' + escapeHtml(t.body || "Boş şablon") + '</div>' +
+          '<div class="card-actions">' +
+            '<button class="btn btn-ghost btn-sm" data-act="edit">Düzenle</button>' +
+            '<button class="btn btn-soft btn-sm" data-act="use">Bunu kullan</button>' +
+            '<button class="btn btn-danger btn-sm" data-act="del">Sil</button>' +
+          '</div>';
+        card.querySelector('[data-act="edit"]').addEventListener('click', () => {
+          editingTplId = t.id;
+          tplNameEl.value = t.name;
+          tplBodyEl.value = t.body;
+          tplFormWrap.style.display = "block";
+          tplNameEl.focus();
+        });
+        card.querySelector('[data-act="use"]').addEventListener('click', () => {
+          resetEditor();
+          applyTemplate(t.id);
+          showView('editor');
+        });
+        card.querySelector('[data-act="del"]').addEventListener('click', () => {
+          if(!confirm('"' + t.name + '" şablonunu silmek istediğine emin misin?')) return;
+          state.templates = state.templates.filter(x => x.id !== t.id);
+          saveState();
+          renderTemplates();
+          renderTemplateChips();
+          toast("Şablon silindi");
+        });
+        grid.appendChild(card);
+      });
+  }
+
+  /* ---------------- ARCHIVE VIEW ---------------- */
+  const archiveList = document.getElementById('archiveList');
+  const archiveEmpty = document.getElementById('archiveEmpty');
+  const archiveRefList = document.getElementById('archiveRefList');
+  const archiveRefEmpty = document.getElementById('archiveRefEmpty');
+  const archiveSearch = document.getElementById('archiveSearch');
+
+  function buildArchiveRow(n){
+    const row = document.createElement('div');
+    row.className = 'archive-row';
+
+    const tags = [];
+    if(n.type === 'reference'){
+      tags.push('<span class="tag-pill ref">📌 Referans</span>');
+    }
+    if(n.templateId){
+      const t = state.templates.find(x => x.id === n.templateId);
+      if(t) tags.push('<span class="tag-pill">' + escapeHtml(t.name) + '</span>');
+    }
+    if(n.referenceId){
+      const r = state.notes.find(x => x.id === n.referenceId);
+      if(r) tags.push('<span class="tag-pill ref">↳ ' + escapeHtml(r.title) + '</span>');
+    }
+
+    row.innerHTML =
+      '<div class="info">' +
+        '<h3>' + escapeHtml(n.title) + '</h3>' +
+        '<div class="snip">' + escapeHtml(n.body.slice(0,90) || "Boş not") + '</div>' +
+      '</div>' +
+      '<div class="meta-col">' +
+        (tags.length ? tags.join(' ') : '') +
+        '<span style="font-size:10px;color:var(--ink-faint);">' + fmtDate(n.updatedAt) + '</span>' +
+      '</div>' +
+      '<div class="actions">' +
+        '<button class="icon-btn" data-act="edit" title="Düzenle">✎</button>' +
+        '<button class="icon-btn" data-act="del" title="Sil">✕</button>' +
+      '</div>';
+
+    row.querySelector('[data-act="edit"]').addEventListener('click', () => openNoteForEdit(n.id));
+    row.querySelector('[data-act="del"]').addEventListener('click', () => {
+      if(!confirm('"' + n.title + '" notunu silmek istediğine emin misin?')) return;
+      state.notes = state.notes.filter(x => x.id !== n.id);
+      saveState();
+      renderArchive();
+      updateNoteCount();
+      toast("Not silindi");
+    });
+    return row;
+  }
+
+  function renderArchive(){
+    const q = archiveSearch.value.trim().toLowerCase();
+    const matches = n => !q || (n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q));
+
+    const regular = state.notes.filter(n => n.type !== 'reference' && matches(n))
+      .slice().sort((a,b) => b.updatedAt - a.updatedAt);
+    const refs = state.notes.filter(n => n.type === 'reference' && matches(n))
+      .slice().sort((a,b) => b.updatedAt - a.updatedAt);
+
+    archiveList.innerHTML = "";
+    if(regular.length === 0){
+      archiveEmpty.style.display = "block";
+      archiveEmpty.querySelector('h3').textContent = q ? "Sonuç bulunamadı" : "Arşiv boş";
+      archiveEmpty.querySelector('p').textContent = q ? "Farklı bir kelime dener misin?" : "Kaydettiğin notlar burada görünecek.";
+    } else {
+      archiveEmpty.style.display = "none";
+      regular.forEach(n => archiveList.appendChild(buildArchiveRow(n)));
+    }
+
+    archiveRefList.innerHTML = "";
+    if(refs.length === 0){
+      archiveRefEmpty.style.display = "block";
+      archiveRefEmpty.querySelector('h3').textContent = q ? "Sonuç bulunamadı" : "Henüz referans notu yok";
+      archiveRefEmpty.querySelector('p').textContent = q ? "Farklı bir kelime dener misin?" : 'Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.';
+    } else {
+      archiveRefEmpty.style.display = "none";
+      refs.forEach(n => archiveRefList.appendChild(buildArchiveRow(n)));
+    }
+
+    document.getElementById('notesSubCount').textContent = regular.length;
+    document.getElementById('refSubCount').textContent = refs.length;
+  }
+  archiveSearch.addEventListener('input', renderArchive);
+
+  function openNoteForEdit(id){
+    const n = state.notes.find(x => x.id === id);
+    if(!n) return;
+    editingNoteId = id;
+    selectedTplId = n.templateId || "";
+    selectedRefId = n.referenceId || "";
+    setNoteTypeUI(n.type || "note");
+    noteTitleEl.value = n.title;
+    noteBodyEl.value = n.body;
+    editorHeading.textContent = "Notu düzenle";
+    editingBadge.style.display = "inline-block";
+    renderTemplateChips();
+    renderRefChips();
+    renderRefPreview();
+    showView('editor');
+  }
+
+  function updateNoteCount(){
+    const el = document.getElementById('noteCountChip');
+    const c = state.notes.length;
+    el.textContent = c + (c === 1 ? " not" : " not");
+  }
+
+  /* ---------------- INIT ---------------- */
+  loadState();
+  renderTemplateChips();
+  renderRefChips();
+  updateNoteCount();
+  showView('editor');
+
+})();
+</script>
+</body>
+</html>
