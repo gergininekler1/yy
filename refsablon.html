@@ -328,6 +328,7 @@
     width: fit-content;
   }
   .tag-pill.ref{ background: var(--sage-soft); color:#46523A; }
+  .tag-pill.lvl3{ background: var(--terracotta-soft); color:#7A3D21; }
 
   /* search bar */
   .search-wrap{ position:relative; max-width: 320px; }
@@ -362,6 +363,37 @@
     font-size: 12.5px; color: var(--ink-soft);
   }
   .icon-btn:hover{ background: var(--bg-deep); color: var(--ink); }
+
+  .count-chip.lvl3-chip{ background: var(--terracotta-soft); color: #7A3D21; }
+
+  /* pagination */
+  .pager{
+    display:flex; align-items:center; justify-content:center;
+    gap: 6px; margin-top: 16px; flex-wrap: wrap;
+  }
+  .pager:empty{ display:none; }
+  .pager-btn{
+    min-width: 32px; height: 32px;
+    padding: 0 8px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    background: var(--paper-soft);
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 700;
+    display:flex; align-items:center; justify-content:center;
+    transition: all .15s ease;
+  }
+  .pager-btn:hover:not([disabled]){ border-color: var(--terracotta); color: var(--ink); }
+  .pager-btn.active{
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .pager-btn[disabled]{ opacity:.35; cursor:not-allowed; }
+  .pager-dots{
+    font-size: 12px; color: var(--ink-faint); padding: 0 2px;
+  }
 
   .footer-row{ display:flex; justify-content:flex-end; gap:10px; margin-top: 24px; }
 
@@ -431,6 +463,7 @@
       <div class="chip-row" id="noteTypeRow">
         <button class="chip selected" data-type="note">📝 Normal not</button>
         <button class="chip" data-type="reference">📌 Referans notu</button>
+        <button class="chip" data-type="level3">🧷 3. Seviye not</button>
       </div>
 
       <label class="field-label">Şablon seç (opsiyonel)</label>
@@ -438,7 +471,7 @@
         <button class="chip selected" data-tpl="">Boş not</button>
       </div>
 
-      <label class="field-label">Referans not ekle (opsiyonel)</label>
+      <label class="field-label" id="refSectionLabel">Referans not ekle (opsiyonel)</label>
       <div class="chip-row" id="refChipRow">
         <button class="chip selected" data-ref="">Yok</button>
       </div>
@@ -506,6 +539,7 @@
         <h3>Arşiv boş</h3>
         <p>Kaydettiğin notlar burada görünecek.</p>
       </div>
+      <div class="pager" id="notesPager"></div>
 
       <hr class="stitch-divider" style="margin:28px 0;">
 
@@ -517,6 +551,19 @@
         <h3>Henüz referans notu yok</h3>
         <p>Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.</p>
       </div>
+      <div class="pager" id="refPager"></div>
+
+      <hr class="stitch-divider" style="margin:28px 0;">
+
+      <h2 class="archive-subhead">🧷 3. Seviye Notlar <span class="count-chip lvl3-chip" id="lvl3SubCount">0</span></h2>
+      <p class="archive-subnote">Bu notlar, "Notlar" bölümündeki notları kaynak/referans alarak oluşturulur.</p>
+      <div class="archive-list" id="archiveLvl3List"></div>
+      <div class="empty" id="archiveLvl3Empty" style="display:none;">
+        <div class="blob">🧷</div>
+        <h3>Henüz 3. seviye not yok</h3>
+        <p>Bir notu kaydederken "3. Seviye not" türünü seçerek buraya ekleyebilirsin.</p>
+      </div>
+      <div class="pager" id="lvl3Pager"></div>
     </section>
 
   </main>
@@ -581,8 +628,15 @@
   const noteTypeRow = document.getElementById('noteTypeRow');
   noteTypeRow.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
+      const prevSourceType = refSourceType();
       selectedNoteType = chip.dataset.type;
       noteTypeRow.querySelectorAll('.chip').forEach(c => c.classList.toggle('selected', c === chip));
+      // referans kaynağı değiştiyse (normal <-> referans notlar), seçimi sıfırla
+      if(refSourceType() !== prevSourceType){
+        selectedRefId = "";
+      }
+      renderRefChips();
+      renderRefPreview();
     });
   });
   function setNoteTypeUI(type){
@@ -645,9 +699,27 @@
     toast("“" + tpl.name + "” şablonu uygulandı");
   }
 
+  // 3. seviye not türü için referans kaynağı "note" tipindeki notlardır,
+  // diğer tüm türler için referans kaynağı "reference" tipindeki notlardır.
+  function refSourceType(){
+    return selectedNoteType === 'level3' ? 'note' : 'reference';
+  }
+
+  function updateRefSectionLabel(){
+    const label = document.getElementById('refSectionLabel');
+    if(!label) return;
+    label.textContent = selectedNoteType === 'level3'
+      ? 'Referans olarak bir not seç (opsiyonel)'
+      : 'Referans not ekle (opsiyonel)';
+  }
+
   function renderRefChips(){
     const row = document.getElementById('refChipRow');
     row.innerHTML = "";
+    updateRefSectionLabel();
+    const sourceType = refSourceType();
+    const icon = sourceType === 'reference' ? '📌 ' : '📝 ';
+
     const none = document.createElement('button');
     none.className = 'chip' + (selectedRefId === "" ? ' selected' : '');
     none.textContent = 'Yok';
@@ -655,23 +727,25 @@
     row.appendChild(none);
 
     state.notes
-      .filter(n => n.id !== editingNoteId && n.type === 'reference')
+      .filter(n => n.id !== editingNoteId && n.type === sourceType)
       .slice()
       .sort((a,b) => b.updatedAt - a.updatedAt)
       .forEach(n => {
         const c = document.createElement('button');
         c.className = 'chip' + (selectedRefId === n.id ? ' selected' : '');
-        c.textContent = '📌 ' + (n.title || "(başlıksız)");
+        c.textContent = icon + (n.title || "(başlıksız)");
         c.addEventListener('click', () => { selectedRefId = n.id; renderRefChips(); renderRefPreview(); });
         row.appendChild(c);
       });
 
-    if(state.notes.filter(n => n.type === 'reference').length === 0){
+    if(state.notes.filter(n => n.type === sourceType).length === 0){
       const hint = document.createElement('span');
       hint.style.fontSize = '11px';
       hint.style.color = 'var(--ink-faint)';
       hint.style.alignSelf = 'center';
-      hint.textContent = 'Henüz referans notu yok — Arşiv\'de "Referans notu" türünde bir not kaydet.';
+      hint.textContent = sourceType === 'reference'
+        ? 'Henüz referans notu yok — Arşiv\'de "Referans notu" türünde bir not kaydet.'
+        : 'Henüz normal not yok — önce "Normal not" türünde bir not kaydet.';
       row.appendChild(hint);
     }
   }
@@ -683,8 +757,9 @@
     if(!ref) return;
     const block = document.createElement('div');
     block.className = 'ref-block';
+    const tagText = ref.type === 'reference' ? 'Referans not' : 'Kaynak not';
     block.innerHTML =
-      '<span class="ref-tag">Referans not</span>' +
+      '<span class="ref-tag">' + tagText + '</span>' +
       '<div class="ref-title">' + escapeHtml(ref.title || "(başlıksız)") + '</div>' +
       '<div class="ref-text">' + escapeHtml(ref.body) + '</div>';
     refPreviewSlot.appendChild(block);
@@ -723,7 +798,7 @@
         createdAt: now,
         updatedAt: now
       });
-      toast(selectedNoteType === 'reference' ? "Referans notu kaydedildi" : "Not kaydedildi");
+      toast(selectedNoteType === 'reference' ? "Referans notu kaydedildi" : (selectedNoteType === 'level3' ? "3. Seviye not kaydedildi" : "Not kaydedildi"));
     }
     saveState();
     updateNoteCount();
@@ -817,7 +892,13 @@
   const archiveEmpty = document.getElementById('archiveEmpty');
   const archiveRefList = document.getElementById('archiveRefList');
   const archiveRefEmpty = document.getElementById('archiveRefEmpty');
+  const archiveLvl3List = document.getElementById('archiveLvl3List');
+  const archiveLvl3Empty = document.getElementById('archiveLvl3Empty');
   const archiveSearch = document.getElementById('archiveSearch');
+
+  const PAGE_SIZE = 5;
+  // her bölümün kendi sayfa numarasını tutar
+  const archivePages = { notes: 1, ref: 1, lvl3: 1 };
 
   function buildArchiveRow(n){
     const row = document.createElement('div');
@@ -826,6 +907,9 @@
     const tags = [];
     if(n.type === 'reference'){
       tags.push('<span class="tag-pill ref">📌 Referans</span>');
+    }
+    if(n.type === 'level3'){
+      tags.push('<span class="tag-pill lvl3">🧷 3. Seviye</span>');
     }
     if(n.templateId){
       const t = state.templates.find(x => x.id === n.templateId);
@@ -862,39 +946,125 @@
     return row;
   }
 
+  // pagerKey: 'notes' | 'ref' | 'lvl3'
+  function buildPager(pagerEl, pagerKey, totalItems){
+    pagerEl.innerHTML = "";
+    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    if(totalPages <= 1) return;
+
+    const current = archivePages[pagerKey];
+
+    function makeBtn(label, page, opts){
+      opts = opts || {};
+      const b = document.createElement('button');
+      b.className = 'pager-btn' + (opts.active ? ' active' : '');
+      b.textContent = label;
+      b.disabled = !!opts.disabled;
+      if(!opts.disabled && !opts.active){
+        b.addEventListener('click', () => {
+          archivePages[pagerKey] = page;
+          renderArchive();
+        });
+      }
+      return b;
+    }
+
+    pagerEl.appendChild(makeBtn('‹', current - 1, { disabled: current <= 1 }));
+
+    // basit sayfa numarası listesi: tüm sayfalar 7 veya daha azsa hepsini göster,
+    // fazlaysa başı, sonu ve current etrafını göster
+    const pages = [];
+    if(totalPages <= 7){
+      for(let i=1;i<=totalPages;i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if(current > 3) pages.push('...');
+      for(let i=Math.max(2,current-1); i<=Math.min(totalPages-1,current+1); i++) pages.push(i);
+      if(current < totalPages-2) pages.push('...');
+      pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+      if(p === '...'){
+        const dots = document.createElement('span');
+        dots.className = 'pager-dots';
+        dots.textContent = '…';
+        pagerEl.appendChild(dots);
+      } else {
+        pagerEl.appendChild(makeBtn(String(p), p, { active: p === current }));
+      }
+    });
+
+    pagerEl.appendChild(makeBtn('›', current + 1, { disabled: current >= totalPages }));
+  }
+
+  function renderArchiveSection(opts){
+    // opts: { items, listEl, emptyEl, pagerEl, pagerKey, emptyTitle, emptyTitleQ, emptyText, emptyTextQ, countElId }
+    const totalPages = Math.max(1, Math.ceil(opts.items.length / PAGE_SIZE));
+    if(archivePages[opts.pagerKey] > totalPages) archivePages[opts.pagerKey] = totalPages;
+    if(archivePages[opts.pagerKey] < 1) archivePages[opts.pagerKey] = 1;
+    const page = archivePages[opts.pagerKey];
+    const startIdx = (page - 1) * PAGE_SIZE;
+    const pageItems = opts.items.slice(startIdx, startIdx + PAGE_SIZE);
+
+    opts.listEl.innerHTML = "";
+    if(opts.items.length === 0){
+      opts.emptyEl.style.display = "block";
+      opts.emptyEl.querySelector('h3').textContent = opts.q ? "Sonuç bulunamadı" : opts.emptyTitle;
+      opts.emptyEl.querySelector('p').textContent = opts.q ? "Farklı bir kelime dener misin?" : opts.emptyText;
+    } else {
+      opts.emptyEl.style.display = "none";
+      pageItems.forEach(n => opts.listEl.appendChild(buildArchiveRow(n)));
+    }
+
+    buildPager(opts.pagerEl, opts.pagerKey, opts.items.length);
+    document.getElementById(opts.countElId).textContent = opts.items.length;
+  }
+
   function renderArchive(){
     const q = archiveSearch.value.trim().toLowerCase();
     const matches = n => !q || (n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q));
 
-    const regular = state.notes.filter(n => n.type !== 'reference' && matches(n))
+    const regular = state.notes.filter(n => n.type !== 'reference' && n.type !== 'level3' && matches(n))
       .slice().sort((a,b) => b.updatedAt - a.updatedAt);
     const refs = state.notes.filter(n => n.type === 'reference' && matches(n))
       .slice().sort((a,b) => b.updatedAt - a.updatedAt);
+    const lvl3 = state.notes.filter(n => n.type === 'level3' && matches(n))
+      .slice().sort((a,b) => b.updatedAt - a.updatedAt);
 
-    archiveList.innerHTML = "";
-    if(regular.length === 0){
-      archiveEmpty.style.display = "block";
-      archiveEmpty.querySelector('h3').textContent = q ? "Sonuç bulunamadı" : "Arşiv boş";
-      archiveEmpty.querySelector('p').textContent = q ? "Farklı bir kelime dener misin?" : "Kaydettiğin notlar burada görünecek.";
-    } else {
-      archiveEmpty.style.display = "none";
-      regular.forEach(n => archiveList.appendChild(buildArchiveRow(n)));
-    }
+    renderArchiveSection({
+      items: regular, q,
+      listEl: archiveList, emptyEl: archiveEmpty,
+      pagerEl: document.getElementById('notesPager'), pagerKey: 'notes',
+      emptyTitle: "Arşiv boş", emptyText: "Kaydettiğin notlar burada görünecek.",
+      countElId: 'notesSubCount'
+    });
 
-    archiveRefList.innerHTML = "";
-    if(refs.length === 0){
-      archiveRefEmpty.style.display = "block";
-      archiveRefEmpty.querySelector('h3').textContent = q ? "Sonuç bulunamadı" : "Henüz referans notu yok";
-      archiveRefEmpty.querySelector('p').textContent = q ? "Farklı bir kelime dener misin?" : 'Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.';
-    } else {
-      archiveRefEmpty.style.display = "none";
-      refs.forEach(n => archiveRefList.appendChild(buildArchiveRow(n)));
-    }
+    renderArchiveSection({
+      items: refs, q,
+      listEl: archiveRefList, emptyEl: archiveRefEmpty,
+      pagerEl: document.getElementById('refPager'), pagerKey: 'ref',
+      emptyTitle: "Henüz referans notu yok",
+      emptyText: 'Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.',
+      countElId: 'refSubCount'
+    });
 
-    document.getElementById('notesSubCount').textContent = regular.length;
-    document.getElementById('refSubCount').textContent = refs.length;
+    renderArchiveSection({
+      items: lvl3, q,
+      listEl: archiveLvl3List, emptyEl: archiveLvl3Empty,
+      pagerEl: document.getElementById('lvl3Pager'), pagerKey: 'lvl3',
+      emptyTitle: "Henüz 3. seviye not yok",
+      emptyText: 'Bir notu kaydederken "3. Seviye not" türünü seçerek buraya ekleyebilirsin.',
+      countElId: 'lvl3SubCount'
+    });
   }
-  archiveSearch.addEventListener('input', renderArchive);
+  archiveSearch.addEventListener('input', () => {
+    // arama değiştiğinde her bölüm 1. sayfaya dönsün
+    archivePages.notes = 1;
+    archivePages.ref = 1;
+    archivePages.lvl3 = 1;
+    renderArchive();
+  });
 
   function openNoteForEdit(id){
     const n = state.notes.find(x => x.id === id);
