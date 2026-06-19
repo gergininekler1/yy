@@ -56,11 +56,12 @@
 
   .app{
     display: flex;
+    flex-direction: row;
     min-height: 100vh;
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 0 auto;
-    gap: 22px;
-    padding: 26px 22px;
+    gap: 26px;
+    padding: 28px 30px;
   }
 
   /* ---------- SIDEBAR ---------- */
@@ -69,7 +70,11 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 26px;
+    gap: 28px;
+    position: sticky;
+    top: 28px;
+    height: calc(100vh - 56px);
+    order: 2;
   }
 
   .brand{
@@ -143,6 +148,16 @@
   main{
     flex: 1;
     min-width: 0;
+    order: 1;
+    position: relative;
+  }
+
+  main::before{ display:none; }
+
+  .view{ display:none; position:relative; }
+  .view.active{ display:block; }
+
+  .content-card{
     background: var(--paper);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
@@ -151,8 +166,7 @@
     position: relative;
     overflow: hidden;
   }
-
-  main::before{
+  .content-card::before{
     content:'';
     position:absolute; top:-60px; right:-60px;
     width:200px; height:200px;
@@ -161,9 +175,15 @@
     opacity:.5;
     pointer-events:none;
   }
+  .content-card > *{ position:relative; }
 
-  .view{ display:none; position:relative; }
-  .view.active{ display:block; }
+  .editor-top-card{
+    margin-bottom: 12px;
+  }
+
+  .editor-bottom-card{
+    padding-top: 8px;
+  }
 
   .view-head{
     display:flex; align-items:flex-start; justify-content:space-between;
@@ -171,7 +191,7 @@
     gap: 14px;
   }
   .view-head h1{ font-size: 21px; margin:0 0 4px; }
-  .view-head p{ margin:0; font-size: 12px; color: var(--ink-soft); max-width: 480px; line-height:1.5;}
+  .view-head p{ margin:0; font-size: 12.5px; color: var(--ink-soft); max-width: 620px; line-height:1.5;}
 
   /* buttons */
   .btn{
@@ -245,8 +265,65 @@
     border-radius: var(--radius-pill);
     padding: 10px 20px;
   }
-  textarea.note-body{ min-height: 220px; line-height:1.6; border-radius: 20px; }
+  textarea.note-body{ min-height: 420px; line-height:1.6; border-radius: 20px; }
   textarea.template-body{ min-height: 140px; line-height:1.6; border-radius: 20px; }
+
+  .editor-workspace{
+    display:grid;
+    grid-template-columns: minmax(300px, 380px) minmax(520px, 1fr);
+    align-items:start;
+    gap: 22px;
+    margin-top: 0;
+  }
+
+  .editor-panel{
+    border: 1px solid var(--border);
+    background: rgba(247, 241, 230, .62);
+    border-radius: 24px;
+    padding: 18px;
+  }
+
+  .editor-panel.ref-panel{
+    position: sticky;
+    top: 28px;
+  }
+
+  .editor-panel.note-panel{
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+  }
+
+  .panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom: 12px;
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+
+  .ref-empty-side{
+    border: 1px dashed var(--border);
+    border-radius: 20px;
+    padding: 18px;
+    background: var(--paper);
+    color: var(--ink-soft);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .ref-empty-side strong{
+    display:block;
+    font-family:'Fraunces', serif;
+    color: var(--ink);
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
 
   /* reference note block */
   .ref-block{
@@ -254,7 +331,7 @@
     border-radius: 20px;
     padding: 14px 18px;
     background: var(--bg-deep);
-    margin-bottom: 4px;
+    margin-bottom: 0;
     position: relative;
   }
   .ref-block .ref-tag{
@@ -269,7 +346,7 @@
     border-radius: var(--radius-pill);
   }
   .ref-block .ref-title{ font-family:'Fraunces',serif; font-size:14px; font-weight:600; margin: 4px 0 5px; }
-  .ref-block .ref-text{ font-size: 12px; color: var(--ink-soft); line-height:1.55; white-space:pre-wrap; max-height: 110px; overflow:auto; }
+  .ref-block .ref-text{ font-size: 12.5px; color: var(--ink-soft); line-height:1.6; white-space:pre-wrap; max-height: 58vh; overflow:auto; padding-right: 4px; }
 
   .stitch-divider{
     border:none;
@@ -296,7 +373,7 @@
   /* template cards */
   .grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
     gap: 14px;
     margin-top: 16px;
   }
@@ -328,7 +405,7 @@
     width: fit-content;
   }
   .tag-pill.ref{ background: var(--sage-soft); color:#46523A; }
-  .tag-pill.lvl3{ background: var(--terracotta-soft); color:#7A3D21; }
+  .tag-pill.upper{ background: var(--terracotta-soft); color:#7A3D21; }
 
   /* search bar */
   .search-wrap{ position:relative; max-width: 320px; }
@@ -341,6 +418,11 @@
   }
   .archive-subnote{ font-size: 11px; color: var(--ink-soft); margin: 4px 0 0; }
   .count-chip.ref-chip{ background: var(--rose-soft); color: #7A3D34; }
+  .count-chip.upper-chip{ background: var(--terracotta-soft); color: #7A3D21; }
+  .pagination{ display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; margin-top:12px; }
+  .page-btn{ min-width:30px; height:30px; border-radius:var(--radius-pill); border:1px solid var(--border); background:var(--paper-soft); color:var(--ink-soft); font-size:11px; font-weight:700; }
+  .page-btn:hover{ border-color:var(--terracotta); color:var(--ink); }
+  .page-btn.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
   .archive-row{
     display:flex; align-items:center; justify-content:space-between;
     gap: 14px;
@@ -364,37 +446,6 @@
   }
   .icon-btn:hover{ background: var(--bg-deep); color: var(--ink); }
 
-  .count-chip.lvl3-chip{ background: var(--terracotta-soft); color: #7A3D21; }
-
-  /* pagination */
-  .pager{
-    display:flex; align-items:center; justify-content:center;
-    gap: 6px; margin-top: 16px; flex-wrap: wrap;
-  }
-  .pager:empty{ display:none; }
-  .pager-btn{
-    min-width: 32px; height: 32px;
-    padding: 0 8px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--border);
-    background: var(--paper-soft);
-    color: var(--ink-soft);
-    font-size: 12px;
-    font-weight: 700;
-    display:flex; align-items:center; justify-content:center;
-    transition: all .15s ease;
-  }
-  .pager-btn:hover:not([disabled]){ border-color: var(--terracotta); color: var(--ink); }
-  .pager-btn.active{
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
-  .pager-btn[disabled]{ opacity:.35; cursor:not-allowed; }
-  .pager-dots{
-    font-size: 12px; color: var(--ink-faint); padding: 0 2px;
-  }
-
   .footer-row{ display:flex; justify-content:flex-end; gap:10px; margin-top: 24px; }
 
   .toast{
@@ -409,12 +460,21 @@
   }
   .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
 
-  @media (max-width: 760px){
+  @media (max-width: 980px){
     .app{ flex-direction:column; padding:16px; }
-    .sidebar{ width:auto; flex-direction:row; align-items:center; }
+    .sidebar{ width:auto; height:auto; position:static; flex-direction:row; align-items:center; order:0; }
     nav.nav-pills{ flex-direction:row; flex-wrap:wrap; }
     .sidebar-foot{ display:none; }
-    main{ padding: 20px; }
+    .content-card{ padding: 20px; }
+    main{ order:1; }
+    .editor-workspace{ grid-template-columns:1fr; }
+    .editor-panel.ref-panel{ position:static; order:1; }
+    .editor-panel.note-panel{ order:2; }
+    textarea.note-body{ min-height: 300px; }
+  }
+
+  @media (min-width: 1280px){
+    textarea.note-body{ min-height: 500px; }
   }
 
   :focus-visible{ outline: 2px solid var(--terracotta); outline-offset: 2px; }
@@ -451,47 +511,59 @@
 
     <!-- ===================== EDITOR VIEW ===================== -->
     <section class="view active" id="view-editor">
-      <div class="view-head">
-        <div>
-          <h1 id="editorHeading">Yeni not</h1>
-          <p>İstersen bir şablonla başla, istersen başka bir nottan referans ekle. Hepsi düzenlenebilir.</p>
+      <div class="content-card editor-top-card">
+        <div class="view-head">
+          <div>
+            <h1 id="editorHeading">Yeni not</h1>
+            <p>İstersen bir şablonla başla; referans not veya normal notlardan destek alarak yeni notunu yaz. Hepsi düzenlenebilir.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="resetEditorBtn">↺ Sıfırla</button>
         </div>
-        <button class="btn btn-ghost btn-sm" id="resetEditorBtn">↺ Sıfırla</button>
+
+        <label class="field-label">Not türü</label>
+        <div class="chip-row" id="noteTypeRow">
+          <button class="chip selected" data-type="note">📝 Normal not</button>
+          <button class="chip" data-type="reference">📌 Referans notu</button>
+          <button class="chip" data-type="upper">🧠 Üst seviye not</button>
+        </div>
+
+        <label class="field-label">Şablon seç (opsiyonel)</label>
+        <div class="chip-row" id="templateChipRow">
+          <button class="chip selected" data-tpl="">Boş not</button>
+        </div>
+
+        <label class="field-label" id="refSelectLabel">Referans not ekle (opsiyonel)</label>
+        <div class="chip-row" id="refChipRow">
+          <button class="chip selected" data-ref="">Yok</button>
+        </div>
+
+        <label class="field-label">Başlık</label>
+        <input type="text" class="title-input" id="noteTitle" placeholder="Notuna bir ad ver…">
       </div>
 
-      <label class="field-label">Not türü</label>
-      <div class="chip-row" id="noteTypeRow">
-        <button class="chip selected" data-type="note">📝 Normal not</button>
-        <button class="chip" data-type="reference">📌 Referans notu</button>
-        <button class="chip" data-type="level3">🧷 3. Seviye not</button>
-      </div>
+      <div class="content-card editor-bottom-card">
+        <div class="editor-workspace">
+          <aside class="editor-panel ref-panel">
+            <div class="panel-title" id="refPanelTitle">Referans not <span>📌</span></div>
+            <div id="refPreviewSlot"></div>
+          </aside>
 
-      <label class="field-label">Şablon seç (opsiyonel)</label>
-      <div class="chip-row" id="templateChipRow">
-        <button class="chip selected" data-tpl="">Boş not</button>
-      </div>
+          <div class="editor-panel note-panel">
+            <label class="field-label">Not metni</label>
+            <textarea class="note-body" id="noteBody" placeholder="Buraya yaz…"></textarea>
 
-      <label class="field-label" id="refSectionLabel">Referans not ekle (opsiyonel)</label>
-      <div class="chip-row" id="refChipRow">
-        <button class="chip selected" data-ref="">Yok</button>
-      </div>
-
-      <div id="refPreviewSlot"></div>
-
-      <label class="field-label">Başlık</label>
-      <input type="text" class="title-input" id="noteTitle" placeholder="Notuna bir ad ver…">
-
-      <label class="field-label">Not metni</label>
-      <textarea class="note-body" id="noteBody" placeholder="Buraya yaz…"></textarea>
-
-      <div class="footer-row">
-        <span id="editingBadge" style="display:none; align-self:center; font-size:11px; color: var(--ink-soft);">bir arşiv notu düzenleniyor</span>
-        <button class="btn btn-accent" id="saveNoteBtn">✓ Kaydet</button>
+            <div class="footer-row">
+              <span id="editingBadge" style="display:none; align-self:center; font-size:11px; color: var(--ink-soft);">bir arşiv notu düzenleniyor</span>
+              <button class="btn btn-accent" id="saveNoteBtn">✓ Kaydet</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ===================== TEMPLATES VIEW ===================== -->
     <section class="view" id="view-templates">
+      <div class="content-card">
       <div class="view-head">
         <div>
           <h1>Şablonlar</h1>
@@ -517,10 +589,12 @@
         <h3>Henüz şablon yok</h3>
         <p>"Şablon oluştur" ile ilk şablonunu ekle.</p>
       </div>
+      </div>
     </section>
 
     <!-- ===================== ARCHIVE VIEW ===================== -->
     <section class="view" id="view-archive">
+      <div class="content-card">
       <div class="view-head">
         <div>
           <h1>Arşiv</h1>
@@ -534,36 +608,37 @@
 
       <h2 class="archive-subhead">Notlar <span class="count-chip" id="notesSubCount">0</span></h2>
       <div class="archive-list" id="archiveList"></div>
+      <div class="pagination" id="archivePagination"></div>
       <div class="empty" id="archiveEmpty" style="display:none;">
         <div class="blob">📜</div>
         <h3>Arşiv boş</h3>
         <p>Kaydettiğin notlar burada görünecek.</p>
       </div>
-      <div class="pager" id="notesPager"></div>
 
       <hr class="stitch-divider" style="margin:28px 0;">
 
       <h2 class="archive-subhead">📌 Referans Notlar <span class="count-chip ref-chip" id="refSubCount">0</span></h2>
-      <p class="archive-subnote">Bu notlar ayrı tutulur ve yeni not yazarken "referans ekle" listesinde sadece bunlar görünür.</p>
+      <p class="archive-subnote">Bu notlar ayrı tutulur ve yeni not yazarken "referans ekle" listesinde görünür.</p>
       <div class="archive-list" id="archiveRefList"></div>
+      <div class="pagination" id="archiveRefPagination"></div>
       <div class="empty" id="archiveRefEmpty" style="display:none;">
         <div class="blob">📌</div>
         <h3>Henüz referans notu yok</h3>
         <p>Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.</p>
       </div>
-      <div class="pager" id="refPager"></div>
 
       <hr class="stitch-divider" style="margin:28px 0;">
 
-      <h2 class="archive-subhead">🧷 3. Seviye Notlar <span class="count-chip lvl3-chip" id="lvl3SubCount">0</span></h2>
-      <p class="archive-subnote">Bu notlar, "Notlar" bölümündeki notları kaynak/referans alarak oluşturulur.</p>
-      <div class="archive-list" id="archiveLvl3List"></div>
-      <div class="empty" id="archiveLvl3Empty" style="display:none;">
-        <div class="blob">🧷</div>
-        <h3>Henüz 3. seviye not yok</h3>
-        <p>Bir notu kaydederken "3. Seviye not" türünü seçerek buraya ekleyebilirsin.</p>
+      <h2 class="archive-subhead">🧠 Üst Seviye Notlar <span class="count-chip upper-chip" id="upperSubCount">0</span></h2>
+      <p class="archive-subnote">Normal notları kaynak alarak yazdığın üst seviye notlar burada listelenir.</p>
+      <div class="archive-list" id="archiveUpperList"></div>
+      <div class="pagination" id="archiveUpperPagination"></div>
+      <div class="empty" id="archiveUpperEmpty" style="display:none;">
+        <div class="blob">🧠</div>
+        <h3>Henüz üst seviye not yok</h3>
+        <p>Not türünden "Üst seviye not" seçerek normal notlardan referans alabilirsin.</p>
       </div>
-      <div class="pager" id="lvl3Pager"></div>
+      </div>
     </section>
 
   </main>
@@ -623,18 +698,15 @@
   let editingNoteId = null;     // null => new note
   let selectedTplId = "";
   let selectedRefId = "";
-  let selectedNoteType = "note"; // "note" | "reference"
+  let selectedNoteType = "note"; // "note" | "reference" | "upper"
 
   const noteTypeRow = document.getElementById('noteTypeRow');
   noteTypeRow.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      const prevSourceType = refSourceType();
-      selectedNoteType = chip.dataset.type;
+      const newType = chip.dataset.type;
+      selectedNoteType = newType;
+      selectedRefId = "";
       noteTypeRow.querySelectorAll('.chip').forEach(c => c.classList.toggle('selected', c === chip));
-      // referans kaynağı değiştiyse (normal <-> referans notlar), seçimi sıfırla
-      if(refSourceType() !== prevSourceType){
-        selectedRefId = "";
-      }
       renderRefChips();
       renderRefPreview();
     });
@@ -649,6 +721,8 @@
   const editorHeading = document.getElementById('editorHeading');
   const editingBadge = document.getElementById('editingBadge');
   const refPreviewSlot = document.getElementById('refPreviewSlot');
+  const refSelectLabel = document.getElementById('refSelectLabel');
+  const refPanelTitle = document.getElementById('refPanelTitle');
 
   function resetEditor(){
     editingNoteId = null;
@@ -699,73 +773,95 @@
     toast("“" + tpl.name + "” şablonu uygulandı");
   }
 
-  // 3. seviye not türü için referans kaynağı "note" tipindeki notlardır,
-  // diğer tüm türler için referans kaynağı "reference" tipindeki notlardır.
-  function refSourceType(){
-    return selectedNoteType === 'level3' ? 'note' : 'reference';
+  function getReferenceSourceType(){
+    return selectedNoteType === 'upper' ? 'note' : 'reference';
   }
 
-  function updateRefSectionLabel(){
-    const label = document.getElementById('refSectionLabel');
-    if(!label) return;
-    label.textContent = selectedNoteType === 'level3'
-      ? 'Referans olarak bir not seç (opsiyonel)'
-      : 'Referans not ekle (opsiyonel)';
+  function refSourceInfo(){
+    if(selectedNoteType === 'upper'){
+      return {
+        type: 'note',
+        label: 'Normal not ekle (opsiyonel)',
+        panel: 'Normal not <span>📝</span>',
+        prefix: '📝 ',
+        emptyTitle: 'Normal not seçilmedi',
+        emptyText: 'Üst seviye not yazarken solda kaynak olarak normal notlarını kullanabilirsin.',
+        noItemText: 'Henüz normal not yok — önce "Normal not" türünde bir not kaydet.',
+        tag: 'Normal not'
+      };
+    }
+    return {
+      type: 'reference',
+      label: 'Referans not ekle (opsiyonel)',
+      panel: 'Referans not <span>📌</span>',
+      prefix: '📌 ',
+      emptyTitle: 'Referans seçilmedi',
+      emptyText: 'Referans seçtiğinde burada sabit kalacak; sağ tarafta notunu yazmaya devam edeceksin.',
+      noItemText: 'Henüz referans notu yok — Arşiv\'de "Referans notu" türünde bir not kaydet.',
+      tag: 'Referans not'
+    };
   }
 
   function renderRefChips(){
     const row = document.getElementById('refChipRow');
-    row.innerHTML = "";
-    updateRefSectionLabel();
-    const sourceType = refSourceType();
-    const icon = sourceType === 'reference' ? '📌 ' : '📝 ';
+    const info = refSourceInfo();
+    if(refSelectLabel) refSelectLabel.textContent = info.label;
+    if(refPanelTitle) refPanelTitle.innerHTML = info.panel;
 
+    const available = state.notes
+      .filter(n => n.id !== editingNoteId && (n.type || 'note') === info.type)
+      .slice()
+      .sort((a,b) => b.updatedAt - a.updatedAt);
+
+    if(selectedRefId && !available.some(n => n.id === selectedRefId)){
+      selectedRefId = "";
+    }
+
+    row.innerHTML = "";
     const none = document.createElement('button');
     none.className = 'chip' + (selectedRefId === "" ? ' selected' : '');
     none.textContent = 'Yok';
     none.addEventListener('click', () => { selectedRefId = ""; renderRefChips(); renderRefPreview(); });
     row.appendChild(none);
 
-    state.notes
-      .filter(n => n.id !== editingNoteId && n.type === sourceType)
-      .slice()
-      .sort((a,b) => b.updatedAt - a.updatedAt)
-      .forEach(n => {
-        const c = document.createElement('button');
-        c.className = 'chip' + (selectedRefId === n.id ? ' selected' : '');
-        c.textContent = icon + (n.title || "(başlıksız)");
-        c.addEventListener('click', () => { selectedRefId = n.id; renderRefChips(); renderRefPreview(); });
-        row.appendChild(c);
-      });
+    available.forEach(n => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (selectedRefId === n.id ? ' selected' : '');
+      c.textContent = info.prefix + (n.title || "(başlıksız)");
+      c.addEventListener('click', () => { selectedRefId = n.id; renderRefChips(); renderRefPreview(); });
+      row.appendChild(c);
+    });
 
-    if(state.notes.filter(n => n.type === sourceType).length === 0){
+    if(available.length === 0){
       const hint = document.createElement('span');
       hint.style.fontSize = '11px';
       hint.style.color = 'var(--ink-faint)';
       hint.style.alignSelf = 'center';
-      hint.textContent = sourceType === 'reference'
-        ? 'Henüz referans notu yok — Arşiv\'de "Referans notu" türünde bir not kaydet.'
-        : 'Henüz normal not yok — önce "Normal not" türünde bir not kaydet.';
+      hint.textContent = info.noItemText;
       row.appendChild(hint);
     }
   }
 
   function renderRefPreview(){
+    const info = refSourceInfo();
+    if(refPanelTitle) refPanelTitle.innerHTML = info.panel;
     refPreviewSlot.innerHTML = "";
-    if(!selectedRefId) return;
+    if(!selectedRefId){
+      const empty = document.createElement('div');
+      empty.className = 'ref-empty-side';
+      empty.innerHTML = '<strong>' + info.emptyTitle + '</strong>' + info.emptyText;
+      refPreviewSlot.appendChild(empty);
+      return;
+    }
     const ref = state.notes.find(n => n.id === selectedRefId);
     if(!ref) return;
     const block = document.createElement('div');
     block.className = 'ref-block';
-    const tagText = ref.type === 'reference' ? 'Referans not' : 'Kaynak not';
     block.innerHTML =
-      '<span class="ref-tag">' + tagText + '</span>' +
+      '<span class="ref-tag">' + escapeHtml(info.tag) + '</span>' +
       '<div class="ref-title">' + escapeHtml(ref.title || "(başlıksız)") + '</div>' +
       '<div class="ref-text">' + escapeHtml(ref.body) + '</div>';
     refPreviewSlot.appendChild(block);
-    const hr = document.createElement('hr');
-    hr.className = 'stitch-divider';
-    refPreviewSlot.appendChild(hr);
   }
 
   document.getElementById('saveNoteBtn').addEventListener('click', () => {
@@ -798,7 +894,7 @@
         createdAt: now,
         updatedAt: now
       });
-      toast(selectedNoteType === 'reference' ? "Referans notu kaydedildi" : (selectedNoteType === 'level3' ? "3. Seviye not kaydedildi" : "Not kaydedildi"));
+      toast(selectedNoteType === 'reference' ? "Referans notu kaydedildi" : (selectedNoteType === 'upper' ? "Üst seviye not kaydedildi" : "Not kaydedildi"));
     }
     saveState();
     updateNoteCount();
@@ -888,17 +984,24 @@
   }
 
   /* ---------------- ARCHIVE VIEW ---------------- */
+  const PAGE_SIZE = 5;
+  const archivePages = { note: 1, reference: 1, upper: 1 };
   const archiveList = document.getElementById('archiveList');
   const archiveEmpty = document.getElementById('archiveEmpty');
+  const archivePagination = document.getElementById('archivePagination');
   const archiveRefList = document.getElementById('archiveRefList');
   const archiveRefEmpty = document.getElementById('archiveRefEmpty');
-  const archiveLvl3List = document.getElementById('archiveLvl3List');
-  const archiveLvl3Empty = document.getElementById('archiveLvl3Empty');
+  const archiveRefPagination = document.getElementById('archiveRefPagination');
+  const archiveUpperList = document.getElementById('archiveUpperList');
+  const archiveUpperEmpty = document.getElementById('archiveUpperEmpty');
+  const archiveUpperPagination = document.getElementById('archiveUpperPagination');
   const archiveSearch = document.getElementById('archiveSearch');
 
-  const PAGE_SIZE = 5;
-  // her bölümün kendi sayfa numarasını tutar
-  const archivePages = { notes: 1, ref: 1, lvl3: 1 };
+  function noteTypeLabel(type){
+    if(type === 'reference') return 'Referans';
+    if(type === 'upper') return 'Üst seviye';
+    return 'Normal';
+  }
 
   function buildArchiveRow(n){
     const row = document.createElement('div');
@@ -907,9 +1010,8 @@
     const tags = [];
     if(n.type === 'reference'){
       tags.push('<span class="tag-pill ref">📌 Referans</span>');
-    }
-    if(n.type === 'level3'){
-      tags.push('<span class="tag-pill lvl3">🧷 3. Seviye</span>');
+    } else if(n.type === 'upper'){
+      tags.push('<span class="tag-pill upper">🧠 Üst seviye</span>');
     }
     if(n.templateId){
       const t = state.templates.find(x => x.id === n.templateId);
@@ -938,131 +1040,109 @@
     row.querySelector('[data-act="del"]').addEventListener('click', () => {
       if(!confirm('"' + n.title + '" notunu silmek istediğine emin misin?')) return;
       state.notes = state.notes.filter(x => x.id !== n.id);
+      // Silinen notu kaynak gösteren notlarda bozuk bağlantı kalmasın.
+      state.notes.forEach(x => { if(x.referenceId === n.id) x.referenceId = null; });
       saveState();
       renderArchive();
+      renderRefChips();
+      renderRefPreview();
       updateNoteCount();
       toast("Not silindi");
     });
     return row;
   }
 
-  // pagerKey: 'notes' | 'ref' | 'lvl3'
-  function buildPager(pagerEl, pagerKey, totalItems){
-    pagerEl.innerHTML = "";
-    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-    if(totalPages <= 1) return;
+  function renderPagination(container, type, total){
+    container.innerHTML = "";
+    const pageCount = Math.ceil(total / PAGE_SIZE);
+    if(pageCount <= 1) return;
 
-    const current = archivePages[pagerKey];
-
-    function makeBtn(label, page, opts){
-      opts = opts || {};
-      const b = document.createElement('button');
-      b.className = 'pager-btn' + (opts.active ? ' active' : '');
-      b.textContent = label;
-      b.disabled = !!opts.disabled;
-      if(!opts.disabled && !opts.active){
-        b.addEventListener('click', () => {
-          archivePages[pagerKey] = page;
-          renderArchive();
-        });
-      }
-      return b;
+    for(let i = 1; i <= pageCount; i++){
+      const btn = document.createElement('button');
+      btn.className = 'page-btn' + (archivePages[type] === i ? ' active' : '');
+      btn.textContent = i;
+      btn.addEventListener('click', () => {
+        archivePages[type] = i;
+        renderArchive();
+      });
+      container.appendChild(btn);
     }
-
-    pagerEl.appendChild(makeBtn('‹', current - 1, { disabled: current <= 1 }));
-
-    // basit sayfa numarası listesi: tüm sayfalar 7 veya daha azsa hepsini göster,
-    // fazlaysa başı, sonu ve current etrafını göster
-    const pages = [];
-    if(totalPages <= 7){
-      for(let i=1;i<=totalPages;i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if(current > 3) pages.push('...');
-      for(let i=Math.max(2,current-1); i<=Math.min(totalPages-1,current+1); i++) pages.push(i);
-      if(current < totalPages-2) pages.push('...');
-      pages.push(totalPages);
-    }
-
-    pages.forEach(p => {
-      if(p === '...'){
-        const dots = document.createElement('span');
-        dots.className = 'pager-dots';
-        dots.textContent = '…';
-        pagerEl.appendChild(dots);
-      } else {
-        pagerEl.appendChild(makeBtn(String(p), p, { active: p === current }));
-      }
-    });
-
-    pagerEl.appendChild(makeBtn('›', current + 1, { disabled: current >= totalPages }));
   }
 
-  function renderArchiveSection(opts){
-    // opts: { items, listEl, emptyEl, pagerEl, pagerKey, emptyTitle, emptyTitleQ, emptyText, emptyTextQ, countElId }
-    const totalPages = Math.max(1, Math.ceil(opts.items.length / PAGE_SIZE));
-    if(archivePages[opts.pagerKey] > totalPages) archivePages[opts.pagerKey] = totalPages;
-    if(archivePages[opts.pagerKey] < 1) archivePages[opts.pagerKey] = 1;
-    const page = archivePages[opts.pagerKey];
-    const startIdx = (page - 1) * PAGE_SIZE;
-    const pageItems = opts.items.slice(startIdx, startIdx + PAGE_SIZE);
+  function renderArchiveSection({type, items, listEl, emptyEl, pageEl, countId, emptyTitle, emptyText, searchEmptyText}){
+    const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+    if(archivePages[type] > pageCount) archivePages[type] = pageCount;
+    if(archivePages[type] < 1) archivePages[type] = 1;
 
-    opts.listEl.innerHTML = "";
-    if(opts.items.length === 0){
-      opts.emptyEl.style.display = "block";
-      opts.emptyEl.querySelector('h3').textContent = opts.q ? "Sonuç bulunamadı" : opts.emptyTitle;
-      opts.emptyEl.querySelector('p').textContent = opts.q ? "Farklı bir kelime dener misin?" : opts.emptyText;
+    const start = (archivePages[type] - 1) * PAGE_SIZE;
+    const pageItems = items.slice(start, start + PAGE_SIZE);
+
+    listEl.innerHTML = "";
+    if(items.length === 0){
+      emptyEl.style.display = "block";
+      emptyEl.querySelector('h3').textContent = archiveSearch.value.trim() ? "Sonuç bulunamadı" : emptyTitle;
+      emptyEl.querySelector('p').textContent = archiveSearch.value.trim() ? searchEmptyText : emptyText;
+      pageEl.innerHTML = "";
     } else {
-      opts.emptyEl.style.display = "none";
-      pageItems.forEach(n => opts.listEl.appendChild(buildArchiveRow(n)));
+      emptyEl.style.display = "none";
+      pageItems.forEach(n => listEl.appendChild(buildArchiveRow(n)));
+      renderPagination(pageEl, type, items.length);
     }
 
-    buildPager(opts.pagerEl, opts.pagerKey, opts.items.length);
-    document.getElementById(opts.countElId).textContent = opts.items.length;
+    document.getElementById(countId).textContent = items.length;
   }
 
   function renderArchive(){
     const q = archiveSearch.value.trim().toLowerCase();
     const matches = n => !q || (n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q));
 
-    const regular = state.notes.filter(n => n.type !== 'reference' && n.type !== 'level3' && matches(n))
+    const regular = state.notes.filter(n => (n.type || 'note') === 'note' && matches(n))
       .slice().sort((a,b) => b.updatedAt - a.updatedAt);
     const refs = state.notes.filter(n => n.type === 'reference' && matches(n))
       .slice().sort((a,b) => b.updatedAt - a.updatedAt);
-    const lvl3 = state.notes.filter(n => n.type === 'level3' && matches(n))
+    const uppers = state.notes.filter(n => n.type === 'upper' && matches(n))
       .slice().sort((a,b) => b.updatedAt - a.updatedAt);
 
     renderArchiveSection({
-      items: regular, q,
-      listEl: archiveList, emptyEl: archiveEmpty,
-      pagerEl: document.getElementById('notesPager'), pagerKey: 'notes',
-      emptyTitle: "Arşiv boş", emptyText: "Kaydettiğin notlar burada görünecek.",
-      countElId: 'notesSubCount'
+      type: 'note',
+      items: regular,
+      listEl: archiveList,
+      emptyEl: archiveEmpty,
+      pageEl: archivePagination,
+      countId: 'notesSubCount',
+      emptyTitle: 'Arşiv boş',
+      emptyText: 'Kaydettiğin normal notlar burada görünecek.',
+      searchEmptyText: 'Farklı bir kelime dener misin?'
     });
 
     renderArchiveSection({
-      items: refs, q,
-      listEl: archiveRefList, emptyEl: archiveRefEmpty,
-      pagerEl: document.getElementById('refPager'), pagerKey: 'ref',
-      emptyTitle: "Henüz referans notu yok",
+      type: 'reference',
+      items: refs,
+      listEl: archiveRefList,
+      emptyEl: archiveRefEmpty,
+      pageEl: archiveRefPagination,
+      countId: 'refSubCount',
+      emptyTitle: 'Henüz referans notu yok',
       emptyText: 'Bir notu kaydederken "Referans notu" türünü seçerek buraya ekleyebilirsin.',
-      countElId: 'refSubCount'
+      searchEmptyText: 'Farklı bir kelime dener misin?'
     });
 
     renderArchiveSection({
-      items: lvl3, q,
-      listEl: archiveLvl3List, emptyEl: archiveLvl3Empty,
-      pagerEl: document.getElementById('lvl3Pager'), pagerKey: 'lvl3',
-      emptyTitle: "Henüz 3. seviye not yok",
-      emptyText: 'Bir notu kaydederken "3. Seviye not" türünü seçerek buraya ekleyebilirsin.',
-      countElId: 'lvl3SubCount'
+      type: 'upper',
+      items: uppers,
+      listEl: archiveUpperList,
+      emptyEl: archiveUpperEmpty,
+      pageEl: archiveUpperPagination,
+      countId: 'upperSubCount',
+      emptyTitle: 'Henüz üst seviye not yok',
+      emptyText: 'Not türünden "Üst seviye not" seçerek normal notlardan referans alabilirsin.',
+      searchEmptyText: 'Farklı bir kelime dener misin?'
     });
   }
   archiveSearch.addEventListener('input', () => {
-    // arama değiştiğinde her bölüm 1. sayfaya dönsün
-    archivePages.notes = 1;
-    archivePages.ref = 1;
-    archivePages.lvl3 = 1;
+    archivePages.note = 1;
+    archivePages.reference = 1;
+    archivePages.upper = 1;
     renderArchive();
   });
 
