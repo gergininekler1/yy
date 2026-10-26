@@ -93,9 +93,9 @@ function newN(t){const n={id:"n"+Date.now(),type:t,d:{},u:Date.now()};if(t==="pr
 function openN(id){cur=S.find(n=>n.id===id);if(cur)edit()}
 function set(k,v){cur.d[k]=v;cur.u=Date.now();save()}
 function arch(){cur.a=!cur.a;cur.u=Date.now();save();cur.a?home():edit()}
-function done(){save();const b=document.getElementById("sv");if(b){b.textContent="Kaydedildi ✓";b.classList.add("ok")}setTimeout(home,500)}
+function done(){save();const b=document.getElementById("sv");if(b){b.textContent="Kaydedildi ✓";b.classList.add("ok")}setTimeout(home,250)}
 function edit(){const n=cur,t=T[n.type];
-let h='<div class="bar"><button class="btn" onclick="done()">← Geri</button><span class="grow"></span><button class="btn" onclick="arch()">'+(n.a?"Arşivden çıkar":"Arşivle")+'</button><button class="btn" onclick="del()">Sil</button></div><h1>'+t.i+' '+t.n+'</h1>';
+let h='<div class="bar"><button class="btn" onclick="home()">← Geri</button><span class="grow"></span><button class="btn" onclick="arch()">'+(n.a?"Arşivden çıkar":"Arşivle")+'</button><button class="btn" onclick="del()">Sil</button></div><h1>'+t.i+' '+t.n+'</h1>';
 t.f.forEach(([k,l,ty])=>{const v=n.d[k];h+='<label>'+l+'</label>';
 if(ty==="text")h+='<input type="text" value="'+esc(v)+'" oninput="set(\''+k+'\',this.value)">';
 else if(ty==="area")h+='<textarea oninput="set(\''+k+'\',this.value)">'+esc(v)+'</textarea>';
@@ -114,11 +114,25 @@ function addT(){const t=tt.value.trim(),d=parseDur(td.value||"1 gün");if(!t)ret
 cur.d.tasks.push({t,done:false,due:Date.now()+d});set("tasks",cur.d.tasks);edit()}
 function del(){if(confirm("Bu not silinsin mi?")){S=S.filter(n=>n!==cur);save();home()}}
 var hf="";
-function hchips(){return '<div class="chips" style="margin-bottom:10px"><span class="chip'+(hf?'':' on')+'" onclick="hf=\'\';pg=0;body()">Hepsi</span>'+Object.keys(T).map(k=>'<span class="chip'+(hf===k?' on':'')+'" onclick="hf=\''+k+'\';pg=0;body()">'+T[k].i+'</span>').join('')+'</div>'}
+function setHf(k){hf=k;pg=0;body()}
+function hchips(){return '<div class="chips" style="margin-bottom:10px"><span class="chip'+(hf?'':' on')+'" onclick="setHf(\'\')">Hepsi</span>'+Object.keys(T).map(k=>'<span class="chip'+(hf===k?' on':'')+'" data-k="'+k+'" onclick="setHf(this.dataset.k)">'+T[k].i+'</span>').join('')+'</div>'}
 function msg(t,ok){syncT=t;const e=document.getElementById("sy");if(e){e.textContent=t;e.className="sync"+(ok?" ok":"")}}
 function errT(e){return e&&(e.code||e.message)||String(e)}
 async function getDB(){try{if(!window.claude)return[null,"Senkron bu ortamda kullanılamıyor."];const u=await claude.use("user"),d=await claude.use("db");if(!u||!d)return[null,"Senkron için claude.ai hesabınla giriş yapmış olmalısın."];const id=await u.id();if(!id)return[null,"Hesap kimliği alınamadı."];return[d.collection("data/users/"+id).doc("notes"),""]}catch(e){return[null,"Hata: "+errT(e)]}}
 async function cloudSave(){msg("Kaydediliyor…");const[r,er]=await getDB();if(!r){msg(er);return}try{await r.set({s:JSON.stringify(S),t:Date.now()});msg("☁ Buluta kaydedildi · "+new Date().toLocaleTimeString("tr",{hour:"2-digit",minute:"2-digit"}),1)}catch(e){msg("Kaydedilemedi: "+errT(e))}}
 async function cloudLoad(){msg("Yükleniyor…");const[r,er]=await getDB();if(!r){msg(er);return}try{const sn=await r.get();if(!sn.exists){msg("Bulutta kayıt yok. Önce diğer cihazda “Buluta kaydet”e bas.");return}if(!confirm("Bu cihazdaki notların yerine buluttaki notlar yüklensin mi?")){msg("");return}S=JSON.parse(sn.data().s);save();syncT="☁ Buluttan yüklendi ("+S.length+" not)";body();msg(syncT,1)}catch(e){msg("Yüklenemedi: "+errT(e))}}
 const app=document.getElementById("app");home();
-</script></body></html>
+</script><script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import{getFirestore,doc,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyASuLrqS3DzgMcwxTgFiKBHSTsl4fr3LXA",authDomain:"ulan-2f6fe.firebaseapp.com",projectId:"ulan-2f6fe",storageBucket:"ulan-2f6fe.firebasestorage.app",messagingSenderId:"309443167684",appId:"1:309443167684:web:bf846ea0c208c89f96d091"};
+const app2=initializeApp(firebaseConfig),au=getAuth(app2),db=getFirestore(app2);let U=null;
+onAuthStateChanged(au,u=>{U=u;msg(u?"Giriş: "+u.email:"Henüz giriş yapılmadı")});
+async function ensure(){if(U)return U;try{U=(await signInWithPopup(au,new GoogleAuthProvider())).user;return U}catch(e){msg("Giriş hatası: "+errT(e));return null}}
+window.cloudSave=async()=>{msg("Kaydediliyor…");if(!await ensure())return;try{await setDoc(doc(db,"users",U.uid),{s:JSON.stringify(S),t:Date.now()});msg("☁ Buluta kaydedildi · "+new Date().toLocaleTimeString("tr",{hour:"2-digit",minute:"2-digit"}),1)}catch(e){msg("Kaydedilemedi: "+errT(e))}};
+window.cloudLoad=async()=>{msg("Yükleniyor…");if(!await ensure())return;try{const sn=await getDoc(doc(db,"users",U.uid));if(!sn.exists()){msg("Bulutta kayıt yok. Önce diğer cihazda “Buluta kaydet”e bas.");return}
+if(!confirm("Bu cihazdaki notların yerine buluttaki notlar yüklensin mi?")){msg("");return}S=JSON.parse(sn.data().s);save();syncT="☁ Buluttan yüklendi ("+S.length+" not)";body();msg(syncT,1)}catch(e){msg("Yüklenemedi: "+errT(e))}};
+window.backup=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:"application/json"}));a.download="anubis-yedek.json";a.click()};
+</script>
+</body></html>
