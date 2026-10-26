@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8"><title>Anubis</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f7f4ee;--card:#fff;--tx:#1d1b18;--mu:#7a746a;--ac:#b8892b;--bd:#e5dfd3;--rd:#d64545;--or:#e08a1e;--gr:#3f9b5f;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15130f;--card:#201d17;--tx:#f1ece2;--mu:#a39b8c;--ac:#d9a840;--bd:#352f25;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{margin:4px 0 12px;font-size:26px;letter-spacing:1px}h1 span{color:var(--ac)}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin:22px 0 8px}
+input,textarea,button{font:inherit;color:var(--tx)}
+input[type=text],input[type=url],textarea,input:not([type]){width:100%;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+textarea{min-height:170px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 4px;text-align:center;cursor:pointer;font-size:13px}
+.tile b{display:block;font-size:26px;font-weight:400}
+.tile.p{border-color:var(--ac)}
+.row{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:center;cursor:pointer}
+.row small{color:var(--mu);display:block}.row img{width:34px;height:48px;object-fit:cover;border-radius:4px}
+.ic{font-size:22px}.grow{flex:1;min-width:0}.grow div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.due{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);white-space:nowrap}
+.late{color:var(--rd);border-color:var(--rd)}.soon{color:var(--or);border-color:var(--or)}
+label{display:block;font-size:13px;color:var(--mu);margin:14px 0 5px}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.btn{border:1px solid var(--bd);background:var(--card);border-radius:10px;padding:9px 14px;cursor:pointer}
+.btn.a{background:var(--ac);border-color:var(--ac);color:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{padding:6px 12px;border:1px solid var(--bd);border-radius:99px;background:var(--card);cursor:pointer;font-size:14px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.star{font-size:28px;cursor:pointer;color:var(--bd)}.star.on{color:var(--ac)}
+.prev{width:60px;height:86px;object-fit:cover;border-radius:6px;margin-top:8px}
+.pg{height:8px;background:var(--bd);border-radius:9px;overflow:hidden;margin:6px 0}.pg i{display:block;height:100%;background:var(--gr)}
+.task{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
+.task input[type=checkbox]{width:22px;height:22px;accent-color:var(--gr)}.task.d .t{text-decoration:line-through;color:var(--mu)}
+.add{display:flex;gap:8px;margin-top:10px}.add input:last-of-type{max-width:110px}
+.x{color:var(--mu);cursor:pointer;padding:0 6px}
+.empty{color:var(--mu);font-size:14px;padding:6px 0}
+.pg2{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px}.pg2 span{color:var(--mu);font-size:14px}
+.btn:disabled{opacity:.35}.sync{font-size:12px;color:var(--mu);text-align:center;margin-top:22px}.ok{color:var(--gr)}
+.save{width:100%;margin-top:22px;padding:14px;font-size:17px}
+</style></head><body><main id="app"></main>
+<script>
+const T={
+blog:{n:"Blog notu",i:"💡",tt:"fikir",f:[["fikir","Ana fikir (tek cümle)","text"],["kw","Anahtar kelimeler","text"],["not","Notun","area"]]},
+kitap:{n:"Kitap",i:"📖",tt:"ad",f:[["ad","Kitap adı","text"],["yazar","Yazar","text"],["puan","Puan","stars"],["kapak","Kapak görseli (URL)","img"],["alinti","Alıntılar","quotes"],["not","Notun","area"]]},
+is:{n:"İş",i:"💼",tt:"baslik",f:[["baslik","Başlık","text"],["tur","Tür","chips"],["not","Notun","area"]]},
+kisi:{n:"Kişi",i:"👤",tt:"ad",f:[["ad","Ad","text"],["ozellik","Özellikleri","area"],["plan","Planlarım","area"],["son","Son görüşme","text"]]},
+etkinlik:{n:"Etkinlik",i:"📅",tt:"ad",f:[["ad","Etkinlik adı","text"],["tarih","Tarih","text"],["yer","Yer","text"],["kisiler","Katılımcılar","text"],["yap","Yapılacaklar","area"]]},
+strateji:{n:"Strateji",i:"🎯",tt:"hedef",f:[["hedef","Hedef","text"],["adim","Adımlar","area"],["sure","Süre","text"]]},
+proje:{n:"Proje",i:"🚀",tt:"ad",f:[["ad","Proje adı","text"],["tasks","Görevler","tasks"]]}};
+const TURLER=["Tecrübe","Kritik","Kural","Sınav"],PER=5;
+let S=[],cur=null,q="",pg=0,ap=0,af="",syncT="Yalnızca bu cihaz",DB=null,pt=null,LT=0;
+try{S=JSON.parse(localStorage.getItem("anubis")||"[]");LT=+localStorage.getItem("anubis_t")||0}catch(e){S=[]}
+function save(){LT=Date.now();try{localStorage.setItem("anubis",JSON.stringify(S));localStorage.setItem("anubis_t",LT)}catch(e){}
+}
+async function push(){try{await DB.set({s:JSON.stringify(S),t:LT});syncT="☁ Senkronize"}catch(e){syncT="Senkron hatası"}upd()}
+function upd(){const e=document.getElementById("sy");if(e)e.textContent=syncT}
+async function pull(){if(!DB)return;try{const sn=await DB.get();const r=sn.exists&&sn.data();
+if(r&&r.t>LT&&!cur){S=JSON.parse(r.s);LT=r.t;try{localStorage.setItem("anubis",r.s);localStorage.setItem("anubis_t",LT)}catch(e){}syncT="☁ Senkronize";home()}
+else if(!r||LT>r.t)await push();else{syncT="☁ Senkronize";upd()}}catch(e){syncT="Senkron hatası";upd()}}
+async function initSync(){try{if(!window.claude)return;const u=await claude.use("user"),d=await claude.use("db");if(!u||!d)return;
+const id=await u.id();if(!id)return;DB=d.collection("data/users/"+id).doc("notes");pull()}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)pull()});
+async function backup(){try{const dl=await claude.use("downloads");if(!dl){alert("Yedek bu ortamda kullanılamıyor.");return}
+const d=JSON.stringify(S,null,1);try{await dl.save({filename:"anubis-yedek.json",data:d})}catch(e){if(e&&e.code==="declined")return;await dl.save({filename:"anubis-yedek.txt",data:d})}}catch(e){}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function title(n){return n.d[T[n.type].tt]||"Başlıksız "+T[n.type].n.toLowerCase()}
+function parseDur(s){const m=String(s).trim().toLowerCase().match(/^(\d+)\s*(saat|sa|gün|gun|g|hafta|h)?/);if(!m)return null;const k=+m[1],u=m[2]||"gün";return k*(/^(saat|sa)$/.test(u)?1:/^(hafta|h)$/.test(u)?168:24)*3600000}
+function dueInfo(ts){const d=ts-Date.now();if(d<0){return["late",-d>=864e5?Math.floor(-d/864e5)+" gün gecikti":"süresi geçti"]}
+if(d<864e5)return["soon",Math.max(1,Math.ceil(d/36e5))+" saat kaldı"];return["",Math.ceil(d/864e5)+" gün kaldı"]}
+function rowH(n,tag){const im=n.type==="kitap"&&n.d.kapak?'<img src="'+esc(n.d.kapak)+'" alt="" onerror="this.outerHTML=\'<span class=ic>📖</span>\'">':'<span class="ic">'+T[n.type].i+'</span>';
+let sub=T[n.type].n+(tag?" · arşiv":"");if(n.type==="proje"){const a=n.d.tasks||[];sub+=" · "+a.filter(t=>t.done).length+"/"+a.length+" görev"}
+return '<div class="row" onclick="openN(\''+n.id+'\')">'+im+'<div class="grow"><div>'+esc(title(n))+'</div><small>'+sub+'</small></div></div>'}
+function pager(tot,p,fn){const m=Math.ceil(tot/PER);if(m<=1)return"";return '<div class="pg2"><button class="btn" '+(p<=0?"disabled":"")+' onclick="'+fn+'(-1)">‹</button><span>'+(p+1)+' / '+m+'</span><button class="btn" '+(p>=m-1?"disabled":"")+' onclick="'+fn+'(1)">›</button></div>'}
+function home(){cur=null;
+app.innerHTML='<h1>𓃥 <span>Anubis</span></h1><input type="text" id="qs" placeholder="Tüm notlarda ara…" value="'+esc(q)+'"><div id="bd"></div>';
+document.getElementById("qs").addEventListener("input",e=>{q=e.target.value;pg=0;body()});body()}
+function body(){const el=document.getElementById("bd");if(!el)return;const k=q.trim().toLocaleLowerCase("tr");
+if(k){const r=S.filter(n=>(JSON.stringify(n.d)+T[n.type].n).toLocaleLowerCase("tr").includes(k)).sort((a,b)=>b.u-a.u);
+el.innerHTML='<h2>Sonuçlar ('+r.length+')</h2>'+(r.length?r.map(n=>rowH(n,n.a)).join(""):'<div class="empty">Eşleşen not yok.</div>');return}
+const up=[];S.filter(n=>n.type==="proje"&&!n.a).forEach(n=>(n.d.tasks||[]).forEach(t=>{if(!t.done)up.push({t,p:n})}));up.sort((a,b)=>a.t.due-b.t.due);
+let h='<h2>Bugün ve yaklaşanlar</h2>'+(up.length?up.slice(0,5).map(({t,p})=>{const[c,l]=dueInfo(t.due);return '<div class="row" onclick="openN(\''+p.id+'\')"><div class="grow"><div>'+esc(t.t)+'</div><small>'+esc(p.d.ad||"Proje")+'</small></div><span class="due '+c+'">'+l+'</span></div>'}).join(""):'<div class="empty">Bekleyen görev yok. Bir proje başlat.</div>');
+h+='<h2>Ne yazmak istiyorsun?</h2><div class="grid">'+Object.keys(T).map(k=>'<div class="tile'+(k==="proje"?" p":"")+'" onclick="newN(\''+k+'\')"><b>'+T[k].i+'</b>'+T[k].n+'</div>').join("")+'</div>';
+const r=S.filter(n=>!n.a&&(!hf||n.type===hf)).sort((a,b)=>b.u-a.u),m=Math.max(0,Math.ceil(r.length/PER)-1);if(pg>m)pg=m;
+h+='<h2>Son notlar</h2>'+hchips()+(r.length?r.slice(pg*PER,pg*PER+PER).map(n=>rowH(n)).join("")+pager(r.length,pg,"goP"):'<div class="empty">Henüz not yok.</div>');
+h+='<div style="display:flex;gap:10px;margin-top:22px"><button class="btn grow" onclick="arsiv()">🗂 Arşiv ('+S.filter(n=>n.a).length+')</button><button class="btn grow" onclick="backup()">⬇ Yedek</button></div><div style="display:flex;gap:10px;margin-top:10px"><button class="btn grow" onclick="cloudSave()">☁ Buluta kaydet</button><button class="btn grow" onclick="cloudLoad()">☁ Buluttan yükle</button></div><div class="sync" id="sy">'+syncT+'</div>';
+el.innerHTML=h}
+function goP(d){pg+=d;body()}
+function arsiv(){cur=null;const r=S.filter(n=>n.a&&(!af||n.type===af)).sort((a,b)=>b.u-a.u),m=Math.max(0,Math.ceil(r.length/PER)-1);if(ap>m)ap=m;
+app.innerHTML='<div class="bar"><button class="btn" onclick="home()">← Geri</button></div><h1>🗂 Arşiv</h1><div class="chips"><span class="chip'+(af?"":" on")+'" onclick="af=\'\';ap=0;arsiv()">Hepsi</span>'+Object.keys(T).map(k=>'<span class="chip'+(af===k?" on":"")+'" onclick="af=\''+k+'\';ap=0;arsiv()">'+T[k].i+' '+T[k].n+'</span>').join("")+'</div><h2>'+r.length+' not</h2>'+(r.length?r.slice(ap*PER,ap*PER+PER).map(n=>rowH(n)).join("")+pager(r.length,ap,"goA"):'<div class="empty">Arşiv boş. Bir notu açıp “Arşivle” de.</div>')}
+function goA(d){ap+=d;arsiv()}
+function newN(t){const n={id:"n"+Date.now(),type:t,d:{},u:Date.now()};if(t==="proje")n.d.tasks=[];if(t==="kitap")n.d.alinti=[];S.push(n);save();openN(n.id)}
+function openN(id){cur=S.find(n=>n.id===id);if(cur)edit()}
+function set(k,v){cur.d[k]=v;cur.u=Date.now();save()}
+function arch(){cur.a=!cur.a;cur.u=Date.now();save();cur.a?home():edit()}
+function done(){save();const b=document.getElementById("sv");if(b){b.textContent="Kaydedildi ✓";b.classList.add("ok")}setTimeout(home,500)}
+function edit(){const n=cur,t=T[n.type];
+let h='<div class="bar"><button class="btn" onclick="done()">← Geri</button><span class="grow"></span><button class="btn" onclick="arch()">'+(n.a?"Arşivden çıkar":"Arşivle")+'</button><button class="btn" onclick="del()">Sil</button></div><h1>'+t.i+' '+t.n+'</h1>';
+t.f.forEach(([k,l,ty])=>{const v=n.d[k];h+='<label>'+l+'</label>';
+if(ty==="text")h+='<input type="text" value="'+esc(v)+'" oninput="set(\''+k+'\',this.value)">';
+else if(ty==="area")h+='<textarea oninput="set(\''+k+'\',this.value)">'+esc(v)+'</textarea>';
+else if(ty==="stars")h+='<div>'+[1,2,3,4,5].map(i=>'<span class="star'+(v>=i?" on":"")+'" onclick="set(\'puan\','+(v===i?0:i)+');edit()">★</span>').join("")+'</div>';
+else if(ty==="img")h+='<input type="url" placeholder="https://…" value="'+esc(v)+'" onchange="set(\'kapak\',this.value);edit()">'+(v?'<img class="prev" src="'+esc(v)+'" alt="" onerror="this.style.display=\'none\'">':'');
+else if(ty==="chips")h+='<div class="chips">'+TURLER.map(x=>'<span class="chip'+(v===x?" on":"")+'" onclick="set(\'tur\','+(v===x?"''":"'"+x+"'")+');edit()">'+x+'</span>').join("")+'</div>';
+else if(ty==="quotes"){const a=v||[];h+=a.map((x,i)=>'<div class="task"><textarea style="min-height:60px" oninput="cur.d.alinti['+i+']=this.value;set(\'alinti\',cur.d.alinti)">'+esc(x)+'</textarea><span class="x" onclick="cur.d.alinti.splice('+i+',1);set(\'alinti\',cur.d.alinti);edit()">✕</span></div>').join("")+'<button class="btn" style="margin-top:10px" onclick="cur.d.alinti=(cur.d.alinti||[]);cur.d.alinti.push(\'\');set(\'alinti\',cur.d.alinti);edit()">+ Alıntı ekle</button>'}
+else if(ty==="tasks")h+=tasks()});
+h+='<button class="btn a save" id="sv" onclick="done()">Kaydet</button>';
+app.innerHTML=h;window.scrollTo(0,0)}
+function tasks(){const a=cur.d.tasks||[],dn=a.filter(t=>t.done).length;
+let h=a.length?'<div class="pg"><i style="width:'+Math.round(dn/a.length*100)+'%"></i></div><small style="color:var(--mu)">'+dn+'/'+a.length+' tamamlandı</small>':'<div class="empty">Görev ekleyerek başla.</div>';
+h+=a.map((t,i)=>{const[c,l]=t.done?["","tamam"]:dueInfo(t.due);return '<div class="task'+(t.done?" d":"")+'"><input type="checkbox" '+(t.done?"checked":"")+' onchange="cur.d.tasks['+i+'].done=this.checked;set(\'tasks\',cur.d.tasks);edit()"><span class="t grow">'+esc(t.t)+'</span><span class="due '+c+'">'+l+'</span><span class="x" onclick="cur.d.tasks.splice('+i+',1);set(\'tasks\',cur.d.tasks);edit()">✕</span></div>'}).join("");
+return h+'<div class="add"><input type="text" id="tt" placeholder="Görev"><input type="text" id="td" placeholder="3 gün"><button class="btn a" onclick="addT()">+</button></div><small style="color:var(--mu)">Süre örnekleri: 5 saat, 3 gün, 2 hafta</small>'}
+function addT(){const t=tt.value.trim(),d=parseDur(td.value||"1 gün");if(!t)return;if(d==null){td.focus();return}
+cur.d.tasks.push({t,done:false,due:Date.now()+d});set("tasks",cur.d.tasks);edit()}
+function del(){if(confirm("Bu not silinsin mi?")){S=S.filter(n=>n!==cur);save();home()}}
+var hf="";
+function hchips(){return '<div class="chips" style="margin-bottom:10px"><span class="chip'+(hf?'':' on')+'" onclick="hf=\'\';pg=0;body()">Hepsi</span>'+Object.keys(T).map(k=>'<span class="chip'+(hf===k?' on':'')+'" onclick="hf=\''+k+'\';pg=0;body()">'+T[k].i+'</span>').join('')+'</div>'}
+function msg(t,ok){syncT=t;const e=document.getElementById("sy");if(e){e.textContent=t;e.className="sync"+(ok?" ok":"")}}
+function errT(e){return e&&(e.code||e.message)||String(e)}
+async function getDB(){try{if(!window.claude)return[null,"Senkron bu ortamda kullanılamıyor."];const u=await claude.use("user"),d=await claude.use("db");if(!u||!d)return[null,"Senkron için claude.ai hesabınla giriş yapmış olmalısın."];const id=await u.id();if(!id)return[null,"Hesap kimliği alınamadı."];return[d.collection("data/users/"+id).doc("notes"),""]}catch(e){return[null,"Hata: "+errT(e)]}}
+async function cloudSave(){msg("Kaydediliyor…");const[r,er]=await getDB();if(!r){msg(er);return}try{await r.set({s:JSON.stringify(S),t:Date.now()});msg("☁ Buluta kaydedildi · "+new Date().toLocaleTimeString("tr",{hour:"2-digit",minute:"2-digit"}),1)}catch(e){msg("Kaydedilemedi: "+errT(e))}}
+async function cloudLoad(){msg("Yükleniyor…");const[r,er]=await getDB();if(!r){msg(er);return}try{const sn=await r.get();if(!sn.exists){msg("Bulutta kayıt yok. Önce diğer cihazda “Buluta kaydet”e bas.");return}if(!confirm("Bu cihazdaki notların yerine buluttaki notlar yüklensin mi?")){msg("");return}S=JSON.parse(sn.data().s);save();syncT="☁ Buluttan yüklendi ("+S.length+" not)";body();msg(syncT,1)}catch(e){msg("Yüklenemedi: "+errT(e))}}
+const app=document.getElementById("app");home();
+</script></body></html>
