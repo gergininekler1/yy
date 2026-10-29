@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Notlarım</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f3ee;--card:#fffdf9;--ink:#2f2d2a;--mute:#8a847b;--line:#ebe5db;--accent:#7c9a8e;--accent-soft:#e3ede8;--warm:#e9a98f;--warm-soft:#fbe9e0;--rose:#d98c8c;--shadow:0 6px 24px rgba(80,66,50,.07)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#1f1e1c;--card:#292724;--ink:#efebe4;--mute:#a09a90;--line:#38352f;--accent:#92b3a5;--accent-soft:#2c3a35;--warm:#e9a98f;--warm-soft:#3d2f29;--rose:#e0a0a0;--shadow:0 6px 24px rgba(0,0,0,.25)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#1f1e1c;--card:#292724;--ink:#efebe4;--mute:#a09a90;--line:#38352f;--accent:#92b3a5;--accent-soft:#2c3a35;--warm:#e9a98f;--warm-soft:#3d2f29;--rose:#e0a0a0;--shadow:0 6px 24px rgba(0,0,0,.25)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:20px 18px 60px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.brand{font-weight:700;font-size:1.15rem;letter-spacing:-.01em}
+.brand small{display:block;font-weight:500;color:var(--mute);font-size:.78rem}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.btn-arch{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.9rem;box-shadow:var(--shadow);transition:transform .15s}
+.btn-arch:hover{transform:translateY(-1px)}
+.count{background:var(--accent-soft);color:var(--accent);border-radius:999px;font-size:.75rem;padding:1px 8px}
+section{margin-bottom:30px}
+h2{font-size:.82rem;text-transform:uppercase;letter-spacing:.09em;color:var(--mute);font-weight:600;margin:0 0 12px}
+.bar{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.bar .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none}
+.bar.task .dot{background:var(--warm)}
+.bar .t{flex:1;min-width:0;cursor:pointer}
+.bar .t b{display:block;font-weight:600;font-size:.97rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .t span{font-size:.78rem;color:var(--mute)}
+.bar.done .t b{text-decoration:line-through;color:var(--mute)}
+.timer{font-variant-numeric:tabular-nums;font-weight:600;font-size:.85rem;background:var(--accent-soft);color:var(--accent);padding:6px 12px;border-radius:999px;white-space:nowrap}
+.timer.soon{background:var(--warm-soft);color:var(--warm)}
+.timer.late{background:var(--warm-soft);color:var(--rose)}
+.timer.none{background:transparent;color:var(--mute);font-weight:500}
+.ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--mute);font-size:.95rem;flex:none}
+.ic:hover{background:var(--accent-soft);color:var(--accent)}
+.ic.on{color:var(--warm)}
+.empty{border:1.5px dashed var(--line);border-radius:16px;padding:20px;text-align:center;color:var(--mute);font-size:.9rem}
+.new-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:#fff;padding:16px;border-radius:18px;font-weight:600;font-size:1rem;box-shadow:var(--shadow);transition:transform .15s,filter .15s}
+.new-btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.tpls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.tpl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center;font-size:.84rem;font-weight:600;transition:border-color .15s}
+.tpl:hover{border-color:var(--accent)}
+.tpl i{display:block;font-style:normal;font-size:1.5rem;margin-bottom:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.card:hover{border-color:var(--accent)}
+.card .em{font-size:1.3rem}
+.card .t{flex:1;min-width:0}
+.card b{display:block;font-weight:600;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card span{font-size:.78rem;color:var(--mute)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tools input{flex:1;min-width:160px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;width:100%;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+.chip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:.82rem;font-weight:600;color:var(--mute)}
+.chip.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.ov{position:fixed;inset:0;background:rgba(40,34,28,.4);display:none;align-items:flex-end;justify-content:center;z-index:50;backdrop-filter:blur(3px)}
+.ov.show{display:flex}
+.modal{background:var(--bg);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:0}
+@media(min-width:700px){.ov{align-items:center}.modal{border-radius:24px}}
+.modal h3{margin:0 0 14px;font-size:1.1rem}
+.row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.78rem;color:var(--mute);font-weight:600;margin-bottom:5px}
+textarea{min-height:92px;resize:none;overflow:hidden;line-height:1.55}
+.pin-row{display:flex;align-items:center;gap:8px;font-size:.9rem;margin-bottom:16px}
+.pin-row input{width:auto}
+.actions{display:flex;gap:10px;justify-content:flex-end}
+.save{background:var(--accent);color:#fff;padding:12px 24px;border-radius:14px;font-weight:600}
+.cancel{padding:12px 18px;border-radius:14px;color:var(--mute);font-weight:600}
+.del{margin-right:auto;color:var(--rose);padding:12px 8px;font-weight:600}
+.hide{display:none!important}
+@keyframes blink{50%{opacity:.2}}
+.timer.late{animation:blink 1s ease-in-out infinite}
+input.big{font-size:1.25rem;font-weight:700;padding:14px}
+input.sub{font-weight:600}
+.inl{display:flex;gap:8px;align-items:center}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px}
+.box .inl{margin-bottom:8px}
+.box .inl:last-child{margin-bottom:0}
+.box textarea{border:0;background:transparent;padding:6px 4px;min-height:88px}
+textarea.short{min-height:56px}
+.x{width:30px;height:30px;border-radius:50%;color:var(--mute);flex:none}
+.x:hover{background:var(--warm-soft);color:var(--rose)}
+.plus{width:42px;height:42px;border-radius:12px;background:var(--accent);color:#fff;font-size:1.2rem;flex:none}
+.add{width:100%;border:1.5px dashed var(--line);border-radius:14px;padding:12px;color:var(--accent);font-weight:600;margin-bottom:12px}
+.add:hover{border-color:var(--accent);background:var(--accent-soft)}
+.kws{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.kws:empty{display:none}
+.kw{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:4px 6px 4px 12px;font-size:.84rem;font-weight:600}
+.kw button{margin-left:4px;font-size:.7rem;color:var(--accent);opacity:.7}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stars button{font-size:1.7rem;color:var(--line);padding:0 2px}
+.stars button.on{color:var(--warm)}
+.ck{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);flex:none;color:#fff;font-size:.8rem}
+.ck.on{background:var(--accent);border-color:var(--accent)}
+.step{margin-bottom:8px}
+.sl{color:var(--mute)}
+.seg{margin-bottom:14px}
+.field.due{margin-top:6px}
+textarea.stp{min-height:0;padding:10px 13px}
+textarea.bk{max-height:140px;overflow:auto;font-size:.78rem}
+.step{align-items:flex-start}.step .ck{margin-top:7px}
+.hb{display:flex;gap:8px}
+.mhead{background:var(--card);border-bottom:1px solid var(--line);padding:14px 20px 12px}
+.mhead h3{margin:0}
+.mtop{display:flex;align-items:center;justify-content:space-between}
+.mtr{display:flex;gap:6px;align-items:center}
+.mbody{padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:12px;background:var(--bg);padding:4px;border-radius:12px}
+.cat{padding:7px 2px;border-radius:9px;font-size:.74rem;font-weight:600;color:var(--mute);display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;transition:background .15s}
+.cat i{font-style:normal;font-size:1rem}
+.cat.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.badge{display:inline-block;margin-top:10px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:4px 12px;font-size:.8rem;font-weight:600}
+.pinbtn{width:38px;height:38px;border-radius:50%;background:var(--bg);font-size:1.05rem;filter:grayscale(1);opacity:.55}
+.pinbtn.on{background:var(--warm-soft);filter:none;opacity:1}
+.dueblk{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:6px;margin-bottom:18px}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dh label{margin:0;font-size:.78rem;color:var(--mute);font-weight:600}
+.clr{color:var(--rose);font-size:.8rem;font-weight:600}
+.qs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.dpick{font-size:.84rem;color:var(--mute)}
+.dpick input{flex:1}
+.dsum{margin-top:12px;background:var(--accent-soft);color:var(--accent);border-radius:12px;padding:9px 12px;font-size:.88rem;font-weight:600}
+.card .ic:not(.on){filter:grayscale(1);opacity:.45}
+.ic.danger{width:auto;padding:0 10px;background:var(--warm-soft);color:var(--rose);font-size:.78rem;font-weight:600;border-radius:999px;filter:none;opacity:1}
+.save,.cancel{font-size:.95rem}
+.note{font-size:.85rem;color:var(--accent);align-self:center}
+.stk{position:sticky;top:0;z-index:3;background:var(--bg);padding:8px 0 10px;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.stk label{margin-bottom:3px}
+.stk textarea{max-height:96px;overflow:auto}
+.bar{display:block;padding:12px 12px 12px 16px}
+.bt{display:flex;align-items:flex-start;gap:10px}
+.bt .dot{margin-top:7px}
+.tt{flex:1;min-width:0;font-weight:600;font-size:.97rem;line-height:1.4;cursor:pointer;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ba{display:flex;gap:2px;flex:none}
+.bm{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 0 20px;cursor:pointer}
+.mt{font-size:.78rem;color:var(--mute);min-width:0}
+.bar.done .tt{text-decoration:line-through;color:var(--mute)}
+.actions{flex-wrap:wrap;align-items:center}
+p.hint{font-size:.8rem;color:var(--mute);margin:8px 0 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Notlarım<small><span id="today"></span> <span id="cloud"></span></small></div>
+    <div class="hb"><button class="btn-arch" id="bkBtn" title="Yedekle / içe aktar">💾</button><button class="btn-arch" id="archBtn">🗂️ <span id="archLbl">Arşiv</span> <span class="count" id="archCount">0</span></button></div>
+  </header>
+
+  <div id="home">
+    <section>
+      <h2>📌 Sabitlenenler</h2>
+      <div id="pinned"></div>
+    </section>
+    <section>
+      <h2>Yeni oluştur</h2>
+      <button class="new-btn" id="newBtn">＋ Yeni not / görev / proje</button>
+      <div class="tpls" id="tpls"></div>
+    </section>
+    <section>
+      <h2>Arşive alınan son 5 not</h2>
+      <div id="recent"></div>
+    </section>
+  </div>
+
+  <div id="archive" class="hide">
+    <h2>Tüm notlar</h2>
+    <div class="tools"><input id="q" type="search" placeholder="Arşivde ara…"></div>
+    <div class="tools" id="filters"></div>
+    <div id="all"></div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+
+<script>
+var KEY='notlarim.v1';
+var CATS={
+ blog:{name:'Blog notu / Taslak',em:'✍️',tpl:'## Fikir\n\n## Ana başlıklar\n- \n- \n\n## Taslak\n'},
+ strateji:{name:'Strateji planlama',em:'🧭',tpl:'Hedef:\n\nMevcut durum:\n\nAdımlar:\n1. \n2. \n3. \n\nRiskler:\n'},
+ kitap:{name:'Kitap ve film notları',em:'📚',tpl:'Tür: Kitap / Film\nYazar / Yönetmen:\nPuan: /10\n\nNotlarım:\n\nAlıntılar:\n'}
+};
+var notes=[],view='home',filter='all',draft=null;
+try{notes=JSON.parse(localStorage.getItem(KEY)||'[]')||[]}catch(e){notes=[]}
+function localSave(ts){try{localStorage.setItem(KEY,JSON.stringify(notes));localStorage.setItem('notlarim.upd',String(ts||Date.now()))}catch(e){}}
+function save(){localSave();schedPush()}
+var cloud={ref:null,t:null,msg:''};
+function cap(n){try{return window.claude&&claude.use?claude.use(n):Promise.resolve(null)}catch(e){return Promise.resolve(null)}}
+function setCloud(st,msg){
+  cloud.msg=msg;
+  var e=$('cloud');if(e)e.textContent={ok:'· ☁️ yedekli',busy:'· ☁️ …',err:'· ⚠️ yedeklenemedi',off:''}[st]||'';
+  var m=$('cloudSt');if(m)m.textContent=msg;
+}
+function okMsg(){return'Bulut yedeği açık · '+notes.length+' not · '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
+function schedPush(){if(!cloud.ref)return;clearTimeout(cloud.t);setCloud('busy','Yedekleniyor…');cloud.t=setTimeout(push,1200)}
+async function push(){
+  if(!cloud.ref){setCloud('off',cloud.msg||'Bulut yedeği bu görünümde kapalı');return}
+  try{
+    var u=+localStorage.getItem('notlarim.upd')||Date.now();
+    await cloud.ref.set({json:JSON.stringify(notes),updated:u,count:notes.length});
+    setCloud('ok',okMsg());
+  }catch(e){setCloud('err','Yedeklenemedi ('+((e&&e.code)||'hata')+')')}
+}
+async function pull(){
+  var snap=await cloud.ref.get(),lu=+localStorage.getItem('notlarim.upd')||0;
+  if(snap.exists){
+    var d=snap.data(),cn=JSON.parse(d.json||'[]'),cu=d.updated||0;
+    if(!lu&&notes.length){var ids={};notes.forEach(function(n){ids[n.id]=1});cn.forEach(function(n){if(!ids[n.id])notes.push(n)});localSave();await push()}
+    else if(cu>lu){notes=cn;localSave(cu);render();setCloud('ok',okMsg())}
+    else if(lu>cu)await push();
+    else setCloud('ok',okMsg());
+  }else if(notes.length)await push();
+  else setCloud('ok',okMsg());
+}
+async function initCloud(){
+  try{
+    var db=await cap('db'),us=await cap('user');
+    if(!db||!us){setCloud('off','Bulut yedeği bu görünümde kapalı. Notlar yalnızca bu cihazda saklanıyor.');return}
+    var id=await us.id();
+    if(!id){setCloud('off','Bulut yedeği için claude.ai hesabına giriş gerekir.');return}
+    cloud.ref=db.collection('data/users/'+id).doc('notes');
+    await pull();
+  }catch(e){setCloud('err','Bulut bağlantısı kurulamadı ('+((e&&e.code)||'hata')+')')}
+}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function pad(n){return n<10?'0'+n:''+n}
+function fdate(ts){return new Date(ts).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}
+function left(ts){
+  var d=ts-Date.now();if(d<=0)return{t:'Süre doldu',c:'late'};
+  var s=Math.floor(d/1000),dy=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),sc=s%60;
+  return{t:(dy?dy+'g ':'')+pad(h)+':'+pad(m)+':'+pad(sc),c:(d<86400000?'soon':'')};
+}
+function timerHTML(n){
+  if(n.done)return'<span class="timer none">Tamamlandı</span>';
+  if(!n.due)return'<span class="timer none">Süresiz</span>';
+  var l=left(n.due);
+  return'<span class="timer '+l.c+'" data-due="'+n.due+'">'+l.t+'</span>';
+}
+function bar(n){
+  return'<div class="bar '+(n.type==='task'?'task ':'')+(n.done?'done':'')+'" data-id="'+n.id+'">'+
+  '<div class="bt"><span class="dot"></span><b class="tt" data-act="open">'+esc(n.title||'Başlıksız')+'</b><div class="ba">'+
+  (n.type==='task'?'<button class="ic" data-act="done" title="Tamamla">'+(n.done?'↺':'✓')+'</button>':'')+
+  '<button class="ic on" data-act="pin" title="Sabitlemeyi kaldır">📌</button></div></div>'+
+  '<div class="bm" data-act="open"><span class="mt">'+emo(n)+' '+CATS[n.cat].name+' · '+(n.type==='task'?'Görev':'Not')+'</span>'+timerHTML(n)+'</div></div>';
+}
+function card(n){
+  return'<div class="card" data-id="'+n.id+'" data-act="open"><span class="em">'+emo(n)+'</span><div class="t"><b>'+esc(n.title||'Başlıksız')+'</b><span>'+CATS[n.cat].name+' · '+fdate(n.created)+'</span></div>'+'<button class="ic'+(n.pinned?' on':'')+'" data-act="pin" title="Sabitle">📌</button><button class="ic" data-act="del" title="Sil">🗑</button>'+'</div>';
+}
+function render(){
+  $('today').textContent=new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long'});
+  $('archCount').textContent=notes.length;
+  $('archLbl').textContent=view==='home'?'Arşiv':'Ana sayfa';
+  $('home').classList.toggle('hide',view!=='home');
+  $('archive').classList.toggle('hide',view!=='archive');
+  var p=notes.filter(function(n){return n.pinned}).sort(function(a,b){function k(n){return n.done?2e15:(n.due||1e15)}return k(a)-k(b)});
+  $('pinned').innerHTML=p.length?p.map(bar).join(''):'<div class="empty">Henüz sabitlenmiş not yok. Bir notu kaydederken sabitleyebilirsin.</div>';
+  var r=notes.slice().sort(function(a,b){return b.created-a.created}).slice(0,5);
+  $('recent').innerHTML=r.length?r.map(card).join(''):'<div class="empty">Arşivin henüz boş.</div>';
+  $('tpls').innerHTML=Object.keys(CATS).map(function(k){return'<button class="tpl" data-cat="'+k+'"><i>'+CATS[k].em+'</i>'+CATS[k].name+'</button>'}).join('');
+  if(view==='archive')renderArchive();
+}
+function renderArchive(){
+  var q=$('q').value.toLowerCase();
+  var f=[['all','Hepsi']].concat(Object.keys(CATS).map(function(k){return[k,CATS[k].em+' '+CATS[k].name]}));
+  $('filters').innerHTML=f.map(function(x){return'<button class="chip '+(filter===x[0]?'on':'')+'" data-f="'+x[0]+'">'+x[1]+'</button>'}).join('');
+  var l=notes.filter(function(n){return(filter==='all'||n.cat===filter)&&((n.title+' '+n.body).toLowerCase().indexOf(q)>-1)}).sort(function(a,b){return b.created-a.created});
+  $('all').innerHTML=l.length?l.map(card).join(''):'<div class="empty">Sonuç bulunamadı.</div>';
+}
+function blank(c){
+  if(c==='blog')return{title:'',idea:'',kw:[],sec:[{h:'',t:''}]};
+  if(c==='strateji')return{title:'',goal:'',steps:[{t:'',done:false}]};
+  return{kind:'kitap',name:'',author:'',rating:0,cur:'',total:'',q:[],notes:''};
+}
+function migrate(n){
+  var d=blank(n.cat);
+  if(n.cat==='blog'){d.title=n.title;d.sec=[{h:'',t:n.body||''}]}
+  else if(n.cat==='strateji'){d.title=n.title;d.goal=n.body||''}
+  else{d.name=n.title;d.notes=n.body||''}
+  n.data=d;
+}
+function emo(n){return n.cat==='kitap'?(n.data&&n.data.kind==='film'?'🎬':'📚'):CATS[n.cat].em}
+function inp(k,v,ph,cl){return'<input'+(cl?' class="'+cl+'"':'')+' data-k="'+k+'" value="'+esc(v==null?'':v)+'" placeholder="'+ph+'">'}
+function ta(k,v,ph,cl){return'<textarea'+(cl?' class="'+cl+'"':'')+' data-k="'+k+'" placeholder="'+ph+'">'+esc(v==null?'':v)+'</textarea>'}
+function fld(l,h,c){return'<div class="field'+(c?' '+c:'')+'">'+(l?'<label>'+l+'</label>':'')+h+'</div>'}
+function xbtn(a){return'<button class="x" data-m="'+a+'" title="Sil">✕</button>'}
+function stars(r){var s='';for(var i=1;i<=5;i++)s+='<button class="star'+(i<=r?' on':'')+'" data-m="star:'+i+'">★</button>';return'<div class="stars">'+s+'</div>'}
+var FORMS={
+ blog:function(d){
+  return fld('',inp('title',d.title,'Ana başlık','big'))+
+   fld('Ana fikir · tek cümle',ta('idea',d.idea,'Bu yazı neyi anlatıyor?','stp'),'stk')+
+   fld('Anahtar kelimeler','<div class="kws">'+d.kw.map(function(w,i){return'<span class="kw">'+esc(w)+'<button data-m="delkw:'+i+'">✕</button></span>'}).join('')+'</div><div class="inl"><input id="kwIn" placeholder="Kelime ekle…"><button class="plus" data-m="addkw">＋</button></div>')+
+   d.sec.map(function(s,i){return'<div class="box"><div class="inl">'+inp('sec.'+i+'.h',s.h,'Alt başlık','sub')+xbtn('delsec:'+i)+'</div>'+ta('sec.'+i+'.t',s.t,'Notunu yaz…')+'</div>'}).join('')+
+   '<button class="add" data-m="addsec">＋ Alt başlık ekle</button>';
+ },
+ strateji:function(d){
+  return fld('',inp('title',d.title,'Strateji projesinin başlığı','big'))+
+   fld('Amaç ve hedef',ta('goal',d.goal,'Ne başarmak istiyorsun?','short'),'stk')+
+   fld('Adımlar',d.steps.map(function(s,i){return'<div class="inl step"><button class="ck'+(s.done?' on':'')+'" data-m="togstep:'+i+'">'+(s.done?'✓':'')+'</button>'+ta('steps.'+i+'.t',s.t,(i+1)+'. adım','stp')+xbtn('delstep:'+i)+'</div>'}).join('')+'<button class="add" data-m="addstep">＋ Adım ekle</button>');
+ },
+ kitap:function(d){
+  var f=d.kind==='film';
+  var h='<div class="row seg"><button class="chip'+(!f?' on':'')+'" data-m="kind:kitap">📚 Kitap</button><button class="chip'+(f?' on':'')+'" data-m="kind:film">🎬 Film</button></div>';
+  if(!f){
+   h+='<div class="two">'+fld('Kitap adı',inp('name',d.name,'Kitap adı'))+fld('Yazar',inp('author',d.author,'Yazar'))+'</div>'+
+   fld('Puan',stars(d.rating))+
+   fld('Sayfa · kaldığım / toplam','<div class="inl"><input type="number" min="0" data-k="cur" value="'+esc(d.cur)+'" placeholder="Kaldığım"><span class="sl">/</span><input type="number" min="0" data-k="total" value="'+esc(d.total)+'" placeholder="Toplam"></div>')+
+   fld('Alıntılar',d.q.map(function(q,i){return'<div class="box"><div class="inl">'+ta('q.'+i,q,'Alıntıyı yaz…','short')+xbtn('delq:'+i)+'</div></div>'}).join('')+'<button class="add" data-m="addq">＋ Alıntı ekle</button>')+
+   fld('Notlar',ta('notes',d.notes,'Genel notların…'));
+  }else{
+   h+=fld('',inp('name',d.name,'Filmin adı','big'))+fld('Puan',stars(d.rating))+fld('Not',ta('notes',d.notes,'Film hakkındaki notların…'));
+  }
+  return h;
+ }
+};
+var SHORT={blog:'Blog / Taslak',strateji:'Strateji',kitap:'Kitap & Film'};
+var Q=[['5 dk',3e5],['10 dk',6e5],['1 saat',36e5],['1 gün',864e5],['2 gün',1728e5],['5 gün',432e6],['1 hafta',6048e5],['1 ay',2592e6]];
+function fdt(ts){return new Date(ts).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})}
+function grow(el){el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
+function paint(){
+  var h='<div class="mhead"><div class="mtop"><h3>'+(draft.id?'Notu düzenle':'Yeni oluştur')+'</h3><div class="mtr"><button class="pinbtn'+(draft.pinned?' on':'')+'" data-m="pin" title="En üste sabitle">📌</button><button class="x" id="bCancel" title="Kapat">✕</button></div></div>';
+  if(!draft.id)h+='<div class="cats">'+Object.keys(CATS).map(function(k){return'<button class="cat'+(draft.cat===k?' on':'')+'" data-m="cat:'+k+'"><i>'+CATS[k].em+'</i>'+SHORT[k]+'</button>'}).join('')+'</div>';
+  else h+='<div class="badge">'+emo(draft)+' '+CATS[draft.cat].name+'</div>';
+  h+='</div><div class="mbody">'+FORMS[draft.cat](draft.data);
+  var book=draft.cat==='kitap'&&draft.data.kind!=='film';
+  var dv=draft.due?new Date(draft.due-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16):'';
+  h+='<div class="dueblk"><div class="dh"><label>📅 Bitiş zamanı'+(book?' · kitabı bitirme hedefin':'')+'</label>'+(draft.due?'<button class="clr" data-m="dueclr">Temizle</button>':'')+'</div>'+
+   '<div class="qs">'+Q.map(function(q){return'<button class="chip" data-m="due:'+q[1]+'">'+q[0]+'</button>'}).join('')+'</div>'+
+   '<div class="inl dpick"><span>Özel:</span><input type="datetime-local" id="fDue" value="'+dv+'"></div>'+
+   (draft.due?'<div class="dsum">⏳ '+fdt(draft.due)+'</div>':'')+'</div>'+
+   '<div class="actions">'+(draft.id?'<button class="del" id="bDel">🗑 Sil</button>':'')+(draft.cat==='blog'?'<button class="chip" data-m="copynote">📋 Not olarak kopyala</button>':'')+'<button class="save" id="bSave">Kaydet</button></div></div>';
+  $('modal').innerHTML=h;
+  $('modal').querySelectorAll('textarea[data-k]').forEach(grow);
+}
+function openEditor(id,cat){
+  var n=id?notes.filter(function(x){return x.id===id})[0]:null;
+  if(n){draft=JSON.parse(JSON.stringify(n));if(!draft.data)migrate(draft)}
+  else{cat=cat||'blog';draft={id:null,cat:cat,title:'',body:'',data:blank(cat),due:null,pinned:false,done:false}}
+  $('ov').classList.add('show');paint();
+}
+function sync(){
+  var d=draft.data,c=draft.cat;
+  draft.type=draft.due?'task':'note';
+  if(c==='blog'){draft.title=d.title;draft.body=[d.idea].concat(d.kw,d.sec.map(function(s){return s.h+' '+s.t})).join(' ')}
+  else if(c==='strateji'){draft.title=d.title;draft.body=d.goal+' '+d.steps.map(function(s){return s.t}).join(' ')}
+  else{draft.title=d.name;draft.body=[d.author,d.notes].concat(d.q).join(' ')}
+  draft.title=(draft.title||'').trim();
+}
+function setp(path,v){var p=path.split('.'),o=draft.data;for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v}
+function blogText(d){
+  var t=[d.title||'Başlıksız'];
+  if(d.idea)t.push('Ana fikir: '+d.idea);
+  if(d.kw.length)t.push('Anahtar kelimeler: '+d.kw.join(', '));
+  d.sec.forEach(function(s){if(s.h||s.t)t.push((s.h?s.h+'\n':'')+s.t)});
+  return t.join('\n\n');
+}
+function copyText(txt,cb){
+  function fb(){var x=document.createElement('textarea');x.value=txt;x.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(x);x.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}x.remove();cb(ok)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){cb(true)},fb);else fb();
+}
+function modalAct(a){
+  sync();
+  var p=a.split(':'),k=p[0],i=+p[1],d=draft.data;
+  if(k==='copynote'){copyText(blogText(d),function(ok){var b=document.querySelector('[data-m="copynote"]');if(b){b.textContent=ok?'Kopyalandı ✓':'Kopyalanamadı';setTimeout(function(){b.textContent='📋 Not olarak kopyala'},1600)}});return}
+  if(k==='cat'){draft.cat=p[1];draft.data=blank(p[1])}
+  else if(k==='pin')draft.pinned=!draft.pinned;
+  else if(k==='due')draft.due=Date.now()+i;
+  else if(k==='dueclr')draft.due=null;
+  else if(k==='kind')d.kind=p[1];
+  else if(k==='star')d.rating=d.rating===i?0:i;
+  else if(k==='addkw'){var w=$('kwIn').value.trim();if(w)d.kw.push(w)}
+  else if(k==='delkw')d.kw.splice(i,1);
+  else if(k==='addsec')d.sec.push({h:'',t:''});
+  else if(k==='delsec'){d.sec.splice(i,1);if(!d.sec.length)d.sec.push({h:'',t:''})}
+  else if(k==='addstep')d.steps.push({t:'',done:false});
+  else if(k==='delstep')d.steps.splice(i,1);
+  else if(k==='togstep')d.steps[i].done=!d.steps[i].done;
+  else if(k==='addq')d.q.push('');
+  else if(k==='delq')d.q.splice(i,1);
+  paint();
+  if(k==='addkw')$('kwIn').focus();
+  if(k==='addstep'){var l=$('modal').querySelectorAll('[data-k^="steps."]');if(l.length)l[l.length-1].focus()}
+}
+function exportText(){return JSON.stringify({app:'notlarim',v:1,notes:notes})}
+function openBackup(){
+  draft=null;
+  $('modal').innerHTML='<div class="mhead"><div class="mtop"><h3>💾 Yedek &amp; aktarım</h3><button class="x" id="bClose" title="Kapat">✕</button></div></div><div class="mbody">'+
+   fld('☁️ Otomatik bulut yedeği','<div class="dsum" id="cloudSt">'+esc(cloud.msg||'Kontrol ediliyor…')+'</div><p class="hint">Açıksa notların her değişiklikte hesabına yedeklenir ve bu bağlantıyı açtığın her cihazda görünür.</p><div class="row"><button class="save" id="bCloud">Şimdi yedekle</button></div>')+
+   fld('📁 Dosya olarak kaydet','<div class="row"><button class="save" id="bFile">.json yedeği kaydet</button><span class="note" id="bkMsg0"></span></div>')+
+   fld('Dışa aktar · '+notes.length+' not','<textarea id="bkOut" class="bk" readonly></textarea><div class="row" style="margin:10px 0 0"><button class="save" id="bCopy">Kopyala</button><span class="note" id="bkMsg"></span></div>')+
+   fld('İçe aktar · yedek metnini yapıştır','<textarea id="bkIn" class="bk" placeholder="Kopyaladığın yedeği buraya yapıştır…"></textarea><div class="row" style="margin:10px 0 0"><button class="save" id="bImport">İçe aktar</button><button class="chip" id="bPaste">Panodan yapıştır</button><span class="note" id="bkMsg2"></span></div><p class="hint">Ya da kaydettiğin dosyayı seç:</p><input type="file" id="bkFile" accept=".json,.txt,application/json">')+
+   '<p class="hint">İçe aktarırken mevcut notların silinmez, sadece eksikler eklenir.</p></div>';
+  $('bkOut').value=exportText();
+  $('ov').classList.add('show');
+}
+async function fileBackup(){
+  var m=$('bkMsg0'),dl=await cap('downloads');
+  if(!dl){m.textContent='Bu görünümde dosya kaydı yok, kopyala-yapıştır kullan';return}
+  try{await dl.save({filename:'notlarim-yedek-'+new Date().toLocaleDateString('sv-SE')+'.json',data:exportText()});m.textContent='Kaydedildi ✓'}
+  catch(e){m.textContent=(e&&e.code==='declined')?'İptal edildi':'Kaydedilemedi'}
+}
+function copyBackup(){
+  var o=$('bkOut'),m=$('bkMsg');o.focus();o.select();
+  function ok(){m.textContent='Kopyalandı ✓'}
+  function fb(){try{document.execCommand('copy')?ok():m.textContent='Metin seçildi, elle kopyala'}catch(e){m.textContent='Metin seçildi, elle kopyala'}}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(o.value).then(ok,fb);else fb();
+}
+function pasteBackup(){
+  var m=$('bkMsg2');
+  if(navigator.clipboard&&navigator.clipboard.readText)navigator.clipboard.readText().then(function(t){$('bkIn').value=t},function(){m.textContent='Pano kapalı, kutuya elle yapıştır'});
+  else m.textContent='Kutuya elle yapıştır';
+}
+function importBackup(){
+  var m=$('bkMsg2');
+  try{
+    var j=JSON.parse($('bkIn').value.trim()),arr=Array.isArray(j)?j:j.notes;
+    if(!Array.isArray(arr))throw 0;
+    var ids={},add=0;notes.forEach(function(n){ids[n.id]=1});
+    arr.forEach(function(n){
+      if(!n||!n.id||!CATS[n.cat]||ids[n.id])return;
+      if(!n.data)migrate(n);
+      n.created=n.created||Date.now();notes.push(n);ids[n.id]=1;add++;
+    });
+    save();render();$('bkOut').value=exportText();
+    m.textContent=add+' not eklendi ✓'+(arr.length-add?' ('+(arr.length-add)+' tanesi zaten vardı)':'');
+  }catch(e){m.textContent='Geçerli bir yedek değil'}
+}
+function closeEd(){$('ov').classList.remove('show');draft=null}
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var b=t.closest('[data-cat]');if(b){openEditor(null,b.dataset.cat);return}
+  if(t.closest('#newBtn')){openEditor(null,'blog');return}
+  if(t.closest('#archBtn')){view=view==='home'?'archive':'home';render();window.scrollTo(0,0);return}
+  var f=t.closest('[data-f]');if(f){filter=f.dataset.f;renderArchive();return}
+  var a=t.closest('[data-act]');
+  if(a){
+    var host=a.closest('[data-id]');var n=notes.filter(function(x){return x.id===host.dataset.id})[0];if(!n)return;
+    if(a.dataset.act==='open')openEditor(n.id);
+    if(a.dataset.act==='pin'){n.pinned=!n.pinned;save();render()}
+    if(a.dataset.act==='done'){n.done=!n.done;save();render()}
+    if(a.dataset.act==='del'){
+      if(a.dataset.arm){notes=notes.filter(function(x){return x.id!==n.id});save();render()}
+      else{a.dataset.arm='1';a.textContent='Sil?';a.classList.add('danger');setTimeout(function(){if(a.isConnected){delete a.dataset.arm;a.textContent='🗑';a.classList.remove('danger')}},3000)}
+    }
+    return;
+  }
+  if(t.closest('#bkBtn')){openBackup();return}
+  if(t.closest('#bCloud')){push();return}
+  if(t.closest('#bFile')){fileBackup();return}
+  if(t.closest('#bCopy')){copyBackup();return}
+  if(t.closest('#bImport')){importBackup();return}
+  if(t.closest('#bPaste')){pasteBackup();return}
+  if(t.closest('#bClose')||t===$('ov')){closeEd();return}
+  if(!draft)return;
+  var m=t.closest('[data-m]');if(m){modalAct(m.dataset.m);return}
+  if(t.closest('#bCancel')||t===$('ov')){closeEd();return}
+  if(t.closest('#bDel')){var bd=$('bDel');if(bd.dataset.arm){notes=notes.filter(function(x){return x.id!==draft.id});save();closeEd();render()}else{bd.dataset.arm='1';bd.textContent='Emin misin? Tekrar dokun';setTimeout(function(){if(bd.isConnected){delete bd.dataset.arm;bd.textContent='🗑 Sil'}},3000)}return}
+  if(t.closest('#bSave')){
+    sync();
+    if(!draft.title.trim())draft.title=CATS[draft.cat].name;
+    if(draft.id){notes=notes.map(function(x){return x.id===draft.id?Object.assign({},x,draft):x})}
+    else{draft.id='n'+Date.now();draft.created=Date.now();notes.push(draft)}
+    save();closeEd();render();
+  }
+});
+document.addEventListener('input',function(e){var k=e.target.dataset&&e.target.dataset.k;if(k&&draft){setp(k,e.target.value);if(e.target.tagName==='TEXTAREA')grow(e.target)}});
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'||e.shiftKey||!draft)return;
+  var k=e.target.dataset&&e.target.dataset.k;
+  if(e.target.id==='kwIn'){e.preventDefault();modalAct('addkw')}
+  else if(k&&k.indexOf('steps.')===0){e.preventDefault();modalAct('addstep')}
+});
+document.addEventListener('change',function(e){if(draft&&e.target.id==='fDue'){sync();draft.due=e.target.value?new Date(e.target.value).getTime():null;paint()}});
+$('q').addEventListener('input',renderArchive);
+setInterval(function(){
+  document.querySelectorAll('[data-due]').forEach(function(el){
+    var l=left(+el.dataset.due);el.textContent=l.t;el.className='timer '+l.c;
+  });
+},1000);
+document.addEventListener('change',function(e){
+  if(e.target.id==='bkFile'){var f=e.target.files&&e.target.files[0];if(f){var r=new FileReader();r.onload=function(){$('bkIn').value=r.result};r.readAsText(f)}}
+});
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&cloud.ref&&!draft)pull().catch(function(){})});
+render();initCloud();
+</script>
+</body>
+</html>
