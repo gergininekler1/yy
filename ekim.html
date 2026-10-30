@@ -140,6 +140,24 @@ textarea.bk{max-height:140px;overflow:auto;font-size:.78rem}
 .bar.done .tt{text-decoration:line-through;color:var(--mute)}
 .actions{flex-wrap:wrap;align-items:center}
 p.hint{font-size:.8rem;color:var(--mute);margin:8px 0 12px}
+.panel{background:var(--bg);background:color-mix(in srgb,var(--ink) 4.5%,var(--bg));border:1px solid var(--line);border-radius:24px;padding:20px 16px 10px;margin-bottom:26px}
+.panel h2{font-size:.98rem;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:700;margin:0 0 16px}
+.p1{box-shadow:inset 0 3px 0 var(--warm)}
+.p2{box-shadow:inset 0 3px 0 var(--accent)}
+.p2 .tpls{margin-bottom:10px}
+.p3{box-shadow:inset 0 3px 0 var(--mute)}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:2px 14px;margin-bottom:24px;box-shadow:var(--shadow)}
+.search:focus-within{border-color:var(--accent)}
+.search input{border:0;background:transparent;padding:13px 0;font-size:1rem;flex:1;border-radius:0}
+.search button{color:var(--mute);width:28px;height:28px;border-radius:50%;flex:none}
+mark{background:rgba(240,190,70,.45);color:inherit;border-radius:4px;padding:0 2px}
+.rh{font-size:.82rem;color:var(--mute);font-weight:600;margin:0 2px 12px}
+.rc{align-items:flex-start}
+.rc b{white-space:normal}
+.rc p{margin:4px 0;font-size:.85rem;color:var(--mute);line-height:1.45}
+.kws{margin:10px 0 0}
+.kw.used{background:var(--line);color:var(--mute)}
+.kw.used button{color:var(--mute)}
 </style>
 </head>
 <body>
@@ -150,24 +168,21 @@ p.hint{font-size:.8rem;color:var(--mute);margin:8px 0 12px}
   </header>
 
   <div id="home">
-    <section>
-      <h2>📌 Sabitlenenler</h2>
-      <div id="pinned"></div>
-    </section>
-    <section>
-      <h2>Yeni oluştur</h2>
-      <button class="new-btn" id="newBtn">＋ Yeni not / görev / proje</button>
-      <div class="tpls" id="tpls"></div>
-    </section>
-    <section>
-      <h2>Arşive alınan son 5 not</h2>
-      <div id="recent"></div>
-    </section>
+    <div class="search"><span>🔍</span><input id="hq" type="search" placeholder="Notlarda ara · başlık ve içerik" autocomplete="off"><button id="hqx" class="hide" title="Temizle">✕</button></div>
+    <div id="results" class="hide"></div>
+    <div id="secs">
+      <section class="panel p1"><h2>📌 Sabitlenenler</h2><div id="pinned"></div></section>
+      <section class="panel p2"><h2>✨ Yeni oluştur</h2>
+        <button class="new-btn" id="newBtn">＋ Yeni not / görev / proje</button>
+        <div class="tpls" id="tpls"></div>
+      </section>
+      <section class="panel p3"><h2>🗂️ Arşive alınan son 5 not</h2><div id="recent"></div></section>
+    </div>
   </div>
 
   <div id="archive" class="hide">
     <h2>Tüm notlar</h2>
-    <div class="tools"><input id="q" type="search" placeholder="Arşivde ara…"></div>
+    <div class="tools"><input id="q" type="search" placeholder="Arşivde ara · başlık ve içerik"></div>
     <div class="tools" id="filters"></div>
     <div id="all"></div>
   </div>
@@ -261,13 +276,58 @@ function render(){
   $('recent').innerHTML=r.length?r.map(card).join(''):'<div class="empty">Arşivin henüz boş.</div>';
   $('tpls').innerHTML=Object.keys(CATS).map(function(k){return'<button class="tpl" data-cat="'+k+'"><i>'+CATS[k].em+'</i>'+CATS[k].name+'</button>'}).join('');
   if(view==='archive')renderArchive();
+  renderSearch();
+}
+function hl(text,terms){
+  var low=text.toLocaleLowerCase('tr'),out='',i=0,rg=[];
+  terms.forEach(function(t){var p=0,k;while((k=low.indexOf(t,p))>-1){rg.push([k,k+t.length]);p=k+t.length}});
+  rg.sort(function(a,b){return a[0]-b[0]});
+  var m=[];rg.forEach(function(r){var l=m[m.length-1];if(l&&r[0]<=l[1])l[1]=Math.max(l[1],r[1]);else m.push([r[0],r[1]])});
+  m.forEach(function(r){out+=esc(text.slice(i,r[0]))+'<mark>'+esc(text.slice(r[0],r[1]))+'</mark>';i=r[1]});
+  return out+esc(text.slice(i));
+}
+function runSearch(q,cat){
+  var terms=(q||'').toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
+  if(!terms.length)return null;
+  var res=[];
+  notes.forEach(function(n){
+    if(cat&&cat!=='all'&&n.cat!==cat)return;
+    var t=(n.title||'').toLocaleLowerCase('tr'),b=(n.body||'').toLocaleLowerCase('tr'),sc=n.pinned?2:0;
+    for(var i=0;i<terms.length;i++){
+      var x=terms[i],ti=t.indexOf(x),bi=b.indexOf(x);
+      if(ti<0&&bi<0)return;
+      if(ti>-1)sc+=ti===0?15:10;
+      if(bi>-1){sc+=3;var c=0,q2=bi;while(q2>-1&&c<5){c++;q2=b.indexOf(x,q2+x.length)}sc+=c}
+    }
+    res.push({n:n,s:sc});
+  });
+  res.sort(function(a,b){return b.s-a.s||((b.n.created||0)-(a.n.created||0))});
+  return{terms:terms,list:res};
+}
+function rcard(n,terms){
+  var tl=n.title||'Başlıksız',body=(n.body||'').replace(/\s+/g,' ').trim(),low=body.toLocaleLowerCase('tr'),idx=-1;
+  terms.forEach(function(t){var k=low.indexOf(t);if(k>-1&&(idx<0||k<idx))idx=k});
+  var st=Math.max(0,idx-40);
+  var sn=body?(idx>-1?(st>0?'…':'')+body.slice(st,st+120)+(st+120<body.length?'…':''):body.slice(0,90)+(body.length>90?'…':'')):'';
+  var tlow=tl.toLocaleLowerCase('tr'),inT=terms.some(function(t){return tlow.indexOf(t)>-1});
+  var where=inT&&idx>-1?'başlıkta ve içerikte':inT?'başlıkta':'içerikte';
+  return'<div class="card rc" data-id="'+n.id+'" data-act="open"><span class="em">'+emo(n)+'</span><div class="t"><b>'+hl(tl,terms)+'</b>'+(sn?'<p>'+hl(sn,terms)+'</p>':'')+'<span>'+CATS[n.cat].name+' · '+where+'</span></div><button class="ic'+(n.pinned?' on':'')+'" data-act="pin" title="Sabitle">📌</button></div>';
+}
+function renderSearch(){
+  var hq=$('hq').value.trim();
+  $('hqx').classList.toggle('hide',!hq);
+  var r=view==='home'?runSearch(hq):null;
+  $('secs').classList.toggle('hide',!!r);
+  $('results').classList.toggle('hide',!r);
+  if(r)$('results').innerHTML='<div class="rh">'+r.list.length+' sonuç</div>'+(r.list.length?r.list.map(function(x){return rcard(x.n,r.terms)}).join(''):'<div class="empty">Eşleşen not bulunamadı.</div>');
 }
 function renderArchive(){
-  var q=$('q').value.toLowerCase();
   var f=[['all','Hepsi']].concat(Object.keys(CATS).map(function(k){return[k,CATS[k].em+' '+CATS[k].name]}));
   $('filters').innerHTML=f.map(function(x){return'<button class="chip '+(filter===x[0]?'on':'')+'" data-f="'+x[0]+'">'+x[1]+'</button>'}).join('');
-  var l=notes.filter(function(n){return(filter==='all'||n.cat===filter)&&((n.title+' '+n.body).toLowerCase().indexOf(q)>-1)}).sort(function(a,b){return b.created-a.created});
-  $('all').innerHTML=l.length?l.map(card).join(''):'<div class="empty">Sonuç bulunamadı.</div>';
+  var r=runSearch($('q').value,filter),h;
+  if(r)h=r.list.map(function(x){return rcard(x.n,r.terms)}).join('');
+  else h=notes.filter(function(n){return filter==='all'||n.cat===filter}).sort(function(a,b){return b.created-a.created}).map(card).join('');
+  $('all').innerHTML=h||'<div class="empty">Sonuç bulunamadı.</div>';
 }
 function blank(c){
   if(c==='blog')return{title:'',idea:'',kw:[],sec:[{h:'',t:''}]};
@@ -291,7 +351,7 @@ var FORMS={
  blog:function(d){
   return fld('',inp('title',d.title,'Ana başlık','big'))+
    fld('Ana fikir · tek cümle',ta('idea',d.idea,'Bu yazı neyi anlatıyor?','stp'),'stk')+
-   fld('Anahtar kelimeler','<div class="kws">'+d.kw.map(function(w,i){return'<span class="kw">'+esc(w)+'<button data-m="delkw:'+i+'">✕</button></span>'}).join('')+'</div><div class="inl"><input id="kwIn" placeholder="Kelime ekle…"><button class="plus" data-m="addkw">＋</button></div>')+
+   fld('Anahtar kelimeler','<div class="inl"><input id="kwIn" placeholder="Kelime ekle…"><button class="plus" data-m="addkw">＋</button></div><div class="kws">'+d.kw.map(function(w,i){return'<span class="kw" data-w="'+esc(w.toLocaleLowerCase('tr'))+'">'+esc(w)+'<button data-m="delkw:'+i+'">✕</button></span>'}).join('')+'</div>'+(d.kw.length?'<p class="hint" style="margin:8px 0 0">Gri kelimeler notunda geçiyor.</p>':''))+
    d.sec.map(function(s,i){return'<div class="box"><div class="inl">'+inp('sec.'+i+'.h',s.h,'Alt başlık','sub')+xbtn('delsec:'+i)+'</div>'+ta('sec.'+i+'.t',s.t,'Notunu yaz…')+'</div>'}).join('')+
    '<button class="add" data-m="addsec">＋ Alt başlık ekle</button>';
  },
@@ -333,6 +393,7 @@ function paint(){
    '<div class="actions">'+(draft.id?'<button class="del" id="bDel">🗑 Sil</button>':'')+(draft.cat==='blog'?'<button class="chip" data-m="copynote">📋 Not olarak kopyala</button>':'')+'<button class="save" id="bSave">Kaydet</button></div></div>';
   $('modal').innerHTML=h;
   $('modal').querySelectorAll('textarea[data-k]').forEach(grow);
+  if(draft.cat==='blog')kwUsed();
 }
 function openEditor(id,cat){
   var n=id?notes.filter(function(x){return x.id===id})[0]:null;
@@ -347,6 +408,10 @@ function sync(){
   else if(c==='strateji'){draft.title=d.title;draft.body=d.goal+' '+d.steps.map(function(s){return s.t}).join(' ')}
   else{draft.title=d.name;draft.body=[d.author,d.notes].concat(d.q).join(' ')}
   draft.title=(draft.title||'').trim();
+}
+function kwUsed(){
+  var d=draft.data,txt=[d.title,d.idea].concat(d.sec.map(function(s){return s.h+' '+s.t})).join(' ').toLocaleLowerCase('tr');
+  document.querySelectorAll('#modal .kw').forEach(function(el){el.classList.toggle('used',txt.indexOf(el.dataset.w)>-1)});
 }
 function setp(path,v){var p=path.split('.'),o=draft.data;for(var i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v}
 function blogText(d){
@@ -447,6 +512,7 @@ document.addEventListener('click',function(e){
     return;
   }
   if(t.closest('#bkBtn')){openBackup();return}
+  if(t.closest('#hqx')){$('hq').value='';renderSearch();$('hq').focus();return}
   if(t.closest('#bCloud')){push();return}
   if(t.closest('#bFile')){fileBackup();return}
   if(t.closest('#bCopy')){copyBackup();return}
@@ -465,7 +531,7 @@ document.addEventListener('click',function(e){
     save();closeEd();render();
   }
 });
-document.addEventListener('input',function(e){var k=e.target.dataset&&e.target.dataset.k;if(k&&draft){setp(k,e.target.value);if(e.target.tagName==='TEXTAREA')grow(e.target)}});
+document.addEventListener('input',function(e){var k=e.target.dataset&&e.target.dataset.k;if(k&&draft){setp(k,e.target.value);if(e.target.tagName==='TEXTAREA')grow(e.target);if(draft.cat==='blog')kwUsed()}});
 document.addEventListener('keydown',function(e){
   if(e.key!=='Enter'||e.shiftKey||!draft)return;
   var k=e.target.dataset&&e.target.dataset.k;
@@ -474,6 +540,7 @@ document.addEventListener('keydown',function(e){
 });
 document.addEventListener('change',function(e){if(draft&&e.target.id==='fDue'){sync();draft.due=e.target.value?new Date(e.target.value).getTime():null;paint()}});
 $('q').addEventListener('input',renderArchive);
+$('hq').addEventListener('input',renderSearch);
 setInterval(function(){
   document.querySelectorAll('[data-due]').forEach(function(el){
     var l=left(+el.dataset.due);el.textContent=l.t;el.className='timer '+l.c;
