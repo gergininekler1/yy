@@ -1,750 +1,925 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="light">
+<html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chimptopus | Sentez Merkezi</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@700&family=Montserrat:wght@800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    
-    <style>
-        /* --- TEMALAR --- */
-        :root, [data-theme="light"] { --bg-base: #f5f5f7; --bg-gradient: linear-gradient(135deg, #eef0f5, #ffffff); --glass-bg: rgba(255, 255, 255, 0.7); --glass-border: rgba(255, 255, 255, 0.9); --glass-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.04); --text-primary: #1d1d1f; --text-secondary: #86868b; --accent: #007AFF; --danger: #FF3B30; --success: #34C759; --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px; --font-main: 'Inter', sans-serif; --font-title: 'Montserrat', sans-serif; --transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        [data-theme="dark"] { --bg-base: #121212; --bg-gradient: linear-gradient(135deg, #1e1e1e, #121212); --glass-bg: rgba(40, 40, 40, 0.6); --glass-border: rgba(255, 255, 255, 0.05); --glass-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.3); --text-primary: #f5f5f7; --text-secondary: #a1a1a6; --font-main: 'Inter', sans-serif; --font-title: 'Montserrat', sans-serif; }
-        [data-theme="apple"] { --bg-base: #fbfbfd; --bg-gradient: linear-gradient(180deg, #fbfbfd, #ffffff); --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 1); --glass-shadow: 0 10px 30px rgba(0,0,0,0.08); --text-primary: #1d1d1f; --text-secondary: #86868b; --radius-lg: 24px; --radius-md: 18px; --radius-sm: 12px; --font-main: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif; --font-title: -apple-system, BlinkMacSystemFont, 'San Francisco', sans-serif; }
-        [data-theme="literature"] { --bg-base: #f4ecd8; --bg-gradient: #f4ecd8; --glass-bg: #fdf6e3; --glass-border: #d4c5b0; --glass-shadow: 0 4px 12px rgba(0,0,0,0.05); --text-primary: #2b2622; --text-secondary: #5e554b; --accent: #8b3a3a; --radius-lg: 4px; --radius-md: 4px; --radius-sm: 2px; --font-main: 'Crimson Text', serif; --font-title: 'Playfair Display', serif; }
-        [data-theme="matrix"] { --bg-base: #060b06; --bg-gradient: #060b06; --glass-bg: rgba(10, 25, 10, 0.7); --glass-border: #144414; --glass-shadow: 0 0 15px rgba(0, 255, 0, 0.05); --text-primary: #4af626; --text-secondary: #2a882a; --accent: #66ff66; --danger: #ff4444; --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px; --font-main: 'Courier New', Courier, monospace; --font-title: 'Courier New', Courier, monospace; }
-        [data-theme="win95"] { --bg-base: #008080; --bg-gradient: #008080; --glass-bg: #c0c0c0; --glass-border: #dfdfdf; --text-primary: #000000; --text-secondary: #222222; --accent: #000080; --radius-lg: 0px; --radius-md: 0px; --radius-sm: 0px; --font-main: 'Tahoma', 'MS Sans Serif', sans-serif; --font-title: 'Tahoma', 'MS Sans Serif', sans-serif; --glass-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F3EBDC">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Notlarım">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACfElEQVR42u3csUpCURjA8aO4tjo1tAg15uAbBI2t4tZ7OPUebdHaGPQGCTomtDg4CU6Cc0MQkVleKP3Oub/fVBBc8/z77rlyqLFejhJ8p+ktQByIA3EgDsSBOBAH4kAciAPEgTgQB+JAHIgDcSAOxIE4QByIA3EgDsSBOBAH4kAciAPEgTiorhX/Ja4Wk8/fzmfTkhbgrNcP+9oakf/t05csCk4kZiXNHMtIKR2fnBYWx8vzvcnxB2V8aHcGuTcxfhqGHSER49ixjGL62EwkSB+eVkLoXtx0L26i3WLCxVFpbKSUFq93JSViQ8rvfUQYHuLw/CIONxdxIA47D3FgciAOxIE4EAfiAHEgDsSBOBAH4kAciANxIA4QB+JAHPyHVt1+4cfbq0Nd+vL6weRQRsSriyP62uTVhz0H4kAciCPXh4W8HljqNTkOuzbZPcrW7nOO7FbI5EAciANxIA7EAeJAHIgDcSAOInGGdH+cIVVG0KuLI/raOEOKDSniQBzlc4ZUHHHXxhlSfbitIA7EAeJAHIgDcSAOxIE4EAcFc4Z0f5whVUbQq4sj+to4Q4oNKeJAHOVzhlQccdfGGVJ9uK0gDsQB4kAciANxIA7EgTgQB+JAHCAOxIE4EAfiQByIA3EgDvZi/DR8/+Ks1xcHJgdVxoY42Oqw9xRx2G1kFcdR+7zSz7c7AzeUf9LyxxowiwhjI6XUWC9HAd+s1WJSk7GxOS2ClBE3jl36mM+mdqA13ZD+vPlQRq0nx7YRUlgWAZvIKQ7cVhAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxIA4QB+JAHIgDcRDPG80snOkkImxqAAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACfElEQVR42u3csUpCURjA8aO4tjo1tAg15uAbBI2t4tZ7OPUebdHaGPQGCTomtDg4CU6Cc0MQkVleKP3Oub/fVBBc8/z77rlyqLFejhJ8p+ktQByIA3EgDsSBOBAH4kAciAPEgTgQB+JAHIgDcSAOxIE4QByIA3EgDsSBOBAH4kAciAPEgTiorhX/Ja4Wk8/fzmfTkhbgrNcP+9oakf/t05csCk4kZiXNHMtIKR2fnBYWx8vzvcnxB2V8aHcGuTcxfhqGHSER49ixjGL62EwkSB+eVkLoXtx0L26i3WLCxVFpbKSUFq93JSViQ8rvfUQYHuLw/CIONxdxIA47D3FgciAOxIE4EAfiAHEgDsSBOBAH4kAciANxIA4QB+JAHPyHVt1+4cfbq0Nd+vL6weRQRsSriyP62uTVhz0H4kAciCPXh4W8HljqNTkOuzbZPcrW7nOO7FbI5EAciANxIA7EAeJAHIgDcSAOInGGdH+cIVVG0KuLI/raOEOKDSniQBzlc4ZUHHHXxhlSfbitIA7EAeJAHIgDcSAOxIE4EAcFc4Z0f5whVUbQq4sj+to4Q4oNKeJAHOVzhlQccdfGGVJ9uK0gDsQB4kAciANxIA7EgTgQB+JAHCAOxIE4EAfiQByIA3EgDvZi/DR8/+Ks1xcHJgdVxoY42Oqw9xRx2G1kFcdR+7zSz7c7AzeUf9LyxxowiwhjI6XUWC9HAd+s1WJSk7GxOS2ClBE3jl36mM+mdqA13ZD+vPlQRq0nx7YRUlgWAZvIKQ7cVhAH4kAciANxgDgQB+JAHIgDcSAOxIE4EAeIA3EgDsSBOBAH4kAciANxIA4QB+JAHIgDcRDPG80snOkkImxqAAAAAElFTkSuQmCC">
+<title>Notlarım</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F3EBDC; --frame:#FAF5EA; --card:#FFFCF5; --soft:#F2EADA; --line:#E8DDC8;
+  --ink:#5B5247; --muted:#A09583;
+  --blue:#D6E4F4; --blue-ink:#4F7BAA; --gray:#E9E5DC; --gray-ink:#A9A396;
+  --peach:#F8E0D0; --peach-ink:#B27A5C; --sage:#DCEBDD; --sage-ink:#6E9372;
+  --lav:#E8E2F5; --butter:#F6EDCB; --rose:#F6DADF;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Nunito","Quicksand","Segoe UI",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+.ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--blue-ink);outline-offset:2px}
+.frame{max-width:640px;margin:16px auto;background:var(--frame);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 10px 30px rgba(140,115,70,.10)}
+@media(max-width:560px){.frame{margin:8px;padding:12px;border-radius:20px}}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{width:40px;height:40px;border-radius:13px;background:var(--butter);color:#A58B3E;display:grid;place-items:center}
+.logo .ic{width:20px;height:20px}
+h1{margin:0;font-size:19px;font-weight:800;line-height:1.2}
+.sub{margin:0;color:var(--muted);font-size:12.5px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--soft);border-radius:16px;margin-bottom:14px}
+.tab{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;text-align:left;color:var(--muted);transition:.2s}
+.tab .bub{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:transparent}
+.tab b{display:block;font-size:13.5px;font-weight:800;line-height:1.2}
+.tab small{display:block;font-size:11px;opacity:.85;line-height:1.2}
+.tab.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(140,115,70,.12)}
+.tab.q.on .bub{background:var(--peach);color:var(--peach-ink)}
+.tab.p.on .bub{background:var(--sage);color:var(--sage-ink)}
+@media(max-width:420px){.tab small{display:none}.tab{padding:9px 8px}}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.ch{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ch .bub{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;flex:none}
+.ch h2{margin:0;font-size:14px;font-weight:800;line-height:1.2}
+.ch p{margin:0;font-size:11.5px;color:var(--muted);line-height:1.3}
+.ch .sp{flex:1}
+.count{font-size:11px;font-weight:700;color:var(--muted);background:var(--soft);padding:2px 9px;border-radius:99px}
+textarea,input,select{font:inherit;font-size:13.5px;color:var(--ink);background:var(--frame);border:1px solid var(--line);border-radius:12px;padding:9px 12px;width:100%}
+textarea{resize:vertical;min-height:110px}
+::placeholder{color:#B9AE9C}
+.row{display:flex;gap:8px;align-items:center;margin-top:10px}
+.field{position:relative;flex:1;min-width:0}
+.field .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.field input,.field select{padding-left:34px}
+select{appearance:none;-webkit-appearance:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:12px;font-weight:800;font-size:13px;white-space:nowrap;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 0 rgba(120,100,60,.12)}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.peach{background:var(--peach);color:var(--peach-ink)}
+.btn.sage{background:var(--sage);color:var(--sage-ink)}
+.btn.blue{background:var(--blue);color:var(--blue-ink)}
+.btn.line{background:transparent;border:1px solid var(--line);color:var(--muted);box-shadow:none}
+.ib{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;color:var(--muted);transition:.15s}
+.ib:hover{background:var(--soft);color:var(--ink)}
+.ib.del:hover{background:var(--rose);color:#B2616F}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 6px 4px 11px;border-radius:99px;font-weight:700;font-size:12px;border:1px solid transparent;background:var(--soft)}
+.chip em{font-style:normal;opacity:.55;font-weight:700}
+.chip.on{border-color:var(--ink)}
+.chip .x{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;opacity:.6}
+.chip .x:hover{opacity:1;background:rgba(255,255,255,.6)}
+.chip .x .ic{width:11px;height:11px}
+.chip.nox{padding-right:11px}
+.c0{background:var(--peach)}.c1{background:var(--sage)}.c2{background:var(--lav)}.c3{background:var(--butter)}.c4{background:var(--rose)}.c5{background:var(--blue)}
+.add{display:flex;gap:6px;margin-top:10px}
+.add input{padding:7px 12px;font-size:12.5px}
+.add .btn{padding:7px 12px}
+.note{background:var(--frame);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-top:8px}
+.note h3{margin:0 0 3px;font-size:13.5px;font-weight:800}
+.note p{margin:0 0 8px;white-space:pre-wrap;word-break:break-word;font-size:13px}
+.meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);font-weight:600}
+.meta .sp{flex:1}
+.tag{padding:1px 9px;border-radius:99px;font-weight:700;font-size:11px;color:var(--ink)}
+.empty{text-align:center;color:var(--muted);font-size:12.5px;padding:18px;border:1px dashed var(--line);border-radius:14px;margin-top:8px}
+.kwbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:20;box-shadow:0 8px 18px rgba(140,115,70,.12);border-color:#DCCFB5}
+.kw{display:inline-flex;align-items:center;gap:5px;padding:4px 6px 4px 11px;border-radius:99px;font-weight:700;font-size:12px;background:var(--blue);color:var(--blue-ink);transition:background .3s,color .3s}
+.kw.found{background:var(--gray);color:var(--gray-ink)}
+.kw .ic{width:12px;height:12px}
+.kw.ro{padding-right:11px}
+.kw .x{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;opacity:.65}
+.kw .x:hover{opacity:1;background:rgba(255,255,255,.6)}
+.prog{font-size:11px;color:var(--muted);margin-top:8px;font-weight:600}
+.edit-flag{display:none;align-items:center;gap:6px;font-size:11.5px;color:var(--peach-ink);background:var(--peach);padding:3px 10px;border-radius:99px;font-weight:700}
+.edit-flag.on{display:inline-flex}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#5B5247;color:#FAF5EA;padding:9px 14px;border-radius:12px;font-size:12.5px;font-weight:700;display:flex;gap:12px;align-items:center;transition:.25s;z-index:40;max-width:92vw}
+#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast button{color:#F8E0D0;font-weight:800;display:flex;gap:4px;align-items:center}
 
-        /* --- GENEL --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
-        body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; font-size: 14px; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
-        .glass { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-shadow: var(--glass-shadow); transition: background 0.3s, border 0.3s; }
-        [data-theme="win95"] .glass, [data-theme="matrix"] .glass, [data-theme="literature"] .glass { backdrop-filter: none; -webkit-backdrop-filter: none; }
-
-        /* --- HEADER --- */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; position: sticky; top: 0; z-index: 100; border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg); border-top: none; }
-        .logo { font-family: var(--font-title); font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); display: flex; align-items: center; gap: 6px; cursor: pointer; }
-        .logo svg { stroke: var(--accent); width: 20px; height: 20px; }
-        [data-theme="win95"] header { background: #000080; color: white; border-bottom: 2px solid #fff; box-shadow: none; }
-        [data-theme="win95"] header .logo, [data-theme="win95"] header .icon-btn { color: white; }
-        
-        .header-controls { display: flex; align-items: center; gap: 4px; }
-        .icon-btn { background: transparent; border: none; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 50%; transition: 0.2s; }
-        .icon-btn:hover { background: rgba(150,150,150,0.1); color: var(--accent); }
-        .header-badge { font-size: 0.65rem; font-weight: 700; color: var(--accent); background: rgba(150,150,150,0.1); padding: 3px 6px; border-radius: 8px; margin-left: 6px; letter-spacing: 0.5px; display: none;}
-        .color-menu { position: relative; display: inline-block; }
-        .color-dropdown { position: absolute; top: 120%; right: 0; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 6px; border-radius: 12px; display: none; gap: 4px; flex-direction: row; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 500;}
-        .color-menu:hover .color-dropdown { display: flex; }
-        .color-dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
-        .color-dot:hover { transform: scale(1.3); }
-        .color-dot.active { border-color: var(--text-primary); }
-
-        /* --- BUTONLAR --- */
-        .btn { background: rgba(150,150,150,0.1); color: var(--text-primary); border: 1px solid rgba(150,150,150,0.1); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn:hover { background: rgba(150,150,150,0.2); transform: translateY(-1px); }
-        .btn-sm { padding: 6px 10px; font-size: 0.75rem; }
-        .btn-primary { background: var(--accent); color: #fff; border: none; }
-        .btn-primary:hover { opacity: 0.9; color: #fff; }
-        .btn-danger { color: var(--danger); background: rgba(255, 59, 48, 0.1); border: none; }
-        .btn-success { background: var(--success); color: #fff; border: none; width: 100%; margin-top: 16px; padding: 12px; font-size: 0.9rem; border-radius: var(--radius-md);}
-        .btn-icon-only { padding: 4px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; transition: 0.2s; border-radius: 50%; }
-        .btn-icon-only:hover { color: var(--accent); background: rgba(150,150,150,0.1); }
-        [data-theme="win95"] .btn { background: #c0c0c0; border: none; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; font-weight: normal; color: #000;}
-        [data-theme="win95"] .btn:active { box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf; transform: translateY(1px); }
-        [data-theme="win95"] .btn-primary, [data-theme="win95"] .btn-success, [data-theme="win95"] .btn-danger { color: #000; background: #c0c0c0; }
-
-        /* --- SAYFA YAPISI --- */
-        main { padding: 16px; padding-bottom: 80px; max-width: 800px; margin: 0 auto; position: relative; }
-        .page { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s, transform 0.3s; }
-        .page.active { display: block; opacity: 1; transform: translateY(0); animation: slideUp 0.3s forwards; }
-        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* --- KARTLAR & CHIPS --- */
-        .section-title { font-family: var(--font-title); font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-        .horizontal-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; margin-left: -16px; padding-left: 16px; padding-right: 16px; }
-        
-        .card { flex: 0 0 120px; height: 120px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; scroll-snap-align: start; cursor: pointer; overflow: hidden; transition: var(--transition); border: 1px solid rgba(150,150,150,0.1); position: relative;}
-        .card:hover { border-color: var(--accent); transform: scale(0.98); }
-        .card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); background: rgba(0, 122, 255, 0.05); }
-        .card.selected::after { content: '✓'; position: absolute; top: 6px; right: 6px; background: var(--accent); color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; }
-
-        .card-tag { font-size: 0.6rem; font-weight: 700; color: var(--accent); background: rgba(150,150,150,0.1); padding: 3px 6px; border-radius: 4px; display: inline-block; }
-        .card-title { font-size: 0.8rem; font-weight: 600; margin-top: 6px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;}
-        .card-content { font-size: 0.7rem; line-height: 1.4; color: var(--text-secondary); margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-date { font-size: 0.6rem; color: var(--text-secondary); opacity: 0.7; margin-top: auto; text-align: right; }
-        .card.new-card { align-items: center; justify-content: center; background: rgba(150,150,150,0.05); border: 2px dashed rgba(150,150,150,0.3); color: var(--text-secondary); }
-        .card.new-card:hover { color: var(--accent); border-color: var(--accent); background: rgba(150,150,150,0.1); }
-
-        .chip-group { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; align-items: center; }
-        .chip { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; background: rgba(150,150,150,0.1); color: var(--text-secondary); cursor: pointer; transition: 0.2s; white-space: nowrap; border: 1px solid transparent; }
-        .chip.active { background: var(--accent); color: #fff; }
-
-        /* --- FORM ELEMANLARI --- */
-        .input-group { margin-bottom: 16px; position: relative;}
-        input[type="text"], textarea { width: 100%; background: var(--glass-bg); border: 1px solid rgba(150,150,150,0.2); color: var(--text-primary); padding: 12px; border-radius: var(--radius-md); font-size: 0.85rem; outline: none; resize: none; transition: 0.2s; line-height: 1.5; }
-        input[type="text"]:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1); }
-        [data-theme="win95"] input[type="text"], [data-theme="win95"] textarea { background: #ffffff; border: none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0;}
-        [data-theme="win95"] .chip { border-radius: 0; background: #dfdfdf; color: #000; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff; }
-        [data-theme="win95"] .chip.active { background: #000080; color: #fff; }
-        
-        #sourceText { height: 140px; overflow-y: auto; }
-        #finalText { height: 180px; overflow-y: auto; }
-        .core-item textarea { height: 60px; overflow-y: auto; padding: 10px; }
-        select.folder-select { padding: 4px 8px; border-radius: var(--radius-sm); border: 1px solid rgba(150,150,150,0.3); background: var(--glass-bg); color: var(--text-primary); font-size: 0.75rem; outline: none; cursor: pointer; margin-left: 6px; }
-        [data-theme="win95"] select.folder-select { border-radius: 0; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a; border: none;}
-        .search-box { width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(150,150,150,0.3); background: var(--glass-bg); color: var(--text-primary); font-size: 0.8rem; margin-bottom: 12px; outline: none;}
-
-        .icon-btn-pick { background: var(--glass-bg); border: 1px solid rgba(150,150,150,0.2); border-radius: var(--radius-md); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 12px; transition: 0.2s;}
-        .icon-picker-menu { position: absolute; top: 110%; left: 0; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 8px; display: none; grid-template-columns: repeat(5, 1fr); gap: 4px; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.1); backdrop-filter: blur(20px);}
-        .icon-picker-menu span { cursor: pointer; font-size: 1.2rem; padding: 4px; text-align: center; border-radius: 4px; transition: 0.2s;}
-        .icon-picker-menu span:hover { background: rgba(150,150,150,0.2); }
-
-        /* --- BAĞLANTILI BLOKLAR & DİĞER --- */
-        .link-preview-box { background: var(--glass-bg); padding: 10px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); margin-top: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; border-right: 1px solid rgba(150,150,150,0.1); border-top: 1px solid rgba(150,150,150,0.1); border-bottom: 1px solid rgba(150,150,150,0.1); display: flex; flex-direction: column; }
-        .link-preview-box:hover { background: rgba(150,150,150,0.1); transform: translateX(3px); }
-        .link-header { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 600; color: var(--text-primary); }
-
-        .preview-box { height: 140px; overflow-y: auto; padding: 14px; font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px; background: var(--glass-bg); border: 1px solid rgba(150,150,150,0.2); border-radius: var(--radius-md); }
-        [data-theme="win95"] .preview-box { background: #fff; border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0; }
-        .core-list { display: flex; flex-direction: column; gap: 8px; }
-        .core-item { display: flex; gap: 6px; align-items: flex-start; }
-        .checklist { display: flex; flex-direction: column; gap: 6px; transition: max-height 0.3s ease, opacity 0.2s ease; overflow: hidden; }
-        .checklist.hidden { max-height: 0; opacity: 0; margin-bottom: 0; }
-        .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; cursor: pointer; background: var(--glass-bg); border-radius: var(--radius-sm); border: 1px solid rgba(150,150,150,0.1); }
-        .check-item input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid rgba(150,150,150,0.3); border-radius: 4px; outline: none; cursor: pointer; position: relative; margin-top: 2px; }
-        .check-item input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
-        .check-item input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 11px; font-weight: bold; }
-        .check-item span { font-size: 0.85rem; line-height: 1.5; }
-        .check-item input[type="checkbox"]:checked + span { text-decoration: line-through; opacity: 0.5; }
-        .nav-footer { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 12px; }
-
-        .metrics-bar { position: absolute; bottom: -20px; right: 0; font-size: 0.65rem; color: var(--text-secondary); font-weight: 500; }
-        .suggestion-panel { background: rgba(0, 122, 255, 0.05); border-left: 3px solid var(--accent); padding: 12px; border-radius: var(--radius-sm); margin-top: 24px;}
-        [data-theme="win95"] .suggestion-panel { border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a; border-radius: 0; background: #c0c0c0; }
-        .suggestion-item { margin-top: 8px; font-size: 0.8rem; cursor: pointer; display: flex; flex-direction: column; color: var(--text-primary); padding: 6px; border-radius: 4px; transition: 0.2s; border-bottom: 1px dashed rgba(150,150,150,0.2);}
-        .suggestion-item:hover { background: rgba(150,150,150,0.1); }
-        .matched-words { font-size: 0.65rem; color: #b8860b; margin-top: 4px; font-weight: 600;} 
-        [data-theme="dark"] .matched-words, [data-theme="matrix"] .matched-words { color: #ffd700; }
-        
-        .prompt-bubble { background: var(--glass-bg); border: 1px solid var(--accent); padding: 10px; border-radius: var(--radius-md); font-size: 0.8rem; font-style: italic; color: var(--text-primary); margin-bottom: 10px; position: relative; display: none; animation: slideUp 0.3s;}
-        .prompt-bubble::after { content: ''; position: absolute; bottom: -6px; left: 20px; border-width: 6px 6px 0; border-style: solid; border-color: var(--accent) transparent transparent transparent; }
-
-        /* --- MODALLAR --- */
-        dialog { margin: auto; width: 100%; max-width: 600px; height: 100vh; max-height: 100vh; background: var(--bg-base); border: none; padding: 0; z-index: 200; display: none; flex-direction: column; color: var(--text-primary); }
-        dialog[open] { display: flex; animation: slideUp 0.2s forwards; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(150,150,150,0.1); background: var(--glass-bg); }
-        [data-theme="win95"] .modal-header { background: #000080; color: white; border-bottom: none;}
-        [data-theme="win95"] .modal-header select, [data-theme="win95"] .modal-header span, [data-theme="win95"] .modal-header h3 { color: #fff; }
-        .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
-
-        /* ÖNİZLEME & FULLSCREEN SENTEZ */
-        .read-section { margin-bottom: 16px; }
-        .read-section h3 { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-        .read-box { background: var(--glass-bg); padding: 14px; border-radius: var(--radius-md); font-size: 0.85rem; line-height: 1.6; border: 1px solid rgba(150,150,150,0.1); max-height: 160px; overflow-y: auto; cursor: text; position: relative;}
-        [data-theme="win95"] .read-box { background: #fff; border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0; }
-        
-        .read-box.fullscreen-mode { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90vw; max-width: 600px; max-height: 80vh; z-index: 99999; background: var(--bg-base); padding: 24px; border-radius: var(--radius-lg); font-size: 1rem; line-height: 1.7; cursor: pointer; border: 1px solid var(--glass-border); box-shadow: 0 0 0 100vmax rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.5); transition: none !important; animation: none !important; }
-        .read-box.fullscreen-mode::after { content: 'Kapatmak için tıkla'; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--text-secondary); opacity: 0.6; }
-        .fs-hint { position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); opacity: 0.7; pointer-events: none;}
-        .read-cores { list-style: none; max-height: 120px; overflow-y: auto; padding-right: 8px; }
-        .read-cores li { position: relative; padding-left: 12px; margin-bottom: 6px; line-height: 1.4; font-size: 0.8rem;}
-        .read-cores li::before { content: '•'; position: absolute; left: 0; color: var(--accent); font-weight: bold; font-size: 1rem; top: -1px; }
-
-        .selection-action-bar { background: var(--accent); color: white; padding: 12px; border-radius: var(--radius-md); display: none; justify-content: space-between; align-items: center; position: sticky; bottom: 10px; z-index: 100; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
-        .cloud-panel { background: rgba(150, 150, 150, 0.05); border: 1px dashed rgba(150,150,150,0.3); padding: 12px; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;}
-        [data-theme="win95"] .cloud-panel { border:none; box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080; border-radius: 0; background: #c0c0c0; }
-
-        /* AĞ HARİTASI CANVAS */
-        #graphCanvas { width: 100%; height: 400px; background: var(--bg-base); border-radius: var(--radius-md); border: 1px solid rgba(150,150,150,0.2); cursor: grab; touch-action: none;}
-        #graphCanvas:active { cursor: grabbing; }
-
-        /* --- TOAST & CONFIRM --- */
-        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .toast { background: var(--text-primary); color: var(--bg-base); padding: 10px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; opacity: 0; transform: translateY(20px); transition: 0.3s; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast-danger { background: var(--danger); color: #fff; }
-        .toast-success { background: var(--success); color: #fff; }
-        #confirmModal { max-width: 320px; border-radius: var(--radius-lg); text-align: center; }
-        [data-theme="win95"] #confirmModal { border-radius: 0; background: #c0c0c0; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
-        #confirmModal .modal-body { padding: 24px; }
-    </style>
+/* v3 */
+.head .sp{flex:1}
+.brand{display:flex;align-items:center;gap:12px;text-align:left}
+.hbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:11px;font-weight:700;font-size:12.5px;background:var(--card);border:1px solid var(--line);margin-left:6px;transition:.15s}
+.hbtn:hover{background:var(--soft)}
+@media(max-width:520px){.sub{display:none}}
+@media(max-width:400px){.hbtn span{display:none}}
+.view{display:none}.view.on{display:block}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar .vt{font-weight:800;font-size:14px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:18px;border:1px solid var(--line);background:var(--card);text-align:left;transition:.2s;box-shadow:0 2px 0 rgba(120,100,60,.08)}
+.mode:hover{transform:translateY(-1px)}
+.mode b{font-size:14px;font-weight:800;line-height:1.2}
+.mode small{color:var(--muted);font-size:11.5px;line-height:1.3}
+.mode .bub{width:32px;height:32px;border-radius:11px;display:grid;place-items:center}
+.mode.q .bub{background:var(--peach);color:var(--peach-ink)}
+.mode.p .bub{background:var(--sage);color:var(--sage-ink)}
+.row{flex-wrap:wrap}
+.field{flex:1 1 150px}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:10px}
+.btn.rose{background:var(--rose);color:#B2616F}
+.lbl{font-size:11.5px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.note.open .clamp{display:block;-webkit-line-clamp:unset}
+.note{cursor:pointer}
+.more{display:none;margin:0 0 8px;padding-left:18px;font-size:12.5px}
+.note.open .more{display:block}
+.acts{display:flex;gap:6px;margin-top:8px}
+.step{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.step .n{flex:none;font-weight:800;font-size:11px;color:var(--sage-ink);background:var(--sage);padding:4px 9px;border-radius:99px;white-space:nowrap}
+.step input{padding:7px 11px}
+.step input.done{text-decoration:line-through;color:var(--muted)}
+.ib.ok.on{background:var(--sage);color:var(--sage-ink)}
+.catrow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.catrow input{padding:7px 11px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.kw{background:var(--sage);color:var(--sage-ink);max-width:220px;white-space:nowrap;overflow:hidden;transition:background .3s,color .3s,max-width .35s,opacity .35s,padding .35s,margin .35s}
+.kw.used{background:var(--gray);color:var(--gray-ink);max-width:0;opacity:0;padding-left:0;padding-right:0;margin-right:-6px;transition:background .3s,color .3s,max-width .4s .6s,opacity .4s .6s,padding .4s .6s,margin .4s .6s}
+.kw.ro{padding:4px 11px}
+.kw.ro.used{max-width:220px;opacity:1;padding:4px 11px;margin-right:0;transition:none}
+.fab,.kwp{display:none}
+body.in-plan .fab{display:grid}
+body.in-plan .kwp.on{display:block}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:35;width:48px;height:48px;border-radius:16px;place-items:center;background:var(--sage);color:var(--sage-ink);box-shadow:0 6px 18px rgba(110,147,114,.35);border:1px solid #C9DECB}
+.fab .ic{width:20px;height:20px}
+.fab .bd{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:99px;background:var(--card);color:var(--sage-ink);border:1px solid #C9DECB;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+.kwp{position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:35;width:min(320px,calc(100vw - 32px));max-height:60vh;overflow:auto;margin:0;box-shadow:0 12px 30px rgba(140,115,70,.22)}
+#toast{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+#ex,#im{min-height:90px;font-size:12px}
+input[type=file]{display:none}
+textarea.auto{overflow:hidden;resize:none}
+.step{align-items:flex-start}
+.step textarea{min-height:36px;padding:7px 11px;line-height:1.45}
+.step textarea.done{text-decoration:line-through;color:var(--muted)}
+.step .n{margin-top:6px}
+.step .ib{margin-top:4px}
+.kbar{position:fixed;left:16px;right:72px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:34;display:none;flex-direction:row-reverse;flex-wrap:wrap-reverse;gap:6px;justify-content:flex-start;pointer-events:none;max-height:128px;overflow:hidden}
+body.in-plan .kbar{display:flex}
+.kbar .kw{pointer-events:auto;padding:5px 12px;border:1px solid #C9DECB;box-shadow:0 3px 10px rgba(110,147,114,.25)}
+.kbar .kw.used{padding-left:0;padding-right:0;border-width:0;box-shadow:none}
+body.in-plan .frame{margin-bottom:96px}
+body.in-plan #toast{bottom:calc(124px + env(safe-area-inset-bottom,0px))}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.grp{font-size:11px;font-weight:800;color:var(--muted);margin:14px 2px 0}
+.pbar{height:5px;background:var(--soft);border-radius:99px;overflow:hidden;margin:2px 0 8px}
+.pbar i{display:block;height:100%;background:var(--sage-ink);opacity:.5;border-radius:99px}
+.ib.pin.on{color:#C9A63E}.ib.pin.on .ic{fill:#F3DE96}
+.note.pinned{border-color:#E3D39A;background:#FFFBEA}
+.top{display:flex;align-items:flex-start;gap:6px}.top h3{flex:1;margin:4px 0 4px}
+[hidden]{display:none!important}
+.btn.pri{background:var(--acc,#6E9372);color:#FFFDF8;padding:11px 18px;font-size:13.5px;box-shadow:0 4px 12px rgba(90,80,70,.18)}
+.btn.soft{background:var(--soft);color:var(--ink);box-shadow:none;padding:11px 14px}
+.btn.rose.ico,.btn.soft.ico{box-shadow:none}
+.btn.ico{width:42px;height:42px;padding:0;border-radius:13px;flex:none}
+.btn.ico.on{background:var(--butter);color:#A58B3E}.btn.ico.on .ic{fill:#F3DE96}
+.actions{display:flex;gap:8px;align-items:center;margin-top:12px}
+.actions .pri,.savebar .pri{flex:1}
+.savebar{display:flex;gap:8px;align-items:center;padding:10px}
+#v-quick{--acc:#B8815F}
+.card.fold>.ch{cursor:pointer;margin-bottom:0;border-radius:10px}
+.card.fold:not(.closed)>.ch{margin-bottom:10px}
+.card.fold.closed>:not(.ch){display:none}
+.chev{margin-left:auto;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;color:var(--muted);transition:transform .2s;flex:none}
+.card.fold.closed .chev{transform:rotate(-90deg)}
+.cr{font-size:11.5px;color:var(--muted);margin:-2px 0 10px}
+.note:hover{border-color:#DCCFB5}
+#pv{position:fixed;inset:0;z-index:50;background:rgba(70,58,40,.35);display:none;align-items:flex-end;justify-content:center}
+#pv.on{display:flex}
+.sheet{width:100%;max-width:640px;max-height:88vh;overflow:auto;background:var(--frame);border-radius:24px 24px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(70,58,40,.25)}
+@media(min-width:700px){#pv{align-items:center}.sheet{border-radius:24px;max-height:80vh}}
+.pvh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pvt{font-size:17px;font-weight:800;margin:0 0 4px;line-height:1.3;word-break:break-word}
+.pvbody{margin:0;white-space:pre-wrap;word-break:break-word;font-size:14.5px;line-height:1.6}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:8px}
+.sec h4{margin:0 0 4px;font-size:12px;color:var(--muted);font-weight:800}
+.sec p{margin:0;white-space:pre-wrap;word-break:break-word;font-size:13.5px}
+.pst{display:flex;gap:8px;align-items:flex-start;padding:4px 0;font-size:13.5px;cursor:pointer}
+.pst .bx{flex:none;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;margin-top:1px}
+.pst.d .bx{background:var(--sage);border-color:var(--sage);color:var(--sage-ink)}
+.pst.d span:last-child{text-decoration:line-through;color:var(--muted)}
+.pst .bx .ic{width:12px;height:12px}
+.pvf{display:flex;gap:8px;align-items:center;margin-top:14px}
+.pvf .pri{flex:1}
+.wk{display:flex;gap:6px;align-items:flex-end;height:64px;margin:4px 0 12px}
+.wk div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;font-size:10.5px;color:var(--muted);font-weight:700}
+.wk i{display:block;width:100%;max-width:26px;border-radius:7px;background:var(--sage);min-height:4px}
+.wk .today i{background:var(--sage-ink);opacity:.7}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--frame);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+.stat b{display:block;font-size:18px;font-weight:800;line-height:1.1}
+.stat small{font-size:11px;color:var(--muted);font-weight:700}
+.tbar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.btn.soft.sm{padding:6px 11px;font-size:12px;border-radius:10px}
+#cv{position:fixed;inset:0;z-index:55;background:rgba(70,58,40,.35);display:none;align-items:flex-end;justify-content:center}
+#cv.on{display:flex}
+@media(min-width:700px){#cv{align-items:center}}
+input[type=checkbox]{width:auto;padding:0;border-radius:4px;accent-color:#6E9372;flex:none;margin-top:2px}
+.cvr{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:13.5px;cursor:pointer}
+textarea.box{height:var(--h,150px);min-height:0!important;overflow:auto;resize:none}
+textarea.box.s{--h:84px}textarea.box.m{--h:150px}textarea.box.l{--h:300px}
+.szb{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0 0 6px;font-size:11px;color:var(--muted);font-weight:700}
+.szb .sz{border-radius:50%;border:1.5px solid #CDBF9F;background:transparent;padding:0;transition:.15s}
+.szb .sz.s{width:12px;height:12px}.szb .sz.m{width:17px;height:17px}.szb .sz.l{width:22px;height:22px}
+.szb .sz.on{background:var(--sage-ink);border-color:var(--sage-ink)}
+.doneb{margin:0 0 8px}
+</style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11M9 8h6"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-plan" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 15l2 2 4-4"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4-4"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h8"/><path d="M5 16 4 20l4-1L19 8l-3-3z"/></symbol>
+<symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m-4-4 4 4 4-4M5 20h14"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V5m-4 4 4-4 4 4M5 20h14"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+<symbol id="i-layout" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 10h16M10 10v10"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+</defs></svg>
 
-    <header class="glass">
-        <div class="logo" onclick="appController.startNewNote()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            Chimptopus <span id="activeNoteBadge" class="header-badge"></span>
-        </div>
-        <div class="header-controls">
-            <button class="icon-btn" onclick="appController.openRandomNote()" title="Rastgele Keşif (Zar)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"></circle><circle cx="15.5" cy="15.5" r="1.5" fill="currentColor"></circle><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor"></circle><circle cx="8.5" cy="15.5" r="1.5" fill="currentColor"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor"></circle></svg></button>
-            <div class="color-menu">
-                <button class="icon-btn" title="Vurgu Rengi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0-10 10c0 5.5 4.5 10 10 10 1.7 0 3-1.3 3-3 0-.8-.3-1.6-.9-2.1-.6-.6-1-1.3-1-2.1 0-1.7 1.3-3 3-3h1.8A3.2 3.2 0 0 0 22 8.6C22 5 17.5 2 12 2z"></path></svg></button>
-                <div class="color-dropdown" id="colorPicker"></div>
-            </div>
-            <button class="icon-btn" onclick="cycleTheme()" title="Temayı Değiştir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></button>
-            <button class="icon-btn" onclick="dbManager.open()" title="Veritabanı"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg></button>
-        </div>
-    </header>
+<main class="frame">
+  <header class="head">
+    <button class="brand" data-go="home" aria-label="Ana sayfa"><span class="logo"><svg class="ic"><use href="#i-book"/></svg></span><span><h1>Notlarım</h1><p class="sub">Fikirlerini yakala, planlarını düzene sok.</p></span></button>
+    <span class="sp"></span>
+    <button class="hbtn" data-go="archive"><svg class="ic"><use href="#i-archive"/></svg><span>Arşivler</span></button>
+    <button class="hbtn" data-go="settings"><svg class="ic"><use href="#i-gear"/></svg><span>Ayarlar</span></button>
+  </header>
 
-    <main>
-        <section id="stage1" class="page active">
-            <div class="section-title">Aktif İstasyonlar</div>
-            <div class="horizontal-scroll" id="activeNotesShelf"></div>
+  <!-- ANA SAYFA -->
+  <section class="view on" id="v-home">
+    <div class="modes">
+      <button class="mode q" id="hq"><span class="bub"><svg class="ic"><use href="#i-zap"/></svg></span><b>Hızlı not al</b><small>Çabuk yaz, kategorile.</small></button>
+      <button class="mode p" id="hp"><span class="bub"><svg class="ic"><use href="#i-plan"/></svg></span><b>Strateji ve planlama</b><small>Hedef, adımlar ve notlar.</small></button>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--butter);color:#A58B3E"><svg class="ic"><use href="#i-clock"/></svg></span><div><h2>Son kalınan not</h2><p>Kaldığın yerden devam et.</p></div></div>
+      <div id="last"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--lav);color:#7F6EB0"><svg class="ic"><use href="#i-chart"/></svg></span><div><h2>Haftalık özet</h2><p>Son 7 günde neler yaptın?</p></div></div>
+      <div id="week"></div>
+    </div>
+  </section>
 
-            <div style="margin-top: 24px;">
-                <div class="input-group">
-                    <label class="section-title">Yeni Kaynak Enjekte Et</label>
-                    <textarea id="sourceText" placeholder="Ham metni veya fikri buraya bırak..." oninput="appController.autoSaveDraft()"></textarea>
-                </div>
-                <div class="input-group">
-                    <label class="section-title">Materyal Tipi</label>
-                    <div class="chip-group" id="sourceTagGroup">
-                        <div class="chip active" onclick="uiHelpers.selectTag(this, 'Makale')">Makale</div>
-                        <div class="chip" onclick="uiHelpers.selectTag(this, 'Kitap')">Kitap</div>
-                        <div class="chip" onclick="uiHelpers.selectTag(this, 'Video')">Video</div>
-                        <div class="chip" onclick="uiHelpers.selectTag(this, 'Fikir')">Fikir</div>
-                    </div>
-                </div>
-                <div class="nav-footer" style="justify-content: flex-end;">
-                    <button class="btn btn-primary" onclick="appController.nextToStage2()">İleri Çözümleme ➔</button>
-                </div>
-            </div>
-        </section>
+  <!-- HIZLI NOT -->
+  <section class="view" id="v-quick">
+    <div class="bar"><button class="btn line sm" data-go="home"><svg class="ic"><use href="#i-back"/></svg>Ana sayfa</button><span class="vt">Hızlı not</span></div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--peach);color:var(--peach-ink)"><svg class="ic"><use href="#i-pen"/></svg></span><div><h2>Yeni hızlı not</h2><p>Aklına geleni bırak, kategorisini seç.</p></div><span class="sp"></span><span class="edit-flag" id="qflag"><svg class="ic" style="width:12px;height:12px"><use href="#i-edit"/></svg>Düzenleniyor</span></div>
+      <div class="field" style="margin-bottom:8px"><svg class="ic"><use href="#i-layout"/></svg><select id="qtp" aria-label="Şablon"></select></div>
+      <div class="cr" id="qcr" hidden></div><div class="tbar"><button class="btn soft sm" id="qb" type="button"><svg class="ic"><use href="#i-list"/></svg>Madde işareti</button><button class="btn soft sm" id="qcv" type="button"><svg class="ic"><use href="#i-plan"/></svg>Adımlara çevir</button></div><textarea id="qt" placeholder="Aklına gelen her şeyi buraya yaz…"></textarea>
+      <div class="field" style="margin-top:10px"><svg class="ic"><use href="#i-folder"/></svg><select id="qc" aria-label="Kategori"></select></div>
+      <div class="actions">
+        <button class="btn ico rose" id="qd" hidden aria-label="Notu sil"><svg class="ic"><use href="#i-trash"/></svg></button>
+        <button class="btn soft" id="qx" hidden>Vazgeç</button>
+        <button class="btn pri" id="qs"><svg class="ic"><use href="#i-check"/></svg><span id="qsl">Kaydet</span></button>
+      </div>
+    </div>
+  </section>
 
-        <section id="stage2" class="page">
-            <div class="section-title">Kaynak Veri Önizleme</div>
-            <div class="preview-box" id="sourcePreview"></div>
+  <!-- STRATEJİ VE PLANLAMA -->
+  <section class="view" id="v-plan">
+    <div class="bar"><button class="btn line sm" data-go="home"><svg class="ic"><use href="#i-back"/></svg>Ana sayfa</button><span class="vt">Strateji ve planlama</span><span class="sp" style="flex:1"></span><span class="edit-flag" id="pflag"><svg class="ic" style="width:12px;height:12px"><use href="#i-edit"/></svg>Düzenleniyor</span></div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--sage);color:var(--sage-ink)"><svg class="ic"><use href="#i-target"/></svg></span><div><h2>Hedef ve amaç</h2><p>Neyi, neden başarmak istiyorsun?</p></div></div>
+      <div class="field" style="margin-bottom:8px"><svg class="ic"><use href="#i-layout"/></svg><select id="ptp" aria-label="Şablon"></select></div>
+      <div class="cr" id="pcr" hidden></div><input id="pt" placeholder="Başlık" maxlength="60" style="margin-bottom:8px">
+      <textarea id="pg" style="min-height:80px" placeholder="Hedefin ve amacın…"></textarea>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--blue);color:var(--blue-ink)"><svg class="ic"><use href="#i-list"/></svg></span><div><h2>Adımlar</h2><p>Hedefe giden yolu adım adım böl; bitenleri işaretle.</p></div></div>
+      <div id="sl"></div>
+      <div class="row" style="margin-top:0"><button class="btn blue" id="sa"><svg class="ic"><use href="#i-plus"/></svg>Adım ekle</button><button class="btn soft" id="sq"><svg class="ic"><use href="#i-zap"/></svg>Hızlı nottan ekle</button></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--lav);color:#7F6EB0"><svg class="ic"><use href="#i-pen"/></svg></span><div><h2>Notlar</h2><p>Taslak alanı: düşün, karala, topla.</p></div></div>
+      <textarea id="pb" style="min-height:140px" placeholder="Notlarını buraya yaz…"></textarea>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--butter);color:#A58B3E"><svg class="ic"><use href="#i-check"/></svg></span><div><h2>Temiz not</h2><p>Taslağın temiz hâli; saklamak ya da paylaşmak için.</p></div></div>
+      <textarea id="pcl" style="min-height:110px" placeholder="Temize çektiğin notu buraya yaz…"></textarea>
+      <div class="row"><button class="btn soft" id="pcf"><svg class="ic"><use href="#i-down"/></svg>Taslaktan aktar</button><button class="btn soft" id="pcc"><svg class="ic"><use href="#i-copy"/></svg>Kopyala</button></div>
+    </div>
+    <div class="card savebar">
+      <button class="btn ico rose" id="pd" hidden aria-label="Kaydı sil"><svg class="ic"><use href="#i-trash"/></svg></button>
+      <button class="btn soft" id="pc">Sıfırla</button>
+      <button class="btn pri" id="ps"><svg class="ic"><use href="#i-check"/></svg><span id="psl">Kaydet</span></button>
+    </div>
+  </section>
 
-            <div class="section-title">
-                <span>Çıkarılan Çekirdekler</span>
-                <button class="btn btn-sm btn-primary" onclick="appController.addCoreBlock()">+ Başa Ekle</button>
-            </div>
-            <div class="core-list" id="coresList"></div>
+  <!-- ARŞİVLER -->
+  <section class="view" id="v-archive">
+    <div class="bar"><button class="btn line sm" data-go="home"><svg class="ic"><use href="#i-back"/></svg>Ana sayfa</button><span class="vt">Arşivler</span></div>
+    <nav class="tabs">
+      <button class="tab q on" id="atq"><span class="bub"><svg class="ic"><use href="#i-zap"/></svg></span><span><b>Hızlı notlar</b><small id="aqn"></small></span></button>
+      <button class="tab p" id="atp"><span class="bub"><svg class="ic"><use href="#i-plan"/></svg></span><span><b>Strateji ve planlama</b><small id="apn"></small></span></button>
+    </nav>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--butter);color:#A58B3E"><svg class="ic"><use href="#i-archive"/></svg></span><div><h2 id="at"></h2><p id="ah"></p></div><span class="sp"></span><span class="count" id="an">0</span></div>
+      <div class="tools"><div class="field"><svg class="ic"><use href="#i-search"/></svg><input id="asr" placeholder="Ara"></div><div class="field" style="flex:0 1 150px"><svg class="ic"><use href="#i-list"/></svg><select id="asort" aria-label="Sırala"><option value="upd">Son güncellenen</option><option value="new">Yeni oluşturulan</option><option value="old">İlk oluşturulan</option><option value="az">A–Z</option></select></div></div>
+      <div class="chips" id="af" style="margin-top:8px"></div>
+      <div id="al"></div>
+    </div>
+  </section>
 
-            <div class="nav-footer">
-                <button class="btn" onclick="uiHelpers.switchPage(1)">&#8592; Kaynağa Dön</button>
-                <button class="btn btn-primary" onclick="appController.nextToStage3()">Sentezle ➔</button>
-            </div>
-        </section>
+  <!-- AYARLAR -->
+  <section class="view" id="v-settings">
+    <div class="bar"><button class="btn line sm" data-go="home"><svg class="ic"><use href="#i-back"/></svg>Ana sayfa</button><span class="vt">Ayarlar</span></div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--lav);color:#7F6EB0"><svg class="ic"><use href="#i-folder"/></svg></span><div><h2>Kategoriler</h2><p>Hızlı notların kategorilerini ekle, adını değiştir ya da sil.</p></div></div>
+      <div id="cl"></div>
+      <div class="add"><input id="nc" placeholder="Yeni kategori adı" maxlength="20"><button class="btn blue" id="ncb"><svg class="ic"><use href="#i-plus"/></svg>Ekle</button></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--peach);color:var(--peach-ink)"><svg class="ic"><use href="#i-layout"/></svg></span><div><h2>Şablonlar</h2><p>Sık kullandığın not düzenlerini kaydet; editörde tek dokunuşla uygula.</p></div></div>
+      <input id="tn" placeholder="Şablon adı" maxlength="40" style="margin-bottom:8px">
+      <div class="field"><svg class="ic"><use href="#i-tag"/></svg><select id="tt"><option value="quick">Hızlı not şablonu</option><option value="plan">Strateji ve planlama şablonu</option></select></div>
+      <div id="tfq"><div class="lbl">İçerik</div><textarea id="tq" style="min-height:80px" placeholder="Şablonun metni…"></textarea></div>
+      <div id="tfp" style="display:none">
+        <div class="lbl">Hedef ve amaç</div><textarea id="tg" style="min-height:60px"></textarea>
+        <div class="lbl">Adımlar (her satıra bir adım)</div><textarea id="ts" style="min-height:70px"></textarea>
+        <div class="lbl">Notlar</div><textarea id="tb" style="min-height:60px"></textarea>
+      </div>
+      <div class="row" style="justify-content:flex-end"><button class="btn line" id="tcx" hidden>Vazgeç</button><button class="btn pri" id="tsv"><svg class="ic"><use href="#i-check"/></svg><span id="tsl">Şablonu kaydet</span></button></div>
+      <div id="tl"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--blue);color:var(--blue-ink)"><svg class="ic"><use href="#i-down"/></svg></span><div><h2>Dışa aktar</h2><p>Tüm notlarını, kategorilerini ve şablonlarını yedekle.</p></div></div>
+      <textarea id="ex" readonly></textarea>
+      <div class="row" style="justify-content:flex-end"><button class="btn line" id="exc"><svg class="ic"><use href="#i-copy"/></svg>Kopyala</button><button class="btn blue" id="exd"><svg class="ic"><use href="#i-down"/></svg>İndir</button></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="bub" style="background:var(--sage);color:var(--sage-ink)"><svg class="ic"><use href="#i-up"/></svg></span><div><h2>İçe aktar</h2><p>Yedek metnini yapıştır ya da dosya yükle. Mevcut notlar silinmez, yenileri eklenir.</p></div></div>
+      <textarea id="im" placeholder="Yedek metnini buraya yapıştır…"></textarea>
+      <div class="row" style="justify-content:flex-end"><input type="file" id="imf" accept=".json,.txt,application/json,text/plain"><button class="btn line" id="imfb"><svg class="ic"><use href="#i-up"/></svg>Dosya yükle</button><button class="btn pri" id="imb"><svg class="ic"><use href="#i-check"/></svg>İçe aktar</button></div>
+    </div>
+  </section>
+</main>
 
-        <section id="stage3" class="page">
-            <div class="section-title">
-                <span>Yapı Taşları (Çekirdekler)</span>
-                <button class="btn-icon-only" onclick="uiHelpers.toggleCores()" title="Gizle/Göster">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                </button>
-            </div>
-            <div class="checklist" id="coreChecklist"></div>
+<button class="fab" id="fab" aria-label="Anahtar kelimeler"><svg class="ic"><use href="#i-tag"/></svg><span class="bd" id="kbd">0</span></button>
+<div class="kbar" id="kbar" aria-label="Bekleyen anahtar kelimeler"></div>
+<div class="card kwp" id="kwp">
+  <div class="ch" style="margin-bottom:8px"><span class="bub" style="background:var(--sage);color:var(--sage-ink)"><svg class="ic"><use href="#i-tag"/></svg></span><div><h2>Anahtar kelimeler</h2><p>Notta kullandıkça gri olup kaybolur; yeşiller bekliyor.</p></div><span class="sp"></span><button class="ib" id="kwx" aria-label="Kapat"><svg class="ic"><use href="#i-x"/></svg></button></div>
+  <div class="add" style="margin:0 0 8px"><input id="ki" placeholder="Kelime yaz, Enter’a bas" maxlength="30"><button class="btn sage" id="kb"><svg class="ic"><use href="#i-plus"/></svg>Ekle</button></div>
+  <div class="chips" id="kl"></div>
+  <div class="prog" id="kp"></div>
+</div>
+<div id="cv" aria-hidden="true"><div class="sheet" id="cvs" role="dialog" aria-modal="true"></div></div>
+<div id="pv" aria-hidden="true"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status" aria-live="polite"><span id="tm"></span><button id="tu" hidden><svg class="ic"><use href="#i-undo"/></svg>Geri al</button></div>
 
-            <div class="input-group" style="margin-top: 16px;">
-                <label class="section-title">İstasyon Başlığı & İkon</label>
-                <div style="display:flex; gap: 8px;">
-                    <button class="icon-btn-pick" id="currentIconBtn" onclick="uiHelpers.toggleIconPicker()">📄</button>
-                    <input type="text" id="noteTitle" placeholder="Örn: Yapay Zeka Devrimi (Opsiyonel)" oninput="appController.autoSaveDraft()">
-                    <div class="icon-picker-menu" id="iconPickerMenu">
-                        <span onclick="uiHelpers.selectIcon('📄')">📄</span> <span onclick="uiHelpers.selectIcon('💡')">💡</span>
-                        <span onclick="uiHelpers.selectIcon('🧠')">🧠</span> <span onclick="uiHelpers.selectIcon('📚')">📚</span>
-                        <span onclick="uiHelpers.selectIcon('✍️')">✍️</span> <span onclick="uiHelpers.selectIcon('📌')">📌</span>
-                        <span onclick="uiHelpers.selectIcon('🎯')">🎯</span> <span onclick="uiHelpers.selectIcon('🚀')">🚀</span>
-                        <span onclick="uiHelpers.selectIcon('🔗')">🔗</span> <span onclick="uiHelpers.selectIcon('📝')">📝</span>
-                    </div>
-                </div>
-            </div>
+<script>
+(function(){
+  var K2="notlarim-v2", K1="notlarim-v1";
+  function uid(){return Date.now()*1000+Math.floor(Math.random()*1000)}
+  function blank(){return {quick:[],cats:["Genel","Fikir","Alışveriş"],plans:[],tpls:[],last:null}}
+  function norm(o){
+    var b=blank(); if(!o||typeof o!=="object")return b;
+    if(Array.isArray(o.cats)&&o.cats.length)b.cats=o.cats.map(String);
+    if(b.cats.indexOf("Genel")<0)b.cats.unshift("Genel");
+    b.quick=(Array.isArray(o.quick)?o.quick:[]).filter(function(n){return n&&n.text}).map(function(n){
+      var c=n.cat?String(n.cat):"Genel"; if(b.cats.indexOf(c)<0)b.cats.push(c);
+      return {id:n.id||uid(),text:String(n.text),cat:c,pin:!!n.pin,c:n.c||n.t||Date.now(),t:n.t||Date.now()}});
+    var pl=Array.isArray(o.plans)?o.plans:(Array.isArray(o.planned)?o.planned:[]);
+    b.plans=pl.filter(Boolean).map(function(n){return {id:n.id||uid(),title:String(n.title||"Başlıksız strateji"),goal:String(n.goal||""),
+      steps:(Array.isArray(n.steps)?n.steps:[]).map(function(s){return {t:String(s&&s.t!==undefined?s.t:s),d:!!(s&&s.d)}}),
+      notes:String(n.notes||n.text||""),kws:(Array.isArray(n.kws)?n.kws:[]).map(String),pin:!!n.pin,clean:String(n.clean||""),c:n.c||n.t||Date.now(),t:n.t||Date.now()}});
+    b.tpls=(Array.isArray(o.tpls)?o.tpls:[]).filter(function(x){return x&&x.name}).map(function(x){return {id:x.id||uid(),name:String(x.name),type:x.type==="plan"?"plan":"quick",
+      text:String(x.text||""),goal:String(x.goal||""),steps:Array.isArray(x.steps)?x.steps.join("\n"):String(x.steps||""),notes:String(x.notes||"")}});
+    if(o.last&&o.last.id)b.last={type:o.last.type==="plan"?"plan":"quick",id:o.last.id};
+    return b;
+  }
+  var S=blank();
+  try{var r=localStorage.getItem(K2)||localStorage.getItem(K1); if(r)S=norm(JSON.parse(r));}catch(e){}
+  function save(){try{localStorage.setItem(K2,JSON.stringify(S))}catch(e){}}
+  var $=function(i){return document.getElementById(i)};
+  var ic=function(n,st){return '<svg class="ic"'+(st?' style="'+st+'"':'')+'><use href="#i-'+n+'"/></svg>'};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function low(s){return String(s).toLocaleLowerCase("tr")}
+  function pad(n){return (n<10?"0":"")+n}
+  function grow(el){if(!el||el.classList.contains("box")||el.offsetParent===null)return;el.style.height="auto";el.style.height=(el.scrollHeight+2)+"px"}
+  function growAll(){document.querySelectorAll("textarea.auto").forEach(grow)}
+  function fmtFull(t){var d=new Date(t);return d.toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"})+", "+d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}
+  function created(n){return "Oluşturuldu: "+fmtFull(n.c)+(n.t-n.c>60000?"  ·  Son güncelleme: "+fmtFull(n.t):"")}
+  function copyText(t){
+    if(!t||!t.trim()){toast("Kopyalanacak metin yok");return}
+    function fb(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}a.remove();toast(ok?"Kopyalandı":"Kopyalanamadı")}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast("Kopyalandı")},fb);else fb();
+  }
+  function fmt(t){return new Date(t).toLocaleDateString("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+  function ci(c){var h=0;for(var i=0;i<c.length;i++)h+=c.charCodeAt(i);return "c"+(h%6)}
+  function has(k,t){return low(t).indexOf(low(k))>=0}
+  function byId(a,id){return a.filter(function(n){return String(n.id)===String(id)})[0]}
+  var editQ=null, editP=null, editT=null, steps=[{t:"",d:false}], kws=[], aTab="quick", aFilter="Hepsi", tt, undoFn=null;
 
-            <div class="input-group">
-                <div class="section-title">
-                    Sentez & Yaratım Alanı
-                    <button class="btn-icon-only" style="color: #f1c40f;" onclick="promptEngine.showPrompt()" title="İlham Şimşeği (Sorular)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                    </button>
-                </div>
-                <div id="promptBubble" class="prompt-bubble"></div>
-                <textarea id="finalText" placeholder="Kendi özgün metnini buraya inşa et..." oninput="appController.handleSynthesisInput()"></textarea>
-                <div id="liveMetrics" class="metrics-bar">0 Kelime | 0 dk</div>
-            </div>
-            
-            <div class="input-group" style="margin-top: 24px;">
-                <label class="section-title">Kaydedilecek Klasör</label>
-                <div class="chip-group" id="folderSelectGroup"></div>
-            </div>
+  function toast(msg,undo){
+    $("tm").textContent=msg; undoFn=undo||null; $("tu").hidden=!undo; $("toast").classList.add("on");
+    clearTimeout(tt); tt=setTimeout(function(){$("toast").classList.remove("on");undoFn=null},4500);
+  }
+  $("tu").onclick=function(){if(undoFn){undoFn();undoFn=null}$("toast").classList.remove("on")};
+  function restore(b){S=norm(JSON.parse(b));save();refresh()}
+  function removeWithUndo(kind,id,msg){
+    var b=JSON.stringify(S);
+    if(kind==="quick")S.quick=S.quick.filter(function(n){return String(n.id)!==String(id)});
+    else S.plans=S.plans.filter(function(n){return String(n.id)!==String(id)});
+    if(S.last&&String(S.last.id)===String(id))S.last=null;
+    save();refresh();toast(msg,function(){restore(b)});
+  }
+  function setLast(type,id){S.last={type:type,id:id}}
 
-            <div class="input-group" style="border-top: 1px solid rgba(150,150,150,0.2); padding-top: 16px;">
-                <label class="section-title">Bağlantılı İstasyonlar</label>
-                <div style="display:flex; gap:6px;">
-                    <input type="text" id="linkInput" placeholder="Örn: 5" style="padding: 8px; width: 100px;">
-                    <button class="btn btn-primary" onclick="appController.addLink()">Ekle</button>
-                </div>
-                <div id="linkedNotesContainer" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
-            </div>
-            
-            <div class="suggestion-panel" id="smartSuggestionPanel" style="display: none;">
-                <div class="section-title" style="color: var(--accent); margin-bottom: 4px;">💡 İlham Radarı</div>
-                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px;">Yazdıklarına bakılırsa bu notlar işine yarayabilir:</div>
-                <div id="smartSuggestionsList"></div>
-            </div>
+  /* ---------- Gezinme ---------- */
+  var VIEWS=["home","quick","plan","archive","settings"];
+  function go(v){
+    VIEWS.forEach(function(x){$("v-"+x).classList.toggle("on",x===v)});
+    document.body.classList.toggle("in-plan",v==="plan");
+    if(v!=="plan")$("kwp").classList.remove("on");
+    refresh(); window.scrollTo(0,0);
+  }
+  document.addEventListener("click",function(e){var g=e.target.closest("[data-go]"); if(g)go(g.getAttribute("data-go"))});
+  $("hq").onclick=function(){if(editQ)resetQ();go("quick")};
+  $("hp").onclick=function(){if(editP)clearP();go("plan")};
 
-            <div class="nav-footer" style="border-top: none; padding-top: 0;">
-                <button class="btn" onclick="uiHelpers.switchPage(2)">&#8592; Geri</button>
-            </div>
-            <button class="btn btn-success" onclick="appController.archiveNote()">✦ Tamamla ve Arşivle</button>
+  function refresh(){refreshCats();refreshTpls();renderHome();renderArchive();renderSettings();growAll()}
 
-            <div style="margin-top: 32px; padding-top: 16px; border-top: 1px dashed rgba(150,150,150,0.3);">
-                <div class="section-title">Son Aktiviteler</div>
-                <div class="horizontal-scroll" id="recentActivitiesShelf"></div>
-            </div>
-        </section>
-    </main>
+  /* ---------- Ana sayfa: son not ---------- */
+  function renderHome(){renderWeek();
+    var l=S.last, n=l?byId(l.type==="plan"?S.plans:S.quick,l.id):null;
+    if(!n){$("last").innerHTML='<div class="empty" style="margin:0">Henüz not yok. Yukarıdan ilkini başlat.</div>';return}
+    var title=l.type==="plan"?n.title:n.text.split("\n")[0], sub=l.type==="plan"?(n.goal||n.clean||n.notes):n.text;
+    $("last").innerHTML='<div class="note" style="margin:0"><div class="meta" style="margin-bottom:6px"><span class="tag '+(l.type==="plan"?"c1":ci(n.cat))+'">'+(l.type==="plan"?"Strateji ve planlama":esc(n.cat))+'</span><span>Oluşturuldu: '+fmt(n.c)+'</span></div><h3 class="clamp" style="-webkit-line-clamp:1">'+esc(title)+'</h3><p class="clamp" style="-webkit-line-clamp:2;margin-bottom:10px">'+esc(sub)+'</p><button class="btn pri" style="--acc:'+(l.type==="plan"?"#6E9372":"#B8815F")+'" id="cont">'+ic("edit")+'Düzenlemeye devam et</button></div>';
+    $("cont").onclick=function(){l.type==="plan"?openPlan(n.id):openQuick(n.id)};
+  }
 
-    <dialog id="dbModal">
-        <div class="modal-header">
-            <div class="logo" style="font-size:1.1rem;">Veri<span>Tabanı</span></div>
-            <div style="display:flex; gap:6px;">
-                <button class="btn btn-sm" onclick="graphEngine.open()" title="Zettelkasten Ağ Haritası">🌐 Ağ</button>
-                <button class="btn btn-sm" id="btnSelectionMode" onclick="dbManager.toggleSelectionMode()" title="Çoklu Seçim / Düzenle">Seç</button>
-                <button class="btn btn-danger btn-sm" onclick="dbManager.close()">Kapat</button>
-            </div>
-        </div>
-        <div class="modal-body">
-            <input type="text" id="globalSearch" class="search-box" placeholder="İstasyonlarda ara (Başlık, ID veya Kelime)..." oninput="dbManager.renderGrid()">
+  /* ---------- Kategoriler / şablon seçicileri ---------- */
+  function refreshCats(){
+    var cur=$("qc").value;
+    $("qc").innerHTML=S.cats.map(function(c){return "<option>"+esc(c)+"</option>"}).join("");
+    if(S.cats.indexOf(cur)>=0)$("qc").value=cur;
+    if(aFilter!=="Hepsi"&&S.cats.indexOf(aFilter)<0)aFilter="Hepsi";
+  }
+  function refreshTpls(){
+    [["qtp","quick"],["ptp","plan"]].forEach(function(p){
+      var l=S.tpls.filter(function(t){return t.type===p[1]});
+      $(p[0]).innerHTML='<option value="">'+(l.length?"Şablondan başla…":"Şablon yok (Ayarlar’dan oluştur)")+'</option>'+l.map(function(t){return '<option value="'+t.id+'">'+esc(t.name)+'</option>'}).join("");
+      $(p[0]).disabled=!l.length;
+    });
+  }
+  $("qtp").onchange=function(){var t=byId(S.tpls,this.value); if(t){$("qt").value=t.text;growAll();toast("Şablon uygulandı")} this.value=""};
+  $("ptp").onchange=function(){
+    var t=byId(S.tpls,this.value); this.value=""; if(!t)return;
+    $("pg").value=t.goal; $("pb").value=t.notes;
+    steps=t.steps.split("\n").map(function(s){return s.trim()}).filter(Boolean).map(function(s){return {t:s,d:false}});
+    if(!steps.length)steps=[{t:"",d:false}];
+    renderSteps();updKw();toast("Şablon uygulandı");
+  };
 
-            <div class="cloud-panel">
-                <div>
-                    <h3 style="font-size:0.8rem; margin-bottom:2px;">Bulut Senkronizasyonu</h3>
-                    <p style="font-size:0.7rem; color:var(--text-secondary);">Firebase Yedekleme</p>
-                </div>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn btn-sm" onclick="firebaseManager.backup()">Yedekle</button>
-                    <button class="btn btn-sm btn-primary" onclick="firebaseManager.restore()">Çek</button>
-                </div>
-            </div>
+  /* ---------- Hızlı not ---------- */
+  function resetQ(){editQ=null;$("qt").value="";$("qcr").hidden=true;$("qflag").classList.remove("on");$("qx").hidden=true;$("qd").hidden=true;$("qsl").textContent="Kaydet"}
+  function saveQ(){
+    var v=$("qt").value.trim(); if(!v){$("qt").focus();return}
+    var id=editQ||uid();
+    if(editQ){S.quick=S.quick.map(function(n){return String(n.id)===String(id)?{id:n.id,text:v,cat:$("qc").value,pin:n.pin,c:n.c||n.t,t:Date.now()}:n});toast("Not güncellendi")}
+    else{S.quick.unshift({id:id,text:v,cat:$("qc").value,pin:false,c:Date.now(),t:Date.now()});toast("Not kaydedildi")}
+    setLast("quick",id); resetQ(); save(); refresh();
+  }
+  $("qs").onclick=saveQ; $("qx").onclick=function(){resetQ();growAll()};
+  $("qd").onclick=function(){var id=editQ;resetQ();removeWithUndo("quick",id,"Not silindi")};
+  $("qt").onkeydown=function(e){
+    if(e.key!=="Enter"&&e.keyCode!==13)return;
+    if(e.ctrlKey||e.metaKey){saveQ();return}
+    var t=this,p=t.selectionStart; if(p!==t.selectionEnd)return;
+    var ls=t.value.lastIndexOf("\n",p-1)+1, m=/^(\s*)([•\-*–])\s(.*)$/.exec(t.value.slice(ls,p));
+    if(!m)return; e.preventDefault();
+    if(!m[3].trim()){t.value=t.value.slice(0,ls)+t.value.slice(p);t.setSelectionRange(ls,ls)}
+    else{var ins="\n"+m[1]+m[2]+" ";t.value=t.value.slice(0,p)+ins+t.value.slice(p);t.setSelectionRange(p+ins.length,p+ins.length)}
+    grow(t);
+  };
+  $("qb").onclick=function(){
+    var t=$("qt"), v=t.value, a=t.selectionStart, b=t.selectionEnd;
+    if(!v.trim()){t.value="• ";t.focus();t.setSelectionRange(2,2);grow(t);return}
+    var s0=a===b?0:v.lastIndexOf("\n",a-1)+1, nl=v.indexOf("\n",b), e0=a===b?v.length:(nl<0?v.length:nl);
+    var seg=v.slice(s0,e0).split("\n"), isB=function(l){return /^\s*[•\-*–]\s/.test(l)};
+    var all=seg.every(function(l){return !l.trim()||isB(l)});
+    seg=seg.map(function(l){
+      if(!l.trim())return l;
+      if(all)return l.replace(/^(\s*)[•\-*–]\s+/,"$1");
+      return isB(l)?l:"• "+l.replace(/^\s*(\d+[.)])\s+/,"").trim();
+    });
+    t.value=v.slice(0,s0)+seg.join("\n")+v.slice(e0); t.focus(); grow(t);
+  };
+  $("qcv").onclick=function(){openCv({text:$("qt").value,noteId:editQ})};
+  $("sq").onclick=function(){if(!S.quick.length){toast("Henüz hızlı not yok");return}openCv({text:"",noteId:null,pick:true})};
+  function openQuick(id){
+    var n=byId(S.quick,id); if(!n)return;
+    editQ=n.id;$("qt").value=n.text;$("qcr").hidden=false;$("qcr").textContent=created(n);$("qc").value=n.cat;$("qflag").classList.add("on");$("qx").hidden=false;$("qd").hidden=false;$("qsl").textContent="Güncelle";
+    setLast("quick",n.id);save();go("quick");
+  }
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <div class="chip-group" id="dbFolderTabs" style="padding:0; flex-grow: 1;"></div>
-                <div style="display:flex; align-items:center; gap:4px; margin-left: 6px;">
-                    <span id="dbNoteCount" style="font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; margin-right: 4px;"></span>
-                    <button class="btn-icon-only" onclick="dbManager.editCurrentFolder()" id="btnEditFolder" style="display:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
-                    <button class="btn-icon-only" style="color:var(--danger);" onclick="dbManager.deleteCurrentFolder()" id="btnDeleteFolder" style="display:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-                    <button class="btn btn-sm" onclick="dbManager.createNewFolder()">+ Klasör</button>
-                </div>
-            </div>
-            
-            <div class="grid" id="dbGrid" style="margin-top: 10px; margin-bottom: 20px;"></div>
+  /* ---------- Strateji ve planlama ---------- */
+  var showDone=false;
+  function renderSteps(){renderSteps0();addDoneBar();growAll()}
+  function addDoneBar(){
+    var dn=steps.filter(function(x){return x.d}).length, h="";
+    if(!dn)showDone=false;
+    if(dn){
+      if(!showDone&&dn===steps.length)h+='<div class="prog" style="margin:0 0 8px">Tüm adımlar tamamlandı.</div>';
+      h+='<button class="btn soft sm" id="sdt" type="button">'+ic("check")+'Tamamlananlar ('+dn+') '+(showDone?"gizle":"göster")+'</button>';
+    }
+    $("sl").insertAdjacentHTML("beforeend",'<div class="doneb">'+h+'</div>');
+  }
+  function renderSteps0(){
+    $("sl").innerHTML=steps.map(function(s,i){if(s.d&&!showDone)return "";
+      return '<div class="step"><span class="n">Adım '+pad(i+1)+'</span><textarea rows="1" data-si="'+i+'" placeholder="Bu adımda ne yapacaksın?" class="auto'+(s.d?" done":"")+'">'+esc(s.t)+'</textarea><button class="ib ok'+(s.d?" on":"")+'" data-sk="'+i+'" aria-label="Tamamlandı">'+ic("check")+'</button><button class="ib del" data-sx="'+i+'" aria-label="Adımı sil">'+ic("x")+'</button></div>';
+    }).join("");
+  }
+  function focusStep(i){var el=$("sl").querySelector('textarea[data-si="'+i+'"]');if(el){el.focus();var n=el.value.length;el.setSelectionRange(n,n)}}
+  $("sa").onclick=function(){steps.push({t:"",d:false});renderSteps();focusStep(steps.length-1)};
+  $("sl").onkeydown=function(e){
+    var i=e.target.getAttribute("data-si"); if(i===null)return; i=+i;
+    if((e.key==="Enter"||e.keyCode===13)&&!e.shiftKey){
+      e.preventDefault();
+      var nx=-1;for(var j=i+1;j<steps.length;j++){if(showDone||!steps[j].d){nx=j;break}}
+      if(nx>=0)focusStep(nx);
+      else if(steps[i].t.trim()){steps.push({t:"",d:false});renderSteps();focusStep(steps.length-1)}
+    }else if(e.key==="Backspace"&&!steps[i].t&&steps.length>1){
+      e.preventDefault();var pvI=-1;for(var j2=i-1;j2>=0;j2--){if(showDone||!steps[j2].d){pvI=j2;break}}steps.splice(i,1);renderSteps();updKw();focusStep(pvI>=0?pvI:i);
+    }
+  };
+  $("sl").oninput=function(e){var i=e.target.getAttribute("data-si"); if(i!==null){steps[+i].t=e.target.value;grow(e.target);updKw()}};
+  $("sl").onclick=function(e){
+    if(e.target.closest("#sdt")){showDone=!showDone;renderSteps();return}
+    var k=e.target.closest("[data-sk]"), x=e.target.closest("[data-sx]");
+    if(k){var si=+k.getAttribute("data-sk"),s=steps[si];s.d=!s.d;renderSteps();updKw();if(s.d&&!showDone)toast("Adım tamamlandı ve gizlendi",function(){steps[si].d=false;renderSteps()})}
+    if(x){steps.splice(+x.getAttribute("data-sx"),1);if(!steps.length)steps=[{t:"",d:false}];renderSteps();updKw()}
+  };
+  function clearP(){editP=null;kws=[];steps=[{t:"",d:false}];$("pt").value="";$("pg").value="";$("pb").value="";$("pcl").value="";$("pcr").hidden=true;$("pflag").classList.remove("on");$("pd").hidden=true;$("psl").textContent="Kaydet";renderSteps();renderKw()}
+  $("pc").onclick=clearP;
+  function savePlan(){
+    var n={id:editP||uid(),title:$("pt").value.trim()||"Başlıksız strateji",goal:$("pg").value.trim(),
+      steps:steps.filter(function(s){return s.t.trim()}).map(function(s){return {t:s.t.trim(),d:s.d}}),notes:$("pb").value.trim(),clean:$("pcl").value.trim(),kws:kws.slice(),pin:!!(byId(S.plans,editP)||{}).pin,c:(byId(S.plans,editP)||{}).c||Date.now(),t:Date.now()};
+    if(!n.goal&&!n.notes&&!n.clean&&!n.steps.length&&!$("pt").value.trim()){toast("Kaydetmek için bir şeyler yaz");return}
+    if(editP){S.plans=S.plans.map(function(x){return String(x.id)===String(n.id)?n:x});toast("Kayıt güncellendi")}
+    else{S.plans.unshift(n);toast("Kayıt eklendi")}
+    setLast("plan",n.id); save(); clearP(); refresh();
+  }
+  $("ps").onclick=savePlan;
+  $("pd").onclick=function(){var id=editP;clearP();removeWithUndo("plan",id,"Kayıt silindi")};
+  $("pb").onkeydown=function(e){if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))savePlan()};
+  ["pt","pg","pb","pcl"].forEach(function(i){$(i).addEventListener("input",updKw)});
+  function openPlan(id){
+    var n=byId(S.plans,id); if(!n)return;
+    editP=n.id;kws=n.kws.slice();steps=n.steps.length?n.steps.map(function(s){return {t:s.t,d:s.d}}):[{t:"",d:false}];
+    $("pt").value=n.title;$("pg").value=n.goal;$("pb").value=n.notes;$("pcl").value=n.clean;$("pcr").hidden=false;$("pcr").textContent=created(n);$("pflag").classList.add("on");$("pd").hidden=false;$("psl").textContent="Güncelle";
+    setLast("plan",n.id);save();go("plan");renderSteps();renderKw();
+  }
 
-            <div class="selection-action-bar" id="selectionActionBar">
-                <span id="selectionCount" style="font-weight: 600; font-size: 0.8rem;">0 Seçildi</span>
-                <div style="display:flex; gap:6px; align-items:center;">
-                    <select id="bulkMoveFolderSelect" style="padding: 4px; font-size: 0.75rem; border-radius:4px; color:#000;" onchange="dbManager.bulkMove(this.value)">
-                        <option value="">📁 Taşı...</option>
-                    </select>
-                    <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color:white; border:none;" onclick="dbManager.bulkDelete()">Sil</button>
-                </div>
-            </div>
-        </div>
-    </dialog>
+  /* ---------- Anahtar kelimeler (sağ alt) ---------- */
+  function planText(){return [$("pt").value,$("pg").value,steps.map(function(s){return s.t}).join(" "),$("pb").value,$("pcl").value].join(" ")}
+  function renderKw(){
+    $("kbar").innerHTML=kws.map(function(k){return '<span class="kw">'+esc(k)+'</span>'}).join("");
+    $("kl").innerHTML=kws.map(function(k,i){return '<span class="kw" data-k="'+i+'">'+esc(k)+'<button class="x" data-r="'+i+'" aria-label="'+esc(k)+' kelimesini sil">'+ic("x","width:11px;height:11px")+'</button></span>'}).join("");
+    updKw();
+  }
+  function updKw(){
+    var text=planText(), left=0, used=0, els=$("kl").children;
+    var be=$("kbar").children; kws.forEach(function(k,i){var f=has(k,text); if(els[i])els[i].classList.toggle("used",f); if(be[i])be[i].classList.toggle("used",f); f?used++:left++});
+    $("kbd").textContent=left; $("kbd").style.display=kws.length?"grid":"none";
+    $("kp").textContent=!kws.length?"Henüz kelime eklenmedi.":(left?left+" kelime bekliyor"+(used?" · "+used+" kullanıldı":""):"Tüm kelimeler kullanıldı.");
+  }
+  function addKw(){
+    var v=$("ki").value.trim(); if(!v)return;
+    if(!kws.some(function(k){return low(k)===low(v)}))kws.push(v);
+    $("ki").value=""; renderKw();
+  }
+  $("kb").onclick=addKw; $("ki").onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();addKw()}};
+  $("kl").onclick=function(e){var b=e.target.closest("[data-r]"); if(b){kws.splice(+b.getAttribute("data-r"),1);renderKw()}};
+  $("fab").onclick=function(){$("kwp").classList.toggle("on");if($("kwp").classList.contains("on"))$("ki").focus()};
+  $("kwx").onclick=function(){$("kwp").classList.remove("on")};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){$("kwp").classList.remove("on");closePreview();closeCv()}});
 
-    <dialog id="previewModal">
-        <div class="modal-header">
-            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                <span id="previewIdBadge" style="font-size: 0.7rem; font-weight: 800; color: var(--accent); background: rgba(150,150,150,0.1); padding: 3px 6px; border-radius: 8px;"></span>
-                <span id="previewTitle" style="font-weight: 700; font-size: 0.9rem;"></span>
-                <select id="previewFolderSelect" class="folder-select" onchange="dbManager.moveCurrentPreviewNote(this.value)"></select>
-            </div>
-            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                <button class="btn btn-sm" style="color: var(--accent);" onclick="appController.deriveNewNote()" title="Bu nottan yeni bir istasyon türet">Türet</button>
-                <button class="btn btn-sm" onclick="uiHelpers.copyToClipboard()" title="Metni Kopyala"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
-                <button class="btn btn-sm btn-primary" id="btnEditNote">Düzenle</button>
-                <button class="btn btn-sm btn-danger" id="btnDeleteNote">Sil</button>
-                <button class="btn btn-sm" style="background: rgba(150,150,150,0.2);" onclick="document.getElementById('previewModal').close()">✕</button>
-            </div>
-        </div>
-        <div class="modal-body">
-            <div class="read-section" id="previewSynthesisBlock">
-                <h3>Sentez / Yaratım</h3>
-                <div class="read-box" id="previewSynthesis" style="font-weight: 500; cursor: pointer;" onclick="this.classList.toggle('fullscreen-mode')">
-                    <div class="fs-hint">⛶ Büyüt</div>
-                    <span id="previewSynthesisText"></span>
-                </div>
-            </div>
-            <div class="read-section">
-                <h3>Çekirdek Fikirler</h3>
-                <ul class="read-cores" id="previewCores"></ul>
-            </div>
-            <div class="read-section">
-                <h3>Kaynak Metin</h3>
-                <div class="read-box" id="previewSource" style="color: var(--text-secondary);"></div>
-            </div>
-            <div class="read-section" id="previewLinksBlock" style="border-top: 1px solid rgba(150,150,150,0.2); padding-top: 12px; margin-top: 16px;">
-                <h3>Giden Bağlantılar</h3>
-                <div id="previewLinkedNodes" style="display:flex; flex-direction:column; gap:6px;"></div>
-            </div>
-            <div class="read-section" id="previewBacklinksBlock" style="border-top: 1px dashed rgba(150,150,150,0.2); padding-top: 12px; margin-top: 16px;">
-                <h3>Geri Bağlantılar (Referanslar)</h3>
-                <div id="previewBacklinkedNodes" style="display:flex; flex-direction:column; gap:6px;"></div>
-            </div>
-        </div>
-    </dialog>
+  /* ---------- Arşivler ---------- */
+  $("atq").onclick=function(){aTab="quick";$("asr").value="";renderArchive()};
+  $("atp").onclick=function(){aTab="plan";$("asr").value="";renderArchive()};
+  $("asr").oninput=renderArchive;
+  var aSort="upd", aStatus="all";
+  $("asort").onchange=function(){aSort=this.value;renderArchive()};
+  function dayBucket(t){var d=new Date(t),n=new Date();d.setHours(0,0,0,0);n.setHours(0,0,0,0);var k=Math.round((n-d)/864e5);return k<=0?"Bugün":k===1?"Dün":k<7?"Bu hafta":"Daha eski"}
+  function planDone(n){return n.steps.length>0&&n.steps.every(function(s){return s.d})}
+  function sortList(l){
+    return l.slice().sort(function(a,b){
+      if(!!a.pin!==!!b.pin)return a.pin?-1:1;
+      if(aSort==="az"){var x=low(a.title||a.text),y=low(b.title||b.text);return x<y?-1:x>y?1:0}
+      return aSort==="old"?a.c-b.c:aSort==="new"?b.c-a.c:b.t-a.t});
+  }
+  function withGroups(l,render){
+    var out="",cur="";
+    l.forEach(function(n){
+      var g=n.pin?"Sabitlenenler":(aSort==="az"?"":dayBucket(aSort==="upd"?n.t:n.c));
+      if(g!==cur){cur=g;if(g)out+='<div class="grp">'+g+'</div>'}
+      out+=render(n);
+    });
+    return out;
+  }
+  function pinBtn(a,n){return '<button class="ib pin'+(n.pin?" on":"")+'" '+a+'="'+n.id+'" aria-label="'+(n.pin?"Sabitlemeyi kaldır":"Sabitle")+'">'+ic("star")+'</button>'}
+  function renderArchive(){
+    var isQ=aTab==="quick", q=low($("asr").value.trim()), list, html;
+    $("atq").classList.toggle("on",isQ);$("atp").classList.toggle("on",!isQ);
+    $("aqn").textContent=S.quick.length+" not";$("apn").textContent=S.plans.length+" kayıt";
+    $("at").textContent=isQ?"Hızlı not arşivi":"Strateji ve planlama arşivi";
+    $("ah").textContent="Karta dokun, önizle; düzenleme ve silme önizlemede.";
+    $("asr").placeholder=isQ?"Notlarda ara":"Başlık, hedef, adım veya kelimede ara";
+    if(isQ){
+      $("af").innerHTML=['<button class="chip nox'+(aFilter==="Hepsi"?" on":"")+'" data-ac="Hepsi">Hepsi <em>'+S.quick.length+'</em></button>'].concat(S.cats.map(function(c){
+        return '<button class="chip nox '+ci(c)+(c===aFilter?" on":"")+'" data-ac="'+esc(c)+'">'+esc(c)+' <em>'+S.quick.filter(function(n){return n.cat===c}).length+'</em></button>'})).join("");
+      list=sortList(S.quick.filter(function(n){return (aFilter==="Hepsi"||n.cat===aFilter)&&(!q||low(n.text).indexOf(q)>=0)}));
+      html=withGroups(list,function(n){return '<div class="note'+(n.pin?" pinned":"")+'" data-vq="'+n.id+'"><div class="meta" style="margin-bottom:6px"><span class="tag '+ci(n.cat)+'">'+esc(n.cat)+'</span><span>Oluşturuldu: '+fmt(n.c)+'</span><span class="sp"></span>'+pinBtn("data-qp",n)+'</div><p class="clamp" style="margin:0">'+esc(n.text)+'</p></div>'});
+    }else{
+      var dn=S.plans.filter(planDone).length;
+      $("af").innerHTML=[["all","Hepsi",S.plans.length],["open","Devam eden",S.plans.length-dn],["done","Tamamlanan",dn]].map(function(x){
+        return '<button class="chip nox'+(x[0]===aStatus?" on":"")+'" data-as="'+x[0]+'">'+x[1]+' <em>'+x[2]+'</em></button>'}).join("");
+      list=sortList(S.plans.filter(function(n){
+        if(aStatus==="done"&&!planDone(n))return false; if(aStatus==="open"&&planDone(n))return false;
+        return !q||low(n.title+" "+n.goal+" "+n.notes+" "+n.clean+" "+n.kws.join(" ")+" "+n.steps.map(function(s){return s.t}).join(" ")).indexOf(q)>=0}));
+      html=withGroups(list,function(n){
+        var done=n.steps.filter(function(s){return s.d}).length, all=n.title+" "+n.goal+" "+n.notes+" "+n.clean+" "+n.steps.map(function(s){return s.t}).join(" "), sub=n.goal||n.clean||n.notes;
+        return '<div class="note'+(n.pin?" pinned":"")+'" data-vp="'+n.id+'"><div class="top"><h3>'+esc(n.title)+'</h3>'+pinBtn("data-pn",n)+'</div>'+
+          (n.steps.length?'<div class="pbar"><i style="width:'+Math.round(done/n.steps.length*100)+'%"></i></div>':'')+
+          (sub?'<p class="clamp" style="-webkit-line-clamp:2;margin-bottom:8px">'+esc(sub)+'</p>':'')+
+          (n.kws.length?'<div class="chips" style="margin-bottom:8px">'+n.kws.map(function(k){return '<span class="kw ro'+(has(k,all)?" used":"")+'">'+esc(k)+'</span>'}).join("")+'</div>':'')+
+          '<div class="meta"><span class="tag c1">'+(n.steps.length?done+"/"+n.steps.length+" adım":"Adımsız")+'</span><span>Oluşturuldu: '+fmt(n.c)+'</span></div></div>'});
+    }
+    $("an").textContent=list.length;
+    $("al").innerHTML=list.length?html:'<div class="empty">'+(q||(isQ&&aFilter!=="Hepsi")||(!isQ&&aStatus!=="all")?"Eşleşen kayıt bulunamadı.":"Burada henüz kayıt yok.")+'</div>';
+  }
+  $("af").onclick=function(e){
+    var c=e.target.closest("[data-ac]"), t=e.target.closest("[data-as]");
+    if(c){aFilter=c.getAttribute("data-ac");renderArchive()}
+    if(t){aStatus=t.getAttribute("data-as");renderArchive()}
+  };
+  $("al").onclick=function(e){
+    var q=e.target.closest("[data-qp]"), p=e.target.closest("[data-pn]");
+    if(q||p){var n0=byId(q?S.quick:S.plans,(q||p).getAttribute(q?"data-qp":"data-pn")); if(n0){n0.pin=!n0.pin;save();renderArchive()} return}
+    var vq=e.target.closest("[data-vq]"), vp=e.target.closest("[data-vp]");
+    if(vq)openPreview("quick",vq.getAttribute("data-vq")); else if(vp)openPreview("plan",vp.getAttribute("data-vp"));
+  };
 
-    <dialog id="graphModal">
-        <div class="modal-header">
-            <div class="logo"><h3>🌐 Zettelkasten Ağ Haritası</h3></div>
-            <button class="btn btn-danger btn-sm" onclick="document.getElementById('graphModal').close()">Kapat</button>
-        </div>
-        <div class="modal-body" style="padding: 10px; overflow: hidden; position:relative;">
-            <div style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:8px; text-align:center;">Pan: Sürükle | Zoom: Tekerlek (Bağlantısı çok olan notlar daha büyük görünür)</div>
-            <canvas id="graphCanvas"></canvas>
-        </div>
-    </dialog>
+  /* ---------- Ayarlar: kategoriler ---------- */
+  function renderCats(){
+    $("cl").innerHTML=S.cats.map(function(c){var g=c==="Genel";
+      return '<div class="catrow"><span class="dot '+ci(c)+'"></span><input data-cn="'+esc(c)+'" value="'+esc(c)+'" maxlength="20" aria-label="Kategori adı"'+(g?" disabled":"")+'><button class="ib del" data-cd="'+esc(c)+'" aria-label="Sil"'+(g?' disabled style="opacity:.3;pointer-events:none"':"")+'>'+ic("trash")+'</button></div>'}).join("");
+  }
+  $("cl").onchange=function(e){
+    var old=e.target.getAttribute("data-cn"); if(old===null)return;
+    var nv=e.target.value.trim();
+    if(!nv||nv===old){renderCats();return}
+    if(S.cats.some(function(c){return c!==old&&low(c)===low(nv)})){toast("Bu isimde bir kategori var");renderCats();return}
+    S.cats[S.cats.indexOf(old)]=nv; S.quick.forEach(function(n){if(n.cat===old)n.cat=nv});
+    if(aFilter===old)aFilter=nv; save();refresh();toast("Kategori adı güncellendi");
+  };
+  $("cl").onclick=function(e){
+    var d=e.target.closest("[data-cd]"); if(!d)return;
+    var c=d.getAttribute("data-cd"), b=JSON.stringify(S);
+    S.cats=S.cats.filter(function(x){return x!==c}); S.quick.forEach(function(n){if(n.cat===c)n.cat="Genel"});
+    save();refresh();toast("“"+c+"” silindi, notları Genel’e taşındı",function(){restore(b)});
+  };
+  function addCat(){
+    var v=$("nc").value.trim(); if(!v)return;
+    if(!S.cats.some(function(c){return low(c)===low(v)})){S.cats.push(v);save();toast("Kategori eklendi")}
+    $("nc").value=""; refresh();
+  }
+  $("ncb").onclick=addCat; $("nc").onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();addCat()}};
 
-    <dialog id="confirmModal">
-        <div class="modal-body">
-            <h3 id="confirmTitle" style="margin-bottom: 8px; font-size: 1rem;"></h3>
-            <p id="confirmMessage" style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 20px;"></p>
-            <div style="display: flex; gap: 8px; justify-content: center;">
-                <button class="btn" style="flex: 1;" onclick="uiHelpers.handleConfirm(false)">İptal</button>
-                <button class="btn" style="flex: 1;" id="confirmYesBtn" onclick="uiHelpers.handleConfirm(true)">Evet</button>
-            </div>
-        </div>
-    </dialog>
+  /* ---------- Ayarlar: şablonlar ---------- */
+  function tfType(){var p=$("tt").value==="plan";$("tfq").style.display=p?"none":"block";$("tfp").style.display=p?"block":"none";growAll()}
+  $("tt").onchange=tfType;
+  function resetT(){editT=null;["tn","tq","tg","ts","tb"].forEach(function(i){$(i).value=""});$("tt").value="quick";$("tcx").hidden=true;$("tsl").textContent="Şablonu kaydet";tfType()}
+  $("tcx").onclick=resetT;
+  $("tsv").onclick=function(){
+    var name=$("tn").value.trim(); if(!name){$("tn").focus();toast("Şablona bir ad ver");return}
+    var t={id:editT||uid(),name:name,type:$("tt").value,text:$("tq").value,goal:$("tg").value,steps:$("ts").value,notes:$("tb").value};
+    if(editT)S.tpls=S.tpls.map(function(x){return String(x.id)===String(t.id)?t:x}); else S.tpls.push(t);
+    resetT();save();refresh();toast("Şablon kaydedildi");
+  };
+  function renderTpls(){
+    $("tl").innerHTML=S.tpls.length?S.tpls.map(function(t){
+      return '<div class="note" style="cursor:default"><div class="meta"><b style="color:var(--ink);font-size:13px">'+esc(t.name)+'</b><span class="tag '+(t.type==="plan"?"c1":"c0")+'">'+(t.type==="plan"?"Strateji ve planlama":"Hızlı not")+'</span><span class="sp"></span><button class="ib" data-te="'+t.id+'" aria-label="Düzenle">'+ic("edit")+'</button><button class="ib del" data-td="'+t.id+'" aria-label="Sil">'+ic("trash")+'</button></div></div>'}).join(""):'<div class="empty">Henüz şablon yok.</div>';
+  }
+  $("tl").onclick=function(e){
+    var ed=e.target.closest("[data-te]"), d=e.target.closest("[data-td]");
+    if(ed){var t=byId(S.tpls,ed.getAttribute("data-te")); if(t){editT=t.id;$("tn").value=t.name;$("tt").value=t.type;$("tq").value=t.text;$("tg").value=t.goal;$("ts").value=t.steps;$("tb").value=t.notes;$("tcx").hidden=false;$("tsl").textContent="Güncelle";tfType();$("tn").focus()}}
+    if(d){var b=JSON.stringify(S);S.tpls=S.tpls.filter(function(x){return String(x.id)!==d.getAttribute("data-td")});save();refresh();toast("Şablon silindi",function(){restore(b)})}
+  };
 
-    <div id="toast-container"></div>
+  /* ---------- Ayarlar: dışa / içe aktarma ---------- */
+  function exportJson(){return JSON.stringify({app:"notlarim",version:2,cats:S.cats,quick:S.quick,plans:S.plans,tpls:S.tpls},null,2)}
+  function renderSettings(){renderCats();renderTpls();$("ex").value=exportJson()}
+  $("exc").onclick=function(){
+    var t=exportJson(), ok=false;
+    function fb(){try{$("ex").select();ok=document.execCommand("copy")}catch(e){} toast(ok?"Kopyalandı":"Kopyalanamadı, metni elle seçip kopyala")}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("Kopyalandı")},fb)}else fb();
+  };
+  $("exd").onclick=function(){
+    var data=exportJson(), name="notlarim-yedek.json";
+    function plain(){try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast("Yedek indiriliyor")}catch(e){toast("İndirme kullanılamıyor, Kopyala’yı dene")}}
+    if(window.claude&&claude.use){
+      claude.use("downloads").then(function(d){
+        if(!d)return plain();
+        d.save({filename:name,data:data}).then(function(){toast("Yedek kaydedildi")},function(er){if(!er||er.code!=="declined")toast("İndirme başarısız, Kopyala’yı dene")});
+      },plain);
+    }else plain();
+  };
+  function importText(txt){
+    var o; try{o=JSON.parse(txt)}catch(e){toast("Bu geçerli bir yedek metni değil");return}
+    if(!o||typeof o!=="object"){toast("Bu geçerli bir yedek metni değil");return}
+    var inc=norm(o), a=0,b=0,c=0;
+    inc.cats.forEach(function(x){if(!S.cats.some(function(y){return low(y)===low(x)}))S.cats.push(x)});
+    inc.quick.forEach(function(n){if(!byId(S.quick,n.id)){S.quick.push(n);a++}});
+    inc.plans.forEach(function(n){if(!byId(S.plans,n.id)){S.plans.push(n);b++}});
+    inc.tpls.forEach(function(n){if(!byId(S.tpls,n.id)){S.tpls.push(n);c++}});
+    S.quick.sort(function(x,y){return y.t-x.t});S.plans.sort(function(x,y){return y.t-x.t});
+    save();$("im").value="";refresh();toast(a+" hızlı not, "+b+" strateji, "+c+" şablon eklendi");
+  }
+  $("imb").onclick=function(){var v=$("im").value.trim(); if(!v){$("im").focus();toast("Önce yedek metnini yapıştır");return} importText(v)};
+  $("imfb").onclick=function(){$("imf").click()};
+  $("imf").onchange=function(){
+    var f=this.files&&this.files[0]; if(!f)return; var rd=new FileReader();
+    rd.onload=function(){importText(String(rd.result))}; rd.onerror=function(){toast("Dosya okunamadı")}; rd.readAsText(f); this.value="";
+  };
 
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyDvkn0pkYJPMNcnUYEaFElyrFUOmEumD30", authDomain: "gergininekler11.firebaseapp.com", databaseURL: "https://gergininekler11-default-rtdb.firebaseio.com", projectId: "gergininekler11", storageBucket: "gergininekler11.firebasestorage.app", messagingSenderId: "75194866682", appId: "1:75194866682:web:d390dc7fea8bd47fbde243", measurementId: "G-1F3HZ9EPDJ" };
-        firebase.initializeApp(firebaseConfig); const cloudDB = firebase.database();
+  /* ---------- Hızlı not -> adım ---------- */
+  var cv=null;
+  function items(t){return String(t||"").split("\n").map(function(l){return l.replace(/^\s*([•\-*–]|\d+[.)])\s+/,"").trim()}).filter(Boolean)}
+  function openCv(o){
+    if(!o.pick&&!items(o.text).length){toast("Notta dönüştürülecek satır yok");return}
+    cv={text:o.text||"",noteId:o.noteId||null,pick:!!o.pick};
+    renderCv();$("cv").classList.add("on");
+  }
+  function closeCv(){$("cv").classList.remove("on");cv=null}
+  function draftHas(){return editP||$("pt").value.trim()||$("pg").value.trim()||$("pb").value.trim()||steps.some(function(x){return x.t.trim()})}
+  function renderCv(){
+    if(!cv)return;
+    var its=items(cv.text), h='<div class="pvh"><b style="font-size:15px">Adımlara çevir</b><span style="flex:1"></span><button class="ib" data-cvx aria-label="Kapat">'+ic("x")+'</button></div>';
+    if(cv.pick)h+='<div class="lbl" style="margin-top:0">Hızlı not seç</div><div class="field"><svg class="ic"><use href="#i-zap"/></svg><select id="cvn"><option value="">Not seç…</option>'+S.quick.map(function(n){return '<option value="'+n.id+'"'+(String(n.id)===String(cv.noteId)?" selected":"")+'>'+esc((n.text.split("\n")[0]||"(boş)").slice(0,50))+'</option>'}).join("")+'</select></div>';
+    h+='<div class="lbl">Eklenecek maddeler (her satır bir adım olur)</div>'+(its.length?its.map(function(t,i){return '<label class="cvr"><input type="checkbox" data-cvi="'+i+'" checked><span>'+esc(t)+'</span></label>'}).join(""):'<div class="empty">Önce bir not seç.</div>');
+    if(!cv.pick){
+      var o='';
+      if(draftHas())o+='<option value="draft">'+(editP?"Açık kayıt: "+esc(($("pt").value.trim()||"Başlıksız").slice(0,30)):"Açık strateji taslağı")+'</option>';
+      o+='<option value="new">Yeni strateji kaydı</option>'+S.plans.filter(function(p){return String(p.id)!==String(editP)}).map(function(p){return '<option value="'+p.id+'">'+esc(p.title.slice(0,40))+'</option>'}).join("");
+      h+='<div class="lbl">Nereye eklensin?</div><div class="field"><svg class="ic"><use href="#i-plan"/></svg><select id="cvt">'+o+'</select></div>';
+    }
+    if(cv.noteId)h+='<label class="cvr" style="margin-top:8px"><input type="checkbox" id="cvr"><span>Dönüşünce hızlı notu arşivden kaldır</span></label>';
+    h+='<div class="pvf"><button class="btn soft" data-cvx>Vazgeç</button><button class="btn pri" data-cvok style="--acc:#6E9372">'+ic("check")+'Adımlara ekle</button></div>';
+    $("cvs").innerHTML=h;
+  }
+  $("cv").onclick=function(e){
+    if(e.target===$("cv")||e.target.closest("[data-cvx]"))return closeCv();
+    if(e.target.closest("[data-cvok]"))applyCv();
+  };
+  $("cv").onchange=function(e){
+    if(cv&&e.target.id==="cvn"){var n=byId(S.quick,e.target.value);cv.noteId=n?n.id:null;cv.text=n?n.text:"";renderCv()}
+  };
+  function applyCv(){
+    if(!cv)return;
+    var all=items(cv.text), picked=[];
+    document.querySelectorAll("#cvs [data-cvi]").forEach(function(c){if(c.checked)picked.push(all[+c.getAttribute("data-cvi")])});
+    if(!picked.length){toast("En az bir madde seç");return}
+    var tgt=cv.pick?"draft":$("cvt").value, rm=!!($("cvr")&&$("cvr").checked&&cv.noteId), noteId=cv.noteId, b=JSON.stringify(S), now=Date.now(), msg;
+    var add=picked.map(function(t){return {t:t,d:false}});
+    if(tgt==="draft"){
+      steps=steps.filter(function(x){return x.t.trim()}).concat(add); msg=picked.length+" adım taslağa eklendi, Kaydet’e basmayı unutma";
+    }else if(tgt==="new"){
+      var np={id:uid(),title:"Yeni strateji (hızlı nottan)",goal:"",steps:add,notes:"",clean:"",kws:[],pin:false,c:now,t:now};
+      S.plans.unshift(np);setLast("plan",np.id);msg="Yeni strateji kaydı oluşturuldu";
+    }else{
+      var p=byId(S.plans,tgt); if(!p)return;
+      p.steps=p.steps.concat(add);p.t=now;setLast("plan",p.id);msg=picked.length+" adım “"+p.title+"” kaydına eklendi";
+    }
+    if(rm){
+      S.quick=S.quick.filter(function(n){return String(n.id)!==String(noteId)});
+      if(S.last&&String(S.last.id)===String(noteId))S.last=null;
+      if(editQ&&String(editQ)===String(noteId))resetQ();
+      msg+="; hızlı not kaldırıldı";
+    }
+    closeCv();save();
+    if(tgt==="draft"){go("plan");renderSteps();updKw()}else refresh();
+    toast(msg,(tgt!=="draft"||rm)?function(){restore(b)}:null);
+  }
 
-        const firebaseManager = {
-            backup: async () => {
-                try { await cloudDB.ref('chimptopus_data/user_default').set({ notes: state.notes, folders: state.folders }); uiHelpers.showToast('Buluta yedeklendi! ☁️', 'success'); }
-                catch (error) { uiHelpers.showToast('Hata: Firebase Kurallarını Açın!', 'danger'); }
-            },
-            restore: () => {
-                uiHelpers.showConfirm("Geri Yükle", "Buluttaki veriler cihazındakilerin üzerine yazılacak. Emin misin?", async (res) => {
-                    if(!res) return;
-                    try {
-                        const snapshot = await cloudDB.ref('chimptopus_data/user_default').once('value'); const data = snapshot.val();
-                        if(data) { state.notes = data.notes || []; state.folders = data.folders || [{id: 'genel', name: 'Genel'}]; db.save(); uiHelpers.showToast('Veriler çekildi. Yenileniyor...', 'success'); setTimeout(() => location.reload(), 1000); }
-                        else { uiHelpers.showToast('Yedek bulunamadı.', 'danger'); }
-                    } catch (error) { uiHelpers.showToast('Hata: Firebase Kurallarını Açın!', 'danger'); }
-                });
-            }
-        };
+  /* ---------- Önizleme ---------- */
+  var pv=null;
+  function openPreview(type,id){if(!byId(type==="plan"?S.plans:S.quick,id))return;pv={type:type,id:id};renderPreview();$("pv").classList.add("on")}
+  function closePreview(){$("pv").classList.remove("on");pv=null}
+  function renderPreview(){
+    if(!pv)return;
+    var isP=pv.type==="plan", n=byId(isP?S.plans:S.quick,pv.id); if(!n){closePreview();return}
+    var h='<div class="pvh"><span class="tag '+(isP?"c1":ci(n.cat))+'">'+(isP?"Strateji ve planlama":esc(n.cat))+'</span><span style="flex:1"></span><button class="ib" data-pvx aria-label="Kapat">'+ic("x")+'</button></div>';
+    if(isP){
+      var all=n.title+" "+n.goal+" "+n.notes+" "+n.clean+" "+n.steps.map(function(s){return s.t}).join(" ");
+      h+='<h2 class="pvt">'+esc(n.title)+'</h2><div class="cr" style="margin:0 0 4px">'+esc(created(n))+'</div>';
+      if(n.goal)h+='<div class="sec"><h4>Hedef ve amaç</h4><p>'+esc(n.goal)+'</p></div>';
+      if(n.steps.length)h+='<div class="sec"><h4>Adımlar</h4>'+n.steps.map(function(s,i){return '<div class="pst'+(s.d?" d":"")+'" data-pst="'+i+'"><span class="bx">'+(s.d?ic("check"):"")+'</span><span><b>Adım '+pad(i+1)+'</b> '+esc(s.t)+'</span></div>'}).join("")+'</div>';
+      if(n.notes)h+='<div class="sec"><h4>Notlar (taslak)</h4><p>'+esc(n.notes)+'</p></div>';
+      if(n.clean)h+='<div class="sec"><h4>Temiz not</h4><p>'+esc(n.clean)+'</p></div>';
+      if(n.kws.length)h+='<div class="chips" style="margin-top:10px">'+n.kws.map(function(k){return '<span class="kw ro'+(has(k,all)?" used":"")+'">'+esc(k)+'</span>'}).join("")+'</div>';
+    }else{
+      h+='<div class="cr" style="margin:0 0 8px">'+esc(created(n))+'</div><p class="pvbody">'+esc(n.text)+'</p>';
+    }
+    if(!isP)h+='<button class="btn soft" data-pvs style="width:100%;margin-top:12px">'+ic("list")+'Stratejiye adım olarak ekle</button>';
+    h+='<div class="pvf"><button class="btn ico rose" data-pvd aria-label="Sil">'+ic("trash")+'</button><button class="btn ico soft'+(n.pin?" on":"")+'" data-pvp aria-label="Sabitle">'+ic("star")+'</button><button class="btn soft" data-pvc>'+ic("copy")+'Kopyala</button><button class="btn pri" data-pve style="--acc:'+(isP?"#6E9372":"#B8815F")+'">'+ic("edit")+'Düzenle</button></div>';
+    $("sheet").innerHTML=h;
+  }
+  $("pv").onclick=function(e){
+    if(e.target===$("pv"))return closePreview();
+    if(!pv)return;
+    var t=e.target, p=pv, isP=p.type==="plan", n=byId(isP?S.plans:S.quick,p.id); if(!n)return;
+    if(t.closest("[data-pvx]"))return closePreview();
+    if(t.closest("[data-pvs]")&&!isP){closePreview();return openCv({text:n.text,noteId:n.id})}
+    if(t.closest("[data-pve]")){closePreview();return isP?openPlan(p.id):openQuick(p.id)}
+    if(t.closest("[data-pvd]")){closePreview();return removeWithUndo(p.type,p.id,isP?"Kayıt silindi":"Not silindi")}
+    if(t.closest("[data-pvp]")){n.pin=!n.pin;save();renderPreview();renderArchive();return}
+    if(t.closest("[data-pvc]"))return copyText(isP?(n.clean||n.notes||n.goal):n.text);
+    var st=t.closest("[data-pst]");
+    if(st&&isP){var s0=n.steps[+st.getAttribute("data-pst")]; if(s0){s0.d=!s0.d;n.t=Date.now();save();renderPreview();renderArchive();renderWeek()}}
+  };
+  $("last").onclick=function(e){if(e.target.closest("#cont")||!S.last)return;if(e.target.closest(".note"))openPreview(S.last.type,S.last.id)};
 
-        const colors = ['#007AFF', '#FF3B30', '#34C759', '#AF52DE', '#FF9500'];
-        const themes = ['light', 'dark', 'apple', 'matrix', 'literature', 'win95'];
-        const themeNames = { 'light':'Modern Açık', 'dark':'Modern Koyu', 'apple':'Apple Minimal', 'matrix':'Matrix Hacker', 'literature':'Edebiyat', 'win95':'Windows 95' };
-        
-        const state = { 
-            notes: JSON.parse(localStorage.getItem('ch_notes')) || [], folders: JSON.parse(localStorage.getItem('ch_folders')) || [{id: 'genel', name: 'Genel'}], 
-            currentId: null, currentDisplayId: null, currentTag: 'Makale', currentFolderId: 'genel', currentIcon: '📄',
-            dbActiveFolder: 'genel', previewActiveNoteId: null,
-            isSelectionMode: false, selectedNotes: new Set()
-        };
+  /* ---------- Haftalık özet ---------- */
+  function renderWeek(){
+    var day=864e5, now=new Date(); now.setHours(0,0,0,0);
+    var days=[],i; for(i=6;i>=0;i--)days.push({d:new Date(now.getTime()-i*day),n:0});
+    var start=days[0].d.getTime(), q=0,p=0,st=0,cats={};
+    function slot(t){return days[Math.max(0,Math.min(6,Math.floor((t-start)/day)))]}
+    S.quick.forEach(function(n){if(n.c>=start){q++;cats[n.cat]=(cats[n.cat]||0)+1;slot(n.c).n++}});
+    S.plans.forEach(function(n){if(n.c>=start){p++;slot(n.c).n++} if(n.t>=start)st+=n.steps.filter(function(s){return s.d}).length});
+    var top="",tc=0; Object.keys(cats).forEach(function(k){if(cats[k]>tc){tc=cats[k];top=k}});
+    var mx=Math.max.apply(null,days.map(function(x){return x.n}).concat([1]));
+    $("week").innerHTML='<div class="wk">'+days.map(function(x,j){return '<div class="'+(j===6?"today":"")+'"><i style="height:'+Math.max(4,Math.round(x.n/mx*40))+'px"></i><span>'+x.d.toLocaleDateString("tr-TR",{weekday:"short"})+'</span></div>'}).join("")+'</div>'+
+      '<div class="stats"><div class="stat"><b>'+q+'</b><small>Hızlı not</small></div><div class="stat"><b>'+p+'</b><small>Strateji</small></div><div class="stat"><b>'+st+'</b><small>Biten adım</small></div></div>'+
+      '<p class="prog" style="margin-top:10px">'+(q+p===0?"Bu hafta henüz not yok.":(top?"En çok not aldığın kategori: <b>"+esc(top)+"</b>":""))+'</p>';
+  }
 
-        const uiHelpers = {
-            switchPage: (num) => { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(`stage${num}`).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); },
-            selectTag: (element, tag) => { document.querySelectorAll('#sourceTagGroup .chip').forEach(c => c.classList.remove('active')); element.classList.add('active'); state.currentTag = tag; db.saveDraft(); },
-            selectFolder: (fid) => { state.currentFolderId = fid; appController.renderFolderSelect(); },
-            toggleIconPicker: () => { const menu = document.getElementById('iconPickerMenu'); menu.style.display = menu.style.display === 'grid' ? 'none' : 'grid'; },
-            selectIcon: (icon) => { state.currentIcon = icon; document.getElementById('currentIconBtn').innerText = icon; document.getElementById('iconPickerMenu').style.display = 'none'; db.saveDraft(); },
-            escapeHtml: (unsafe) => (unsafe || '').replace(/[&<"'>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])),
-            updateBadge: () => { const badge = document.getElementById('activeNoteBadge'); if(state.currentDisplayId) { badge.innerText = state.currentDisplayId; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } },
-            formatDate: (iso) => { const d = new Date(iso); return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }); },
-            toggleCores: () => { document.getElementById('coreChecklist').classList.toggle('hidden'); },
-            showToast: (msg, type = 'success') => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerText = msg; c.appendChild(t); setTimeout(() => t.classList.add('show'), 10); setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000); },
-            confirmCallback: null,
-            showConfirm: (title, message, callback, isDanger=true) => { document.getElementById('confirmTitle').innerText = title; document.getElementById('confirmMessage').innerText = message; const btn = document.getElementById('confirmYesBtn'); btn.className = isDanger ? 'btn btn-danger' : 'btn btn-primary'; uiHelpers.confirmCallback = callback; document.getElementById('confirmModal').showModal(); },
-            handleConfirm: (res) => { document.getElementById('confirmModal').close(); if(uiHelpers.confirmCallback) uiHelpers.confirmCallback(res); },
-            copyToClipboard: () => { const note = db.getNote(state.previewActiveNoteId); if(!note) return; const text = note.synthesis || note.source; navigator.clipboard.writeText(text).then(() => uiHelpers.showToast('Metin kopyalandı!')) .catch(() => uiHelpers.showToast('Kopyalama başarısız.', 'danger')); }
-        };
+  /* ---------- Temiz not ---------- */
+  $("pcf").onclick=function(){
+    var d=$("pb").value.trim(); if(!d){toast("Önce taslak notu yaz");return}
+    var c=$("pcl").value.trim(); $("pcl").value=c?c+"\n\n"+d:d; growAll();updKw();
+    toast(c?"Taslak temiz notun sonuna eklendi":"Taslak temiz nota aktarıldı");
+  };
+  $("pcc").onclick=function(){copyText($("pcl").value||$("pb").value)};
 
-        const db = {
-            save: () => { localStorage.setItem('ch_notes', JSON.stringify(state.notes)); localStorage.setItem('ch_folders', JSON.stringify(state.folders)); appController.renderActiveShelf(); },
-            getNote: (id) => state.notes.find(n => n.id === id),
-            getNoteByDisplayId: (did) => state.notes.find(n => n.displayId === did),
-            getBacklinks: (id) => state.notes.filter(n => n.links && n.links.includes(id)),
-            generateDisplayId: () => { const used = state.notes.map(n => parseInt(n.displayId.replace('#', ''))).filter(n => !isNaN(n)).sort((a,b)=>a-b); let next = 1; for (let i = 0; i < used.length; i++) { if (used[i] === next) next++; else break; } return '#' + String(next).padStart(4, '0'); },
-            saveDraft: () => {
-                const source = document.getElementById('sourceText').value.trim(); const title = document.getElementById('noteTitle') ? document.getElementById('noteTitle').value.trim() : '';
-                if (!source && !title) return;
-                if (!state.currentId) { state.currentId = Date.now().toString(); state.currentDisplayId = db.generateDisplayId(); state.notes.unshift({ id: state.currentId, displayId: state.currentDisplayId, title, source, tag: state.currentTag, icon: state.currentIcon, cores: [], synthesis: '', status: 'active', folderId: state.currentFolderId, links: [], date: new Date().toISOString() });
-                } else { const note = db.getNote(state.currentId); note.source = source; note.tag = state.currentTag; note.title = title; note.icon = state.currentIcon; }
-                uiHelpers.updateBadge(); db.save();
-            },
-            deleteNote: (id) => {
-                uiHelpers.showConfirm("İstasyonu Sil", "Bu istasyonu kalıcı olarak silmek istediğine emin misin?", (res) => {
-                    if(res) { state.notes = state.notes.filter(n => n.id !== id); if(state.currentId === id) appController.startNewNote(); state.notes.forEach(n => { if(n.links) n.links = n.links.filter(lid => lid !== id); }); db.save(); document.getElementById('previewModal').close(); dbManager.renderGrid(); appController.renderRecentActivities(); uiHelpers.showToast("İstasyon silindi."); }
-                });
-            }
-        };
+  /* ---------- Açılır kapanır bölümler ---------- */
+  document.querySelectorAll("#v-home .card,#v-quick .card,#v-plan .card:not(.savebar),#v-settings .card").forEach(function(c){
+    var h=c.querySelector(":scope > .ch"); if(!h)return;
+    c.classList.add("fold"); h.setAttribute("role","button"); h.setAttribute("tabindex","0"); h.setAttribute("aria-expanded","true");
+    h.insertAdjacentHTML("beforeend",'<span class="chev">'+ic("chev")+'</span>');
+    function tg(){var cl=c.classList.toggle("closed");h.setAttribute("aria-expanded",cl?"false":"true");if(!cl)growAll()}
+    h.addEventListener("click",tg);
+    h.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&e.target===h){e.preventDefault();tg()}});
+  });
 
-        const promptEngine = {
-            prompts: [
-                "Bu fikrin tam tersi doğru olsaydı, dünya nasıl bir yer olurdu?", "Bu karmaşık konuyu 5 yaşındaki bir çocuğa 3 cümlede nasıl anlatırdın?", "10 yıl sonra bu yazdıklarına dönüp baksan, neyi komik veya hatalı bulursun?", "Bu konunun günlük hayatımızdaki en basit, en somut örneği nedir?", "Eğer bu konuyu bir romanın içine yerleştirseydin, ana karakter bu bilgiyle ne yapardı?",
-                "Bu anlattığın kuralın/fikrin kesinlikle işe yaramayacağı en bariz istisna nedir?", "Acaba burada bir şeyi gözden kaçırıyor olabilir misin? Madalyonun görünmeyen yüzünde ne var?", "Bütün bu yazdıklarını tek bir atasözü veya deyimle özetleseydin bu ne olurdu?", "Okuyucu bu yazıyı okudu ve bitirdi. Ee, sonra? Bu bilgi onun hayatında neyi değiştirecek?", "Yarın sabah bu fikri uygulamaya geçirmek istesek, atacağımız o 'ilk küçük adım' ne olurdu?",
-                "Bu konuyu okurken insanların en çok sıkıldığı kısım neresi? Orayı nasıl eğlenceli yaparsın?", "Bu durumu doğadaki (hayvanlar/bitkiler alemindeki) hangi olaya benzetebilirsin?", "Bunu bir uzaylıya açıklaman gerekseydi, nereden başlardın?", "En güvendiğin argümanının aslında bir safsata olma ihtimali var mı?", "Eğer bu yazıyı sadece 50 kelimeyle yazmak zorunda kalsaydın, hangi kısımları atardın?"
-            ],
-            showPrompt: () => { const bubble = document.getElementById('promptBubble'); const randomP = promptEngine.prompts[Math.floor(Math.random() * promptEngine.prompts.length)]; bubble.innerText = `⚡ ${randomP}`; bubble.style.display = 'block'; setTimeout(() => { bubble.style.display = 'none'; }, 10000); }
-        };
-
-        const metricsEngine = { update: () => { const text = document.getElementById('finalText').value; const words = text.trim().split(/\s+/).filter(w => w.length > 0).length; const readTime = Math.ceil(words / 200); document.getElementById('liveMetrics').innerText = `${words} Kelime | Yaklaşık ${readTime} dk okuma`; } };
-
-        const graphEngine = {
-            nodes: [], scale: 1, offsetX: 0, offsetY: 0, isDragging: false, lastX: 0, lastY: 0, ctx: null, canvas: null,
-            open: () => {
-                const modal = document.getElementById('graphModal'); modal.showModal();
-                graphEngine.canvas = document.getElementById('graphCanvas');
-                graphEngine.ctx = graphEngine.canvas.getContext('2d');
-                graphEngine.canvas.width = graphEngine.canvas.parentElement.clientWidth - 20;
-                graphEngine.canvas.height = 380;
-                graphEngine.scale = 1; graphEngine.offsetX = 0; graphEngine.offsetY = 0;
-                
-                graphEngine.canvas.onmousedown = e => { graphEngine.isDragging = true; graphEngine.lastX = e.offsetX; graphEngine.lastY = e.offsetY; };
-                graphEngine.canvas.onmousemove = e => { if(graphEngine.isDragging) { graphEngine.offsetX += e.offsetX - graphEngine.lastX; graphEngine.offsetY += e.offsetY - graphEngine.lastY; graphEngine.lastX = e.offsetX; graphEngine.lastY = e.offsetY; graphEngine.render(); } };
-                graphEngine.canvas.onmouseup = () => graphEngine.isDragging = false;
-                graphEngine.canvas.onmouseleave = () => graphEngine.isDragging = false;
-                
-                graphEngine.canvas.ontouchstart = e => { graphEngine.isDragging = true; graphEngine.lastX = e.touches[0].clientX; graphEngine.lastY = e.touches[0].clientY; };
-                graphEngine.canvas.ontouchmove = e => { if(graphEngine.isDragging) { graphEngine.offsetX += e.touches[0].clientX - graphEngine.lastX; graphEngine.offsetY += e.touches[0].clientY - graphEngine.lastY; graphEngine.lastX = e.touches[0].clientX; graphEngine.lastY = e.touches[0].clientY; graphEngine.render(); } };
-                graphEngine.canvas.ontouchend = () => graphEngine.isDragging = false;
-
-                graphEngine.canvas.onwheel = e => { e.preventDefault(); const zoom = e.deltaY > 0 ? 0.9 : 1.1; graphEngine.scale *= zoom; graphEngine.render(); };
-                
-                graphEngine.computePhysics();
-            },
-            computePhysics: () => {
-                const w = graphEngine.canvas.width; const h = graphEngine.canvas.height;
-                graphEngine.nodes = state.notes.map(n => {
-                    const bl = db.getBacklinks(n.id).length; const fl = n.links ? n.links.length : 0;
-                    return { id: n.id, display: n.displayId, title: n.title || n.tag, size: 6 + (bl + fl) * 1.5, links: n.links || [], x: Math.random()*w, y: Math.random()*h, vx: 0, vy: 0 };
-                });
-                
-                for(let i=0; i<150; i++) {
-                    graphEngine.nodes.forEach(n1 => {
-                        graphEngine.nodes.forEach(n2 => {
-                            if(n1 === n2) return;
-                            const dx = n2.x - n1.x; const dy = n2.y - n1.y; const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-                            if(dist < 100) { n1.vx -= (dx/dist)*0.8; n1.vy -= (dy/dist)*0.8; } 
-                            if(n1.links.includes(n2.id) || n2.links.includes(n1.id)) { n1.vx += (dx/dist)*0.3; n1.vy += (dy/dist)*0.3; } 
-                        });
-                        n1.vx += (w/2 - n1.x) * 0.01; n1.vy += (h/2 - n1.y) * 0.01; 
-                    });
-                    graphEngine.nodes.forEach(n => { n.x += n.vx; n.y += n.vy; n.vx*=0.8; n.vy*=0.8; n.x = Math.max(20, Math.min(w-20, n.x)); n.y = Math.max(20, Math.min(h-20, n.y)); });
-                }
-                graphEngine.render();
-            },
-            render: () => {
-                const ctx = graphEngine.ctx; ctx.clearRect(0, 0, graphEngine.canvas.width, graphEngine.canvas.height);
-                ctx.save(); ctx.translate(graphEngine.offsetX, graphEngine.offsetY); ctx.scale(graphEngine.scale, graphEngine.scale);
-                
-                ctx.strokeStyle = "rgba(150,150,150,0.3)"; ctx.lineWidth = 1.5;
-                graphEngine.nodes.forEach(n => { n.links.forEach(lid => { const target = graphEngine.nodes.find(tn => tn.id === lid); if(target) { ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(target.x, target.y); ctx.stroke(); } }); });
-                
-                ctx.textAlign = "center";
-                graphEngine.nodes.forEach(n => {
-                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#007AFF';
-                    ctx.beginPath(); ctx.arc(n.x, n.y, n.size, 0, 2*Math.PI); ctx.fill();
-                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#000';
-                    ctx.font = "bold 9px Inter"; ctx.fillText(n.display, n.x, n.y - n.size - 10);
-                    ctx.font = "8px Inter"; ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() || '#666';
-                    ctx.fillText((n.title.length > 15 ? n.title.substring(0,15)+'...' : n.title), n.x, n.y - n.size - 2);
-                });
-                ctx.restore();
-            }
-        };
-
-        const aiEngine = {
-            stopWords: ['ve', 'veya', 'ile', 'ama', 'fakat', 'lakin', 'bir', 'bu', 'şu', 'o', 'için', 'gibi', 'kadar', 'da', 'de', 'mı', 'mi', 'çok', 'en', 'daha', 'ise', 'ki', 'göre', 'diye'],
-            getKeywords: (text) => { if(!text) return []; return text.toLowerCase().replace(/[.,!?;:()]/g, '').split(/\s+/).filter(w => w.length > 2 && !aiEngine.stopWords.includes(w)); },
-            findSuggestions: () => {
-                const currentText = document.getElementById('finalText').value + " " + document.getElementById('noteTitle').value;
-                const keywords = aiEngine.getKeywords(currentText);
-                const panel = document.getElementById('smartSuggestionPanel'); const list = document.getElementById('smartSuggestionsList');
-                if(keywords.length < 3) { panel.style.display = 'none'; return; }
-                let scoredNotes = state.notes.map(n => {
-                    if(n.id === state.currentId) return {note: n, score: 0, matched: []};
-                    const nText = (n.synthesis + " " + n.source + " " + n.title).toLowerCase();
-                    let score = 0; let matched = [];
-                    keywords.forEach(kw => { if(nText.includes(kw)) { score++; if(!matched.includes(kw)) matched.push(kw); } });
-                    return {note: n, score, matched};
-                }).filter(item => item.score > 1).sort((a,b) => b.score - a.score).slice(0, 3); 
-
-                if(scoredNotes.length > 0) {
-                    panel.style.display = 'block';
-                    list.innerHTML = scoredNotes.map(sn => `<div class="suggestion-item" onclick="document.getElementById('linkInput').value = '${sn.note.displayId}'; appController.addLink(); uiHelpers.showToast('Öneri Eklendi!')"><div style="display:flex; justify-content:space-between; width:100%;"><div><span style="font-weight:600;">${sn.note.displayId}</span> <span style="opacity:0.8;">${uiHelpers.escapeHtml(sn.note.title || sn.note.tag)}</span></div><span style="color:var(--accent);">+ Ekle</span></div><div class="matched-words">Uyumlu: ${sn.matched.join(', ')}</div></div>`).join('');
-                } else { panel.style.display = 'none'; }
-            }
-        };
-
-        function initSettings() {
-            const savedColor = localStorage.getItem('ch_accent') || '#007AFF'; document.documentElement.style.setProperty('--accent', savedColor);
-            const picker = document.getElementById('colorPicker');
-            colors.forEach(c => { const dot = document.createElement('div'); dot.className = `color-dot ${savedColor === c ? 'active' : ''}`; dot.style.backgroundColor = c; dot.onclick = () => { document.documentElement.style.setProperty('--accent', c); localStorage.setItem('ch_accent', c); document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active')); dot.classList.add('active'); }; picker.appendChild(dot); });
-            const savedTheme = localStorage.getItem('ch_theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme); 
-        }
-        function cycleTheme() { let current = document.documentElement.getAttribute('data-theme'); let idx = themes.indexOf(current); if(idx === -1) idx = 0; let next = themes[(idx + 1) % themes.length]; document.documentElement.setAttribute('data-theme', next); localStorage.setItem('ch_theme', next); uiHelpers.showToast('Tema: ' + themeNames[next], 'success'); }
-
-        const appController = {
-            init: () => { initSettings(); appController.renderActiveShelf(); appController.renderFolderSelect(); uiHelpers.updateBadge(); },
-            autoSaveDraft: () => { db.saveDraft(); },
-            handleSynthesisInput: () => { db.saveDraft(); aiEngine.findSuggestions(); metricsEngine.update(); }, 
-            startNewNote: () => {
-                state.currentId = null; state.currentDisplayId = null; state.currentIcon = '📄'; document.getElementById('currentIconBtn').innerText = '📄';
-                document.getElementById('sourceText').value = ''; document.getElementById('finalText').value = ''; document.getElementById('noteTitle').value = '';
-                document.getElementById('smartSuggestionPanel').style.display = 'none'; document.getElementById('liveMetrics').innerText = '0 Kelime | 0 dk';
-                uiHelpers.updateBadge(); uiHelpers.switchPage(1);
-            },
-            
-            deriveNewNote: () => {
-                const note = db.getNote(state.previewActiveNoteId); if(!note) return;
-                const text = note.synthesis || note.source;
-                document.getElementById('previewModal').close();
-                appController.startNewNote();
-                document.getElementById('sourceText').value = text;
-                uiHelpers.showToast('Yeni istasyon olarak türetildi!');
-            },
-
-            openRandomNote: () => { const archived = state.notes.filter(n => n.status === 'archived'); if(archived.length === 0) return uiHelpers.showToast('Henüz tamamlanmış istasyon yok.', 'danger'); const randomNote = archived[Math.floor(Math.random() * archived.length)]; dbManager.openPreview(randomNote.id); uiHelpers.showToast(`🎲 Rastgele: ${randomNote.displayId} açıldı.`); },
-            nextToStage2: () => { db.saveDraft(); const note = db.getNote(state.currentId); if (!note || !note.source) return uiHelpers.showToast('Önce kaynak metin girin.', 'danger'); document.getElementById('sourcePreview').innerHTML = uiHelpers.escapeHtml(note.source).replace(/\n/g, '<br>'); appController.renderCores(); uiHelpers.switchPage(2); },
-            addCoreBlock: (val = "") => { const list = document.getElementById('coresList'); const div = document.createElement('div'); div.className = 'core-item'; div.innerHTML = `<textarea class="glass" placeholder="Çekirdek fikir...">${uiHelpers.escapeHtml(val)}</textarea><button class="btn btn-icon-only" style="color:var(--danger); padding:8px;" onclick="this.parentElement.remove()">✕</button>`; list.prepend(div); if(val === "") div.querySelector('textarea').focus(); },
-            renderCores: () => { document.getElementById('coresList').innerHTML = ''; const note = db.getNote(state.currentId); if (note.cores && note.cores.length > 0) [...note.cores].reverse().forEach(c => appController.addCoreBlock(c)); else appController.addCoreBlock(); },
-            nextToStage3: () => {
-                const coreNodes = document.querySelectorAll('#coresList textarea'); const cores = Array.from(coreNodes).map(n => n.value.trim()).filter(v => v !== ""); const note = db.getNote(state.currentId); note.cores = cores; db.save();
-                const checklist = document.getElementById('coreChecklist'); checklist.innerHTML = cores.length === 0 ? '<div style="opacity:0.5; font-size:0.8rem; padding: 6px;">Çekirdek yok.</div>' : cores.map(c => `<label class="check-item"><input type="checkbox"><span>${uiHelpers.escapeHtml(c)}</span></label>`).join('');
-                document.getElementById('finalText').value = note.synthesis || ''; document.getElementById('noteTitle').value = note.title || ''; document.getElementById('currentIconBtn').innerText = note.icon || '📄';
-                appController.renderFolderSelect(); appController.renderLinks(); appController.renderRecentActivities(); metricsEngine.update(); aiEngine.findSuggestions(); uiHelpers.switchPage(3);
-            },
-            archiveNote: () => { const note = db.getNote(state.currentId); note.title = document.getElementById('noteTitle').value.trim(); note.synthesis = document.getElementById('finalText').value.trim(); note.folderId = state.currentFolderId; note.status = 'archived'; db.save(); uiHelpers.showToast('Sentez arşivlendi!'); appController.startNewNote(); },
-            loadNoteForEdit: (id) => {
-                const note = db.getNote(id); if (!note) return;
-                state.currentId = note.id; state.currentDisplayId = note.displayId; state.currentFolderId = note.folderId || 'genel'; state.currentIcon = note.icon || '📄';
-                document.getElementById('sourceText').value = note.source; document.getElementById('noteTitle').value = note.title || ''; document.getElementById('currentIconBtn').innerText = state.currentIcon;
-                uiHelpers.updateBadge(); document.querySelectorAll('#sourceTagGroup .chip').forEach(c => { c.classList.remove('active'); if(c.innerText === note.tag) c.classList.add('active'); }); state.currentTag = note.tag;
-                document.getElementById('dbModal').close(); document.getElementById('previewModal').close(); uiHelpers.switchPage(1);
-            },
-            renderActiveShelf: () => {
-                const shelf = document.getElementById('activeNotesShelf'); const actives = state.notes.filter(n => n.status === 'active');
-                let html = `<div class="card new-card glass" onclick="appController.startNewNote()"><div style="font-size: 1.5rem; margin-bottom: 2px;">+</div><div style="font-size: 0.7rem; font-weight: 600;">Yeni İstasyon</div></div>`;
-                html += actives.map(n => {
-                    const totalLinks = (n.links ? n.links.length : 0) + db.getBacklinks(n.id).length;
-                    const linkBadge = totalLinks > 0 ? `<span style="font-size:0.6rem; color:var(--accent); font-weight:600; margin-left:4px;">🔗 ${totalLinks}</span>` : '';
-                    return `<div class="card glass" onclick="dbManager.openPreview('${n.id}')"><div style="display:flex; justify-content:space-between; align-items:center;"><span class="card-tag">${n.tag}</span><div><span style="font-size:0.6rem; color:var(--text-secondary);">${n.displayId}</span>${linkBadge}</div></div><div class="card-title">${n.icon||'📄'} ${uiHelpers.escapeHtml(n.title || 'Başlıksız')}</div><div class="card-content">${uiHelpers.escapeHtml(n.source)}</div></div>`;
-                }).join(''); shelf.innerHTML = html;
-            },
-            renderFolderSelect: () => { document.getElementById('folderSelectGroup').innerHTML = state.folders.map(f => `<div class="chip ${f.id === state.currentFolderId ? 'active' : ''}" onclick="uiHelpers.selectFolder('${f.id}')">${uiHelpers.escapeHtml(f.name)}</div>`).join(''); },
-            addLink: () => {
-                const input = document.getElementById('linkInput'); let val = input.value.trim(); let cleanVal = val.replace('#', ''); 
-                if (!isNaN(cleanVal) && cleanVal !== '') val = '#' + String(cleanVal).padStart(4, '0'); else { val = val.toUpperCase(); if(!val.startsWith('#')) val = '#' + val; }
-                const targetNote = db.getNoteByDisplayId(val);
-                if(!targetNote) return uiHelpers.showToast('Not bulunamadı!', 'danger'); if(targetNote.id === state.currentId) return uiHelpers.showToast('Kendisine bağlayamazsın!', 'danger');
-                const currentNote = db.getNote(state.currentId); if(!currentNote.links) currentNote.links = [];
-                if(!currentNote.links.includes(targetNote.id)) { currentNote.links.push(targetNote.id); db.save(); }
-                input.value = ''; appController.renderLinks(); document.getElementById('smartSuggestionPanel').style.display = 'none';
-            },
-            renderLinks: () => {
-                const container = document.getElementById('linkedNotesContainer'); const note = db.getNote(state.currentId);
-                if(!note || !note.links || note.links.length === 0) return container.innerHTML = '<div style="opacity:0.5; font-size:0.75rem;">Henüz bağlantı yok.</div>';
-                container.innerHTML = note.links.map(linkId => {
-                    const linked = db.getNote(linkId); if(!linked) return '';
-                    return `<div class="link-preview-box" onclick="dbManager.openPreview('${linked.id}')"><div class="link-header"><span>${linked.displayId} - ${linked.icon||'📄'} ${uiHelpers.escapeHtml(linked.title || linked.tag)}</span><button class="btn btn-icon-only" style="color:var(--danger); padding:2px;" onclick="event.stopPropagation(); appController.removeLink('${linked.id}')">✕</button></div><div style="color:var(--text-primary); opacity:0.9;">${uiHelpers.escapeHtml((linked.synthesis || linked.source).substring(0, 60))}...</div></div>`;
-                }).join('');
-            },
-            removeLink: (idToRemove) => { const note = db.getNote(state.currentId); note.links = note.links.filter(id => id !== idToRemove); db.save(); appController.renderLinks(); },
-            renderRecentActivities: () => {
-                const shelf = document.getElementById('recentActivitiesShelf'); const recents = state.notes.filter(n => n.status === 'archived').slice(0, 5);
-                if(recents.length === 0) return shelf.innerHTML = '<div style="opacity:0.5; font-size:0.8rem;">İş bulunamadı.</div>';
-                shelf.innerHTML = recents.map(n => `<div class="card glass" onclick="dbManager.openPreview('${n.id}')" style="flex: 0 0 100px; height: 90px;"><span class="card-tag" style="font-size:0.55rem;">${n.displayId}</span><div class="card-title" style="font-size:0.7rem; margin-top:4px;">${n.icon||'📄'} ${uiHelpers.escapeHtml(n.title || n.tag)}</div><div class="card-date" style="font-size:0.55rem;">${n.date ? uiHelpers.formatDate(n.date) : ''}</div></div>`).join('');
-            }
-        };
-
-        const dbManager = {
-            open: () => { document.getElementById('globalSearch').value = ''; state.isSelectionMode = false; state.selectedNotes.clear(); document.getElementById('selectionActionBar').style.display = 'none'; dbManager.renderFolderTabs(); dbManager.renderGrid(); document.getElementById('dbModal').showModal(); },
-            close: () => { document.getElementById('dbModal').close(); state.isSelectionMode = false; },
-            createNewFolder: () => { const name = prompt("Yeni klasör adı:"); if (name && name.trim() !== "") { state.folders.push({ id: 'f_' + Date.now(), name: name.trim() }); db.save(); appController.renderFolderSelect(); dbManager.renderFolderTabs(); } },
-            editCurrentFolder: () => { if(state.dbActiveFolder === 'genel') return; const folder = state.folders.find(f => f.id === state.dbActiveFolder); const newName = prompt("Yeni ad:", folder.name); if(newName && newName.trim() !== "") { folder.name = newName.trim(); db.save(); dbManager.renderFolderTabs(); appController.renderFolderSelect(); } },
-            deleteCurrentFolder: () => {
-                if(state.dbActiveFolder === 'genel') return; const folderNotes = state.notes.filter(n => n.folderId === state.dbActiveFolder);
-                let msg = folderNotes.length > 0 ? `Bu klasörde ${folderNotes.length} not var. Silerseniz "Genel" klasörüne taşınacak. Onaylıyor musunuz?` : "Bu klasörü silmek istediğinize emin misiniz?";
-                uiHelpers.showConfirm("Klasörü Sil", msg, (res) => { if(res) { folderNotes.forEach(n => n.folderId = 'genel'); state.folders = state.folders.filter(f => f.id !== state.dbActiveFolder); state.dbActiveFolder = 'genel'; db.save(); dbManager.renderFolderTabs(); appController.renderFolderSelect(); uiHelpers.showToast("Klasör silindi."); } });
-            },
-            renderFolderTabs: () => { 
-                document.getElementById('dbFolderTabs').innerHTML = state.folders.map(f => `<div class="chip ${f.id === state.dbActiveFolder ? 'active' : ''}" onclick="dbManager.switchFolder('${f.id}')">${uiHelpers.escapeHtml(f.name)}</div>`).join(''); 
-                document.getElementById('btnEditFolder').style.display = state.dbActiveFolder === 'genel' ? 'none' : 'block'; document.getElementById('btnDeleteFolder').style.display = state.dbActiveFolder === 'genel' ? 'none' : 'block';
-                document.getElementById('bulkMoveFolderSelect').innerHTML = '<option value="">📁 Taşı...</option>' + state.folders.map(f => `<option value="${f.id}">${uiHelpers.escapeHtml(f.name)}</option>`).join('');
-                dbManager.renderGrid();
-            },
-            switchFolder: (id) => { state.dbActiveFolder = id; document.getElementById('globalSearch').value = ''; state.selectedNotes.clear(); dbManager.updateSelectionUI(); dbManager.renderFolderTabs(); },
-            
-            toggleSelectionMode: () => {
-                state.isSelectionMode = !state.isSelectionMode; state.selectedNotes.clear();
-                const btn = document.getElementById('btnSelectionMode'); btn.style.background = state.isSelectionMode ? 'var(--accent)' : ''; btn.style.color = state.isSelectionMode ? 'white' : '';
-                dbManager.updateSelectionUI(); dbManager.renderGrid();
-            },
-            toggleNoteSelection: (id, cardElement) => { if(state.selectedNotes.has(id)) { state.selectedNotes.delete(id); cardElement.classList.remove('selected'); } else { state.selectedNotes.add(id); cardElement.classList.add('selected'); } dbManager.updateSelectionUI(); },
-            updateSelectionUI: () => { const bar = document.getElementById('selectionActionBar'); if(state.isSelectionMode && state.selectedNotes.size > 0) { bar.style.display = 'flex'; document.getElementById('selectionCount').innerText = `${state.selectedNotes.size} Seçildi`; } else { bar.style.display = 'none'; } },
-            bulkDelete: () => { uiHelpers.showConfirm("Toplu Sil", `${state.selectedNotes.size} notu silmek istediğinize emin misiniz?`, (res) => { if(res) { state.notes = state.notes.filter(n => !state.selectedNotes.has(n.id)); state.notes.forEach(n => { if(n.links) n.links = n.links.filter(lid => !state.selectedNotes.has(lid)); }); state.selectedNotes.clear(); dbManager.toggleSelectionMode(); db.save(); dbManager.renderGrid(); uiHelpers.showToast("Notlar silindi."); } }); },
-            bulkMove: (newFolderId) => { if(!newFolderId) return; state.notes.forEach(n => { if(state.selectedNotes.has(n.id)) n.folderId = newFolderId; }); state.selectedNotes.clear(); dbManager.toggleSelectionMode(); document.getElementById('bulkMoveFolderSelect').value = ""; db.save(); dbManager.renderGrid(); uiHelpers.showToast("Notlar taşındı."); },
-
-            renderGrid: () => {
-                const grid = document.getElementById('dbGrid'); const searchTerm = document.getElementById('globalSearch').value.trim().toLowerCase();
-                let filtered = state.notes.filter(n => n.status === 'archived');
-                if(searchTerm !== "") { filtered = filtered.filter(n => (n.displayId && n.displayId.toLowerCase().includes(searchTerm)) || (n.title && n.title.toLowerCase().includes(searchTerm)) || (n.synthesis && n.synthesis.toLowerCase().includes(searchTerm)) || (n.tag && n.tag.toLowerCase().includes(searchTerm)) || (n.source && n.source.toLowerCase().includes(searchTerm))); } 
-                else { filtered = filtered.filter(n => n.folderId === state.dbActiveFolder); }
-
-                document.getElementById('dbNoteCount').innerText = `(${filtered.length} İstasyon)`;
-                if (filtered.length === 0) return grid.innerHTML = '<div style="color:var(--text-secondary); grid-column:1/-1;">Kayıt bulunamadı.</div>';
-                
-                grid.innerHTML = filtered.map(n => {
-                    const totalLinks = (n.links ? n.links.length : 0) + db.getBacklinks(n.id).length;
-                    const linkBadge = totalLinks > 0 ? `<span style="font-size:0.6rem; color:var(--accent); font-weight:600; margin-left:4px;">🔗 ${totalLinks}</span>` : '';
-                    const isSel = state.selectedNotes.has(n.id) ? 'selected' : '';
-                    const onClick = state.isSelectionMode ? `dbManager.toggleNoteSelection('${n.id}', this)` : `dbManager.openPreview('${n.id}')`;
-
-                    return `<div class="card glass ${isSel}" onclick="${onClick}"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;"><span class="card-tag">${n.tag}</span><div><span style="font-size:0.6rem; font-weight:bold; color:var(--text-secondary);">${n.displayId}</span>${linkBadge}</div></div><div class="card-title">${n.icon||'📄'} ${uiHelpers.escapeHtml(n.title || 'Başlıksız')}</div><div class="card-content">${uiHelpers.escapeHtml(n.synthesis || n.source)}</div><div class="card-date">${n.date ? uiHelpers.formatDate(n.date) : ''}</div></div>`;
-                }).join('');
-            },
-            
-            moveCurrentPreviewNote: (newFolderId) => { const note = db.getNote(state.previewActiveNoteId); if(note && note.folderId !== newFolderId) { note.folderId = newFolderId; db.save(); dbManager.renderGrid(); uiHelpers.showToast('Taşındı.'); } },
-            openPreview: (id) => {
-                if(state.isSelectionMode) return; 
-                const note = db.getNote(id); if (!note) return; state.previewActiveNoteId = id; const modal = document.getElementById('previewModal');
-                document.getElementById('previewIdBadge').innerText = note.displayId;
-                document.getElementById('previewTitle').innerText = (note.icon||'📄') + ' ' + (note.title || 'Başlıksız İstasyon');
-                const folderSelect = document.getElementById('previewFolderSelect'); folderSelect.innerHTML = state.folders.map(f => `<option value="${f.id}" ${f.id === note.folderId ? 'selected' : ''}>📁 ${uiHelpers.escapeHtml(f.name)}</option>`).join('');
-                
-                const synthBlock = document.getElementById('previewSynthesisBlock'); const synthText = document.getElementById('previewSynthesisText');
-                document.getElementById('previewSynthesis').classList.remove('fullscreen-mode');
-                if (note.synthesis) { synthBlock.style.display = 'block'; synthText.innerHTML = uiHelpers.escapeHtml(note.synthesis).replace(/\n/g, '<br>'); } else synthBlock.style.display = 'none';
-                
-                const coresUl = document.getElementById('previewCores');
-                if(note.cores && note.cores.length > 0) coresUl.innerHTML = note.cores.map(c => `<li>${uiHelpers.escapeHtml(c)}</li>`).join(''); else coresUl.innerHTML = '<li style="opacity:0.5;">Çekirdek eklenmemiş.</li>';
-                document.getElementById('previewSource').innerHTML = uiHelpers.escapeHtml(note.source).replace(/\n/g, '<br>');
-                
-                const linksContainer = document.getElementById('previewLinkedNodes');
-                if(!note.links || note.links.length === 0) linksContainer.innerHTML = '<div style="opacity:0.5; font-size:0.75rem;">Giden bağlantı yok.</div>';
-                else linksContainer.innerHTML = note.links.map(linkId => { const linked = db.getNote(linkId); if(!linked) return ''; return `<div class="link-preview-box" onclick="dbManager.openPreview('${linked.id}')"><div class="link-header"><span>${linked.displayId} - ${linked.icon||'📄'} ${uiHelpers.escapeHtml(linked.title || linked.tag)}</span></div><div style="color:var(--text-primary); opacity:0.9;">${uiHelpers.escapeHtml((linked.synthesis || linked.source).substring(0, 60))}...</div></div>`; }).join('');
-
-                const backlinksBlock = document.getElementById('previewBacklinksBlock'); const backlinksContainer = document.getElementById('previewBacklinkedNodes');
-                const backlinks = db.getBacklinks(id);
-                if(backlinks.length === 0) { backlinksBlock.style.display = 'none'; } else {
-                    backlinksBlock.style.display = 'block';
-                    backlinksContainer.innerHTML = backlinks.map(linked => { return `<div class="link-preview-box" onclick="dbManager.openPreview('${linked.id}')"><div class="link-header"><span>${linked.displayId} - ${linked.icon||'📄'} ${uiHelpers.escapeHtml(linked.title || linked.tag)}</span></div><div style="color:var(--text-primary); opacity:0.9;">${uiHelpers.escapeHtml((linked.synthesis || linked.source).substring(0, 60))}...</div></div>`; }).join('');
-                }
-
-                document.getElementById('btnEditNote').onclick = () => appController.loadNoteForEdit(id);
-                document.getElementById('btnDeleteNote').onclick = () => db.deleteNote(id);
-                modal.showModal();
-            }
-        };
-
-        window.onload = appController.init;
-    </script>
+    var SZ={qt:"m",pg:"s",pb:"m",pcl:"m"}, SZK="notlarim-ui-v1";
+  try{var u=JSON.parse(localStorage.getItem(SZK)||"{}");Object.keys(SZ).forEach(function(k){if(/^[sml]$/.test(u[k]))SZ[k]=u[k]})}catch(e){}
+  function applySz(id){
+    var t=$(id); t.classList.remove("s","m","l"); t.classList.add("box",SZ[id]);
+    document.querySelectorAll('.szb[data-for="'+id+'"] .sz').forEach(function(x){var on=x.getAttribute("data-s")===SZ[id];x.classList.toggle("on",on);x.setAttribute("aria-pressed",on?"true":"false")});
+  }
+  Object.keys(SZ).forEach(function(id){
+    $(id).insertAdjacentHTML("beforebegin",'<div class="szb" data-for="'+id+'"><span>Kutu boyutu</span><button class="sz s" data-s="s" type="button" aria-label="Küçük kutu"></button><button class="sz m" data-s="m" type="button" aria-label="Orta kutu"></button><button class="sz l" data-s="l" type="button" aria-label="Büyük kutu"></button></div>');
+    applySz(id);
+  });
+  document.addEventListener("click",function(e){
+    var b=e.target.closest(".sz"); if(!b)return;
+    var id=b.parentNode.getAttribute("data-for"); SZ[id]=b.getAttribute("data-s"); applySz(id);
+    try{localStorage.setItem(SZK,JSON.stringify(SZ))}catch(er){}
+  });
+  resetT(); renderSteps(); renderKw(); refresh();
+})();
+</script>
 </body>
 </html>
